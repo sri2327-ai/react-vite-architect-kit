@@ -14,7 +14,7 @@ import {
   CardContent,
   Chip,
 } from '@mui/material';
-import { CheckCircle, User, Settings, CreditCard } from '@mui/icons-material';
+import { CheckCircle, Person, Settings, CreditCard } from '@mui/icons-material';
 import { PrimaryButton } from '@/components/ui/Buttons';
 
 interface WelcomePopupProps {
@@ -24,7 +24,7 @@ interface WelcomePopupProps {
 
 const gettingStartedSteps = [
   {
-    icon: <User sx={{ fontSize: 20 }} />,
+    icon: <Person sx={{ fontSize: 20 }} />,
     title: 'Create Account',
     description: 'Set up your S10.AI account with basic information',
     status: 'active'
