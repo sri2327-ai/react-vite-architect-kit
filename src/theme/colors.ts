@@ -29,5 +29,9 @@ export const bravoColors = {
   icons: {
     primary: '#888888', // Updated to grey for icons
     secondary: '#666666', // Updated to darker grey for secondary icons
+  },
+  highlight: {
+    selected: '#E3F2FD', // Light blue highlight for selected items
+    hover: '#F5F9FF', // Very light blue for hover states
   }
 };

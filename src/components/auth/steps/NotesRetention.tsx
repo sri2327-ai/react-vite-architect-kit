@@ -81,10 +81,10 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                   cursor: 'pointer',
                   border: retentionDuration === option.value ? 2 : 1,
                   borderColor: retentionDuration === option.value ? 'primary.main' : 'divider',
-                  backgroundColor: retentionDuration === option.value ? 'primary.light' : 'background.paper',
+                  backgroundColor: retentionDuration === option.value ? '#E3F2FD' : 'background.paper',
                   '&:hover': {
                     borderColor: 'primary.main',
-                    backgroundColor: 'background.light',
+                    backgroundColor: '#F5F9FF',
                   },
                   transition: 'all 0.2s ease-in-out',
                 }}
@@ -97,7 +97,7 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                         <Storage 
-                          color={retentionDuration === option.value ? 'primary' : 'action'} 
+                          sx={{ color: retentionDuration === option.value ? 'primary.main' : '#888888' }}
                         />
                         <Box sx={{ flex: 1 }}>
                           <Typography

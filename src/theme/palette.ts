@@ -10,7 +10,6 @@ export const lightPalette: PaletteOptions = {
   },
   secondary: {
     main: bravoColors.secondary,
-    light: bravoColors.tertiary,
     dark: bravoColors.primaryDark,
   },
   background: {
@@ -41,6 +40,10 @@ export const lightPalette: PaletteOptions = {
     light: '#4caf50',
     dark: '#1b5e20',
   },
+  action: {
+    selected: bravoColors.highlight.selected,
+    hover: bravoColors.highlight.hover,
+  },
 };
 
 export const darkPalette: PaletteOptions = {
@@ -51,7 +54,6 @@ export const darkPalette: PaletteOptions = {
   },
   secondary: {
     main: bravoColors.secondary,
-    light: bravoColors.tertiary,
     dark: bravoColors.primaryFlat,
   },
   background: {
@@ -81,5 +83,9 @@ export const darkPalette: PaletteOptions = {
     main: '#4caf50',
     light: '#81c784',
     dark: '#388e3c',
+  },
+  action: {
+    selected: bravoColors.highlight.selected,
+    hover: bravoColors.highlight.hover,
   },
 };
