@@ -1,23 +1,31 @@
 
 import React from 'react';
 import { Button, ButtonProps } from '@mui/material';
+import { bravoColors } from '@/theme/colors';
 
-interface SecondaryButtonProps extends ButtonProps {
-  children: React.ReactNode;
-}
-
-export const SecondaryButton: React.FC<SecondaryButtonProps> = ({
-  children,
-  variant = 'outlined',
-  color = 'primary',
-  size = 'medium',
-  ...props
-}) => {
+export const SecondaryButton: React.FC<ButtonProps> = ({ children, sx, ...props }) => {
   return (
     <Button
-      variant={variant}
-      color={color}
-      size={size}
+      variant="outlined"
+      sx={{
+        borderColor: bravoColors.primary,
+        color: bravoColors.primary,
+        fontWeight: 600,
+        borderRadius: 2,
+        textTransform: 'none',
+        borderWidth: 2,
+        '&:hover': {
+          borderColor: bravoColors.secondary,
+          backgroundColor: bravoColors.background.light,
+          borderWidth: 2,
+          transform: 'translateY(-1px)',
+        },
+        '&:active': {
+          transform: 'translateY(0px)',
+        },
+        transition: 'all 0.2s ease-in-out',
+        ...sx,
+      }}
       {...props}
     >
       {children}

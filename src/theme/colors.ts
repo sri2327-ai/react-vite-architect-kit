@@ -9,13 +9,22 @@ export const bravoColors = {
     dark: '#387E89', // Dark Teal Blue for darker background sections if needed
   },
   text: {
-    primary: '#143151', // Dark Navy Blue for primary text (headings)
-    secondary: '#387E89', // Dark Teal Blue for body text
-    light: '#5192AE', // Medium Teal Blue for lighter text (e.g., captions)
-    white: '#FFFFFF', // White for text on colored backgrounds (e.g., buttons)
+    primary: '#000000', // Black for primary text (headings)
+    secondary: '#000000', // Black for secondary text 
+    light: '#333333', // Dark grey for light text to ensure visibility
+    white: '#FFFFFF', // White for text on colored backgrounds
+    lightGrey: '#CCCCCC', // Light grey for secondary text on colored backgrounds
   },
   accent: {
-    blue: '#5192AE', // Medium Teal Blue for accents (icons, borders)
+    blue: '#387E89', // Medium Teal Blue for accents (icons, borders)
     purple: '#A5CCF3', // Light Sky Blue repurposed as a secondary accent
+  },
+  button: {
+    gradient: 'linear-gradient(90deg, #143151, #387E89)', // Updated button gradient to match primary
+    hover: 'linear-gradient(90deg, #0d1f31, #2c6269)', // Slightly darker for hover state
+  },
+  icons: {
+    primary: '#888888', // Updated to grey for icons
+    secondary: '#666666', // Updated to darker grey for secondary icons
   }
 };

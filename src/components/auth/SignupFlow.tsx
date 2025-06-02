@@ -27,6 +27,12 @@ export interface SignupData {
   ehrSystem: string;
   needsMeeting: boolean;
   
+  // Meeting booking
+  meetingScheduled: boolean;
+  meetingDate: string;
+  meetingTime: string;
+  meetingNotes: string;
+  
   // Notes Retention
   retentionDuration: string;
   
