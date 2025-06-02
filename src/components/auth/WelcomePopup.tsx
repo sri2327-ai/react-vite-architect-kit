@@ -7,14 +7,16 @@ import {
   DialogActions,
   Typography,
   Box,
-  Step,
-  Stepper,
-  StepLabel,
-  StepContent,
   Card,
   CardContent,
+  Chip,
 } from '@mui/material';
-import { CheckCircle, AccountCircle, Info, Settings, Payment } from '@mui/icons-material';
+import { 
+  UserPlus, 
+  User, 
+  Settings, 
+  Sparkles 
+} from 'lucide-react';
 import { PrimaryButton } from '@/components/ui/Buttons';
 
 interface WelcomePopupProps {
@@ -25,27 +27,31 @@ interface WelcomePopupProps {
 const steps = [
   {
     label: 'Create Your Account',
-    description: 'Sign up with your email or Google account',
-    icon: <AccountCircle color="primary" />,
-    details: 'Quick and secure registration process'
+    description: 'Quick and secure registration in under 2 minutes',
+    icon: <UserPlus size={24} />,
+    details: 'Sign up with email or continue with Google',
+    color: '#E8F5E8'
   },
   {
-    label: 'Professional Information',
-    description: 'Tell us about your medical practice',
-    icon: <Info color="primary" />,
-    details: 'Help us customize your experience'
+    label: 'Professional Setup',
+    description: 'Customize S10.AI for your medical practice',
+    icon: <User size={24} />,
+    details: 'Tell us about your specialty and preferences',
+    color: '#E8F0FF'
   },
   {
-    label: 'Optional EHR Integration',
+    label: 'EHR Integration',
     description: 'Connect your Electronic Health Records (optional)',
-    icon: <Settings color="primary" />,
-    details: 'Skip this step if you prefer to start without EHR'
+    icon: <Settings size={24} />,
+    details: 'Skip this step to start immediately without EHR',
+    color: '#FFF8E8'
   },
   {
-    label: 'Start Using S10.AI',
-    description: 'Begin documenting with AI assistance',
-    icon: <CheckCircle color="primary" />,
-    details: 'Transform your clinical documentation workflow'
+    label: 'Start Documenting',
+    description: 'Begin using AI-powered clinical documentation',
+    icon: <Sparkles size={24} />,
+    details: 'Transform your workflow in minutes',
+    color: '#F0E8FF'
   }
 ];
 
@@ -54,88 +60,172 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       sx={{
         '& .MuiDialog-paper': {
-          borderRadius: 3,
-          background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+          borderRadius: 4,
+          background: 'linear-gradient(135deg, #fafbfc 0%, #ffffff 100%)',
+          boxShadow: '0 20px 60px rgba(20, 49, 81, 0.15)',
+          overflow: 'hidden'
         }
       }}
     >
-      <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+      <DialogTitle sx={{ textAlign: 'center', pb: 2, pt: 4 }}>
+        <Box sx={{ mb: 2 }}>
+          <Box 
+            component="img" 
+            src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png" 
+            alt="S10.AI Logo" 
+            sx={{
+              height: 48,
+              mb: 2
+            }} 
+          />
+        </Box>
         <Typography
-          variant="h4"
+          variant="h3"
           sx={{
-            fontWeight: 700,
-            background: 'linear-gradient(90deg, #143151, #387E89)',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #143151, #387E89)',
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 1
+            mb: 1,
+            fontSize: { xs: '1.75rem', sm: '2.25rem' }
           }}
         >
           Welcome to S10.AI
         </Typography>
-        <Typography variant="subtitle1" color="text.secondary">
+        <Typography 
+          variant="h6" 
+          color="text.secondary"
+          sx={{ 
+            fontWeight: 500,
+            fontSize: { xs: '1rem', sm: '1.125rem' }
+          }}
+        >
           Your AI-powered clinical documentation assistant
         </Typography>
+        <Chip 
+          label="✨ Get started in under 5 minutes"
+          sx={{
+            mt: 2,
+            backgroundColor: '#E8F5E8',
+            color: '#2E7D32',
+            fontWeight: 600,
+            fontSize: '0.875rem'
+          }}
+        />
       </DialogTitle>
 
-      <DialogContent sx={{ px: 4, py: 3 }}>
+      <DialogContent sx={{ px: 5, py: 4 }}>
         <Typography
-          variant="h6"
-          sx={{ mb: 3, textAlign: 'center', fontWeight: 600 }}
+          variant="h5"
+          sx={{ 
+            mb: 4, 
+            textAlign: 'center', 
+            fontWeight: 700,
+            color: 'text.primary'
+          }}
         >
-          Getting started is simple - here's how:
+          Here's how it works:
         </Typography>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ display: 'grid', gap: 3 }}>
           {steps.map((step, index) => (
             <Card
               key={index}
               sx={{
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-                transition: 'all 0.2s ease',
+                border: '2px solid transparent',
+                borderRadius: 3,
+                background: `linear-gradient(white, white) padding-box, linear-gradient(135deg, #387E89, #A5CCF3) border-box`,
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  borderColor: 'primary.main',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 4px 12px rgba(20, 49, 81, 0.15)'
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 12px 40px rgba(56, 126, 137, 0.2)',
+                  '& .step-number': {
+                    transform: 'scale(1.1)',
+                    background: 'linear-gradient(135deg, #143151, #387E89)',
+                  }
                 }
               }}
             >
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+              <CardContent sx={{ p: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                   <Box
+                    className="step-number"
                     sx={{
-                      minWidth: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, #143151, #387E89)',
+                      minWidth: 56,
+                      height: 56,
+                      borderRadius: '16px',
+                      background: step.color,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: 'white',
-                      fontWeight: 700,
-                      fontSize: '1.1rem'
+                      color: '#387E89',
+                      fontWeight: 800,
+                      fontSize: '1.25rem',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1))',
+                        borderRadius: '16px'
+                      }
                     }}
                   >
-                    {index + 1}
+                    {step.icon}
                   </Box>
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-                      {step.label}
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ mb: 0.5 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                      <Typography 
+                        variant="h6" 
+                        sx={{ 
+                          fontWeight: 700,
+                          color: 'text.primary'
+                        }}
+                      >
+                        {step.label}
+                      </Typography>
+                      <Chip 
+                        label={`Step ${index + 1}`}
+                        size="small"
+                        sx={{
+                          backgroundColor: '#F0F8FF',
+                          color: '#387E89',
+                          fontWeight: 600,
+                          fontSize: '0.75rem'
+                        }}
+                      />
+                    </Box>
+                    <Typography 
+                      variant="body1" 
+                      sx={{ 
+                        color: 'text.secondary',
+                        fontWeight: 500,
+                        mb: 1
+                      }}
+                    >
                       {step.description}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: 'text.secondary',
+                        fontSize: '0.875rem',
+                        opacity: 0.8
+                      }}
+                    >
                       {step.details}
                     </Typography>
                   </Box>
-                  {step.icon}
                 </Box>
               </CardContent>
             </Card>
@@ -144,35 +234,55 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
 
         <Box
           sx={{
-            mt: 4,
-            p: 3,
-            backgroundColor: 'primary.light',
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: 'primary.main'
+            mt: 5,
+            p: 4,
+            background: 'linear-gradient(135deg, #F0F8FF, #E8F4F8)',
+            borderRadius: 3,
+            border: '2px solid #D6E8F5',
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2))',
+              borderRadius: 3
+            }
           }}
         >
-          <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
-            💡 Pro Tip:
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            You can always skip the EHR integration step and add it later. 
-            Start documenting immediately with our no-EHR mode!
-          </Typography>
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, color: '#143151' }}>
+              💡 Pro Tip
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+              You can always skip the EHR integration step and add it later. 
+              Start documenting immediately with our no-EHR mode!
+            </Typography>
+          </Box>
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ px: 4, pb: 3 }}>
+      <DialogActions sx={{ px: 5, pb: 4, pt: 2 }}>
         <PrimaryButton
           onClick={onClose}
           fullWidth
           sx={{
-            py: 1.5,
-            fontWeight: 600,
-            fontSize: '1rem'
+            py: 2,
+            fontWeight: 700,
+            fontSize: '1.1rem',
+            borderRadius: 3,
+            textTransform: 'none',
+            boxShadow: '0 8px 24px rgba(20, 49, 81, 0.3)',
+            '&:hover': {
+              boxShadow: '0 12px 32px rgba(20, 49, 81, 0.4)',
+              transform: 'translateY(-2px)'
+            }
           }}
         >
-          Let's Get Started
+          Let's Get Started →
         </PrimaryButton>
       </DialogActions>
     </Dialog>
