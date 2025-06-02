@@ -13,7 +13,7 @@ import {
   IconButton,
   Link,
 } from '@mui/material';
-import { Visibility, VisibilityOff, Mail } from '@mui/icons-material';
+import { Visibility, VisibilityOff, Google, Mail } from '@mui/icons-material';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -36,9 +36,14 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
   const [error, setError] = useState('');
 
   const handleGoogleSignup = () => {
-    // Real Google OAuth integration
-    const googleAuthUrl = `https://accounts.google.com/oauth/authorize?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/google/callback')}&scope=openid%20profile%20email&response_type=code&state=google_signup`;
-    window.location.href = googleAuthUrl;
+    // Simulate Google OAuth
+    setFormData(prev => ({
+      ...prev,
+      email: 'user@gmail.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      isGoogleSignup: true,
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,15 +85,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
       </Typography>
 
       {error && (
-        <Alert
-          severity="error"
-          sx={{
-            mb: 3,
-            borderRadius: 3,
-            border: 'none',
-            boxShadow: '0 4px 12px rgba(211, 47, 47, 0.15)',
-          }}
-        >
+        <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
           {error}
         </Alert>
       )}
@@ -98,47 +95,23 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
           <SecondaryButton
             fullWidth
             onClick={handleGoogleSignup}
-            startIcon={
-              <Box
-                component="img"
-                src="/lovable-uploads/aedc49ae-9a96-4f24-b6d7-2a15e4ec0bb1.png"
-                alt="Google"
-                sx={{ width: 20, height: 20 }}
-              />
-            }
+            startIcon={<Google />}
             sx={{
               mb: 3,
-              py: 2,
-              fontSize: '1rem',
-              fontWeight: 600,
-              border: '2px solid #E5E7EB',
-              borderRadius: 3,
-              backgroundColor: '#FFFFFF',
-              color: '#374151',
-              textTransform: 'none',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+              py: 1.5,
+              borderColor: 'divider',
               '&:hover': {
-                borderColor: '#143151',
-                backgroundColor: '#F8FAFC',
-                transform: 'translateY(-1px)',
-                boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
+                borderColor: 'primary.main',
+                backgroundColor: 'background.light',
               },
-              transition: 'all 0.2s ease-in-out',
             }}
           >
             Sign up with Google
           </SecondaryButton>
 
           <Divider sx={{ my: 3 }}>
-            <Typography
-              variant="body2"
-              sx={{
-                color: 'text.secondary',
-                fontWeight: 500,
-                px: 2,
-              }}
-            >
-              or sign up with email
+            <Typography variant="body2" color="text.secondary">
+              or
             </Typography>
           </Divider>
         </>
@@ -153,19 +126,6 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
             onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
             required
             disabled={formData.isGoogleSignup}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 3,
-                backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : '#FAFAFA',
-                '&:hover': {
-                  backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : '#FFFFFF',
-                },
-                '&.Mui-focused': {
-                  backgroundColor: '#FFFFFF',
-                  boxShadow: '0 0 0 3px rgba(20, 49, 81, 0.1)',
-                },
-              },
-            }}
           />
           <TextField
             fullWidth
@@ -174,19 +134,6 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
             onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
             required
             disabled={formData.isGoogleSignup}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 3,
-                backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : '#FAFAFA',
-                '&:hover': {
-                  backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : '#FFFFFF',
-                },
-                '&.Mui-focused': {
-                  backgroundColor: '#FFFFFF',
-                  boxShadow: '0 0 0 3px rgba(20, 49, 81, 0.1)',
-                },
-              },
-            }}
           />
         </Box>
 
@@ -198,24 +145,11 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
           onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
           required
           disabled={formData.isGoogleSignup}
-          sx={{
-            mb: 3,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 3,
-              backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : '#FAFAFA',
-              '&:hover': {
-                backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : '#FFFFFF',
-              },
-              '&.Mui-focused': {
-                backgroundColor: '#FFFFFF',
-                boxShadow: '0 0 0 3px rgba(20, 49, 81, 0.1)',
-              },
-            },
-          }}
+          sx={{ mb: 3 }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Mail sx={{ color: '#6B7280' }} />
+                <Mail color="action" />
               </InputAdornment>
             ),
           }}
@@ -228,20 +162,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
           value={formData.password}
           onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
           required
-          sx={{
-            mb: 4,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 3,
-              backgroundColor: '#FAFAFA',
-              '&:hover': {
-                backgroundColor: '#FFFFFF',
-              },
-              '&.Mui-focused': {
-                backgroundColor: '#FFFFFF',
-                boxShadow: '0 0 0 3px rgba(20, 49, 81, 0.1)',
-              },
-            },
-          }}
+          sx={{ mb: 4 }}
           helperText="Minimum 8 characters"
           InputProps={{
             endAdornment: (
@@ -249,7 +170,6 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                 <IconButton
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
-                  sx={{ color: '#6B7280' }}
                 >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
@@ -265,29 +185,12 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                 checked={formData.agreedToBAA}
                 onChange={(e) => setFormData(prev => ({ ...prev, agreedToBAA: e.target.checked }))}
                 size="small"
-                sx={{
-                  color: '#6B7280',
-                  '&.Mui-checked': {
-                    color: '#143151',
-                  },
-                }}
               />
             }
             label={
-              <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
+              <Typography variant="body2">
                 I agree to the{' '}
-                <Link
-                  href="#"
-                  sx={{
-                    color: '#143151',
-                    textDecoration: 'none',
-                    fontWeight: 600,
-                    '&:hover': {
-                      textDecoration: 'underline',
-                      color: '#387E89',
-                    },
-                  }}
-                >
+                <Link href="#" color="primary" sx={{ textDecoration: 'none' }}>
                   Business Associate Agreement (BAA)
                 </Link>
               </Typography>
@@ -299,29 +202,12 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                 checked={formData.agreedToTerms}
                 onChange={(e) => setFormData(prev => ({ ...prev, agreedToTerms: e.target.checked }))}
                 size="small"
-                sx={{
-                  color: '#6B7280',
-                  '&.Mui-checked': {
-                    color: '#143151',
-                  },
-                }}
               />
             }
             label={
-              <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
+              <Typography variant="body2">
                 I agree to the{' '}
-                <Link
-                  href="#"
-                  sx={{
-                    color: '#143151',
-                    textDecoration: 'none',
-                    fontWeight: 600,
-                    '&:hover': {
-                      textDecoration: 'underline',
-                      color: '#387E89',
-                    },
-                  }}
-                >
+                <Link href="#" color="primary" sx={{ textDecoration: 'none' }}>
                   Terms of Service
                 </Link>
               </Typography>
@@ -333,17 +219,8 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
           fullWidth
           type="submit"
           sx={{
-            py: 2,
+            py: 1.5,
             fontWeight: 600,
-            fontSize: '1rem',
-            borderRadius: 3,
-            textTransform: 'none',
-            boxShadow: '0 6px 20px rgba(20, 49, 81, 0.25)',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: '0 8px 25px rgba(20, 49, 81, 0.35)',
-            },
-            transition: 'all 0.2s ease-in-out',
           }}
         >
           Continue
@@ -351,25 +228,17 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
       </Box>
 
       <Box sx={{ textAlign: 'center', mt: 3 }}>
-        <Typography
-          variant="body2"
-          sx={{
-            color: 'text.secondary',
-            fontSize: '0.9rem',
-          }}
-        >
+        <Typography variant="body2" color="text.secondary">
           Already have an account?{' '}
           <Link
             href="/login"
             sx={{
-              color: '#143151',
+              color: 'primary.main',
               textDecoration: 'none',
               fontWeight: 600,
               '&:hover': {
                 textDecoration: 'underline',
-                color: '#387E89',
               },
-              transition: 'color 0.2s ease-in-out',
             }}
           >
             Sign in here
