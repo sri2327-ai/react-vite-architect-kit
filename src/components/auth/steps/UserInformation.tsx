@@ -26,19 +26,9 @@ interface UserInformationProps {
 }
 
 const specialties = [
-  'Cardiology',
-  'Dermatology',
-  'Emergency Medicine',
-  'Family Medicine',
-  'Internal Medicine',
-  'Neurology',
-  'Oncology',
-  'Orthopedics',
-  'Pediatrics',
-  'Psychiatry',
-  'Radiology',
-  'Surgery',
-  'Other',
+  'Cardiology', 'Dermatology', 'Emergency Medicine', 'Family Medicine',
+  'Internal Medicine', 'Neurology', 'Oncology', 'Orthopedics',
+  'Pediatrics', 'Psychiatry', 'Radiology', 'Surgery', 'Other',
 ];
 
 export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack, data }) => {
@@ -55,12 +45,11 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
 
   return (
     <Box sx={{ 
-      height: '100%', 
+      height: { xs: 'calc(100vh - 250px)', sm: 'calc(100vh - 300px)' },
       display: 'flex', 
-      flexDirection: 'column',
-      maxHeight: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 250px)' }
+      flexDirection: 'column'
     }}>
-      <Box sx={{ textAlign: 'center', mb: 3, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
         <Typography
           variant="h3"
           sx={{
@@ -69,8 +58,8 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 2,
-            fontSize: { xs: '1.75rem', sm: '2.25rem' }
+            mb: 1,
+            fontSize: { xs: '1.5rem', sm: '2rem' }
           }}
         >
           Professional Information
@@ -80,45 +69,42 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           color="text.secondary"
           sx={{ 
             fontWeight: 500,
-            fontSize: { xs: '1rem', sm: '1.125rem' },
-            maxWidth: 500,
+            fontSize: { xs: '0.9rem', sm: '1rem' },
+            maxWidth: 400,
             mx: 'auto'
           }}
         >
-          Help us customize S10.AI to match your medical practice and workflow
+          Customize S10.AI for your medical practice
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <Card
           sx={{
-            mb: 4,
-            borderRadius: 3,
-            border: '2px solid #F0F8FF',
+            flex: 1,
+            borderRadius: 2,
+            border: '1px solid #F0F8FF',
             backgroundColor: 'background.paper',
-            boxShadow: '0 8px 32px rgba(20, 49, 81, 0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
           }}
         >
-          <CardContent sx={{ p: 4 }}>
-            <Box component="form" onSubmit={handleSubmit}>
+          <CardContent sx={{ p: { xs: 2, sm: 3 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <TextField
                 fullWidth
                 label="Phone Number"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
                 required
-                sx={{ 
-                  mb: 4,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2
-                  }
-                }}
-                size="medium"
+                sx={{ mb: 2 }}
+                size="small"
                 placeholder="+1 (555) 123-4567"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Phone size={18} color="#888888" />
+                      <Phone size={16} color="#888888" />
                     </InputAdornment>
                   ),
                 }}
@@ -131,17 +117,12 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 value={formData.specialty}
                 onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
                 required
-                sx={{ 
-                  mb: 5,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2
-                  }
-                }}
-                size="medium"
+                sx={{ mb: 3 }}
+                size="small"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Stethoscope size={18} color="#888888" />
+                      <Stethoscope size={16} color="#888888" />
                     </InputAdornment>
                   ),
                 }}
@@ -153,47 +134,46 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 ))}
               </TextField>
 
-              <FormControl component="fieldset" sx={{ mb: 5, width: '100%' }}>
+              <FormControl component="fieldset" sx={{ flex: 1, minHeight: 0 }}>
                 <FormLabel
                   component="legend"
                   sx={{
                     color: 'text.primary',
                     fontWeight: 700,
-                    mb: 3,
-                    fontSize: '1.1rem'
+                    mb: 2,
+                    fontSize: '1rem'
                   }}
                 >
-                  Choose Your Documentation Mode
+                  Documentation Mode
                 </FormLabel>
                 <RadioGroup
                   value={formData.ehrMode}
                   onChange={(e) => setFormData(prev => ({ ...prev, ehrMode: e.target.value === 'true' }))}
+                  sx={{ flex: 1 }}
                 >
                   <Card
                     sx={{
-                      mb: 2,
+                      mb: 1.5,
                       cursor: 'pointer',
-                      border: formData.ehrMode ? '2px solid #387E89' : '2px solid #E0E7FF',
-                      borderRadius: 3,
+                      border: formData.ehrMode ? '2px solid #387E89' : '1px solid #E0E7FF',
+                      borderRadius: 2,
                       backgroundColor: formData.ehrMode ? '#F0F8FF' : 'background.paper',
-                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        borderColor: '#387E89',
-                        backgroundColor: '#F8FAFF'
+                        borderColor: '#387E89'
                       }
                     }}
                     onClick={() => setFormData(prev => ({ ...prev, ehrMode: true }))}
                   >
-                    <CardContent sx={{ p: 3 }}>
+                    <CardContent sx={{ p: 2 }}>
                       <FormControlLabel
                         value={true}
                         control={<Radio sx={{ display: 'none' }} />}
                         label={
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                            <Database size={24} color={formData.ehrMode ? '#387E89' : '#888888'} />
+                            <Database size={20} color={formData.ehrMode ? '#387E89' : '#888888'} />
                             <Box sx={{ flex: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                                <Typography variant="h6" fontWeight={700} color={formData.ehrMode ? 'primary.main' : 'text.primary'}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 0.5 }}>
+                                <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.95rem' }}>
                                   EHR Integration Mode
                                 </Typography>
                                 <Chip 
@@ -202,15 +182,12 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                                   sx={{
                                     backgroundColor: '#E8F5E8',
                                     color: '#2E7D32',
-                                    fontWeight: 600
+                                    fontSize: '0.7rem'
                                   }}
                                 />
                               </Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                Connect with your Electronic Health Record system for seamless workflow
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                                • Direct integration with your EHR • Automated note uploads • Streamlined workflow
+                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                                Connect with your EHR system for seamless workflow
                               </Typography>
                             </Box>
                           </Box>
@@ -223,27 +200,25 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                   <Card
                     sx={{
                       cursor: 'pointer',
-                      border: !formData.ehrMode ? '2px solid #387E89' : '2px solid #E0E7FF',
-                      borderRadius: 3,
+                      border: !formData.ehrMode ? '2px solid #387E89' : '1px solid #E0E7FF',
+                      borderRadius: 2,
                       backgroundColor: !formData.ehrMode ? '#F0F8FF' : 'background.paper',
-                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        borderColor: '#387E89',
-                        backgroundColor: '#F8FAFF'
+                        borderColor: '#387E89'
                       }
                     }}
                     onClick={() => setFormData(prev => ({ ...prev, ehrMode: false }))}
                   >
-                    <CardContent sx={{ p: 3 }}>
+                    <CardContent sx={{ p: 2 }}>
                       <FormControlLabel
                         value={false}
                         control={<Radio sx={{ display: 'none' }} />}
                         label={
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                            <X size={24} color={!formData.ehrMode ? '#387E89' : '#888888'} />
+                            <X size={20} color={!formData.ehrMode ? '#387E89' : '#888888'} />
                             <Box sx={{ flex: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                                <Typography variant="h6" fontWeight={700} color={!formData.ehrMode ? 'primary.main' : 'text.primary'}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 0.5 }}>
+                                <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.95rem' }}>
                                   No EHR Mode
                                 </Typography>
                                 <Chip 
@@ -252,15 +227,12 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                                   sx={{
                                     backgroundColor: '#FFF8E8',
                                     color: '#F57C00',
-                                    fontWeight: 600
+                                    fontSize: '0.7rem'
                                   }}
                                 />
                               </Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
                                 Start documenting immediately without EHR integration
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                                • Get started instantly • Export notes manually • Add EHR later
                               </Typography>
                             </Box>
                           </Box>
@@ -274,42 +246,40 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             </Box>
           </CardContent>
         </Card>
-      </Box>
 
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
-        gap: 2,
-        flexShrink: 0,
-        pt: 2,
-        borderTop: '1px solid #F0F8FF'
-      }}>
-        <SecondaryButton
-          onClick={onBack}
-          sx={{ 
-            flex: 1,
-            order: { xs: 2, sm: 1 },
-            py: 1.5,
-            borderRadius: 3,
-            fontWeight: 600
-          }}
-        >
-          ← Back
-        </SecondaryButton>
-        <PrimaryButton
-          type="submit"
-          onClick={handleSubmit}
-          sx={{ 
-            flex: 2, 
-            order: { xs: 1, sm: 2 },
-            py: 1.5,
-            fontWeight: 700,
-            borderRadius: 3,
-            textTransform: 'none'
-          }}
-        >
-          Continue to {formData.ehrMode ? 'EHR Setup' : 'Configuration'} →
-        </PrimaryButton>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 2,
+          flexShrink: 0,
+          pt: 2
+        }}>
+          <SecondaryButton
+            onClick={onBack}
+            sx={{ 
+              flex: 1,
+              order: { xs: 2, sm: 1 },
+              py: 1.5,
+              borderRadius: 2
+            }}
+          >
+            ← Back
+          </SecondaryButton>
+          <PrimaryButton
+            type="submit"
+            onClick={handleSubmit}
+            sx={{ 
+              flex: 2, 
+              order: { xs: 1, sm: 2 },
+              py: 1.5,
+              fontWeight: 700,
+              borderRadius: 2,
+              fontSize: { xs: '0.9rem', sm: '1rem' }
+            }}
+          >
+            Continue to {formData.ehrMode ? 'EHR Setup' : 'Configuration'} →
+          </PrimaryButton>
+        </Box>
       </Box>
     </Box>
   );

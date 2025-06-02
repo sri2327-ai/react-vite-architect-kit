@@ -27,42 +27,37 @@ const retentionOptions = [
   { 
     value: '1year', 
     label: '1 Year', 
-    description: 'Standard retention period',
-    icon: <Clock size={24} />,
-    recommended: false,
-    color: '#E3F2FD'
+    description: 'Standard retention',
+    icon: <Clock size={20} />,
+    recommended: false
   },
   { 
     value: '3years', 
     label: '3 Years', 
-    description: 'Extended retention for most practices',
-    icon: <HardDrive size={24} />,
-    recommended: true,
-    color: '#E8F5E8'
+    description: 'Extended retention',
+    icon: <HardDrive size={20} />,
+    recommended: true
   },
   { 
     value: '5years', 
     label: '5 Years', 
-    description: 'Long-term storage for compliance',
-    icon: <Shield size={24} />,
-    recommended: false,
-    color: '#FFF3E0'
+    description: 'Long-term storage',
+    icon: <Shield size={20} />,
+    recommended: false
   },
   { 
     value: '7years', 
     label: '7 Years', 
-    description: 'Maximum compliance period',
-    icon: <Shield size={24} />,
-    recommended: false,
-    color: '#F3E5F5'
+    description: 'Maximum compliance',
+    icon: <Shield size={20} />,
+    recommended: false
   },
   { 
     value: 'indefinite', 
     label: 'Indefinite', 
     description: 'No automatic deletion',
-    icon: <Infinity size={24} />,
-    recommended: false,
-    color: '#FAFAFA'
+    icon: <Infinity size={20} />,
+    recommended: false
   },
 ];
 
@@ -83,12 +78,11 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
 
   return (
     <Box sx={{ 
-      height: '100%', 
+      height: { xs: 'calc(100vh - 250px)', sm: 'calc(100vh - 300px)' },
       display: 'flex', 
-      flexDirection: 'column',
-      maxHeight: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 250px)' }
+      flexDirection: 'column'
     }}>
-      <Box sx={{ textAlign: 'center', mb: 3, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
         <Typography
           variant="h4"
           sx={{
@@ -97,8 +91,8 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 2,
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+            mb: 1,
+            fontSize: { xs: '1.4rem', sm: '1.8rem' }
           }}
         >
           Data Retention Policy
@@ -107,12 +101,11 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
           variant="body1"
           color="text.secondary"
           sx={{ 
-            fontSize: { xs: '0.875rem', sm: '1rem' },
-            px: { xs: 1, sm: 0 },
-            mb: 2
+            fontSize: { xs: '0.85rem', sm: '0.95rem' },
+            mb: 1
           }}
         >
-          Choose how long you want to securely store your clinical notes
+          Choose how long to securely store your clinical notes
         </Typography>
         
         <Box sx={{ 
@@ -120,35 +113,35 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
           alignItems: 'center', 
           gap: 1,
           backgroundColor: '#E8F5E8',
-          px: 2,
-          py: 1,
-          borderRadius: 2,
+          px: 1.5,
+          py: 0.5,
+          borderRadius: 1,
           border: '1px solid #C8E6C9'
         }}>
-          <Shield size={16} color="#2E7D32" />
-          <Typography variant="body2" sx={{ color: '#2E7D32', fontWeight: 600 }}>
+          <Shield size={14} color="#2E7D32" />
+          <Typography variant="body2" sx={{ color: '#2E7D32', fontWeight: 600, fontSize: '0.8rem' }}>
             HIPAA compliant • Bank-level security
           </Typography>
         </Box>
       </Box>
 
-      <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
-        {/* Security Features */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <Card
           sx={{
             background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
-            border: '2px solid #E8F4F8',
-            borderRadius: 3,
-            mb: 4
+            border: '1px solid #E8F4F8',
+            borderRadius: 2,
+            mb: 2,
+            flexShrink: 0
           }}
         >
-          <CardContent sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+          <CardContent sx={{ p: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
               <Box
                 sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '10px',
+                  width: 32,
+                  height: 32,
+                  borderRadius: '8px',
                   background: 'linear-gradient(135deg, #143151, #387E89)',
                   display: 'flex',
                   alignItems: 'center',
@@ -156,18 +149,18 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                   color: 'white'
                 }}
               >
-                <Shield size={20} />
+                <Shield size={16} />
               </Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', fontSize: '1rem' }}>
                 Your Data is Protected
               </Typography>
             </Box>
-            <Grid container spacing={2}>
+            <Grid container spacing={1}>
               {securityFeatures.map((feature, index) => (
-                <Grid key={index} size={{ xs: 12, sm: 6 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CheckCircle2 size={16} color="#2E7D32" />
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                <Grid key={index} size={{ xs: 6, sm: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <CheckCircle2 size={12} color="#2E7D32" />
+                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
                       {feature}
                     </Typography>
                   </Box>
@@ -180,58 +173,45 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
         <Alert
           severity="info"
           sx={{ 
-            mb: 4, 
-            borderRadius: 3,
-            backgroundColor: '#F0F8FF',
-            borderColor: '#D6E8F5'
+            mb: 2, 
+            borderRadius: 2,
+            flexShrink: 0,
+            '& .MuiAlert-message': {
+              fontSize: '0.8rem'
+            }
           }}
-          icon={<Shield size={20} />}
+          icon={<Shield size={18} />}
         >
-          All notes are encrypted and stored securely. You can change this setting anytime in your account preferences.
+          All notes are encrypted and stored securely. Change this setting anytime.
         </Alert>
 
-        <Box component="form" onSubmit={handleSubmit}>
-          <FormControl component="fieldset" fullWidth sx={{ mb: 4 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, minHeight: 0 }}>
+          <FormControl component="fieldset" fullWidth sx={{ height: '100%' }}>
             <RadioGroup
               value={retentionDuration}
               onChange={(e) => setRetentionDuration(e.target.value)}
+              sx={{ height: '100%' }}
             >
-              <Grid container spacing={2}>
+              <Grid container spacing={1.5} sx={{ height: '100%', overflow: 'auto' }}>
                 {retentionOptions.map((option) => (
-                  <Grid key={option.value} size={{ xs: 12, sm: 6, lg: 4 }}>
+                  <Grid key={option.value} size={{ xs: 6, sm: 4, lg: 2.4 }}>
                     <Card
                       sx={{
                         cursor: 'pointer',
-                        border: retentionDuration === option.value ? 3 : 2,
-                        borderColor: retentionDuration === option.value ? 'primary.main' : 'transparent',
+                        border: retentionDuration === option.value ? 2 : 1,
+                        borderColor: retentionDuration === option.value ? 'primary.main' : '#E0E7FF',
                         background: retentionDuration === option.value 
                           ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
-                          : `linear-gradient(135deg, ${option.color} 0%, #FFFFFF 100%)`,
-                        borderRadius: 3,
+                          : 'background.paper',
+                        borderRadius: 2,
                         position: 'relative',
-                        overflow: 'hidden',
-                        height: '100%',
-                        minHeight: 160,
+                        height: { xs: 120, sm: 140 },
                         '&:hover': {
                           borderColor: 'primary.main',
-                          transform: 'translateY(-4px)',
-                          boxShadow: '0 12px 40px rgba(20, 49, 81, 0.15)',
-                          '& .retention-icon': {
-                            transform: 'scale(1.1) rotate(5deg)'
-                          }
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 8px 24px rgba(20, 49, 81, 0.1)'
                         },
-                        '&::before': retentionDuration === option.value ? {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0,
-                          right: 0,
-                          width: 0,
-                          height: 0,
-                          borderLeft: '24px solid transparent',
-                          borderTop: '24px solid #2E7D32',
-                          zIndex: 1
-                        } : {},
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transition: 'all 0.2s ease'
                       }}
                       onClick={() => setRetentionDuration(option.value)}
                     >
@@ -241,12 +221,12 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                           size="small"
                           sx={{
                             position: 'absolute',
-                            top: 12,
-                            left: 12,
+                            top: 8,
+                            left: 8,
                             backgroundColor: '#E8F5E8',
                             color: '#2E7D32',
                             fontWeight: 700,
-                            fontSize: '0.7rem',
+                            fontSize: '0.65rem',
                             zIndex: 2
                           }}
                         />
@@ -254,12 +234,14 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
 
                       {retentionDuration === option.value && (
                         <CheckCircle2 
-                          size={14} 
+                          size={12} 
                           color="white" 
                           style={{
                             position: 'absolute',
                             top: 4,
                             right: 4,
+                            backgroundColor: '#2E7D32',
+                            borderRadius: '50%',
                             zIndex: 2
                           }}
                         />
@@ -267,7 +249,7 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                       
                       <CardContent sx={{ 
                         textAlign: 'center', 
-                        p: 3,
+                        p: 1.5,
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
@@ -279,23 +261,19 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                           label={
                             <Box>
                               <Box
-                                className="retention-icon"
                                 sx={{
-                                  width: 56,
-                                  height: 56,
-                                  borderRadius: '14px',
+                                  width: { xs: 36, sm: 44 },
+                                  height: { xs: 36, sm: 44 },
+                                  borderRadius: '10px',
                                   background: retentionDuration === option.value 
                                     ? 'linear-gradient(135deg, #143151, #387E89)'
                                     : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  margin: '0 auto 16px auto',
+                                  margin: '0 auto 8px auto',
                                   color: retentionDuration === option.value ? 'white' : '#666',
-                                  transition: 'all 0.3s ease',
-                                  boxShadow: retentionDuration === option.value 
-                                    ? '0 6px 20px rgba(20, 49, 81, 0.3)'
-                                    : '0 2px 8px rgba(0, 0, 0, 0.1)'
+                                  transition: 'all 0.3s ease'
                                 }}
                               >
                                 {option.icon}
@@ -304,14 +282,14 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                                 variant="h6"
                                 fontWeight={retentionDuration === option.value ? 700 : 600}
                                 color={retentionDuration === option.value ? 'primary.main' : 'text.primary'}
-                                sx={{ mb: 1, fontSize: '1.1rem' }}
+                                sx={{ mb: 0.5, fontSize: { xs: '0.9rem', sm: '1rem' } }}
                               >
                                 {option.label}
                               </Typography>
                               <Typography 
                                 variant="body2" 
                                 color="text.secondary"
-                                sx={{ fontSize: '0.875rem', lineHeight: 1.4 }}
+                                sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' }, lineHeight: 1.2 }}
                               >
                                 {option.description}
                               </Typography>
@@ -327,42 +305,41 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
             </RadioGroup>
           </FormControl>
         </Box>
-      </Box>
 
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
-        gap: 2,
-        flexShrink: 0,
-        pt: 2,
-        borderTop: '1px solid #F0F8FF'
-      }}>
-        <SecondaryButton
-          onClick={onBack}
-          sx={{ 
-            flex: 1,
-            order: { xs: 2, sm: 1 },
-            py: 1.5,
-            borderRadius: 3
-          }}
-        >
-          Back
-        </SecondaryButton>
-        <PrimaryButton
-          type="submit"
-          disabled={!retentionDuration}
-          onClick={handleSubmit}
-          sx={{ 
-            flex: 2, 
-            fontWeight: 700,
-            order: { xs: 1, sm: 2 },
-            py: 1.5,
-            borderRadius: 3,
-            fontSize: '1.1rem'
-          }}
-        >
-          Continue to Payment →
-        </PrimaryButton>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: 2,
+          flexShrink: 0,
+          pt: 2
+        }}>
+          <SecondaryButton
+            onClick={onBack}
+            sx={{ 
+              flex: 1,
+              order: { xs: 2, sm: 1 },
+              py: 1.5,
+              borderRadius: 2
+            }}
+          >
+            Back
+          </SecondaryButton>
+          <PrimaryButton
+            type="submit"
+            disabled={!retentionDuration}
+            onClick={handleSubmit}
+            sx={{ 
+              flex: 2, 
+              fontWeight: 700,
+              order: { xs: 1, sm: 2 },
+              py: 1.5,
+              borderRadius: 2,
+              fontSize: { xs: '0.9rem', sm: '1rem' }
+            }}
+          >
+            Continue to Payment →
+          </PrimaryButton>
+        </Box>
       </Box>
     </Box>
   );

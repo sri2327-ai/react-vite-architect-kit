@@ -37,7 +37,6 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
   const [error, setError] = useState('');
 
   const handleGoogleSignup = () => {
-    // Simulate Google OAuth
     setFormData(prev => ({
       ...prev,
       email: 'user@gmail.com',
@@ -66,12 +65,11 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
 
   return (
     <Box sx={{ 
-      height: '100%', 
+      height: { xs: 'calc(100vh - 250px)', sm: 'calc(100vh - 300px)' },
       display: 'flex', 
-      flexDirection: 'column',
-      maxHeight: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 250px)' }
+      flexDirection: 'column'
     }}>
-      <Box sx={{ textAlign: 'center', mb: 3, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
         <Typography
           variant="h3"
           sx={{
@@ -80,8 +78,8 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 2,
-            fontSize: { xs: '1.75rem', sm: '2.25rem' }
+            mb: 1,
+            fontSize: { xs: '1.5rem', sm: '2rem' }
           }}
         >
           Create Your Account
@@ -91,24 +89,23 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
           color="text.secondary"
           sx={{ 
             fontWeight: 500,
-            fontSize: { xs: '1rem', sm: '1.125rem' },
-            maxWidth: 500,
+            fontSize: { xs: '0.9rem', sm: '1rem' },
+            maxWidth: 400,
             mx: 'auto'
           }}
         >
-          Join thousands of healthcare professionals using S10.AI to revolutionize clinical documentation
+          Join thousands using S10.AI for clinical documentation
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         {error && (
           <Alert 
             severity="error" 
             sx={{ 
-              mb: 4, 
-              borderRadius: 3,
-              border: '1px solid #ffcdd2',
-              backgroundColor: '#ffebee'
+              mb: 2, 
+              borderRadius: 2,
+              flexShrink: 0
             }}
           >
             {error}
@@ -117,14 +114,16 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
 
         <Card
           sx={{
-            mb: 4,
-            borderRadius: 3,
-            border: '2px solid #F0F8FF',
+            flex: 1,
+            borderRadius: 2,
+            border: '1px solid #F0F8FF',
             backgroundColor: 'background.paper',
-            boxShadow: '0 8px 32px rgba(20, 49, 81, 0.08)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
           }}
         >
-          <CardContent sx={{ p: 4 }}>
+          <CardContent sx={{ p: { xs: 2, sm: 3 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
             {!formData.isGoogleSignup && (
               <>
                 <SecondaryButton
@@ -135,36 +134,28 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                       component="img" 
                       src="https://developers.google.com/identity/images/g-logo.png" 
                       alt="Google" 
-                      sx={{ width: 20, height: 20 }} 
+                      sx={{ width: 18, height: 18 }} 
                     />
                   }
                   sx={{
-                    mb: 4,
-                    py: 2,
-                    borderColor: '#E0E7FF',
-                    borderWidth: 2,
-                    fontSize: { xs: '0.975rem', sm: '1.05rem' },
+                    mb: 2,
+                    py: 1.5,
+                    fontSize: { xs: '0.9rem', sm: '1rem' },
                     fontWeight: 600,
-                    borderRadius: 3,
-                    '&:hover': {
-                      borderColor: 'primary.main',
-                      backgroundColor: '#F8FAFF',
-                      transform: 'translateY(-1px)',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-                    },
+                    borderRadius: 2
                   }}
                 >
                   Continue with Google
                 </SecondaryButton>
 
-                <Divider sx={{ my: 4 }}>
+                <Divider sx={{ my: 2 }}>
                   <Typography 
                     variant="body2" 
                     color="text.secondary"
                     sx={{ 
                       backgroundColor: 'background.paper',
-                      px: 3,
-                      fontWeight: 500
+                      px: 2,
+                      fontSize: '0.85rem'
                     }}
                   >
                     or create with email
@@ -173,12 +164,12 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
               </>
             )}
 
-            <Box component="form" onSubmit={handleSubmit}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ 
                 display: 'grid', 
                 gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                gap: 3, 
-                mb: 4 
+                gap: 2, 
+                mb: 2 
               }}>
                 <TextField
                   fullWidth
@@ -187,17 +178,11 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                   onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                   required
                   disabled={formData.isGoogleSignup}
-                  size="medium"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : 'transparent'
-                    }
-                  }}
+                  size="small"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <User size={18} color="#888888" />
+                        <User size={16} color="#888888" />
                       </InputAdornment>
                     ),
                   }}
@@ -209,17 +194,11 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                   onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
                   required
                   disabled={formData.isGoogleSignup}
-                  size="medium"
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      borderRadius: 2,
-                      backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : 'transparent'
-                    }
-                  }}
+                  size="small"
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <User size={18} color="#888888" />
+                        <User size={16} color="#888888" />
                       </InputAdornment>
                     ),
                   }}
@@ -234,18 +213,12 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
                 disabled={formData.isGoogleSignup}
-                sx={{ 
-                  mb: 4,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: formData.isGoogleSignup ? '#F5F5F5' : 'transparent'
-                  }
-                }}
-                size="medium"
+                sx={{ mb: 2 }}
+                size="small"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Mail size={18} color="#888888" />
+                      <Mail size={16} color="#888888" />
                     </InputAdornment>
                   ),
                 }}
@@ -258,18 +231,13 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                 value={formData.password}
                 onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                 required
-                sx={{ 
-                  mb: 5,
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2
-                  }
-                }}
-                size="medium"
+                sx={{ mb: 2 }}
+                size="small"
                 helperText="Minimum 8 characters"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Lock size={18} color="#888888" />
+                      <Lock size={16} color="#888888" />
                     </InputAdornment>
                   ),
                   endAdornment: (
@@ -279,27 +247,26 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                         edge="end"
                         size="small"
                       >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
               />
 
-              <Box sx={{ mb: 5 }}>
+              <Box sx={{ mb: 2, flex: 1 }}>
                 <FormControlLabel
                   control={
                     <Checkbox
                       checked={formData.agreedToBAA}
                       onChange={(e) => setFormData(prev => ({ ...prev, agreedToBAA: e.target.checked }))}
-                      size="medium"
-                      sx={{ color: '#387E89' }}
+                      size="small"
                     />
                   }
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Shield size={16} color="#387E89" />
-                      <Typography variant="body2" sx={{ fontSize: { xs: '0.875rem', sm: '0.95rem' } }}>
+                      <Shield size={14} color="#387E89" />
+                      <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
                         I agree to the{' '}
                         <Link href="#" color="primary" sx={{ textDecoration: 'none', fontWeight: 600 }}>
                           Business Associate Agreement (BAA)
@@ -307,21 +274,20 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                       </Typography>
                     </Box>
                   }
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1 }}
                 />
                 <FormControlLabel
                   control={
                     <Checkbox
                       checked={formData.agreedToTerms}
                       onChange={(e) => setFormData(prev => ({ ...prev, agreedToTerms: e.target.checked }))}
-                      size="medium"
-                      sx={{ color: '#387E89' }}
+                      size="small"
                     />
                   }
                   label={
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Shield size={16} color="#387E89" />
-                      <Typography variant="body2" sx={{ fontSize: { xs: '0.875rem', sm: '0.95rem' } }}>
+                      <Shield size={14} color="#387E89" />
+                      <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
                         I agree to the{' '}
                         <Link href="#" color="primary" sx={{ textDecoration: 'none', fontWeight: 600 }}>
                           Terms of Service
@@ -331,56 +297,48 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                   }
                 />
               </Box>
+
+              <Box sx={{ textAlign: 'center', mb: 2 }}>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary"
+                  sx={{ fontSize: '0.8rem' }}
+                >
+                  Already have an account?{' '}
+                  <Link
+                    href="/login"
+                    sx={{
+                      color: 'primary.main',
+                      textDecoration: 'none',
+                      fontWeight: 600
+                    }}
+                  >
+                    Sign in here
+                  </Link>
+                </Typography>
+              </Box>
             </Box>
           </CardContent>
         </Card>
 
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{ fontSize: { xs: '0.875rem', sm: '0.95rem' } }}
+        <Box sx={{ 
+          flexShrink: 0,
+          pt: 2
+        }}>
+          <PrimaryButton
+            fullWidth
+            type="submit"
+            onClick={handleSubmit}
+            sx={{
+              py: 1.5,
+              fontWeight: 700,
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              borderRadius: 2
+            }}
           >
-            Already have an account?{' '}
-            <Link
-              href="/login"
-              sx={{
-                background: 'linear-gradient(135deg, #143151, #387E89)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textDecoration: 'none',
-                fontWeight: 700,
-                '&:hover': {
-                  textDecoration: 'underline',
-                },
-              }}
-            >
-              Sign in here
-            </Link>
-          </Typography>
+            Create Account & Continue →
+          </PrimaryButton>
         </Box>
-      </Box>
-
-      <Box sx={{ 
-        flexShrink: 0,
-        pt: 2,
-        borderTop: '1px solid #F0F8FF'
-      }}>
-        <PrimaryButton
-          fullWidth
-          type="submit"
-          onClick={handleSubmit}
-          sx={{
-            py: 2,
-            fontWeight: 700,
-            fontSize: { xs: '1rem', sm: '1.1rem' },
-            borderRadius: 3,
-            textTransform: 'none'
-          }}
-        >
-          Create Account & Continue →
-        </PrimaryButton>
       </Box>
     </Box>
   );
