@@ -7,14 +7,11 @@ import {
   DialogActions,
   Typography,
   Box,
-  Step,
-  StepLabel,
-  Stepper,
   Card,
   CardContent,
   Chip,
 } from '@mui/material';
-import { CheckCircle, Person, Settings, CreditCard } from '@mui/icons-material';
+import { CheckCircle, Person, Settings, CreditCard, Celebration } from '@mui/icons-material';
 import { PrimaryButton } from '@/components/ui/Buttons';
 
 interface WelcomePopupProps {
@@ -32,7 +29,7 @@ const gettingStartedSteps = [
   {
     icon: <Settings sx={{ fontSize: 20 }} />,
     title: 'Configure Settings',
-    description: 'Choose your specialty and EHR integration preferences',
+    description: 'Select specialty, customize templates, and connect EHR (optional). Skip to start without EHR.',
     status: 'upcoming'
   },
   {
@@ -54,48 +51,57 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
         sx: {
           borderRadius: 3,
           maxHeight: '90vh',
+          mx: { xs: 1, sm: 2 },
+          my: { xs: 1, sm: 2 },
         }
       }}
     >
-      <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 800,
-            background: 'linear-gradient(135deg, #143151, #387E89)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            mb: 1
-          }}
+      <DialogTitle sx={{ textAlign: 'center', pb: 1, px: { xs: 2, sm: 3 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1 }}>
+          <Celebration sx={{ color: '#387E89', fontSize: { xs: 28, sm: 32 } }} />
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #143151, #387E89)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontSize: { xs: '1.3rem', sm: '1.5rem' }
+            }}
+          >
+            Welcome to S10.AI!
+          </Typography>
+        </Box>
+        <Typography 
+          variant="body1" 
+          color="text.secondary"
+          sx={{ fontSize: { xs: '0.85rem', sm: '0.95rem' } }}
         >
-          Welcome to S10.AI! 🎉
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
           Let's get you set up in just a few simple steps
         </Typography>
       </DialogTitle>
 
-      <DialogContent sx={{ px: 3, py: 2 }}>
-        <Box sx={{ mb: 3 }}>
+      <DialogContent sx={{ px: { xs: 2, sm: 3 }, py: 1 }}>
+        <Box>
           <Typography
             variant="h6"
             sx={{
               fontWeight: 600,
               color: 'primary.main',
               mb: 2,
-              textAlign: 'center'
+              textAlign: 'center',
+              fontSize: { xs: '1rem', sm: '1.1rem' }
             }}
           >
             Getting Started Guide
           </Typography>
 
-          <Box sx={{ space: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             {gettingStartedSteps.map((step, index) => (
               <Card
                 key={index}
                 sx={{
-                  mb: 2,
                   border: step.status === 'active' ? 2 : 1,
                   borderColor: step.status === 'active' ? 'primary.main' : 'divider',
                   background: step.status === 'active' 
@@ -103,12 +109,12 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
                     : 'background.paper'
                 }}
               >
-                <CardContent sx={{ p: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
                     <Box
                       sx={{
-                        width: 40,
-                        height: 40,
+                        width: { xs: 36, sm: 40 },
+                        height: { xs: 36, sm: 40 },
                         borderRadius: '50%',
                         background: step.status === 'active' 
                           ? 'linear-gradient(135deg, #143151, #387E89)'
@@ -116,15 +122,23 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: step.status === 'active' ? 'white' : '#666'
+                        color: step.status === 'active' ? 'white' : '#666',
+                        flexShrink: 0
                       }}
                     >
                       {step.icon}
                     </Box>
                     
-                    <Box sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5, flexWrap: 'wrap' }}>
+                        <Typography 
+                          variant="h6" 
+                          sx={{ 
+                            fontWeight: 600, 
+                            fontSize: { xs: '0.9rem', sm: '1rem' },
+                            lineHeight: 1.2
+                          }}
+                        >
                           {step.title}
                         </Typography>
                         {step.status === 'active' && (
@@ -134,18 +148,26 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
                             sx={{ 
                               backgroundColor: '#E8F5E8', 
                               color: '#2E7D32',
-                              fontSize: '0.7rem'
+                              fontSize: '0.65rem',
+                              height: 20
                             }} 
                           />
                         )}
                       </Box>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ 
+                          fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                          lineHeight: 1.3
+                        }}
+                      >
                         {step.description}
                       </Typography>
                     </Box>
 
                     {step.status === 'completed' && (
-                      <CheckCircle sx={{ color: '#2E7D32' }} />
+                      <CheckCircle sx={{ color: '#2E7D32', fontSize: 20, flexShrink: 0 }} />
                     )}
                   </Box>
                 </CardContent>
@@ -155,8 +177,8 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
 
           <Box
             sx={{
-              mt: 3,
-              p: 2,
+              mt: 2,
+              p: { xs: 1.5, sm: 2 },
               backgroundColor: '#FFF8E1',
               borderRadius: 2,
               border: '1px solid #FFE082'
@@ -167,7 +189,8 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
               sx={{
                 color: '#F57F17',
                 fontWeight: 600,
-                textAlign: 'center'
+                textAlign: 'center',
+                fontSize: { xs: '0.75rem', sm: '0.8rem' }
               }}
             >
               💡 Tip: Complete all steps to unlock the full potential of S10.AI
@@ -176,14 +199,15 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 1 }}>
+      <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1 }}>
         <PrimaryButton
           onClick={onClose}
           fullWidth
           sx={{
             py: 1.5,
             fontWeight: 700,
-            borderRadius: 2
+            borderRadius: 2,
+            fontSize: { xs: '0.9rem', sm: '1rem' }
           }}
         >
           Let's Get Started! →
