@@ -51,11 +51,8 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
         '& .MuiDialog-paper': {
           borderRadius: 3,
           backgroundColor: 'background.paper',
-          height: { xs: '95vh', sm: '85vh' },
-          maxHeight: { xs: '95vh', sm: '85vh' },
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
+          maxHeight: '90vh',
+          overflow: 'hidden'
         }
       }}
     >
@@ -63,8 +60,7 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
         p: 0,
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
-        overflow: 'hidden'
+        maxHeight: '90vh'
       }}>
         {/* Header */}
         <Box sx={{ 
@@ -104,125 +100,146 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
           </Typography>
         </Box>
 
-        {/* Content */}
+        {/* Scrollable Content */}
         <Box sx={{ 
           p: { xs: 2, sm: 3 },
           flex: 1,
+          overflow: 'auto',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          minHeight: 0
+          flexDirection: 'column'
         }}>
-          <Box>
-            <Typography
-              variant="h5"
-              sx={{
-                textAlign: 'center',
-                mb: { xs: 2, sm: 3 },
-                fontWeight: 600,
-                color: 'text.primary',
-                fontSize: { xs: '1.1rem', sm: '1.3rem' }
-              }}
-            >
-              Transform Your Medical Practice
-            </Typography>
-
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              {features.map((feature, index) => (
-                <Grid key={index} size={{ xs: 6, sm: 6 }}>
-                  <Card
-                    sx={{
-                      background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
-                      border: '2px solid #E8F4F8',
-                      borderRadius: 2,
-                      height: '100%',
-                      minHeight: { xs: 80, sm: 100 },
-                      transition: 'all 0.3s ease',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 8px 24px rgba(20, 49, 81, 0.1)',
-                        border: '2px solid white',
-                        outline: '2px solid #387E89',
-                        '& .feature-icon': {
-                          transform: 'scale(1.1)'
-                        }
-                      }
-                    }}
-                  >
-                    <CardContent sx={{ p: { xs: 1.5, sm: 2 }, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                      <Box
-                        className="feature-icon"
-                        sx={{
-                          width: { xs: 32, sm: 40 },
-                          height: { xs: 32, sm: 40 },
-                          borderRadius: '10px',
-                          background: 'linear-gradient(135deg, #143151, #387E89)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          margin: '0 auto 8px auto',
-                          color: 'white',
-                          boxShadow: '0 4px 16px rgba(20, 49, 81, 0.3)',
-                          transition: 'all 0.3s ease'
-                        }}
-                      >
-                        {feature.icon}
-                      </Box>
-                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: { xs: '0.8rem', sm: '0.9rem' } }}>
-                        {feature.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}>
-                        {feature.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-
-            <Box sx={{
+          <Typography
+            variant="h5"
+            sx={{
               textAlign: 'center',
-              p: { xs: 1.5, sm: 2 },
-              backgroundColor: '#F8FBFF',
-              borderRadius: 2,
-              border: '1px solid #E8F4F8'
-            }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
-                Join over <strong>10,000+ healthcare professionals</strong>
-              </Typography>
-              <Typography variant="body2" color="primary.main" sx={{ fontWeight: 600, fontSize: { xs: '0.75rem', sm: '0.85rem' } }}>
-                ⭐ ⭐ ⭐ ⭐ ⭐ 4.9/5 rating
-              </Typography>
-            </Box>
-          </Box>
+              mb: { xs: 2, sm: 3 },
+              fontWeight: 600,
+              color: 'text.primary',
+              fontSize: { xs: '1.1rem', sm: '1.3rem' }
+            }}
+          >
+            Transform Your Medical Practice
+          </Typography>
 
-          {/* Footer */}
-          <Box sx={{ mt: 2 }}>
-            <PrimaryButton
-              fullWidth
-              onClick={onClose}
-              sx={{
-                py: { xs: 1.5, sm: 2 },
-                fontWeight: 700,
-                fontSize: { xs: '0.9rem', sm: '1rem' },
-                borderRadius: 3,
-                textTransform: 'none'
-              }}
-            >
-              Get Started - Create Your Account →
-            </PrimaryButton>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                textAlign: 'center',
-                mt: 1,
-                fontSize: { xs: '0.75rem', sm: '0.8rem' }
-              }}
-            >
-              No credit card required • 30-day free trial
+          <Grid container spacing={2} sx={{ mb: 3 }}>
+            {features.map((feature, index) => (
+              <Grid key={index} size={{ xs: 6, sm: 6 }}>
+                <Card
+                  sx={{
+                    background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
+                    border: '2px solid #E8F4F8',
+                    borderRadius: 2,
+                    height: '100%',
+                    minHeight: { xs: 100, sm: 120 },
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 24px rgba(20, 49, 81, 0.1)',
+                      border: '2px solid white',
+                      outline: '2px solid #387E89',
+                      '& .feature-icon': {
+                        transform: 'scale(1.1)'
+                      }
+                    }
+                  }}
+                >
+                  <CardContent sx={{ 
+                    p: { xs: 1.5, sm: 2 }, 
+                    textAlign: 'center', 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center' 
+                  }}>
+                    <Box
+                      className="feature-icon"
+                      sx={{
+                        width: { xs: 32, sm: 40 },
+                        height: { xs: 32, sm: 40 },
+                        borderRadius: '10px',
+                        background: 'linear-gradient(135deg, #143151, #387E89)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 8px auto',
+                        color: 'white',
+                        boxShadow: '0 4px 16px rgba(20, 49, 81, 0.3)',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      {feature.icon}
+                    </Box>
+                    <Typography variant="h6" sx={{ 
+                      fontWeight: 700, 
+                      mb: 0.5, 
+                      fontSize: { xs: '0.8rem', sm: '0.9rem' } 
+                    }}>
+                      {feature.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ 
+                      fontSize: { xs: '0.7rem', sm: '0.8rem' } 
+                    }}>
+                      {feature.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Box sx={{
+            textAlign: 'center',
+            p: { xs: 1.5, sm: 2 },
+            backgroundColor: '#F8FBFF',
+            borderRadius: 2,
+            border: '1px solid #E8F4F8',
+            mb: 3
+          }}>
+            <Typography variant="body2" color="text.secondary" sx={{ 
+              mb: 1, 
+              fontSize: { xs: '0.75rem', sm: '0.85rem' } 
+            }}>
+              Join over <strong>10,000+ healthcare professionals</strong>
+            </Typography>
+            <Typography variant="body2" color="primary.main" sx={{ 
+              fontWeight: 600, 
+              fontSize: { xs: '0.75rem', sm: '0.85rem' } 
+            }}>
+              ⭐ ⭐ ⭐ ⭐ ⭐ 4.9/5 rating
             </Typography>
           </Box>
+        </Box>
+
+        {/* Footer - Fixed at bottom */}
+        <Box sx={{ 
+          p: { xs: 2, sm: 3 },
+          flexShrink: 0,
+          borderTop: '1px solid #F0F8FF'
+        }}>
+          <PrimaryButton
+            fullWidth
+            onClick={onClose}
+            sx={{
+              py: { xs: 1.5, sm: 2 },
+              fontWeight: 700,
+              fontSize: { xs: '0.9rem', sm: '1rem' },
+              borderRadius: 3,
+              textTransform: 'none'
+            }}
+          >
+            Get Started - Create Your Account →
+          </PrimaryButton>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              textAlign: 'center',
+              mt: 1,
+              fontSize: { xs: '0.75rem', sm: '0.8rem' }
+            }}
+          >
+            No credit card required • 30-day free trial
+          </Typography>
         </Box>
       </DialogContent>
     </Dialog>
