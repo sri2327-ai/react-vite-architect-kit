@@ -56,7 +56,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
 
   return (
     <Box sx={{ 
-      height: { xs: 'calc(100vh - 250px)', sm: 'calc(100vh - 300px)' },
+      height: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 250px)' },
       display: 'flex', 
       flexDirection: 'column'
     }}>
@@ -138,101 +138,121 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
           }}
         />
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, minHeight: 0 }}>
-          <FormControl component="fieldset" fullWidth sx={{ height: '100%' }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <FormControl component="fieldset" fullWidth sx={{ flex: 1, minHeight: 0 }}>
             <RadioGroup
               value={selectedEHR}
               onChange={(e) => setSelectedEHR(e.target.value)}
-              sx={{ height: '100%' }}
+              sx={{ flex: 1, minHeight: 0 }}
             >
-              <Grid container spacing={1.5} sx={{ height: '100%', overflow: 'auto' }}>
-                {filteredEHRs.map((ehr) => (
-                  <Grid key={ehr.name} size={{ xs: 6, sm: 4, lg: 3 }}>
-                    <Card
-                      sx={{
-                        cursor: 'pointer',
-                        border: selectedEHR === ehr.name ? 2 : 1,
-                        borderColor: selectedEHR === ehr.name ? 'primary.main' : '#E0E7FF',
-                        background: selectedEHR === ehr.name 
-                          ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
-                          : 'background.paper',
-                        borderRadius: 2,
-                        position: 'relative',
-                        height: { xs: 90, sm: 100 },
-                        '&:hover': {
-                          borderColor: 'primary.main',
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 8px 24px rgba(20, 49, 81, 0.15)'
-                        },
-                        transition: 'all 0.2s ease'
-                      }}
-                      onClick={() => setSelectedEHR(ehr.name)}
-                    >
-                      {selectedEHR === ehr.name && (
-                        <CheckCircle2 
-                          size={12} 
-                          color="white" 
-                          style={{
-                            position: 'absolute',
-                            top: 4,
-                            right: 4,
-                            backgroundColor: '#2E7D32',
-                            borderRadius: '50%',
-                            zIndex: 2
-                          }}
-                        />
-                      )}
-                      
-                      <CardContent sx={{ 
-                        textAlign: 'center', 
-                        p: 1.5,
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center'
-                      }}>
-                        <Box
-                          sx={{
-                            width: 32,
-                            height: 32,
-                            borderRadius: '8px',
-                            background: selectedEHR === ehr.name 
-                              ? 'linear-gradient(135deg, #143151, #387E89)'
-                              : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            margin: '0 auto 8px auto',
-                            color: selectedEHR === ehr.name ? 'white' : '#666',
-                            fontSize: '1rem',
-                            fontWeight: 700
-                          }}
-                        >
-                          {ehr.name.charAt(0)}
-                        </Box>
+              <Box sx={{ 
+                flex: 1, 
+                overflowY: 'auto',
+                pr: 1,
+                '&::-webkit-scrollbar': {
+                  width: '4px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  background: '#f1f1f1',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                  background: '#c1c1c1',
+                  borderRadius: '4px',
+                },
+                '&::-webkit-scrollbar-thumb:hover': {
+                  background: '#a8a8a8',
+                }
+              }}>
+                <Grid container spacing={1.5}>
+                  {filteredEHRs.map((ehr) => (
+                    <Grid key={ehr.name} size={{ xs: 6, sm: 4, lg: 3 }}>
+                      <Card
+                        sx={{
+                          cursor: 'pointer',
+                          border: selectedEHR === ehr.name ? 2 : 1,
+                          borderColor: selectedEHR === ehr.name ? 'primary.main' : '#E0E7FF',
+                          background: selectedEHR === ehr.name 
+                            ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
+                            : 'background.paper',
+                          borderRadius: 2,
+                          position: 'relative',
+                          height: { xs: 90, sm: 100 },
+                          '&:hover': {
+                            borderColor: 'primary.main',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 8px 24px rgba(20, 49, 81, 0.15)'
+                          },
+                          transition: 'all 0.2s ease'
+                        }}
+                        onClick={() => setSelectedEHR(ehr.name)}
+                      >
+                        {selectedEHR === ehr.name && (
+                          <CheckCircle2 
+                            size={12} 
+                            color="white" 
+                            style={{
+                              position: 'absolute',
+                              top: 4,
+                              right: 4,
+                              backgroundColor: '#2E7D32',
+                              borderRadius: '50%',
+                              zIndex: 2
+                            }}
+                          />
+                        )}
                         
-                        <FormControlLabel
-                          value={ehr.name}
-                          control={<Radio sx={{ display: 'none' }} />}
-                          label={
-                            <Typography
-                              variant="body1"
-                              fontWeight={selectedEHR === ehr.name ? 700 : 600}
-                              color={selectedEHR === ehr.name ? 'primary.main' : 'text.primary'}
-                              sx={{
-                                fontSize: { xs: '0.75rem', sm: '0.85rem' }
-                              }}
-                            >
-                              {ehr.name}
-                            </Typography>
-                          }
-                          sx={{ m: 0 }}
-                        />
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
+                        <CardContent sx={{ 
+                          textAlign: 'center', 
+                          p: 1.5,
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center'
+                        }}>
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: '8px',
+                              background: selectedEHR === ehr.name 
+                                ? 'linear-gradient(135deg, #143151, #387E89)'
+                                : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              margin: '0 auto 8px auto',
+                              color: selectedEHR === ehr.name ? 'white' : '#666',
+                              fontSize: '1rem',
+                              fontWeight: 700
+                            }}
+                          >
+                            {ehr.name.charAt(0)}
+                          </Box>
+                          
+                          <FormControlLabel
+                            value={ehr.name}
+                            control={<Radio sx={{ display: 'none' }} />}
+                            label={
+                              <Typography
+                                variant="body1"
+                                fontWeight={selectedEHR === ehr.name ? 700 : 600}
+                                color={selectedEHR === ehr.name ? 'primary.main' : 'text.primary'}
+                                sx={{
+                                  fontSize: { xs: '0.75rem', sm: '0.85rem' }
+                                }}
+                              >
+                                {ehr.name}
+                              </Typography>
+                            }
+                            sx={{ m: 0 }}
+                          />
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
             </RadioGroup>
           </FormControl>
         </Box>

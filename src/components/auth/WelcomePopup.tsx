@@ -2,14 +2,19 @@
 import React from 'react';
 import {
   Dialog,
+  DialogTitle,
   DialogContent,
-  Box,
+  DialogActions,
   Typography,
+  Box,
+  Step,
+  StepLabel,
+  Stepper,
   Card,
   CardContent,
-  Grid,
+  Chip,
 } from '@mui/material';
-import { Sparkles, Shield, Zap, Clock } from 'lucide-react';
+import { CheckCircle, User, Settings, CreditCard } from '@mui/icons-material';
 import { PrimaryButton } from '@/components/ui/Buttons';
 
 interface WelcomePopupProps {
@@ -17,26 +22,24 @@ interface WelcomePopupProps {
   onClose: () => void;
 }
 
-const features = [
+const gettingStartedSteps = [
   {
-    icon: <Sparkles size={20} />,
-    title: 'AI-Powered Documentation',
-    description: 'Transform voice into clinical notes'
+    icon: <User sx={{ fontSize: 20 }} />,
+    title: 'Create Account',
+    description: 'Set up your S10.AI account with basic information',
+    status: 'active'
   },
   {
-    icon: <Shield size={20} />,
-    title: 'HIPAA Compliant',
-    description: 'Bank-level security'
+    icon: <Settings sx={{ fontSize: 20 }} />,
+    title: 'Configure Settings',
+    description: 'Choose your specialty and EHR integration preferences',
+    status: 'upcoming'
   },
   {
-    icon: <Zap size={20} />,
-    title: 'EHR Integration',
-    description: 'Seamless workflow'
-  },
-  {
-    icon: <Clock size={20} />,
-    title: 'Save Time',
-    description: 'Reduce documentation by 70%'
+    icon: <CreditCard sx={{ fontSize: 20 }} />,
+    title: 'Complete Setup',
+    description: 'Finalize payment and start using S10.AI',
+    status: 'upcoming'
   }
 ];
 
@@ -45,203 +48,147 @@ export const WelcomePopup: React.FC<WelcomePopupProps> = ({ open, onClose }) => 
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="sm"
       fullWidth
-      sx={{
-        '& .MuiDialog-paper': {
+      PaperProps={{
+        sx: {
           borderRadius: 3,
-          backgroundColor: 'background.paper',
           maxHeight: '90vh',
-          overflow: 'hidden'
         }
       }}
     >
-      <DialogContent sx={{ 
-        p: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        maxHeight: '90vh'
-      }}>
-        {/* Header */}
-        <Box sx={{ 
-          background: 'linear-gradient(135deg, #143151, #387E89)',
-          p: { xs: 2, sm: 3 },
-          textAlign: 'center',
-          flexShrink: 0
-        }}>
-          <Box 
-            component="img" 
-            src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png" 
-            alt="S10.AI Logo" 
-            sx={{
-              height: { xs: 30, sm: 40 },
-              mb: 1
-            }} 
-          />
-          <Typography
-            variant="h4"
-            sx={{
-              color: 'white',
-              fontWeight: 800,
-              mb: 0.5,
-              fontSize: { xs: '1.25rem', sm: '1.75rem' }
-            }}
-          >
-            Welcome to S10.AI
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: 'rgba(255, 255, 255, 0.9)',
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
-            }}
-          >
-            The future of clinical documentation
-          </Typography>
-        </Box>
+      <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #143151, #387E89)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            mb: 1
+          }}
+        >
+          Welcome to S10.AI! 🎉
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Let's get you set up in just a few simple steps
+        </Typography>
+      </DialogTitle>
 
-        {/* Scrollable Content */}
-        <Box sx={{ 
-          p: { xs: 2, sm: 3 },
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        <Box sx={{ mb: 3 }}>
           <Typography
-            variant="h5"
+            variant="h6"
             sx={{
-              textAlign: 'center',
-              mb: { xs: 2, sm: 3 },
               fontWeight: 600,
-              color: 'text.primary',
-              fontSize: { xs: '1.1rem', sm: '1.3rem' }
+              color: 'primary.main',
+              mb: 2,
+              textAlign: 'center'
             }}
           >
-            Transform Your Medical Practice
+            Getting Started Guide
           </Typography>
 
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            {features.map((feature, index) => (
-              <Grid key={index} size={{ xs: 6, sm: 6 }}>
-                <Card
-                  sx={{
-                    background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
-                    border: '2px solid #E8F4F8',
-                    borderRadius: 2,
-                    height: '100%',
-                    minHeight: { xs: 100, sm: 120 },
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 24px rgba(20, 49, 81, 0.1)',
-                      border: '2px solid white',
-                      outline: '2px solid #387E89',
-                      '& .feature-icon': {
-                        transform: 'scale(1.1)'
-                      }
-                    }
-                  }}
-                >
-                  <CardContent sx={{ 
-                    p: { xs: 1.5, sm: 2 }, 
-                    textAlign: 'center', 
-                    height: '100%', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    justifyContent: 'center' 
-                  }}>
+          <Box sx={{ space: 2 }}>
+            {gettingStartedSteps.map((step, index) => (
+              <Card
+                key={index}
+                sx={{
+                  mb: 2,
+                  border: step.status === 'active' ? 2 : 1,
+                  borderColor: step.status === 'active' ? 'primary.main' : 'divider',
+                  background: step.status === 'active' 
+                    ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)'
+                    : 'background.paper'
+                }}
+              >
+                <CardContent sx={{ p: 2 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Box
-                      className="feature-icon"
                       sx={{
-                        width: { xs: 32, sm: 40 },
-                        height: { xs: 32, sm: 40 },
-                        borderRadius: '10px',
-                        background: 'linear-gradient(135deg, #143151, #387E89)',
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        background: step.status === 'active' 
+                          ? 'linear-gradient(135deg, #143151, #387E89)'
+                          : '#f5f5f5',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        margin: '0 auto 8px auto',
-                        color: 'white',
-                        boxShadow: '0 4px 16px rgba(20, 49, 81, 0.3)',
-                        transition: 'all 0.3s ease'
+                        color: step.status === 'active' ? 'white' : '#666'
                       }}
                     >
-                      {feature.icon}
+                      {step.icon}
                     </Box>
-                    <Typography variant="h6" sx={{ 
-                      fontWeight: 700, 
-                      mb: 0.5, 
-                      fontSize: { xs: '0.8rem', sm: '0.9rem' } 
-                    }}>
-                      {feature.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ 
-                      fontSize: { xs: '0.7rem', sm: '0.8rem' } 
-                    }}>
-                      {feature.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+                    
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                          {step.title}
+                        </Typography>
+                        {step.status === 'active' && (
+                          <Chip 
+                            label="Current" 
+                            size="small" 
+                            sx={{ 
+                              backgroundColor: '#E8F5E8', 
+                              color: '#2E7D32',
+                              fontSize: '0.7rem'
+                            }} 
+                          />
+                        )}
+                      </Box>
+                      <Typography variant="body2" color="text.secondary">
+                        {step.description}
+                      </Typography>
+                    </Box>
 
-          <Box sx={{
-            textAlign: 'center',
-            p: { xs: 1.5, sm: 2 },
-            backgroundColor: '#F8FBFF',
-            borderRadius: 2,
-            border: '1px solid #E8F4F8',
-            mb: 3
-          }}>
-            <Typography variant="body2" color="text.secondary" sx={{ 
-              mb: 1, 
-              fontSize: { xs: '0.75rem', sm: '0.85rem' } 
-            }}>
-              Join over <strong>10,000+ healthcare professionals</strong>
-            </Typography>
-            <Typography variant="body2" color="primary.main" sx={{ 
-              fontWeight: 600, 
-              fontSize: { xs: '0.75rem', sm: '0.85rem' } 
-            }}>
-              ⭐ ⭐ ⭐ ⭐ ⭐ 4.9/5 rating
+                    {step.status === 'completed' && (
+                      <CheckCircle sx={{ color: '#2E7D32' }} />
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+
+          <Box
+            sx={{
+              mt: 3,
+              p: 2,
+              backgroundColor: '#FFF8E1',
+              borderRadius: 2,
+              border: '1px solid #FFE082'
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                color: '#F57F17',
+                fontWeight: 600,
+                textAlign: 'center'
+              }}
+            >
+              💡 Tip: Complete all steps to unlock the full potential of S10.AI
             </Typography>
           </Box>
         </Box>
-
-        {/* Footer - Fixed at bottom */}
-        <Box sx={{ 
-          p: { xs: 2, sm: 3 },
-          flexShrink: 0,
-          borderTop: '1px solid #F0F8FF'
-        }}>
-          <PrimaryButton
-            fullWidth
-            onClick={onClose}
-            sx={{
-              py: { xs: 1.5, sm: 2 },
-              fontWeight: 700,
-              fontSize: { xs: '0.9rem', sm: '1rem' },
-              borderRadius: 3,
-              textTransform: 'none'
-            }}
-          >
-            Get Started - Create Your Account →
-          </PrimaryButton>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{
-              textAlign: 'center',
-              mt: 1,
-              fontSize: { xs: '0.75rem', sm: '0.8rem' }
-            }}
-          >
-            No credit card required • 30-day free trial
-          </Typography>
-        </Box>
       </DialogContent>
+
+      <DialogActions sx={{ p: 3, pt: 1 }}>
+        <PrimaryButton
+          onClick={onClose}
+          fullWidth
+          sx={{
+            py: 1.5,
+            fontWeight: 700,
+            borderRadius: 2
+          }}
+        >
+          Let's Get Started! →
+        </PrimaryButton>
+      </DialogActions>
     </Dialog>
   );
 };

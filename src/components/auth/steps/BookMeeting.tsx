@@ -71,7 +71,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
 
   return (
     <Box sx={{ 
-      height: { xs: 'calc(100vh - 250px)', sm: 'calc(100vh - 300px)' },
+      height: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 250px)' },
       display: 'flex', 
       flexDirection: 'column'
     }}>
@@ -173,81 +173,101 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
           Our specialists will help connect your EHR system via secure video conference.
         </Alert>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <Grid container spacing={2} sx={{ mb: 2, flexShrink: 0 }}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                fullWidth
-                label="Preferred Date"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                required
-                size="small"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                inputProps={{
-                  min: getMinDate(),
-                }}
-              />
+        <Box sx={{ 
+          flex: 1, 
+          overflowY: 'auto',
+          pr: 1,
+          '&::-webkit-scrollbar': {
+            width: '4px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#c1c1c1',
+            borderRadius: '4px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: '#a8a8a8',
+          }
+        }}>
+          <Box component="form" onSubmit={handleSubmit}>
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  fullWidth
+                  label="Preferred Date"
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  required
+                  size="small"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  inputProps={{
+                    min: getMinDate(),
+                  }}
+                />
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  fullWidth
+                  select
+                  label="Preferred Time"
+                  value={selectedTime}
+                  onChange={(e) => setSelectedTime(e.target.value)}
+                  required
+                  size="small"
+                >
+                  {timeSlots.map((slot) => (
+                    <MenuItem 
+                      key={slot.value} 
+                      value={slot.value}
+                      disabled={!slot.available}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Clock size={14} color={slot.available ? '#387E89' : '#ccc'} />
+                        {slot.label}
+                      </Box>
+                      {slot.available ? (
+                        <Chip label="Available" size="small" sx={{ 
+                          backgroundColor: '#E8F5E8', 
+                          color: '#2E7D32',
+                          fontSize: '0.6rem'
+                        }} />
+                      ) : (
+                        <Chip label="Booked" size="small" sx={{ 
+                          backgroundColor: '#FFEBEE', 
+                          color: '#C62828',
+                          fontSize: '0.6rem'
+                        }} />
+                      )}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
             </Grid>
 
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                fullWidth
-                select
-                label="Preferred Time"
-                value={selectedTime}
-                onChange={(e) => setSelectedTime(e.target.value)}
-                required
-                size="small"
-              >
-                {timeSlots.map((slot) => (
-                  <MenuItem 
-                    key={slot.value} 
-                    value={slot.value}
-                    disabled={!slot.available}
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Clock size={14} color={slot.available ? '#387E89' : '#ccc'} />
-                      {slot.label}
-                    </Box>
-                    {slot.available ? (
-                      <Chip label="Available" size="small" sx={{ 
-                        backgroundColor: '#E8F5E8', 
-                        color: '#2E7D32',
-                        fontSize: '0.6rem'
-                      }} />
-                    ) : (
-                      <Chip label="Booked" size="small" sx={{ 
-                        backgroundColor: '#FFEBEE', 
-                        color: '#C62828',
-                        fontSize: '0.6rem'
-                      }} />
-                    )}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-
-          <TextField
-            fullWidth
-            label="Additional Notes (Optional)"
-            multiline
-            rows={3}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Tell us about your EHR setup or questions..."
-            size="small"
-            sx={{ flex: 1, mb: 2 }}
-          />
+            <TextField
+              fullWidth
+              label="Additional Notes (Optional)"
+              multiline
+              rows={3}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Tell us about your EHR setup or questions..."
+              size="small"
+              sx={{ mb: 2 }}
+            />
+          </Box>
         </Box>
 
         <Box sx={{ 
