@@ -18,6 +18,7 @@ export const PageContainer: React.FC<PageContainerProps> = ({
       sx={{
         py: { xs: 2, md: 3 },
         px: { xs: 2, md: 3 },
+        width: '100%',
         ...sx,
       }}
       {...props}

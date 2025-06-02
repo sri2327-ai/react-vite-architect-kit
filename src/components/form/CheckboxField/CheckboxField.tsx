@@ -32,7 +32,9 @@ export const CheckboxField = <T extends FieldValues>({
                   checked={field.value || false}
                   disabled={disabled}
                   size="small"
-                  aria-required={required}
+                  inputProps={{
+                    'aria-required': required,
+                  }}
                 />
               }
               label={label}
@@ -51,7 +53,9 @@ export const CheckboxField = <T extends FieldValues>({
           name={name}
           disabled={disabled}
           size="small"
-          aria-required={required}
+          inputProps={{
+            'aria-required': required,
+          }}
         />
       }
       label={label}

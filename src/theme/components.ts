@@ -3,14 +3,32 @@ import { Components, Theme } from '@mui/material/styles';
 
 export const components: Components<Omit<Theme, 'components'>> = {
   MuiButton: {
+    defaultProps: {
+      size: 'small',
+      variant: 'contained',
+    },
     styleOverrides: {
       root: {
         textTransform: 'none',
         borderRadius: 8,
         fontWeight: 600,
-        boxShadow: 'none', // Remove elevation from buttons
+        boxShadow: 'none',
         '&:hover': {
-          boxShadow: 'none', // Remove elevation on hover
+          boxShadow: 'none',
+        },
+      },
+    },
+  },
+  MuiTextField: {
+    defaultProps: {
+      size: 'small',
+      variant: 'outlined',
+      fullWidth: true,
+    },
+    styleOverrides: {
+      root: {
+        '& .MuiOutlinedInput-root': {
+          borderRadius: 8,
         },
       },
     },
@@ -23,27 +41,35 @@ export const components: Components<Omit<Theme, 'components'>> = {
       },
     },
   },
-  MuiTextField: {
-    styleOverrides: {
-      root: {
-        '& .MuiOutlinedInput-root': {
-          borderRadius: 8, // Consistent border radius for inputs
-        },
-      },
-    },
-  },
   MuiOutlinedInput: {
     styleOverrides: {
       root: {
-        borderRadius: 8, // Consistent border radius for all outlined inputs
+        borderRadius: 8,
       },
     },
   },
   MuiInputBase: {
     styleOverrides: {
       root: {
-        borderRadius: 8, // Consistent border radius for all input bases
+        borderRadius: 8,
       },
+    },
+  },
+  MuiCheckbox: {
+    defaultProps: {
+      size: 'small',
+    },
+  },
+  MuiFormControl: {
+    defaultProps: {
+      size: 'small',
+      fullWidth: true,
+    },
+  },
+  MuiSelect: {
+    defaultProps: {
+      size: 'small',
+      fullWidth: true,
     },
   },
 };

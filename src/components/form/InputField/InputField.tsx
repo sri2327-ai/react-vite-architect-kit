@@ -36,8 +36,10 @@ export const InputField = <T extends FieldValues>({
             variant={variant}
             error={!!error}
             helperText={error?.message}
-            aria-label={label}
-            aria-required={required}
+            inputProps={{
+              'aria-label': label,
+              'aria-required': required,
+            }}
           />
         )}
       />
@@ -53,8 +55,10 @@ export const InputField = <T extends FieldValues>({
       fullWidth={fullWidth}
       size={size}
       variant={variant}
-      aria-label={label}
-      aria-required={required}
+      inputProps={{
+        'aria-label': label,
+        'aria-required': required,
+      }}
     />
   );
 };

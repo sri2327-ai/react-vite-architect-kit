@@ -27,6 +27,21 @@ export const lightPalette: PaletteOptions = {
     light: '#ef5350',
     dark: '#c62828',
   },
+  warning: {
+    main: '#ed6c02',
+    light: '#ff9800',
+    dark: '#e65100',
+  },
+  info: {
+    main: bravoColors.accent.blue,
+    light: bravoColors.tertiary,
+    dark: bravoColors.primary,
+  },
+  success: {
+    main: '#2e7d32',
+    light: '#4caf50',
+    dark: '#1b5e20',
+  },
 };
 
 export const darkPalette: PaletteOptions = {
@@ -53,5 +68,20 @@ export const darkPalette: PaletteOptions = {
     main: '#f44336',
     light: '#e57373',
     dark: '#d32f2f',
+  },
+  warning: {
+    main: '#ff9800',
+    light: '#ffb74d',
+    dark: '#f57c00',
+  },
+  info: {
+    main: bravoColors.tertiary,
+    light: bravoColors.secondary,
+    dark: bravoColors.primary,
+  },
+  success: {
+    main: '#4caf50',
+    light: '#81c784',
+    dark: '#388e3c',
   },
 };

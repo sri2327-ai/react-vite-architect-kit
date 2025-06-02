@@ -40,8 +40,10 @@ export const TextAreaField = <T extends FieldValues>({
             rows={rows}
             error={!!error}
             helperText={error?.message}
-            aria-label={label}
-            aria-required={required}
+            inputProps={{
+              'aria-label': label,
+              'aria-required': required,
+            }}
           />
         )}
       />
@@ -59,8 +61,10 @@ export const TextAreaField = <T extends FieldValues>({
       variant={variant}
       multiline
       rows={rows}
-      aria-label={label}
-      aria-required={required}
+      inputProps={{
+        'aria-label': label,
+        'aria-required': required,
+      }}
     />
   );
 };

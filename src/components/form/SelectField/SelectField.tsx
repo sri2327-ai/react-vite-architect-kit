@@ -44,8 +44,10 @@ export const SelectField = <T extends FieldValues>({
             variant={variant}
             error={!!error}
             helperText={error?.message}
-            aria-label={label}
-            aria-required={required}
+            inputProps={{
+              'aria-label': label,
+              'aria-required': required,
+            }}
           >
             {options.map((option) => (
               <MenuItem key={option.value} value={option.value}>
@@ -68,8 +70,10 @@ export const SelectField = <T extends FieldValues>({
       fullWidth={fullWidth}
       size={size}
       variant={variant}
-      aria-label={label}
-      aria-required={required}
+      inputProps={{
+        'aria-label': label,
+        'aria-required': required,
+      }}
     >
       {options.map((option) => (
         <MenuItem key={option.value} value={option.value}>
