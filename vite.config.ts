@@ -30,6 +30,13 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    include: ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
+    include: [
+      '@mui/material', 
+      '@mui/icons-material', 
+      '@emotion/react', 
+      '@emotion/styled',
+      '@mui/styled-engine'
+    ],
+    force: true,
   },
 }));
