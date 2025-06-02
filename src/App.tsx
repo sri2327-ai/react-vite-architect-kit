@@ -8,6 +8,8 @@ import { lightTheme, darkTheme } from '@/theme';
 import { Layout } from '@/components/common';
 import { ThemeContext, useThemeStorage } from '@/hooks/useTheme';
 import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,12 +22,16 @@ const AppContent = () => {
       <ThemeProvider theme={themeMode.isDarkMode ? darkTheme : lightTheme}>
         <CssBaseline />
         <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/" element={
+              <Layout>
+                <Index />
+              </Layout>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </ThemeProvider>
     </ThemeContext.Provider>
