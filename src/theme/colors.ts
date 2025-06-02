@@ -1,11 +1,14 @@
 
 export const bravoColors = {
-  primary: '#143151', // Dark Navy Blue for headings or primary elements
-  secondary: '#5192AE', // Medium Teal Blue for buttons and secondary elements
+  primary: 'linear-gradient(90deg, #143151, #387E89)', // Primary gradient for headings or primary elements
+  primaryFlat: '#143151', // Flat version of primary for when gradients can't be used
+  primaryDark: '#0d1f31', // Dark end of the primary gradient
+  secondary: '#387E89', // Medium Teal Blue for buttons and secondary elements
   tertiary: '#A5CCF3', // Light Sky Blue for hover states or tertiary elements
   background: {
     white: '#FFFFFF', // Dominant white background
-    light: '#F5F9FF', // A very light blue (inspired by xAI's subtle background tones)
+    light: '#F5F9FF', // A very light blue
+    gradient: 'linear-gradient(90deg,#f8f9fa,#e9ecef)', // Light gradient background
     dark: '#387E89', // Dark Teal Blue for darker background sections if needed
   },
   text: {
