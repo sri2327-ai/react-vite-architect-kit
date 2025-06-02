@@ -55,7 +55,7 @@ const CustomStepIcon = ({ active, completed, icon }: any) => {
     return (
       <CheckCircle 
         sx={{ 
-          color: 'primary.main',
+          color: '#2E8B57', // Sea green color - more elegant and sophisticated
           fontSize: { xs: 20, sm: 24 }
         }} 
       />
