@@ -16,7 +16,7 @@ import {
   CheckCircle, 
   CreditCard, 
   Shield, 
-  CloudSync,
+  Cloud,
   Headphones,
   BarChart3 
 } from 'lucide-react';
@@ -29,7 +29,7 @@ interface PaymentProps {
 }
 
 const features = [
-  { icon: <CloudSync size={18} />, text: 'Unlimited clinical note transcriptions' },
+  { icon: <Cloud size={18} />, text: 'Unlimited clinical note transcriptions' },
   { icon: <Shield size={18} />, text: 'HIPAA-compliant data security' },
   { icon: <Headphones size={18} />, text: '24/7 customer support' },
   { icon: <BarChart3 size={18} />, text: 'Advanced analytics and insights' },
