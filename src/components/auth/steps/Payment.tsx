@@ -15,11 +15,11 @@ import {
 import { 
   CheckCircle, 
   CreditCard, 
-  Security, 
+  Shield, 
   CloudSync,
-  Support,
-  Analytics 
-} from '@mui/icons-material';
+  Headphones,
+  BarChart3 
+} from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -29,10 +29,10 @@ interface PaymentProps {
 }
 
 const features = [
-  { icon: <CloudSync />, text: 'Unlimited clinical note transcriptions' },
-  { icon: <Security />, text: 'HIPAA-compliant data security' },
-  { icon: <Support />, text: '24/7 customer support' },
-  { icon: <Analytics />, text: 'Advanced analytics and insights' },
+  { icon: <CloudSync size={18} />, text: 'Unlimited clinical note transcriptions' },
+  { icon: <Shield size={18} />, text: 'HIPAA-compliant data security' },
+  { icon: <Headphones size={18} />, text: '24/7 customer support' },
+  { icon: <BarChart3 size={18} />, text: 'Advanced analytics and insights' },
 ];
 
 export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
@@ -95,8 +95,8 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           <List sx={{ py: 0 }}>
             {features.map((feature, index) => (
               <ListItem key={index} sx={{ px: 0, py: 1 }}>
-                <ListItemIcon sx={{ minWidth: 36 }}>
-                  {React.cloneElement(feature.icon, { sx: { color: '#000000' }, fontSize: 'small' })}
+                <ListItemIcon sx={{ minWidth: 36, color: '#000000' }}>
+                  {feature.icon}
                 </ListItemIcon>
                 <ListItemText
                   primary={feature.text}
@@ -113,8 +113,13 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
 
       <Alert
         severity="success"
-        sx={{ mb: 4, borderRadius: 2 }}
-        icon={<CheckCircle />}
+        sx={{ 
+          mb: 4, 
+          borderRadius: 2,
+          backgroundColor: '#F0F8FF',
+          borderColor: '#D6E8F5',
+        }}
+        icon={<CheckCircle size={20} />}
       >
         <Typography variant="body2" fontWeight={600}>
           Setup Summary Complete
@@ -136,7 +141,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         <PrimaryButton
           onClick={handlePayment}
           disabled={loading}
-          startIcon={<CreditCard />}
+          startIcon={<CreditCard size={18} />}
           sx={{ flex: 2, fontWeight: 600 }}
         >
           {loading ? 'Processing Payment...' : 'Complete Setup - $99/month'}

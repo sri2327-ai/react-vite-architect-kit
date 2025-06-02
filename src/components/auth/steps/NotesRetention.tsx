@@ -12,7 +12,7 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-import { Security, Storage } from '@mui/icons-material';
+import { Shield, HardDrive } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -62,7 +62,7 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
       <Alert
         severity="info"
         sx={{ mb: 4, borderRadius: 2 }}
-        icon={<Security />}
+        icon={<Shield size={20} />}
       >
         All notes are encrypted and stored securely. You can change this setting anytime in your account preferences.
       </Alert>
@@ -81,10 +81,10 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                   cursor: 'pointer',
                   border: retentionDuration === option.value ? 2 : 1,
                   borderColor: retentionDuration === option.value ? 'primary.main' : 'divider',
-                  backgroundColor: retentionDuration === option.value ? '#E3F2FD' : 'background.paper',
+                  backgroundColor: retentionDuration === option.value ? '#F0F8FF' : 'background.paper',
                   '&:hover': {
                     borderColor: 'primary.main',
-                    backgroundColor: '#F5F9FF',
+                    backgroundColor: '#F8FBFF',
                   },
                   transition: 'all 0.2s ease-in-out',
                 }}
@@ -96,8 +96,9 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                     control={<Radio sx={{ display: 'none' }} />}
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                        <Storage 
-                          sx={{ color: retentionDuration === option.value ? 'primary.main' : '#888888' }}
+                        <HardDrive 
+                          size={20}
+                          color={retentionDuration === option.value ? '#143151' : '#888888'}
                         />
                         <Box sx={{ flex: 1 }}>
                           <Typography

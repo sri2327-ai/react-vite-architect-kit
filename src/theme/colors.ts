@@ -31,7 +31,9 @@ export const bravoColors = {
     secondary: '#666666', // Updated to darker grey for secondary icons
   },
   highlight: {
-    selected: '#E3F2FD', // Light blue highlight for selected items
-    hover: '#F5F9FF', // Very light blue for hover states
+    selected: '#F0F8FF', // Very light blue, almost white with a hint of blue
+    hover: '#F8FBFF', // Even lighter for hover states
+    border: '#D6E8F5', // Soft blue border for selected items
+    accent: '#E8F4F8', // Subtle accent highlight
   }
 };

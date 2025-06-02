@@ -68,8 +68,8 @@ const CustomStepIcon = ({ active, completed, icon }: any) => {
         width: { xs: 20, sm: 24 },
         height: { xs: 20, sm: 24 },
         borderRadius: '50%',
-        backgroundColor: active ? 'primary.main' : 'grey.300',
-        color: active ? 'white' : 'grey.600',
+        backgroundColor: active ? 'primary.main' : '#E5E7EB',
+        color: active ? 'white' : '#9CA3AF',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -180,7 +180,7 @@ export const SignupFlow: React.FC = () => {
               sx={{
                 width: '100%',
                 height: 4,
-                backgroundColor: 'grey.200',
+                backgroundColor: '#F0F8FF',
                 borderRadius: 2,
                 overflow: 'hidden'
               }}
@@ -215,11 +215,14 @@ export const SignupFlow: React.FC = () => {
                 fontWeight: 500
               },
               '& .MuiStepConnector-line': {
-                borderColor: 'divider',
+                borderColor: '#E5E7EB',
                 borderTopWidth: 2
               },
               '& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line': {
                 borderColor: 'primary.main'
+              },
+              '& .MuiStepConnector-root.Mui-active .MuiStepConnector-line': {
+                borderColor: '#D6E8F5'
               }
             }}
           >

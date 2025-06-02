@@ -12,7 +12,7 @@ import {
   CardContent,
   Alert,
 } from '@mui/material';
-import { Info } from '@mui/icons-material';
+import { Info } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -88,11 +88,12 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
 
       <Alert
         severity="info"
-        icon={<Info />}
+        icon={<Info size={20} />}
         sx={{ 
           mb: 4, 
           borderRadius: 2,
-          backgroundColor: 'info.light',
+          backgroundColor: '#F0F8FF',
+          borderColor: '#D6E8F5',
           '& .MuiAlert-message': {
             fontSize: { xs: '0.8rem', sm: '0.875rem' }
           }
@@ -115,10 +116,10 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
                       cursor: 'pointer',
                       border: selectedEHR === ehr ? 2 : 1,
                       borderColor: selectedEHR === ehr ? 'primary.main' : 'divider',
-                      backgroundColor: selectedEHR === ehr ? 'primary.light' : 'background.paper',
+                      backgroundColor: selectedEHR === ehr ? '#F0F8FF' : 'background.paper',
                       '&:hover': {
                         borderColor: 'primary.main',
-                        backgroundColor: selectedEHR === ehr ? 'primary.light' : 'background.light',
+                        backgroundColor: selectedEHR === ehr ? '#F0F8FF' : '#F8FBFF',
                         transform: 'translateY(-2px)',
                         boxShadow: '0 4px 12px rgba(20, 49, 81, 0.15)'
                       },

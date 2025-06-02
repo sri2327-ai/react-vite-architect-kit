@@ -7,7 +7,7 @@ import {
   MenuItem,
   Alert,
 } from '@mui/material';
-import { CalendarToday, Schedule } from '@mui/icons-material';
+import { Calendar, Clock } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -65,8 +65,13 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
 
       <Alert
         severity="info"
-        sx={{ mb: 4, borderRadius: 2 }}
-        icon={<CalendarToday />}
+        sx={{ 
+          mb: 4, 
+          borderRadius: 2,
+          backgroundColor: '#F0F8FF',
+          borderColor: '#D6E8F5',
+        }}
+        icon={<Calendar size={20} />}
       >
         Our integration specialists will help you connect your EHR system to S10.AI. 
         This typically takes 30-45 minutes.
@@ -98,7 +103,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
           required
           sx={{ mb: 3 }}
           SelectProps={{
-            startAdornment: <Schedule sx={{ mr: 1, color: 'action.active' }} />,
+            startAdornment: <Clock size={16} style={{ marginRight: 8, color: '#888888' }} />,
           }}
         >
           {timeSlots.map((slot) => (
