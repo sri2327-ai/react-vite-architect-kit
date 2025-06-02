@@ -8,8 +8,8 @@ export const SecondaryButton: React.FC<ButtonProps> = ({ children, sx, ...props 
     <Button
       variant="outlined"
       sx={{
-        borderColor: bravoColors.primary,
-        color: bravoColors.primary,
+        borderColor: bravoColors.primaryFlat, // Use flat color instead of gradient
+        color: bravoColors.primaryFlat,
         fontWeight: 600,
         borderRadius: 2,
         textTransform: 'none',

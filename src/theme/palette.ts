@@ -5,14 +5,14 @@ import { bravoColors } from './colors';
 export const lightPalette: PaletteOptions = {
   mode: 'light',
   primary: {
-    main: bravoColors.primary,
+    main: bravoColors.primaryFlat, // Use flat color instead of gradient
     light: bravoColors.secondary,
-    dark: bravoColors.background.dark,
+    dark: bravoColors.primaryDark,
   },
   secondary: {
     main: bravoColors.secondary,
     light: bravoColors.tertiary,
-    dark: bravoColors.background.dark,
+    dark: bravoColors.primaryDark,
   },
   background: {
     default: bravoColors.background.white,
@@ -35,7 +35,7 @@ export const lightPalette: PaletteOptions = {
   info: {
     main: bravoColors.accent.blue,
     light: bravoColors.tertiary,
-    dark: bravoColors.primary,
+    dark: bravoColors.primaryFlat,
   },
   success: {
     main: '#2e7d32',
@@ -49,16 +49,16 @@ export const darkPalette: PaletteOptions = {
   primary: {
     main: bravoColors.tertiary,
     light: bravoColors.secondary,
-    dark: bravoColors.primary,
+    dark: bravoColors.primaryFlat,
   },
   secondary: {
     main: bravoColors.secondary,
     light: bravoColors.tertiary,
-    dark: bravoColors.primary,
+    dark: bravoColors.primaryFlat,
   },
   background: {
     default: bravoColors.background.dark,
-    paper: bravoColors.primary,
+    paper: bravoColors.primaryFlat,
   },
   text: {
     primary: bravoColors.text.white,
@@ -77,7 +77,7 @@ export const darkPalette: PaletteOptions = {
   info: {
     main: bravoColors.tertiary,
     light: bravoColors.secondary,
-    dark: bravoColors.primary,
+    dark: bravoColors.primaryFlat,
   },
   success: {
     main: '#4caf50',
