@@ -1,18 +1,17 @@
 
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box } from '@mui/material';
+import { ThemeToggle } from '../ThemeToggle';
 
 export const Header: React.FC = () => {
   return (
-    <AppBar position="static">
+    <AppBar position="static" elevation={0}>
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          My App
+          Bravo App
         </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button color="inherit">Home</Button>
-          <Button color="inherit">About</Button>
-          <Button color="inherit">Contact</Button>
+        <Box>
+          <ThemeToggle />
         </Box>
       </Toolbar>
     </AppBar>

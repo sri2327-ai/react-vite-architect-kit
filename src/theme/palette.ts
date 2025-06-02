@@ -1,24 +1,57 @@
 
 import { PaletteOptions } from '@mui/material/styles';
+import { bravoColors } from './colors';
 
-export const palette: PaletteOptions = {
+export const lightPalette: PaletteOptions = {
   mode: 'light',
   primary: {
-    main: '#1976d2',
-    light: '#42a5f5',
-    dark: '#1565c0',
+    main: bravoColors.primary,
+    light: bravoColors.secondary,
+    dark: bravoColors.background.dark,
   },
   secondary: {
-    main: '#dc004e',
-    light: '#ff5983',
-    dark: '#9a0036',
+    main: bravoColors.secondary,
+    light: bravoColors.tertiary,
+    dark: bravoColors.background.dark,
   },
   background: {
-    default: '#f5f5f5',
-    paper: '#ffffff',
+    default: bravoColors.background.white,
+    paper: bravoColors.background.light,
   },
   text: {
-    primary: '#333333',
-    secondary: '#666666',
+    primary: bravoColors.text.primary,
+    secondary: bravoColors.text.secondary,
+  },
+  error: {
+    main: '#d32f2f',
+    light: '#ef5350',
+    dark: '#c62828',
+  },
+};
+
+export const darkPalette: PaletteOptions = {
+  mode: 'dark',
+  primary: {
+    main: bravoColors.tertiary,
+    light: bravoColors.secondary,
+    dark: bravoColors.primary,
+  },
+  secondary: {
+    main: bravoColors.secondary,
+    light: bravoColors.tertiary,
+    dark: bravoColors.primary,
+  },
+  background: {
+    default: bravoColors.background.dark,
+    paper: bravoColors.primary,
+  },
+  text: {
+    primary: bravoColors.text.white,
+    secondary: bravoColors.tertiary,
+  },
+  error: {
+    main: '#f44336',
+    light: '#e57373',
+    dark: '#d32f2f',
   },
 };

@@ -1,11 +1,10 @@
 
 import { createTheme, ThemeOptions } from '@mui/material/styles';
-import { palette } from './palette';
+import { lightPalette, darkPalette } from './palette';
 import { typography } from './typography';
 import { components } from './components';
 
-const themeOptions: ThemeOptions = {
-  palette,
+const baseThemeOptions: Omit<ThemeOptions, 'palette'> = {
   typography,
   components,
   spacing: 8,
@@ -14,5 +13,19 @@ const themeOptions: ThemeOptions = {
   },
 };
 
-export const theme = createTheme(themeOptions);
-export type CustomTheme = typeof theme;
+export const lightTheme = createTheme({
+  ...baseThemeOptions,
+  palette: lightPalette,
+});
+
+export const darkTheme = createTheme({
+  ...baseThemeOptions,
+  palette: darkPalette,
+});
+
+// Default theme (light)
+export const theme = lightTheme;
+export type CustomTheme = typeof lightTheme;
+
+// Export colors for use in components
+export { bravoColors } from './colors';
