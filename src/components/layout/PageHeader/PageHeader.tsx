@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Box, Typography, Breadcrumbs, Link, Grid2 } from '@mui/material';
+import { Box, Typography, Breadcrumbs, Link, Grid } from '@mui/material';
 import { NavigateNext } from '@mui/icons-material';
 
 interface BreadcrumbItem {
@@ -43,8 +43,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         </Breadcrumbs>
       )}
       
-      <Grid2 container spacing={2} alignItems="flex-start">
-        <Grid2 xs={12} md={actions ? 8 : 12}>
+      <Grid container spacing={2} alignItems="flex-start">
+        <Grid item xs={12} md={actions ? 8 : 12}>
           <Typography 
             variant="h4" 
             component="h1" 
@@ -65,10 +65,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
               {subtitle}
             </Typography>
           )}
-        </Grid2>
+        </Grid>
         
         {actions && (
-          <Grid2 xs={12} md={4}>
+          <Grid item xs={12} md={4}>
             <Box 
               sx={{
                 display: 'flex',
@@ -80,9 +80,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
             >
               {actions}
             </Box>
-          </Grid2>
+          </Grid>
         )}
-      </Grid2>
+      </Grid>
     </Box>
   );
 };
