@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
-import { Box, Card, CardContent, TextField, Button, Typography, Divider, Alert, InputAdornment, IconButton, Link, Grid } from '@mui/material';
+import { Box, Card, CardContent, TextField, Button, Typography, Divider, Alert, InputAdornment, IconButton, Link, Container } from '@mui/material';
 import { Visibility, VisibilityOff, Google, Mail } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
+import { useResponsive } from '@/hooks/useResponsive';
 
 export const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { isMobile } = useResponsive();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,89 +35,133 @@ export const Login: React.FC = () => {
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: `linear-gradient(135deg, ${(theme) => theme.palette.background.paper} 0%, ${(theme) => theme.palette.background.default} 100%)`
+      background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      p: 2
     }}>
-      <Grid container sx={{ minHeight: '100vh' }}>
-        {/* Left side - Animation space */}
-        <Grid item xs={12} md={6} sx={{
+      <Container maxWidth="lg" sx={{ height: '100vh', display: 'flex', alignItems: 'center' }}>
+        <Box sx={{
+          width: '100%',
           display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 3,
-          background: 'linear-gradient(135deg, #143151 0%, #387E89 100%)'
+          flexDirection: { xs: 'column', md: 'row' },
+          minHeight: { xs: 'auto', md: '600px' },
+          borderRadius: 3,
+          overflow: 'hidden',
+          boxShadow: '0 20px 60px rgba(20, 49, 81, 0.15)'
         }}>
+          {/* Left side - Branding */}
           <Box sx={{
+            flex: 1,
+            background: 'linear-gradient(135deg, #143151 0%, #387E89 100%)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            color: 'white'
+            justifyContent: 'center',
+            p: { xs: 3, md: 4 },
+            color: 'white',
+            textAlign: 'center',
+            minHeight: { xs: '200px', md: 'auto' }
           }}>
-            <Typography variant="h3" sx={{
+            <Typography variant={isMobile ? "h4" : "h3"} sx={{
               fontWeight: 700,
               mb: 2,
-              textAlign: 'center'
+              lineHeight: 1.2
             }}>
               Welcome to S10.AI
             </Typography>
             <Typography variant="h6" sx={{
               opacity: 0.9,
-              textAlign: 'center',
-              maxWidth: 400
+              maxWidth: 400,
+              lineHeight: 1.5,
+              fontSize: { xs: '1rem', md: '1.25rem' }
             }}>
-              Transform your workflow with intelligent automation
+              Transform your workflow with intelligent automation and streamlined processes
             </Typography>
-            {/* Space reserved for future animation */}
+            
+            {/* Animation placeholder */}
             <Box sx={{
               mt: 4,
-              width: 300,
-              height: 200,
+              width: { xs: 250, md: 300 },
+              height: { xs: 150, md: 200 },
               border: '2px dashed rgba(255,255,255,0.3)',
               borderRadius: 2,
-              display: 'flex',
+              display: { xs: 'none', md: 'flex' },
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Typography variant="body2" sx={{
-                opacity: 0.7
-              }}>
+              <Typography variant="body2" sx={{ opacity: 0.7 }}>
                 Animation Space
               </Typography>
             </Box>
           </Box>
-        </Grid>
 
-        {/* Right side - Login Form */}
-        <Grid item xs={12} md={6} sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 3
-        }}>
-          <Card sx={{
-            maxWidth: 440,
-            width: '100%',
-            borderRadius: 3,
-            boxShadow: '0 8px 32px rgba(20, 49, 81, 0.15)',
-            border: `1px solid ${(theme) => theme.palette.divider}`
+          {/* Right side - Login Form */}
+          <Box sx={{
+            flex: 1,
+            backgroundColor: 'white',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            p: { xs: 3, md: 5 }
           }}>
-            <CardContent sx={{ p: 4 }}>
-              <Box sx={{ textAlign: 'center', mb: 4 }}>
-                <Typography variant="h4" sx={{
-                  fontWeight: 700,
-                  background: 'linear-gradient(90deg, #143151, #387E89)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  mb: 1
-                }}>
-                  Welcome Back
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Sign in to your S10.AI account
+            {/* Logo and Title */}
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              mb: 4
+            }}>
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mb: 3
+              }}>
+                <Box
+                  component="img"
+                  src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
+                  alt="S10.AI Logo"
+                  sx={{
+                    height: { xs: 40, md: 50 },
+                    mr: 2,
+                  }}
+                />
+                <Typography
+                  variant={isMobile ? "h5" : "h4"}
+                  sx={{
+                    fontWeight: 700,
+                    background: 'linear-gradient(90deg, #143151, #387E89)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}
+                >
+                  S10.AI
                 </Typography>
               </Box>
 
+              <Typography variant={isMobile ? "h5" : "h4"} sx={{
+                fontWeight: 700,
+                background: 'linear-gradient(90deg, #143151, #387E89)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 1,
+                textAlign: 'center'
+              }}>
+                Welcome Back
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{
+                textAlign: 'center',
+                fontSize: { xs: '0.9rem', md: '1rem' }
+              }}>
+                Sign in to your S10.AI account
+              </Typography>
+            </Box>
+
+            {/* Form Container */}
+            <Box sx={{ maxWidth: 400, mx: 'auto', width: '100%' }}>
               {error && (
                 <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
                   {error}
@@ -130,6 +176,7 @@ export const Login: React.FC = () => {
                   mb: 3,
                   py: 1.5,
                   borderColor: 'divider',
+                  fontSize: { xs: '0.875rem', md: '1rem' },
                   '&:hover': {
                     borderColor: 'primary.main',
                     backgroundColor: 'background.paper'
@@ -192,7 +239,8 @@ export const Login: React.FC = () => {
                   sx={{
                     py: 1.5,
                     mb: 3,
-                    fontWeight: 600
+                    fontWeight: 600,
+                    fontSize: { xs: '0.875rem', md: '1rem' }
                   }}
                 >
                   {loading ? 'Signing In...' : 'Sign In'}
@@ -200,7 +248,9 @@ export const Login: React.FC = () => {
               </Box>
 
               <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{
+                  fontSize: { xs: '0.8rem', md: '0.875rem' }
+                }}>
                   Don't have an account?{' '}
                   <Link
                     href="/signup"
@@ -220,10 +270,10 @@ export const Login: React.FC = () => {
                   </Link>
                 </Typography>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+            </Box>
+          </Box>
+        </Box>
+      </Container>
     </Box>
   );
 };
