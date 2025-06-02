@@ -74,7 +74,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           mb: 4,
           border: 2,
           borderColor: 'primary.main',
-          backgroundColor: 'primary.light',
+          backgroundColor: 'background.paper',
         }}
       >
         <CardContent sx={{ p: 4 }}>
@@ -96,7 +96,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
             {features.map((feature, index) => (
               <ListItem key={index} sx={{ px: 0, py: 1 }}>
                 <ListItemIcon sx={{ minWidth: 36 }}>
-                  {React.cloneElement(feature.icon, { color: 'primary', fontSize: 'small' })}
+                  {React.cloneElement(feature.icon, { sx: { color: '#000000' }, fontSize: 'small' })}
                 </ListItemIcon>
                 <ListItemText
                   primary={feature.text}

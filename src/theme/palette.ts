@@ -6,7 +6,6 @@ export const lightPalette: PaletteOptions = {
   mode: 'light',
   primary: {
     main: bravoColors.primaryFlat, // Use flat color instead of gradient
-    light: bravoColors.secondary,
     dark: bravoColors.primaryDark,
   },
   secondary: {
@@ -48,7 +47,6 @@ export const darkPalette: PaletteOptions = {
   mode: 'dark',
   primary: {
     main: bravoColors.tertiary,
-    light: bravoColors.secondary,
     dark: bravoColors.primaryFlat,
   },
   secondary: {
