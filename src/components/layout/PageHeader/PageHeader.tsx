@@ -44,7 +44,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       )}
       
       <Grid container spacing={2} alignItems="flex-start">
-        <Grid item xs={12} md={actions ? 8 : 12}>
+        <Grid size={{ xs: 12, md: actions ? 8 : 12 }}>
           <Typography 
             variant="h4" 
             component="h1" 
@@ -68,7 +68,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         </Grid>
         
         {actions && (
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box 
               sx={{
                 display: 'flex',
