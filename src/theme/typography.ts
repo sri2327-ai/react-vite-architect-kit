@@ -1,7 +1,7 @@
 
-import { TypographyOptions } from '@mui/material/styles';
+import { TypographyVariants } from '@mui/material/styles';
 
-export const typography: TypographyOptions = {
+export const typography: Partial<TypographyVariants> = {
   fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   h1: {
     fontSize: '2.5rem',
