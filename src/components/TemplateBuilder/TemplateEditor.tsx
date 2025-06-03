@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import {
   Box,
-  Card,
-  CardContent,
-  TextField,
   Button,
+  TextField,
   Typography,
-  IconButton,
+  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -15,943 +13,600 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Card,
+  CardContent,
+  IconButton,
+  Tooltip,
   Chip,
   Stack,
   Divider,
-  Grid2 as Grid,
+  Grid,
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
-  Collapse,
-  Paper,
+  ListItemSecondaryAction,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  FormControlLabel,
+  Switch,
+  Alert,
+  AlertTitle,
+  Snackbar
 } from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  DragIndicator as DragIndicatorIcon,
-  Save as SaveIcon,
-  Close as CloseIcon,
-  ArrowBack as ArrowBackIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
-  Psychology as PsychologyIcon,
-  LocalHospital as MedicalIcon,
-  LocalPharmacy as PharmacyIcon,
-  Warning as WarningIcon,
-  School as SchoolIcon,
-  Assignment as AssignmentIcon,
-  CheckCircle as CheckCircleIcon,
-  TextFields as TextFieldsIcon,
-  Title as TitleIcon,
-  List as ListIcon,
-  Help as HelpIcon
-} from '@mui/icons-material';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { bravoColors } from '@/theme/colors';
-
-interface TemplateSection {
-  id: string;
-  title: string;
-  content: string;
-  type: 'text' | 'list' | 'checkbox' | 'dropdown' | 'exam_list' | 'paragraph' | 'section_header';
-  options?: string[];
-  subsections?: Array<{
-    id: string;
-    title: string;
-    instruction?: string;
-  }>;
-  aiInstruction?: string;
-}
+import { Delete, Add, Edit, DragHandle } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
+import { useTheme } from '@mui/material/styles';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 interface TemplateEditorProps {
-  templateName: string;
-  initialSections?: TemplateSection[];
-  onSave: (sections: TemplateSection[]) => void;
-  onBack: () => void;
+  template: Template | null;
+  onChange: (template: Template) => void;
+  onSave: () => void;
+}
+
+interface Template {
+  id: string;
+  name: string;
+  description: string;
+  elements: TemplateElement[];
+}
+
+interface TemplateElement {
+  id: string;
+  type: string;
+  label: string;
+  required: boolean;
+  placeholder?: string;
+  options?: string[];
 }
 
 const PREDEFINED_SECTIONS = [
   {
-    id: 'past-psychiatric',
-    title: 'Past Psychiatric History',
-    description: "Patient's history of psychiatric conditions and treatments",
-    icon: <PsychologyIcon />,
-    type: 'paragraph' as const,
-    content: "Document the patient's history of psychiatric conditions and treatments"
-  },
-  {
-    id: 'medical-history',
-    title: 'Medical History',
-    description: "Patient's history of medical conditions",
-    icon: <MedicalIcon />,
-    type: 'paragraph' as const,
-    content: "Patient's history of medical conditions"
-  },
-  {
-    id: 'surgical-history',
-    title: 'Surgical History',
-    description: "Patient's history of surgical procedures",
-    icon: <MedicalIcon />,
-    type: 'paragraph' as const,
-    content: "Patient's history of surgical procedures"
-  },
-  {
-    id: 'current-medications',
-    title: 'Current Medications',
-    description: "List of patient's current medications",
-    icon: <PharmacyIcon />,
-    type: 'list' as const,
-    content: "List of patient's current medications"
-  },
-  {
-    id: 'allergies',
-    title: 'Allergies',
-    description: "Patient's allergies to medications, foods, or other substances",
-    icon: <WarningIcon />,
-    type: 'list' as const,
-    content: "Patient's allergies to medications, foods, or other substances"
-  },
-  {
-    id: 'substance-use',
-    title: 'Substance Use History',
-    description: "Patient's history of substance use",
-    icon: <WarningIcon />,
-    type: 'paragraph' as const,
-    content: "Patient's history of substance use"
-  },
-  {
-    id: 'treatment-history',
-    title: 'Treatment History',
-    description: "Patient's history of substance use treatment",
-    icon: <MedicalIcon />,
-    type: 'paragraph' as const,
-    content: "Patient's history of substance use treatment"
-  },
-  {
-    id: 'family-history',
-    title: 'Family History',
-    description: "Patient's family psychiatric history",
-    icon: <PsychologyIcon />,
-    type: 'paragraph' as const,
-    content: "Patient's family psychiatric history"
-  },
-  {
-    id: 'plan',
-    title: 'Plan',
-    description: 'Comprehensive treatment plan with interventions',
-    icon: <AssignmentIcon />,
-    type: 'paragraph' as const,
-    content: 'Comprehensive treatment plan with interventions'
-  },
-  {
-    id: 'developmental-history',
-    title: 'Developmental History',
-    description: "Patient's developmental history and milestones",
-    icon: <SchoolIcon />,
-    type: 'paragraph' as const,
-    content: "Patient's developmental history and milestones"
-  },
-  {
-    id: 'academic-history',
-    title: 'Academic History',
-    description: "Patient's academic performance and school history",
-    icon: <SchoolIcon />,
-    type: 'paragraph' as const,
-    content: "Patient's academic performance and school history"
-  },
-  {
-    id: 'todo-next-steps',
-    title: 'To-do and Next Steps',
-    description: 'Action items for provider and patient before next visit',
-    icon: <CheckCircleIcon />,
-    type: 'list' as const,
-    content: 'Action items for provider and patient before next visit'
-  }
-];
-
-const CUSTOM_SECTION_TYPES = [
-  {
-    id: 'paragraph',
-    title: 'Paragraph',
-    description: 'Add a paragraph for general note-taking or documentation.',
-    icon: <TextFieldsIcon />
-  },
-  {
-    id: 'section_header',
-    title: 'Section Header',
-    description: 'Insert a section header to organize and separate content.',
-    icon: <TitleIcon />
-  },
-  {
-    id: 'exam_list',
-    title: 'Exam List',
-    description: 'Use this for structured lists of exam observations or findings.',
-    icon: <ListIcon />
-  },
-  {
-    id: 'list',
-    title: 'Bullet List',
-    description: 'Create a bullet list for multiple items.',
-    icon: <ListIcon />
-  }
-];
-
-const SortableSection: React.FC<{
-  section: TemplateSection;
-  onEdit: (section: TemplateSection) => void;
-  onDelete: (id: string) => void;
-  onEditAI: (section: TemplateSection) => void;
-}> = ({ section, onEdit, onDelete, onEditAI }) => {
-  const [expanded, setExpanded] = useState(false);
-  
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: section.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <Card
-      ref={setNodeRef}
-      style={style}
-      sx={{
-        mb: 2,
-        border: '1px solid #e0e0e0',
-        borderRadius: 2,
-        overflow: 'visible'
-      }}
-    >
-      <CardContent sx={{ p: 3 }}>
-        <Box display="flex" alignItems="flex-start" gap={2}>
-          <IconButton
-            {...attributes}
-            {...listeners}
-            sx={{ 
-              cursor: 'grab',
-              color: bravoColors.text.secondary,
-              mt: -1,
-              '&:active': { cursor: 'grabbing' }
-            }}
-          >
-            <DragIndicatorIcon />
-          </IconButton>
-          
-          <Box flex={1}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.text.primary }}>
-                {section.title} - {section.type.replace('_', ' ')}
-              </Typography>
-              <Box display="flex" gap={1}>
-                <IconButton size="small" onClick={() => onEdit(section)}>
-                  <EditIcon sx={{ fontSize: 20 }} />
-                </IconButton>
-                <IconButton size="small" onClick={() => onDelete(section.id)}>
-                  <DeleteIcon sx={{ fontSize: 20 }} />
-                </IconButton>
-              </Box>
-            </Box>
-            
-            <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mb: 2 }}>
-              {section.content}
-            </Typography>
-
-            {section.type === 'exam_list' && section.subsections && (
-              <Box mb={2}>
-                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                  Exam Sections:
-                </Typography>
-                {section.subsections.map((subsection, index) => (
-                  <Box key={subsection.id} display="flex" alignItems="center" mb={0.5}>
-                    <Typography variant="body2" sx={{ color: bravoColors.text.primary }}>
-                      • {subsection.title}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            )}
-            
-            {section.options && section.options.length > 0 && (
-              <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
-                {section.options.map((option, index) => (
-                  <Chip
-                    key={index}
-                    label={option}
-                    size="small"
-                    variant="outlined"
-                    sx={{ fontSize: '0.7rem' }}
-                  />
-                ))}
-              </Box>
-            )}
-
-            <Box display="flex" gap={1}>
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<EditIcon />}
-                onClick={() => onEditAI(section)}
-                sx={{
-                  backgroundColor: bravoColors.secondary,
-                  color: 'white',
-                  fontSize: '0.75rem',
-                  textTransform: 'uppercase',
-                  '&:hover': {
-                    backgroundColor: bravoColors.primaryFlat
-                  }
-                }}
-              >
-                Edit Instruction for A.I
-              </Button>
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<HelpIcon />}
-                sx={{
-                  borderColor: bravoColors.secondary,
-                  color: bravoColors.secondary,
-                  fontSize: '0.75rem',
-                  textTransform: 'uppercase'
-                }}
-              >
-                Help Me
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
-
-const TemplateEditor: React.FC<TemplateEditorProps> = ({
-  templateName,
-  initialSections = [],
-  onSave,
-  onBack
-}) => {
-  const [sections, setSections] = useState<TemplateSection[]>(initialSections);
-  const [openAddSection, setOpenAddSection] = useState(false);
-  const [openCustomSection, setOpenCustomSection] = useState(false);
-  const [openExamListEditor, setOpenExamListEditor] = useState(false);
-  const [openAIInstructionEditor, setOpenAIInstructionEditor] = useState(false);
-  const [editingSection, setEditingSection] = useState<TemplateSection | null>(null);
-  const [selectedPredefinedSection, setSelectedPredefinedSection] = useState<any>(null);
-  const [customSectionForm, setCustomSectionForm] = useState({
-    title: '',
-    description: '',
-    type: 'paragraph' as const
-  });
-  const [examListForm, setExamListForm] = useState({
-    title: '',
-    subsections: [
-      { id: '1', title: 'Past Psychiatric Diagnoses' },
-      { id: '2', title: 'Psychiatric Hospitalizations' },
-      { id: '3', title: 'Suicide Attempts' },
-      { id: '4', title: 'Self-Injurious Behavior' },
-      { id: '5', title: 'Psychiatric Medication Trials' },
-      { id: '6', title: 'Previous mental health treatment' }
+    id: 'medical_history',
+    name: 'Medical History',
+    description: 'A comprehensive section for gathering patient medical history.',
+    elements: [
+      { id: uuidv4(), type: 'text', label: 'Chief Complaint', required: true, placeholder: 'Enter chief complaint' },
+      { id: uuidv4(), type: 'textarea', label: 'History of Present Illness', required: true, placeholder: 'Describe the history of present illness' },
+      { id: uuidv4(), type: 'textarea', label: 'Past Medical History', required: false, placeholder: 'List past medical conditions' },
+      { id: uuidv4(), type: 'textarea', label: 'Current Medications', required: false, placeholder: 'List current medications' },
+      { id: uuidv4(), type: 'textarea', label: 'Allergies', required: false, placeholder: 'List any allergies' }
     ]
-  });
-  const [aiInstructionForm, setAIInstructionForm] = useState({
-    instruction: ''
-  });
+  },
+  {
+    id: 'physical_exam',
+    name: 'Physical Exam',
+    description: 'A structured section for documenting physical examination findings.',
+    elements: [
+      { id: uuidv4(), type: 'text', label: 'General Appearance', required: false, placeholder: 'Describe general appearance' },
+      { id: uuidv4(), type: 'text', label: 'Vital Signs', required: false, placeholder: 'Record vital signs' },
+      { id: uuidv4(), type: 'text', label: 'Skin', required: false, placeholder: 'Describe skin condition' },
+      { id: uuidv4(), type: 'text', label: 'HEENT', required: false, placeholder: 'Describe head, eyes, ears, nose, and throat' },
+      { id: uuidv4(), type: 'text', label: 'Cardiovascular', required: false, placeholder: 'Describe cardiovascular findings' },
+      { id: uuidv4(), type: 'text', label: 'Respiratory', required: false, placeholder: 'Describe respiratory findings' },
+      { id: uuidv4(), type: 'text', label: 'Gastrointestinal', required: false, placeholder: 'Describe gastrointestinal findings' },
+      { id: uuidv4(), type: 'text', label: 'Neurological', required: false, placeholder: 'Describe neurological findings' },
+      { id: uuidv4(), type: 'text', label: 'Musculoskeletal', required: false, placeholder: 'Describe musculoskeletal findings' }
+    ]
+  },
+  {
+    id: 'assessment_plan',
+    name: 'Assessment and Plan',
+    description: 'A section for summarizing the assessment and outlining the treatment plan.',
+    elements: [
+      { id: uuidv4(), type: 'textarea', label: 'Assessment', required: true, placeholder: 'Summarize the assessment' },
+      { id: uuidv4(), type: 'textarea', label: 'Plan', required: true, placeholder: 'Outline the treatment plan' },
+      { id: uuidv4(), type: 'textarea', label: 'Follow-up', required: false, placeholder: 'Describe follow-up instructions' }
+    ]
+  },
+  {
+    id: 'lab_results',
+    name: 'Lab Results',
+    description: 'A section for recording and interpreting laboratory results.',
+    elements: [
+      { id: uuidv4(), type: 'text', label: 'Lab Name', required: true, placeholder: 'Enter lab name' },
+      { id: uuidv4(), type: 'text', label: 'Result', required: true, placeholder: 'Enter result' },
+      { id: uuidv4(), type: 'textarea', label: 'Interpretation', required: false, placeholder: 'Provide interpretation' }
+    ]
+  },
+  {
+    id: 'imaging_reports',
+    name: 'Imaging Reports',
+    description: 'A section for documenting imaging reports and findings.',
+    elements: [
+      { id: uuidv4(), type: 'text', label: 'Imaging Type', required: true, placeholder: 'Enter imaging type' },
+      { id: uuidv4(), type: 'text', label: 'Report Date', required: true, placeholder: 'Enter report date' },
+      { id: uuidv4(), type: 'textarea', label: 'Findings', required: false, placeholder: 'Describe findings' }
+    ]
+  }
+];
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+const TemplateEditor: React.FC<TemplateEditorProps> = ({ 
+  template, 
+  onChange, 
+  onSave 
+}) => {
+  const [selectedElement, setSelectedElement] = useState<TemplateElement | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [newElementName, setNewElementName] = useState('');
+  const [showPredefinedSections, setShowPredefinedSections] = useState(false);
+  const [showSnackbar, setShowSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const theme = useTheme();
 
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-
-    if (active.id !== over.id) {
-      setSections((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
+  const handleTemplateNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!template) return;
+    onChange({ ...template, name: event.target.value });
   };
 
-  const handleAddPredefinedSection = (predefinedSection: any) => {
-    const newSection: TemplateSection = {
-      id: `section-${Date.now()}`,
-      title: predefinedSection.title,
-      content: predefinedSection.content,
-      type: predefinedSection.type,
-      options: predefinedSection.type === 'list' ? [''] : undefined
+  const handleTemplateDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!template) return;
+    onChange({ ...template, description: event.target.value });
+  };
+
+  const handleAddElement = (type: string) => {
+    if (!template) return;
+    const newElement: TemplateElement = {
+      id: uuidv4(),
+      type: type,
+      label: newElementName || 'New Element',
+      required: false,
+      placeholder: '',
+      options: type === 'select' ? [] : undefined
     };
-
-    setSections(prev => [...prev, newSection]);
-    setOpenAddSection(false);
+    onChange({ ...template, elements: [...template.elements, newElement] });
+    setNewElementName('');
+    handleOpenSnackbar('Element added successfully!', 'success');
   };
 
-  const handleCreateCustomSection = () => {
-    setOpenAddSection(false);
-    setOpenCustomSection(true);
+  const handleAddPredefinedSection = (section: any) => {
+    if (!template) return;
+    const newElements = section.elements.map((element: any) => ({
+      ...element,
+      id: uuidv4()
+    }));
+    onChange({ ...template, elements: [...template.elements, ...newElements] });
+    setShowPredefinedSections(false);
+    handleOpenSnackbar(`${section.name} added successfully!`, 'success');
   };
 
-  const handleSaveCustomSection = () => {
-    if (customSectionForm.type === 'exam_list') {
-      setOpenCustomSection(false);
-      setOpenExamListEditor(true);
-      setExamListForm(prev => ({ ...prev, title: customSectionForm.title }));
-    } else {
-      const newSection: TemplateSection = {
-        id: `section-${Date.now()}`,
-        title: customSectionForm.title,
-        content: customSectionForm.description,
-        type: customSectionForm.type
-      };
-
-      setSections(prev => [...prev, newSection]);
-      setOpenCustomSection(false);
-      setCustomSectionForm({ title: '', description: '', type: 'paragraph' });
-    }
+  const handleRemoveElement = (elementId: string) => {
+    if (!template) return;
+    const updatedElements = template.elements.filter(element => element.id !== elementId);
+    onChange({ ...template, elements: updatedElements });
+    handleCloseEditDialog();
+    handleOpenSnackbar('Element removed successfully!', 'success');
   };
 
-  const handleSaveExamList = () => {
-    const newSection: TemplateSection = {
-      id: `section-${Date.now()}`,
-      title: examListForm.title,
-      content: 'A.I. will craft an examination list in a structured format, as instructed.',
-      type: 'exam_list',
-      subsections: examListForm.subsections
-    };
+  const handleEditElement = (element: TemplateElement) => {
+    setSelectedElement(element);
+    setIsEditDialogOpen(true);
+  };
 
-    setSections(prev => [...prev, newSection]);
-    setOpenExamListEditor(false);
-    setExamListForm({
-      title: '',
-      subsections: [
-        { id: '1', title: 'Past Psychiatric Diagnoses' },
-        { id: '2', title: 'Psychiatric Hospitalizations' },
-        { id: '3', title: 'Suicide Attempts' },
-        { id: '4', title: 'Self-Injurious Behavior' },
-        { id: '5', title: 'Psychiatric Medication Trials' },
-        { id: '6', title: 'Previous mental health treatment' }
-      ]
+  const handleUpdateElement = (updatedElement: TemplateElement) => {
+    if (!template) return;
+    const updatedElements = template.elements.map(element => {
+      return element.id === updatedElement.id ? updatedElement : element;
+    });
+    onChange({ ...template, elements: updatedElements });
+    handleCloseEditDialog();
+    handleOpenSnackbar('Element updated successfully!', 'success');
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setSelectedElement(null);
+  };
+
+  const handleElementNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewElementName(event.target.value);
+  };
+
+  const handleOnDragEnd = (result: any) => {
+    if (!template || !result.destination) return;
+
+    const items = Array.from(template.elements);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    onChange({ ...template, elements: items });
+  };
+
+  const handleRequiredChange = (elementId: string, required: boolean) => {
+    if (!template) return;
+
+    const updatedElements = template.elements.map(element => {
+      if (element.id === elementId) {
+        return { ...element, required: required };
+      }
+      return element;
+    });
+
+    onChange({
+      ...template,
+      elements: updatedElements
     });
   };
 
-  const handleEditSection = (section: TemplateSection) => {
-    // Handle different edit modes based on section type
-    console.log('Edit section:', section);
+  const handleLabelChange = (elementId: string, label: string) => {
+    if (!template) return;
+
+    const updatedElements = template.elements.map(element => {
+      if (element.id === elementId) {
+        return { ...element, label: label };
+      }
+      return element;
+    });
+
+    onChange({
+      ...template,
+      elements: updatedElements
+    });
   };
 
-  const handleDeleteSection = (id: string) => {
-    setSections(prev => prev.filter(section => section.id !== id));
+  const handlePlaceholderChange = (elementId: string, placeholder: string) => {
+    if (!template) return;
+
+    const updatedElements = template.elements.map(element => {
+      if (element.id === elementId) {
+        return { ...element, placeholder: placeholder };
+      }
+      return element;
+    });
+
+    onChange({
+      ...template,
+      elements: updatedElements
+    });
   };
 
-  const handleEditAI = (section: TemplateSection) => {
-    setEditingSection(section);
-    setAIInstructionForm({ instruction: section.aiInstruction || '' });
-    setOpenAIInstructionEditor(true);
+  const handleOptionsChange = (elementId: string, options: string[]) => {
+    if (!template) return;
+
+    const updatedElements = template.elements.map(element => {
+      if (element.id === elementId) {
+        return { ...element, options: options };
+      }
+      return element;
+    });
+
+    onChange({
+      ...template,
+      elements: updatedElements
+    });
   };
 
-  const handleSaveAIInstruction = () => {
-    if (editingSection) {
-      setSections(prev => prev.map(section => 
-        section.id === editingSection.id 
-          ? { ...section, aiInstruction: aiInstructionForm.instruction }
-          : section
-      ));
+  const handleElementTypeChange = (elementId: string, newType: string) => {
+    if (!template) return;
+
+    const updatedElements = template.elements.map(element => {
+      if (element.id === elementId) {
+        if (newType === 'exam_list' || element.type === 'exam_list') {
+          return {
+            ...element,
+            type: newType,
+            options: newType === 'exam_list' ? (element.options || []) : undefined
+          };
+        }
+        return {
+          ...element,
+          type: newType,
+          options: undefined
+        };
+      }
+      return element;
+    });
+
+    onChange({
+      ...template,
+      elements: updatedElements
+    });
+  };
+
+  const handleOpenSnackbar = (message: string, severity: 'success' | 'error') => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setShowSnackbar(true);
+  };
+
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
     }
-    setOpenAIInstructionEditor(false);
-    setEditingSection(null);
+    setShowSnackbar(false);
   };
 
-  const handleAddSubsection = () => {
-    setExamListForm(prev => ({
-      ...prev,
-      subsections: [...prev.subsections, { id: Date.now().toString(), title: '' }]
-    }));
-  };
-
-  const handleRemoveSubsection = (id: string) => {
-    setExamListForm(prev => ({
-      ...prev,
-      subsections: prev.subsections.filter(sub => sub.id !== id)
-    }));
-  };
-
-  const handleSubsectionChange = (id: string, title: string) => {
-    setExamListForm(prev => ({
-      ...prev,
-      subsections: prev.subsections.map(sub => 
-        sub.id === id ? { ...sub, title } : sub
-      )
-    }));
+  const renderElementSettings = (element: TemplateElement) => {
+    switch (element.type) {
+      case 'text':
+      case 'textarea':
+        return (
+          <TextField
+            label="Placeholder"
+            fullWidth
+            margin="normal"
+            value={element.placeholder || ''}
+            onChange={(e) => handlePlaceholderChange(element.id, e.target.value)}
+          />
+        );
+      case 'select':
+        return (
+          <>
+            <TextField
+              label="Options (comma-separated)"
+              fullWidth
+              margin="normal"
+              value={element.options ? element.options.join(', ') : ''}
+              onChange={(e) => {
+                const options = e.target.value.split(',').map(option => option.trim());
+                handleOptionsChange(element.id, options);
+              }}
+            />
+            <Typography variant="caption" color="textSecondary">
+              Enter options separated by commas.
+            </Typography>
+          </>
+        );
+      case 'exam_list':
+        return (
+          <>
+            <TextField
+              label="Exam Options (comma-separated)"
+              fullWidth
+              margin="normal"
+              value={element.options ? element.options.join(', ') : ''}
+              onChange={(e) => {
+                const options = e.target.value.split(',').map(option => option.trim());
+                handleOptionsChange(element.id, options);
+              }}
+            />
+            <Typography variant="caption" color="textSecondary">
+              Enter exam options separated by commas.
+            </Typography>
+          </>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
-    <Box>
-      {/* Header */}
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
-        <Box display="flex" alignItems="center">
-          <IconButton onClick={onBack} sx={{ mr: 2, color: bravoColors.primaryFlat }}>
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-            {templateName}
-          </Typography>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Typography variant="h6" gutterBottom>
+          Template Editor
+        </Typography>
+        <TextField
+          label="Template Name"
+          fullWidth
+          margin="normal"
+          value={template ? template.name : ''}
+          onChange={handleTemplateNameChange}
+        />
+        <TextField
+          label="Template Description"
+          fullWidth
+          margin="normal"
+          value={template ? template.description : ''}
+          onChange={handleTemplateDescriptionChange}
+        />
+      </Box>
+
+      <Box sx={{ flex: 1, p: 2, overflow: 'auto' }}>
+        <Typography variant="subtitle1" gutterBottom>
+          Elements:
+        </Typography>
+        <DragDropContext onDragEnd={handleOnDragEnd}>
+          <Droppable droppableId="elements">
+            {(provided) => (
+              <List
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                sx={{ bgcolor: 'background.paper', mb: 2 }}
+              >
+                {template && template.elements.map((element, index) => (
+                  <Draggable key={element.id} draggableId={element.id} index={index}>
+                    {(provided) => (
+                      <ListItem
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        disableGutters
+                        secondaryAction={
+                          <Box {...provided.dragHandleProps}>
+                            <DragHandle color={theme.palette.action.active} />
+                          </Box>
+                        }
+                        sx={{
+                          border: '1px solid',
+                          borderColor: 'divider',
+                          borderRadius: 1,
+                          mb: 1,
+                          bgcolor: 'background.default',
+                          '&:hover': {
+                            bgcolor: 'action.hover'
+                          },
+                          cursor: 'grab'
+                        }}
+                      >
+                        <ListItemText
+                          primary={element.label}
+                          secondary={
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                              <Chip label={element.type} size="small" color="primary" />
+                              {element.required && <Chip label="Required" size="small" color="secondary" />}
+                            </Stack>
+                          }
+                        />
+                        <ListItemSecondaryAction>
+                          <Tooltip title="Edit">
+                            <IconButton edge="end" aria-label="edit" onClick={() => handleEditElement(element)}>
+                              <Edit />
+                            </IconButton>
+                          </Tooltip>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </List>
+            )}
+          </Droppable>
+        </DragDropContext>
+
+        <Typography variant="subtitle1" gutterBottom>
+          Add New Element:
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+          <TextField
+            label="Element Name"
+            size="small"
+            value={newElementName}
+            onChange={handleElementNameChange}
+            sx={{ flexGrow: 1 }}
+          />
+          <Button variant="contained" color="primary" onClick={() => handleAddElement('text')}>
+            Text
+          </Button>
+          <Button variant="contained" color="primary" onClick={() => handleAddElement('textarea')}>
+            Textarea
+          </Button>
+          <Button variant="contained" color="primary" onClick={() => handleAddElement('select')}>
+            Select
+          </Button>
+          <Button variant="contained" color="primary" onClick={() => handleAddElement('exam_list')}>
+            Exam List
+          </Button>
         </Box>
-        
-        <Box display="flex" gap={2}>
+
+        <Button variant="outlined" onClick={() => setShowPredefinedSections(true)}>
+          Add Predefined Section
+        </Button>
+      </Box>
+
+      <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider', textAlign: 'right' }}>
+        <Button variant="contained" color="primary" onClick={onSave}>
+          Save Template
+        </Button>
+      </Box>
+      
+      {showPredefinedSections && (
+        <Dialog open={showPredefinedSections} onClose={() => setShowPredefinedSections(false)} maxWidth="md" fullWidth>
+          <DialogTitle>Add Predefined Section</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2}>
+              {PREDEFINED_SECTIONS.map((section) => (
+                <Grid item xs={12} md={4} key={section.id}>
+                  <Card
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: 'action.hover' },
+                      height: '100%'
+                    }}
+                    onClick={() => handleAddPredefinedSection(section)}
+                  >
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        {section.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {section.description}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowPredefinedSections(false)}>Cancel</Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      <Dialog open={isEditDialogOpen} onClose={handleCloseEditDialog} fullWidth maxWidth="sm">
+        <DialogTitle>Edit Element</DialogTitle>
+        <DialogContent>
+          {selectedElement && (
+            <Box>
+              <FormControl fullWidth margin="normal">
+                <InputLabel id="element-type-label">Element Type</InputLabel>
+                <Select
+                  labelId="element-type-label"
+                  id="element-type-select"
+                  value={selectedElement.type}
+                  label="Element Type"
+                  onChange={(e) => {
+                    handleElementTypeChange(selectedElement.id, e.target.value);
+                  }}
+                >
+                  <MenuItem value="text">Text</MenuItem>
+                  <MenuItem value="textarea">Textarea</MenuItem>
+                  <MenuItem value="select">Select</MenuItem>
+                  <MenuItem value="exam_list">Exam List</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                label="Label"
+                fullWidth
+                margin="normal"
+                value={selectedElement.label}
+                onChange={(e) => handleLabelChange(selectedElement.id, e.target.value)}
+              />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={selectedElement.required}
+                    onChange={(e) => handleRequiredChange(selectedElement.id, e.target.checked)}
+                    name="required"
+                    color="primary"
+                  />
+                }
+                label="Required"
+              />
+              {renderElementSettings(selectedElement)}
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditDialog}>Cancel</Button>
           <Button
             variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenAddSection(true)}
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              borderRadius: 2,
-              textTransform: 'uppercase',
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat
+            color="primary"
+            onClick={() => {
+              if (selectedElement) {
+                handleUpdateElement(selectedElement);
               }
             }}
           >
-            Add Section
+            Update
           </Button>
           <Button
             variant="contained"
-            onClick={() => onSave(sections)}
-            sx={{
-              backgroundColor: bravoColors.primaryFlat,
-              color: 'white',
-              borderRadius: 2,
-              textTransform: 'uppercase'
+            color="error"
+            onClick={() => {
+              if (selectedElement) {
+                handleRemoveElement(selectedElement.id);
+              }
             }}
           >
-            Save
-          </Button>
-        </Box>
-      </Box>
-
-      {/* Progress Bar */}
-      <Box sx={{ backgroundColor: bravoColors.secondary, height: 4, borderRadius: 2, mb: 4 }} />
-
-      {/* Sections List */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={sections.map(s => s.id)} strategy={verticalListSortingStrategy}>
-          {sections.map((section) => (
-            <SortableSection
-              key={section.id}
-              section={section}
-              onEdit={handleEditSection}
-              onDelete={handleDeleteSection}
-              onEditAI={handleEditAI}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
-
-      {sections.length === 0 && (
-        <Box
-          sx={{
-            textAlign: 'center',
-            py: 8,
-            border: '2px dashed #ccc',
-            borderRadius: 2,
-            backgroundColor: '#f9f9f9'
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 2, color: bravoColors.text.secondary }}>
-            No sections added yet
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 3, color: bravoColors.text.secondary }}>
-            Start building your template by adding sections
-          </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenAddSection(true)}
-            sx={{
-              backgroundColor: bravoColors.primaryFlat,
-              color: 'white',
-              borderRadius: 2
-            }}
-          >
-            ADD FIRST SECTION
-          </Button>
-        </Box>
-      )}
-
-      {/* Add Section Dialog */}
-      <Dialog
-        open={openAddSection}
-        onClose={() => setOpenAddSection(false)}
-        maxWidth="lg"
-        fullWidth
-        PaperProps={{
-          sx: { borderRadius: 3, p: 2, height: '80vh' }
-        }}
-      >
-        <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Add section
-            </Typography>
-            <IconButton onClick={() => setOpenAddSection(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-        
-        <DialogContent>
-          <Paper
-            sx={{
-              p: 3,
-              mb: 3,
-              border: '2px dashed #ccc',
-              borderRadius: 2,
-              textAlign: 'center',
-              cursor: 'pointer',
-              '&:hover': { borderColor: bravoColors.secondary }
-            }}
-            onClick={handleCreateCustomSection}
-          >
-            <Typography variant="body1" sx={{ color: bravoColors.text.secondary }}>
-              Can't find the section you need?{' '}
-              <Typography component="span" sx={{ color: bravoColors.secondary, fontWeight: 600 }}>
-                Click here to Create your own!
-              </Typography>
-            </Typography>
-          </Paper>
-
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-            Predefined Sections
-          </Typography>
-
-          <Grid container spacing={2}>
-            {PREDEFINED_SECTIONS.map((section) => (
-              <Grid xs={12} md={4} key={section.id}>
-                <Card
-                  sx={{
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    '&:hover': {
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                      transform: 'translateY(-2px)'
-                    }
-                  }}
-                  onClick={() => handleAddPredefinedSection(section)}
-                >
-                  <CardContent sx={{ p: 2 }}>
-                    <Box display="flex" alignItems="center" mb={1}>
-                      {section.icon}
-                      <Typography variant="subtitle1" sx={{ ml: 1, fontWeight: 600 }}>
-                        {section.title}
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                      {section.description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </DialogContent>
-      </Dialog>
-
-      {/* Custom Section Dialog */}
-      <Dialog
-        open={openCustomSection}
-        onClose={() => setOpenCustomSection(false)}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: { borderRadius: 3, p: 2 }
-        }}
-      >
-        <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Create Custom Section
-            </Typography>
-            <IconButton onClick={() => setOpenCustomSection(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-        
-        <DialogContent>
-          <Paper sx={{ p: 3, mb: 3, backgroundColor: '#f8f9fa', border: '1px solid #e9ecef' }}>
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-              Explain the type of content you want to generate.
-            </Typography>
-            <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-              Example: A comprehensive mental status exam with sections for appearance, behavior, mood, affect, and thought process
-            </Typography>
-          </Paper>
-
-          <TextField
-            fullWidth
-            multiline
-            rows={4}
-            placeholder="Describe what you want"
-            value={customSectionForm.description}
-            onChange={(e) => setCustomSectionForm(prev => ({ ...prev, description: e.target.value }))}
-            variant="outlined"
-            sx={{ mb: 3 }}
-          />
-
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            Define From Scratch
-          </Typography>
-
-          <Stack spacing={2}>
-            {CUSTOM_SECTION_TYPES.map((type) => (
-              <Paper
-                key={type.id}
-                sx={{
-                  p: 2,
-                  cursor: 'pointer',
-                  border: customSectionForm.type === type.id ? `2px solid ${bravoColors.secondary}` : '1px solid #e0e0e0',
-                  '&:hover': { borderColor: bravoColors.secondary }
-                }}
-                onClick={() => setCustomSectionForm(prev => ({ ...prev, type: type.id as any }))}
-              >
-                <Box display="flex" alignItems="center">
-                  {type.icon}
-                  <Box ml={2}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                      {type.title}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                      {type.description}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Paper>
-            ))}
-          </Stack>
-        </DialogContent>
-        
-        <DialogActions sx={{ p: 3 }}>
-          <Button
-            onClick={() => setOpenCustomSection(false)}
-            variant="outlined"
-            sx={{ borderColor: bravoColors.secondary, color: bravoColors.secondary }}
-          >
-            BACK
-          </Button>
-          <Button
-            onClick={handleSaveCustomSection}
-            variant="contained"
-            disabled={!customSectionForm.description.trim()}
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              '&:hover': { backgroundColor: bravoColors.primaryFlat }
-            }}
-          >
-            GENERATE
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Exam List Editor Dialog */}
-      <Dialog
-        open={openExamListEditor}
-        onClose={() => setOpenExamListEditor(false)}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: { borderRadius: 3, p: 2 }
-        }}
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Add section Exam List
-            </Typography>
-            <Box display="flex" alignItems="center" gap={2}>
-              <Typography variant="h6" sx={{ color: bravoColors.text.secondary }}>
-                How this works
-              </Typography>
-              <IconButton onClick={() => setOpenExamListEditor(false)}>
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          </Box>
-        </DialogTitle>
-        
-        <DialogContent>
-          <Box display="flex" gap={4}>
-            <Box flex={1}>
-              <TextField
-                fullWidth
-                label="Title"
-                value={examListForm.title}
-                onChange={(e) => setExamListForm(prev => ({ ...prev, title: e.target.value }))}
-                variant="outlined"
-                size="small"
-                sx={{ mb: 3 }}
-              />
-
-              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                What exam sections would you like A.I. to report on?
-              </Typography>
-
-              <Stack spacing={1}>
-                {examListForm.subsections.map((subsection, index) => (
-                  <Box key={subsection.id} display="flex" alignItems="center" gap={1}>
-                    <DeleteIcon sx={{ color: 'red', cursor: 'pointer' }} onClick={() => handleRemoveSubsection(subsection.id)} />
-                    <TextField
-                      fullWidth
-                      size="small"
-                      value={subsection.title}
-                      onChange={(e) => handleSubsectionChange(subsection.id, e.target.value)}
-                      variant="outlined"
-                    />
-                    <ExpandMoreIcon />
-                  </Box>
-                ))}
-              </Stack>
-            </Box>
-
-            <Box flex={1} sx={{ pl: 2, borderLeft: '1px solid #e0e0e0' }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                How this works
-              </Typography>
-              
-              <Box mb={3}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Review each subsection
-                </Typography>
-                <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                  An exam-list is a structured output, with each subsection as it's own instruction for A.I. You can add, remove, or edit sections.
-                </Typography>
-              </Box>
-
-              <Box mb={3}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Tell A.I what to focus on
-                </Typography>
-                <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                  For each section, you can tell A.I what to write for that subsection.
-                </Typography>
-              </Box>
-
-              <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
-                  Decide Normal Limits Behavior
-                </Typography>
-                <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                  You can specify certain default "within normal limits" text, and decide when you want A.I to fall back to that text.
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-        </DialogContent>
-        
-        <DialogActions sx={{ p: 3 }}>
-          <Button
-            onClick={() => setOpenExamListEditor(false)}
-            variant="outlined"
-            sx={{ borderColor: bravoColors.secondary, color: bravoColors.secondary }}
-          >
-            BACK
-          </Button>
-          <Button
-            onClick={handleSaveExamList}
-            variant="contained"
-            disabled={!examListForm.title.trim()}
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              '&:hover': { backgroundColor: bravoColors.primaryFlat }
-            }}
-          >
-            UPDATE
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* AI Instruction Editor Dialog */}
-      <Dialog
-        open={openAIInstructionEditor}
-        onClose={() => setOpenAIInstructionEditor(false)}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: { borderRadius: 3, p: 2 }
-        }}
-      >
-        <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Edit AI Instructions
-            </Typography>
-            <IconButton onClick={() => setOpenAIInstructionEditor(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-        
-        <DialogContent>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Provide specific instructions for how AI should handle this section:
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={6}
-            placeholder="Enter detailed instructions for AI..."
-            value={aiInstructionForm.instruction}
-            onChange={(e) => setAIInstructionForm(prev => ({ ...prev, instruction: e.target.value }))}
-            variant="outlined"
-          />
-        </DialogContent>
-        
-        <DialogActions sx={{ p: 3 }}>
-          <Button
-            onClick={() => setOpenAIInstructionEditor(false)}
-            variant="outlined"
-            sx={{ borderColor: bravoColors.secondary, color: bravoColors.secondary }}
-          >
-            CANCEL
-          </Button>
-          <Button
-            onClick={handleSaveAIInstruction}
-            variant="contained"
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              '&:hover': { backgroundColor: bravoColors.primaryFlat }
-            }}
-          >
-            SAVE INSTRUCTIONS
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
