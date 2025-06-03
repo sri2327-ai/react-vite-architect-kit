@@ -45,11 +45,11 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
 
   return (
     <Box sx={{ 
-      height: { xs: 'calc(100vh - 250px)', sm: 'calc(100vh - 300px)' },
+      minHeight: '60vh',
       display: 'flex', 
       flexDirection: 'column'
     }}>
-      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
         <Typography
           variant="h3"
           sx={{
@@ -78,7 +78,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Card
           sx={{
             flex: 1,
@@ -86,8 +86,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             border: '1px solid #F0F8FF',
             backgroundColor: 'background.paper',
             display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
+            flexDirection: 'column'
           }}
         >
           <CardContent sx={{ p: { xs: 2, sm: 3 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -98,7 +97,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
                 required
-                sx={{ mb: 2 }}
+                sx={{ mb: 1.5 }}
                 size="small"
                 placeholder="+1 (555) 123-4567"
                 InputProps={{
@@ -117,7 +116,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 value={formData.specialty}
                 onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
                 required
-                sx={{ mb: 3 }}
+                sx={{ mb: 2 }}
                 size="small"
                 InputProps={{
                   startAdornment: (
@@ -134,13 +133,13 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 ))}
               </TextField>
 
-              <FormControl component="fieldset" sx={{ flex: 1, minHeight: 0 }}>
+              <FormControl component="fieldset" sx={{ flex: 1 }}>
                 <FormLabel
                   component="legend"
                   sx={{
                     color: 'text.primary',
                     fontWeight: 700,
-                    mb: 2,
+                    mb: 1.5,
                     fontSize: '1rem'
                   }}
                 >
@@ -164,7 +163,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                     }}
                     onClick={() => setFormData(prev => ({ ...prev, ehrMode: true }))}
                   >
-                    <CardContent sx={{ p: 2 }}>
+                    <CardContent sx={{ p: 1.5 }}>
                       <FormControlLabel
                         value={true}
                         control={<Radio sx={{ display: 'none' }} />}
@@ -209,7 +208,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                     }}
                     onClick={() => setFormData(prev => ({ ...prev, ehrMode: false }))}
                   >
-                    <CardContent sx={{ p: 2 }}>
+                    <CardContent sx={{ p: 1.5 }}>
                       <FormControlLabel
                         value={false}
                         control={<Radio sx={{ display: 'none' }} />}

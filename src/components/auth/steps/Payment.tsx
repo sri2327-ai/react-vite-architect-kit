@@ -48,11 +48,11 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
 
   return (
     <Box sx={{ 
-      height: { xs: 'calc(100vh - 250px)', sm: 'calc(100vh - 300px)' },
+      minHeight: '60vh',
       display: 'flex', 
       flexDirection: 'column'
     }}>
-      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
         <Typography
           variant="h4"
           sx={{
@@ -75,10 +75,10 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Card
           sx={{
-            mb: 2,
+            mb: 1.5,
             border: 2,
             borderColor: 'primary.main',
             backgroundColor: 'background.paper',
@@ -88,25 +88,25 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
             flexDirection: 'column'
           }}
         >
-          <CardContent sx={{ p: { xs: 2, sm: 3 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ textAlign: 'center', mb: 2 }}>
-              <Typography variant="h3" fontWeight={700} color="primary.main" sx={{ fontSize: { xs: '2rem', sm: '2.5rem' } }}>
+          <CardContent sx={{ p: { xs: 2, sm: 2.5 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ textAlign: 'center', mb: 1.5 }}>
+              <Typography variant="h3" fontWeight={700} color="primary.main" sx={{ fontSize: { xs: '1.8rem', sm: '2.2rem' } }}>
                 $99
               </Typography>
-              <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+              <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '1rem', sm: '1.1rem' } }}>
                 per month
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.85rem' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.8rem' }}>
                 Professional Plan - Everything you need
               </Typography>
             </Box>
 
-            <Divider sx={{ my: 2 }} />
+            <Divider sx={{ my: 1.5 }} />
 
             <List sx={{ py: 0, flex: 1 }}>
               {features.map((feature, index) => (
                 <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 28, color: '#000000' }}>
+                  <ListItemIcon sx={{ minWidth: 24, color: '#000000' }}>
                     {feature.icon}
                   </ListItemIcon>
                   <ListItemText
@@ -114,7 +114,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
                     primaryTypographyProps={{
                       variant: 'body2',
                       fontWeight: 500,
-                      fontSize: '0.85rem'
+                      fontSize: '0.8rem'
                     }}
                   />
                 </ListItem>
@@ -126,7 +126,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         <Alert
           severity="success"
           sx={{ 
-            mb: 2, 
+            mb: 1.5, 
             borderRadius: 2,
             backgroundColor: '#F0F8FF',
             borderColor: '#D6E8F5',
@@ -134,10 +134,10 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           }}
           icon={<CheckCircle size={18} />}
         >
-          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.8rem' }}>
+          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.75rem' }}>
             Setup Summary Complete
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.75rem' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.7rem' }}>
             Account: {data.firstName} {data.lastName} • Specialty: {data.specialty}
             {data.ehrMode && ` • EHR: ${data.ehrSystem}`}
             • Retention: {data.retentionDuration?.replace('years', ' Years').replace('year', ' Year')}
@@ -147,7 +147,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ textAlign: 'center', mb: 2, fontSize: '0.8rem', flexShrink: 0 }}
+          sx={{ textAlign: 'center', mb: 1.5, fontSize: '0.75rem', flexShrink: 0 }}
         >
           🔒 Secure payment • Cancel anytime • 30-day money-back guarantee
         </Typography>

@@ -71,11 +71,11 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
 
   return (
     <Box sx={{ 
-      height: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 250px)' },
+      minHeight: '60vh',
       display: 'flex', 
       flexDirection: 'column'
     }}>
-      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
         <Typography
           variant="h4"
           sx={{
@@ -118,8 +118,8 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
         </Box>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        <Grid container spacing={1.5} sx={{ mb: 2, flexShrink: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <Grid container spacing={1.5} sx={{ mb: 1.5, flexShrink: 0 }}>
           {meetingFeatures.map((feature, index) => (
             <Grid key={index} size={{ xs: 12, sm: 4 }}>
               <Card
@@ -127,15 +127,15 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                   background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
                   border: '1px solid #E8F4F8',
                   borderRadius: 2,
-                  height: { xs: 70, sm: 80 }
+                  height: { xs: 60, sm: 70 }
                 }}
               >
-                <CardContent sx={{ p: 1.5, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <CardContent sx={{ p: 1, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Box
                     sx={{
-                      width: 28,
-                      height: 28,
-                      borderRadius: '8px',
+                      width: 24,
+                      height: 24,
+                      borderRadius: '6px',
                       background: 'linear-gradient(135deg, #143151, #387E89)',
                       display: 'flex',
                       alignItems: 'center',
@@ -146,10 +146,10 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                   >
                     {feature.icon}
                   </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '0.8rem' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '0.75rem' }}>
                     {feature.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
                     {feature.description}
                   </Typography>
                 </CardContent>
@@ -161,7 +161,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
         <Alert
           severity="info"
           sx={{ 
-            mb: 2, 
+            mb: 1.5, 
             borderRadius: 2,
             flexShrink: 0,
             '& .MuiAlert-message': {
@@ -173,27 +173,9 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
           Our specialists will help connect your EHR system via secure video conference.
         </Alert>
 
-        <Box sx={{ 
-          flex: 1, 
-          overflowY: 'auto',
-          pr: 1,
-          '&::-webkit-scrollbar': {
-            width: '4px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#c1c1c1',
-            borderRadius: '4px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: '#a8a8a8',
-          }
-        }}>
-          <Box component="form" onSubmit={handleSubmit}>
-            <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
+            <Grid container spacing={2} sx={{ mb: 1.5 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
@@ -260,12 +242,12 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
               fullWidth
               label="Additional Notes (Optional)"
               multiline
-              rows={3}
+              rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Tell us about your EHR setup or questions..."
               size="small"
-              sx={{ mb: 2 }}
+              sx={{ mb: 1.5 }}
             />
           </Box>
         </Box>

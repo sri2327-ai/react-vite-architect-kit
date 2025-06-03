@@ -78,11 +78,11 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
 
   return (
     <Box sx={{ 
-      height: { xs: 'calc(100vh - 250px)', sm: 'calc(100vh - 300px)' },
+      minHeight: '60vh',
       display: 'flex', 
       flexDirection: 'column'
     }}>
-      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
         <Typography
           variant="h4"
           sx={{
@@ -125,23 +125,23 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
         </Box>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <Card
           sx={{
             background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
             border: '1px solid #E8F4F8',
             borderRadius: 2,
-            mb: 2,
+            mb: 1.5,
             flexShrink: 0
           }}
         >
-          <CardContent sx={{ p: 2 }}>
+          <CardContent sx={{ p: 1.5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
               <Box
                 sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '8px',
+                  width: 28,
+                  height: 28,
+                  borderRadius: '6px',
                   background: 'linear-gradient(135deg, #143151, #387E89)',
                   display: 'flex',
                   alignItems: 'center',
@@ -149,9 +149,9 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                   color: 'white'
                 }}
               >
-                <Shield size={16} />
+                <Shield size={14} />
               </Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', fontSize: '1rem' }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', fontSize: '0.9rem' }}>
                 Your Data is Protected
               </Typography>
             </Box>
@@ -159,8 +159,8 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
               {securityFeatures.map((feature, index) => (
                 <Grid key={index} size={{ xs: 6, sm: 3 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <CheckCircle2 size={12} color="#2E7D32" />
-                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.75rem' }}>
+                    <CheckCircle2 size={10} color="#2E7D32" />
+                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.7rem' }}>
                       {feature}
                     </Typography>
                   </Box>
@@ -173,7 +173,7 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
         <Alert
           severity="info"
           sx={{ 
-            mb: 2, 
+            mb: 1.5, 
             borderRadius: 2,
             flexShrink: 0,
             '& .MuiAlert-message': {
@@ -185,14 +185,14 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
           All notes are encrypted and stored securely. Change this setting anytime.
         </Alert>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, minHeight: 0 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
           <FormControl component="fieldset" fullWidth sx={{ height: '100%' }}>
             <RadioGroup
               value={retentionDuration}
               onChange={(e) => setRetentionDuration(e.target.value)}
               sx={{ height: '100%' }}
             >
-              <Grid container spacing={1.5} sx={{ height: '100%', overflow: 'auto' }}>
+              <Grid container spacing={1.5} sx={{ maxHeight: '35vh', overflow: 'auto' }}>
                 {retentionOptions.map((option) => (
                   <Grid key={option.value} size={{ xs: 6, sm: 4, lg: 2.4 }}>
                     <Card
@@ -205,7 +205,7 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                           : 'background.paper',
                         borderRadius: 2,
                         position: 'relative',
-                        height: { xs: 120, sm: 140 },
+                        height: { xs: 100, sm: 110 },
                         '&:hover': {
                           borderColor: 'primary.main',
                           transform: 'translateY(-2px)',
@@ -221,12 +221,12 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                           size="small"
                           sx={{
                             position: 'absolute',
-                            top: 8,
-                            left: 8,
+                            top: 6,
+                            left: 6,
                             backgroundColor: '#E8F5E8',
                             color: '#2E7D32',
                             fontWeight: 700,
-                            fontSize: '0.65rem',
+                            fontSize: '0.6rem',
                             zIndex: 2
                           }}
                         />
@@ -234,7 +234,7 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
 
                       {retentionDuration === option.value && (
                         <CheckCircle2 
-                          size={12} 
+                          size={10} 
                           color="white" 
                           style={{
                             position: 'absolute',
@@ -249,7 +249,7 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                       
                       <CardContent sx={{ 
                         textAlign: 'center', 
-                        p: 1.5,
+                        p: 1,
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
@@ -262,16 +262,16 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                             <Box>
                               <Box
                                 sx={{
-                                  width: { xs: 36, sm: 44 },
-                                  height: { xs: 36, sm: 44 },
-                                  borderRadius: '10px',
+                                  width: { xs: 32, sm: 36 },
+                                  height: { xs: 32, sm: 36 },
+                                  borderRadius: '8px',
                                   background: retentionDuration === option.value 
                                     ? 'linear-gradient(135deg, #143151, #387E89)'
                                     : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  margin: '0 auto 8px auto',
+                                  margin: '0 auto 6px auto',
                                   color: retentionDuration === option.value ? 'white' : '#666',
                                   transition: 'all 0.3s ease'
                                 }}
@@ -282,14 +282,14 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
                                 variant="h6"
                                 fontWeight={retentionDuration === option.value ? 700 : 600}
                                 color={retentionDuration === option.value ? 'primary.main' : 'text.primary'}
-                                sx={{ mb: 0.5, fontSize: { xs: '0.9rem', sm: '1rem' } }}
+                                sx={{ mb: 0.5, fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
                               >
                                 {option.label}
                               </Typography>
                               <Typography 
                                 variant="body2" 
                                 color="text.secondary"
-                                sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' }, lineHeight: 1.2 }}
+                                sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' }, lineHeight: 1.2 }}
                               >
                                 {option.description}
                               </Typography>

@@ -65,11 +65,11 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
 
   return (
     <Box sx={{ 
-      height: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 250px)' },
+      minHeight: '60vh',
       display: 'flex', 
       flexDirection: 'column'
     }}>
-      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
         <Typography
           variant="h3"
           sx={{
@@ -98,7 +98,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {error && (
           <Alert 
             severity="error" 
@@ -119,36 +119,16 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
             border: '1px solid #F0F8FF',
             backgroundColor: 'background.paper',
             display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
+            flexDirection: 'column'
           }}
         >
           <CardContent sx={{ 
             p: { xs: 2, sm: 3 }, 
             flex: 1, 
             display: 'flex', 
-            flexDirection: 'column',
-            overflow: 'hidden'
+            flexDirection: 'column'
           }}>
-            <Box sx={{ 
-              flex: 1, 
-              overflowY: 'auto',
-              pr: 1,
-              '&::-webkit-scrollbar': {
-                width: '4px',
-              },
-              '&::-webkit-scrollbar-track': {
-                background: '#f1f1f1',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb': {
-                background: '#c1c1c1',
-                borderRadius: '4px',
-              },
-              '&::-webkit-scrollbar-thumb:hover': {
-                background: '#a8a8a8',
-              }
-            }}>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               {!formData.isGoogleSignup && (
                 <>
                   <SecondaryButton
@@ -173,7 +153,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                     Continue with Google
                   </SecondaryButton>
 
-                  <Divider sx={{ my: 2 }}>
+                  <Divider sx={{ my: 1.5 }}>
                     <Typography 
                       variant="body2" 
                       color="text.secondary"
@@ -189,12 +169,12 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                 </>
               )}
 
-              <Box component="form" onSubmit={handleSubmit}>
+              <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
                 <Box sx={{ 
                   display: 'grid', 
                   gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                  gap: 2, 
-                  mb: 2 
+                  gap: 1.5, 
+                  mb: 1.5 
                 }}>
                   <TextField
                     fullWidth
@@ -238,7 +218,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   required
                   disabled={formData.isGoogleSignup}
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1.5 }}
                   size="small"
                   InputProps={{
                     startAdornment: (
@@ -256,7 +236,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                   required
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1.5 }}
                   size="small"
                   helperText="Minimum 8 characters"
                   InputProps={{
@@ -279,7 +259,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                   }}
                 />
 
-                <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: 1.5 }}>
                   <FormControlLabel
                     control={
                       <Checkbox
@@ -323,7 +303,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
                   />
                 </Box>
 
-                <Box sx={{ textAlign: 'center', mb: 2 }}>
+                <Box sx={{ textAlign: 'center', mb: 1.5 }}>
                   <Typography 
                     variant="body2" 
                     color="text.secondary"
