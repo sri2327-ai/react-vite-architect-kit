@@ -46,7 +46,7 @@ interface CreateTemplateOption {
   id: number;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: React.ReactElement;
 }
 
 const createTemplateOptions: CreateTemplateOption[] = [
@@ -177,7 +177,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             </Typography>
             <Grid container spacing={2}>
               {createTemplateOptions.map((option) => (
-                <Grid xs={12} sm={6} key={option.id}>
+                <Grid item xs={12} sm={6} key={option.id}>
                   <Card 
                     sx={{ 
                       height: '100%',

@@ -258,7 +258,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
               
               <Grid container spacing={2}>
                 {categorySections.map((section) => (
-                  <Grid xs={12} sm={6} md={4} key={section.id}>
+                  <Grid item xs={12} sm={6} md={4} key={section.id}>
                     <Card 
                       sx={{ 
                         height: '100%',
