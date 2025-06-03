@@ -29,8 +29,10 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Badge
+  Badge,
+  Stack
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import {
   Add as AddIcon,
   Edit as EditIcon,
@@ -48,6 +50,7 @@ import {
   LocationOn as LocationIcon,
   Today as TodayIcon
 } from '@mui/icons-material';
+import { bravoColors } from '@/theme/colors';
 
 interface WorkflowBlock {
   id: string;
