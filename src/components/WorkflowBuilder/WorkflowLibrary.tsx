@@ -326,27 +326,44 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h5" gutterBottom>
-            Workflow Library
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Pre-built EHR workflows with schedule setup and automation blocks
+    <Box sx={{ p: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" gutterBottom sx={{ 
+          color: bravoColors.primaryFlat, 
+          fontWeight: 700,
+          mb: 1
+        }}>
+          Workflow Library
+        </Typography>
+        <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
+          Pre-built EHR workflows with schedule setup and automation blocks
+        </Typography>
+        
+        <Box sx={{ 
+          p: 3, 
+          borderRadius: 3, 
+          bgcolor: alpha('#2196F3', 0.05),
+          border: `1px solid ${alpha('#2196F3', 0.2)}`
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <EHRIcon sx={{ color: '#2196F3', mr: 1 }} />
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#2196F3' }}>
+              Enhanced Workflows
+            </Typography>
+          </Box>
+          <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+            All workflows include comprehensive schedule setup blocks (Schedule Menu, Provider Filter, 
+            Date Filter, Location Filter) before patient selection. Import and configure these with 
+            your provider name and location preferences for seamless automation.
           </Typography>
         </Box>
       </Box>
-
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          <strong>Enhanced workflows:</strong> All workflows now include schedule setup blocks 
-          (Schedule Menu, Provider Filter, Date Filter, Location Filter) before patient selection. 
-          Import and configure these with your provider name and location preferences.
-        </Typography>
-      </Alert>
       
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 3 }}>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', 
+        gap: 4 
+      }}>
         {predefinedWorkflows.map((workflow) => (
           <Card 
             key={workflow.id}
@@ -354,82 +371,139 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
               height: '100%',
               display: 'flex',
               flexDirection: 'column',
+              borderRadius: 3,
+              border: '1px solid',
+              borderColor: alpha(bravoColors.primaryFlat, 0.1),
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: 4,
-              },
-              transition: 'all 0.3s ease'
+                transform: 'translateY(-6px)',
+                boxShadow: '0 12px 30px rgba(0,0,0,0.15)',
+                borderColor: bravoColors.primaryFlat
+              }
             }}
           >
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                <EHRIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" component="div">
-                  {workflow.name}
-                </Typography>
+            <CardContent sx={{ flexGrow: 1, p: 4 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                <Box sx={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 2,
+                  bgcolor: alpha(bravoColors.primaryFlat, 0.1),
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  mr: 2
+                }}>
+                  <EHRIcon sx={{ color: bravoColors.primaryFlat, fontSize: 24 }} />
+                </Box>
+                <Box>
+                  <Typography variant="h5" sx={{ 
+                    fontWeight: 700,
+                    color: bravoColors.primaryFlat,
+                    lineHeight: 1.2
+                  }}>
+                    {workflow.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                    {workflow.ehrSystem} • {workflow.category}
+                  </Typography>
+                </Box>
               </Box>
               
-              <Typography variant="body2" color="text.secondary" paragraph>
+              <Typography variant="body1" color="text.secondary" paragraph sx={{ 
+                lineHeight: 1.6,
+                mb: 3
+              }}>
                 {workflow.description}
               </Typography>
               
-              <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                <Chip 
-                  icon={<EHRIcon />} 
-                  label={workflow.ehrSystem} 
-                  size="small" 
-                  color="primary" 
-                />
-                <Chip 
-                  label={workflow.category} 
-                  size="small" 
-                  color="secondary" 
-                />
-                <Badge badgeContent={workflow.blocks.length} color="primary">
+              <Box sx={{ mb: 3 }}>
+                <Stack direction="row" spacing={1} sx={{ mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                  <Chip 
+                    icon={<EHRIcon />} 
+                    label={workflow.ehrSystem} 
+                    sx={{ 
+                      bgcolor: alpha(bravoColors.primaryFlat, 0.1),
+                      color: bravoColors.primaryFlat,
+                      fontWeight: 600
+                    }}
+                  />
+                  <Chip 
+                    label={workflow.category} 
+                    sx={{ 
+                      bgcolor: alpha(bravoColors.secondary, 0.1),
+                      color: bravoColors.secondary,
+                      fontWeight: 600
+                    }}
+                  />
                   <Chip 
                     icon={<WorkflowIcon />}
-                    label="Automation Blocks" 
-                    size="small" 
-                    variant="outlined"
+                    label={`${workflow.blocks.length} Blocks`}
+                    sx={{ 
+                      bgcolor: alpha('#4CAF50', 0.1),
+                      color: '#4CAF50',
+                      fontWeight: 600
+                    }}
                   />
-                </Badge>
+                </Stack>
               </Box>
 
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                <strong>Supported Visit Types:</strong>
-              </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                {workflow.supportedVisitTypes.map((visitType) => (
-                  <Chip 
-                    key={visitType}
-                    label={visitType}
-                    size="small"
-                    variant="outlined"
-                  />
-                ))}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle1" sx={{ 
+                  fontWeight: 600, 
+                  mb: 2,
+                  color: bravoColors.primaryFlat
+                }}>
+                  Supported Visit Types
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {workflow.supportedVisitTypes.map((visitType) => (
+                    <Chip 
+                      key={visitType}
+                      label={visitType}
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        borderColor: alpha(bravoColors.primaryFlat, 0.3),
+                        color: bravoColors.primaryFlat,
+                        '&:hover': {
+                          bgcolor: alpha(bravoColors.primaryFlat, 0.05)
+                        }
+                      }}
+                    />
+                  ))}
+                </Box>
               </Box>
             </CardContent>
             
-            <Box sx={{ p: 2, pt: 0 }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ p: 3, pt: 0 }}>
+              <Stack direction="row" spacing={2}>
                 <Button
                   variant="outlined"
-                  size="small"
                   onClick={() => handleViewWorkflow(workflow)}
-                  sx={{ flex: 1 }}
+                  sx={{ 
+                    flex: 1,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600
+                  }}
                 >
                   View Blocks
                 </Button>
                 <Button
                   variant="contained"
-                  size="small"
                   startIcon={<ImportIcon />}
                   onClick={() => handleImportClick(workflow)}
-                  sx={{ flex: 1 }}
+                  sx={{ 
+                    flex: 1,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600
+                  }}
                 >
                   Import
                 </Button>
-              </Box>
+              </Stack>
             </Box>
           </Card>
         ))}

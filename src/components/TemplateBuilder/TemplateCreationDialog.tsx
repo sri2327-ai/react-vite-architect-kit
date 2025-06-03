@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -172,55 +171,76 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
       case 0:
         return (
           <Box>
-            <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
-              Choose how you'd like to create your template:
+            <Typography variant="h5" gutterBottom sx={{ 
+              mb: 4, 
+              textAlign: 'center',
+              color: bravoColors.primaryFlat,
+              fontWeight: 600
+            }}>
+              Choose how you'd like to create your template
             </Typography>
-            <Grid container spacing={2}>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+              gap: 3,
+              maxWidth: '900px',
+              mx: 'auto'
+            }}>
               {createTemplateOptions.map((option) => (
-                <Grid item xs={12} sm={6} key={option.id}>
-                  <Card 
-                    sx={{ 
-                      height: '100%',
-                      cursor: 'pointer',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: 4
-                      },
-                      transition: 'all 0.2s'
-                    }}
+                <Card 
+                  key={option.id}
+                  sx={{ 
+                    height: '100%',
+                    cursor: 'pointer',
+                    borderRadius: 3,
+                    border: '2px solid transparent',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      transform: 'translateY(-6px)',
+                      boxShadow: '0 12px 30px rgba(0,0,0,0.15)',
+                      borderColor: bravoColors.primaryFlat
+                    }
+                  }}
+                >
+                  <CardActionArea 
+                    onClick={() => handleMethodSelect(option)}
+                    sx={{ height: '100%', p: 3 }}
                   >
-                    <CardActionArea 
-                      onClick={() => handleMethodSelect(option)}
-                      sx={{ height: '100%', p: 2 }}
-                    >
-                      <CardContent sx={{ textAlign: 'center' }}>
-                        <Box
-                          sx={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 2,
-                            backgroundColor: bravoColors.primaryFlat,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mb: 2,
-                            mx: 'auto'
-                          }}
-                        >
-                          {option.icon}
-                        </Box>
-                        <Typography variant="h6" gutterBottom>
-                          {option.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {option.description}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
+                    <CardContent sx={{ textAlign: 'center', p: 0 }}>
+                      <Box
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: 3,
+                          background: bravoColors.primary,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mb: 3,
+                          mx: 'auto',
+                          boxShadow: '0 4px 12px rgba(20,49,81,0.3)'
+                        }}
+                      >
+                        {React.cloneElement(option.icon, { sx: { color: 'white', fontSize: 28 } })}
+                      </Box>
+                      <Typography variant="h6" gutterBottom sx={{ 
+                        fontWeight: 600,
+                        color: bravoColors.primaryFlat,
+                        mb: 1
+                      }}>
+                        {option.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{
+                        lineHeight: 1.5,
+                        px: 1
+                      }}>
+                        {option.description}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
               ))}
-            </Grid>
+            </Box>
           </Box>
         );
 
@@ -435,41 +455,81 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
     <Dialog 
       open={open} 
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="lg"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 3, minHeight: 500 }
+        sx: { 
+          borderRadius: 4, 
+          minHeight: 600,
+          boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+        }
       }}
     >
-      <DialogTitle>
+      <DialogTitle sx={{ pb: 2 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-            Create New Template
-          </Typography>
-          <IconButton onClick={onClose}>
+          <Box>
+            <Typography variant="h4" sx={{ 
+              color: bravoColors.primaryFlat, 
+              fontWeight: 700,
+              mb: 0.5
+            }}>
+              Create New Template
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Build powerful templates for streamlined documentation
+            </Typography>
+          </Box>
+          <IconButton 
+            onClick={onClose}
+            sx={{ 
+              bgcolor: alpha(bravoColors.primaryFlat, 0.1),
+              '&:hover': { bgcolor: alpha(bravoColors.primaryFlat, 0.2) }
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ minHeight: 400 }}>
-        <Stepper activeStep={currentStep} orientation="vertical">
+      <DialogContent sx={{ minHeight: 450, px: 4 }}>
+        <Stepper activeStep={currentStep} orientation="vertical" sx={{ mt: 2 }}>
           <Step>
-            <StepLabel>Choose Creation Method</StepLabel>
+            <StepLabel sx={{ 
+              '& .MuiStepLabel-label': { 
+                fontSize: '1.1rem', 
+                fontWeight: 600 
+              } 
+            }}>
+              Choose Creation Method
+            </StepLabel>
             <StepContent>
               {renderStepContent(0)}
             </StepContent>
           </Step>
           
           <Step>
-            <StepLabel>Configure Template</StepLabel>
+            <StepLabel sx={{ 
+              '& .MuiStepLabel-label': { 
+                fontSize: '1.1rem', 
+                fontWeight: 600 
+              } 
+            }}>
+              Configure Template
+            </StepLabel>
             <StepContent>
               {renderStepContent(1)}
             </StepContent>
           </Step>
           
           <Step>
-            <StepLabel>Finalize Details</StepLabel>
+            <StepLabel sx={{ 
+              '& .MuiStepLabel-label': { 
+                fontSize: '1.1rem', 
+                fontWeight: 600 
+              } 
+            }}>
+              Finalize Details
+            </StepLabel>
             <StepContent>
               {renderStepContent(2)}
             </StepContent>
@@ -477,8 +537,12 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
         </Stepper>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3 }}>
-        <Button onClick={onClose} variant="outlined">
+      <DialogActions sx={{ p: 4, pt: 2 }}>
+        <Button 
+          onClick={onClose} 
+          variant="outlined"
+          sx={{ borderRadius: 2, px: 3 }}
+        >
           Cancel
         </Button>
         
@@ -487,6 +551,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             onClick={handleBack}
             variant="outlined"
             startIcon={<NavigateBeforeIcon />}
+            sx={{ borderRadius: 2, px: 3 }}
           >
             Back
           </Button>
@@ -498,6 +563,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             variant="contained"
             disabled={!canProceed()}
             endIcon={<NavigateNextIcon />}
+            sx={{ borderRadius: 2, px: 4 }}
           >
             Next
           </Button>
@@ -507,6 +573,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             variant="contained"
             disabled={!canProceed()}
             endIcon={<CheckIcon />}
+            sx={{ borderRadius: 2, px: 4 }}
           >
             Create Template
           </Button>
