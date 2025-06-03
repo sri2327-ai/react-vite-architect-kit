@@ -33,8 +33,7 @@ import {
   Select,
   Accordion,
   AccordionSummary,
-  AccordionDetails,
-  Grid
+  AccordionDetails
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -664,8 +663,12 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       <ScheduleIcon color="primary" />
                       Schedule Configuration
                     </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      flexDirection: { xs: 'column', md: 'row' }, 
+                      gap: 2 
+                    }}>
+                      <Box sx={{ flex: 1 }}>
                         <TextField
                           fullWidth
                           size="small"
@@ -677,8 +680,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                             startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
                           }}
                         />
-                      </Grid>
-                      <Grid item xs={12} md={6}>
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
                         <TextField
                           fullWidth
                           size="small"
@@ -690,8 +693,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                             startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
                           }}
                         />
-                      </Grid>
-                    </Grid>
+                      </Box>
+                    </Box>
                   </Box>
 
                   <Divider sx={{ my: 3 }} />
