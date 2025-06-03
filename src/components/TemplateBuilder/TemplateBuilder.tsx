@@ -19,7 +19,8 @@ import {
   useTheme,
   useMediaQuery,
   Pagination,
-  Skeleton
+  Skeleton,
+  alpha
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -474,7 +475,7 @@ const TemplateBuilder: React.FC = () => {
   // Render Templates Screen with enhanced filters and cards
   const renderTemplates = () => (
     <Box>
-      <Box display="flex" alignItems="center" justifyContent="between" mb={4}>
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
         <Box sx={{ flex: 1 }}>
           <Box display="flex" alignItems="center" gap={2} mb={2}>
             <IconButton 
