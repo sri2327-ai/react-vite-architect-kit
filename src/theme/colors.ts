@@ -16,7 +16,7 @@ export const bravoColors = {
     secondary: '#000000',
     light: '#000000',
     white: '#FFFFFF',
-    lightGrey: '#000000',
+    lightGrey: '#A5CCF3',
   },
   accent: {
     blue: '#387E89',

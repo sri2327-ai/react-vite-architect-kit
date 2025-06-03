@@ -17,9 +17,27 @@ export const components: Components<Omit<Theme, 'components'>> = {
         fontSize: '0.95rem',
         boxShadow: 'none',
         fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
-        color: '#000000',
+        background: bravoColors.button.gradient,
+        color: bravoColors.text.white,
         '&:hover': {
+          background: bravoColors.button.hover,
           boxShadow: 'none',
+        },
+      },
+      outlined: {
+        background: 'transparent',
+        color: bravoColors.primaryFlat,
+        borderColor: bravoColors.primaryFlat,
+        '&:hover': {
+          background: bravoColors.highlight.hover,
+          borderColor: bravoColors.primaryDark,
+        },
+      },
+      text: {
+        background: 'transparent',
+        color: bravoColors.primaryFlat,
+        '&:hover': {
+          background: bravoColors.highlight.hover,
         },
       },
     },
@@ -37,7 +55,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
           backgroundColor: bravoColors.background.white,
           fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
           '& fieldset': {
-            borderColor: '#E5E7EB',
+            borderColor: bravoColors.highlight.border,
             borderWidth: 1.5,
           },
           '&:hover fieldset': {
@@ -50,11 +68,11 @@ export const components: Components<Omit<Theme, 'components'>> = {
         },
         '& .MuiInputLabel-root': {
           fontWeight: 500,
-          color: '#000000',
+          color: bravoColors.text.primary,
           fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
         },
         '& .MuiInputBase-input': {
-          color: '#000000',
+          color: bravoColors.text.primary,
           fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
         },
       },
@@ -65,7 +83,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
       root: {
         borderRadius: 16,
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-        border: `1px solid #F3F4F6`,
+        border: `1px solid ${bravoColors.highlight.border}`,
         backgroundColor: bravoColors.background.white,
       },
     },
@@ -75,6 +93,40 @@ export const components: Components<Omit<Theme, 'components'>> = {
       root: {
         borderRadius: 16,
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        backgroundColor: bravoColors.background.light,
+      },
+    },
+  },
+  MuiDrawer: {
+    styleOverrides: {
+      paper: {
+        backgroundColor: bravoColors.background.light,
+        borderRight: `1px solid ${bravoColors.highlight.border}`,
+      },
+    },
+  },
+  MuiAppBar: {
+    styleOverrides: {
+      root: {
+        backgroundColor: bravoColors.primaryFlat,
+        color: bravoColors.text.white,
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+      },
+    },
+  },
+  MuiListItemButton: {
+    styleOverrides: {
+      root: {
+        '&.Mui-selected': {
+          backgroundColor: bravoColors.highlight.selected,
+          color: bravoColors.primaryFlat,
+          '&:hover': {
+            backgroundColor: bravoColors.highlight.hover,
+          },
+        },
+        '&:hover': {
+          backgroundColor: bravoColors.highlight.hover,
+        },
       },
     },
   },
@@ -147,7 +199,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
     styleOverrides: {
       root: {
         '& .MuiStepIcon-root': {
-          color: '#E5E7EB',
+          color: bravoColors.highlight.border,
           '&.Mui-active': {
             color: bravoColors.primaryFlat,
           },
@@ -162,7 +214,25 @@ export const components: Components<Omit<Theme, 'components'>> = {
     styleOverrides: {
       root: {
         fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
-        color: '#000000',
+        color: bravoColors.text.primary,
+      },
+    },
+  },
+  MuiIconButton: {
+    styleOverrides: {
+      root: {
+        color: bravoColors.icons.primary,
+        '&:hover': {
+          backgroundColor: bravoColors.highlight.hover,
+        },
+      },
+    },
+  },
+  MuiToolbar: {
+    styleOverrides: {
+      root: {
+        backgroundColor: bravoColors.primaryFlat,
+        color: bravoColors.text.white,
       },
     },
   },

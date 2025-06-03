@@ -5,7 +5,7 @@ import { bravoColors } from './colors';
 export const lightPalette: PaletteOptions = {
   mode: 'light',
   primary: {
-    main: bravoColors.primaryFlat, // Use flat color instead of gradient
+    main: bravoColors.primaryFlat,
     dark: bravoColors.primaryDark,
   },
   secondary: {
@@ -44,6 +44,7 @@ export const lightPalette: PaletteOptions = {
     selected: bravoColors.highlight.selected,
     hover: bravoColors.highlight.hover,
   },
+  divider: bravoColors.highlight.border,
 };
 
 export const darkPalette: PaletteOptions = {
@@ -62,7 +63,7 @@ export const darkPalette: PaletteOptions = {
   },
   text: {
     primary: bravoColors.text.white,
-    secondary: bravoColors.tertiary,
+    secondary: bravoColors.text.lightGrey,
   },
   error: {
     main: '#f44336',
@@ -88,4 +89,5 @@ export const darkPalette: PaletteOptions = {
     selected: bravoColors.highlight.selected,
     hover: bravoColors.highlight.hover,
   },
+  divider: bravoColors.highlight.border,
 };
