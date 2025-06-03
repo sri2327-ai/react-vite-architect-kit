@@ -30,7 +30,12 @@ import {
   Tab,
   RadioGroup,
   FormControlLabel,
-  Radio
+  Radio,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
+  LinearProgress
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
@@ -53,7 +58,10 @@ import {
   FormatListBulleted as FormatListBulletedIcon,
   Circle as CircleIcon,
   Preview as PreviewIcon,
-  Note as NoteIcon
+  Note as NoteIcon,
+  NavigateNext as NavigateNextIcon,
+  NavigateBefore as NavigateBeforeIcon,
+  Check as CheckIcon
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
@@ -105,6 +113,12 @@ const TemplateBuilder: React.FC = () => {
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
   const [openAddSection, setOpenAddSection] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+
+  // Multi-step workflow states
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processedContent, setProcessedContent] = useState('');
+  const [aiSummary, setAiSummary] = useState('');
 
   // Form states for different creation methods
   const [templateName, setTemplateName] = useState('');
@@ -346,6 +360,56 @@ const TemplateBuilder: React.FC = () => {
     },
   ];
 
+  // Multi-step workflow handlers
+  const handleNextStep = () => {
+    setCurrentStep(prev => prev + 1);
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep(prev => prev - 1);
+  };
+
+  const handleResetSteps = () => {
+    setCurrentStep(0);
+    setIsProcessing(false);
+    setProcessedContent('');
+    setAiSummary('');
+  };
+
+  // Simulate AI processing for different methods
+  const simulateAIProcessing = async (content: string, method: string) => {
+    setIsProcessing(true);
+    
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    let result = '';
+    let summary = '';
+    
+    switch (method) {
+      case 'copyNotes':
+        result = `Processed Template Content:\n\n${content}\n\n[AI has analyzed and structured your previous notes into a template format]`;
+        summary = 'AI has successfully converted your previous notes into a structured template format, organizing key sections and improving readability.';
+        break;
+      case 'generateTemplate':
+        result = `Generated Template Based on Description:\n\nSubjective:\n[Patient's description of symptoms and concerns]\n\nObjective:\n[Physical examination findings and vital signs]\n\nAssessment:\n[Clinical diagnosis and differential diagnosis]\n\nPlan:\n[Treatment plan and follow-up instructions]\n\n[AI generated this template based on: "${content}"]`;
+        summary = 'AI has created a comprehensive template structure based on your description, following medical documentation best practices.';
+        break;
+      case 'existingTemplate':
+        result = `Optimized Template Content:\n\n${content}\n\n[AI has reviewed and optimized the existing template for better structure and completeness]`;
+        summary = 'AI has analyzed your existing template and made structural improvements while maintaining the original content intent.';
+        break;
+      default:
+        result = content;
+        summary = 'Content processed successfully.';
+    }
+    
+    setProcessedContent(result);
+    setAiSummary(summary);
+    setIsProcessing(false);
+    handleNextStep();
+  };
+
   // Event handlers
   const handleConsultTypeSelect = (consultType: ConsultType) => {
     setSelectedConsultType(consultType);
@@ -378,12 +442,15 @@ const TemplateBuilder: React.FC = () => {
 
   const handleCreateTemplateMethod = (method: any) => {
     setTemplateMethod(method);
+    setCurrentStep(0);
     // Reset form states
     setTemplateName('');
     setPreviousNotes('');
     setTemplateDescription('');
     setExistingTemplateContent('');
     setSelectedLibraryTemplate(null);
+    setProcessedContent('');
+    setAiSummary('');
   };
 
   const handleAddType = () => {
@@ -400,73 +467,335 @@ const TemplateBuilder: React.FC = () => {
   };
 
   const onCreateTemplate = async () => {
-    // Validate based on selected method
-    if (!templateName.trim()) {
-      return;
-    }
-
-    if (templateMethod.id === 1 && !previousNotes.trim()) {
-      return;
-    }
-
-    if (templateMethod.id === 2 && !templateDescription.trim()) {
-      return;
-    }
-
-    if (templateMethod.id === 4 && !existingTemplateContent.trim()) {
-      return;
-    }
-
-    if (templateMethod.id === 5 && !selectedLibraryTemplate) {
-      return;
-    }
-
-    console.log("Create Template Data", {
-      method: templateMethod,
-      name: templateName,
-      previousNotes,
-      description: templateDescription,
-      existingContent: existingTemplateContent,
-      libraryTemplate: selectedLibraryTemplate
-    });
-
-    setOpenCreateTemplate(false);
-    setCurrentScreen('templateEditor');
-    setOpenModifyTemplate(true);
-    setShowTemplate(true);
-    setSectionList([]);
-  };
-
-  const handleLibraryTemplatePreview = (template: LibraryTemplate) => {
-    setPreviewTemplate(template);
-    setPreviewType('template');
-    setOpenPreview(true);
-  };
-
-  const handleImportToMyTemplates = () => {
-    if (previewTemplate) {
-      setOpenPreview(false);
-      setOpenImportConfirm(true);
-    }
-  };
-
-  const handleConfirmImport = () => {
-    if (previewTemplate && selectedImportType) {
-      console.log('Importing template to my templates:', {
-        template: previewTemplate,
-        consultType: selectedImportType
+    // For methods 1, 2, 4 - go through the step process
+    if ([1, 2, 4].includes(templateMethod.id)) {
+      if (currentStep === 0) {
+        // Validate first step
+        if (!templateName.trim()) return;
+        
+        if (templateMethod.id === 1 && !previousNotes.trim()) return;
+        if (templateMethod.id === 2 && !templateDescription.trim()) return;
+        if (templateMethod.id === 4 && !existingTemplateContent.trim()) return;
+        
+        handleNextStep();
+      } else if (currentStep === 1) {
+        // Process content with AI
+        let content = '';
+        let method = '';
+        
+        if (templateMethod.id === 1) {
+          content = previousNotes;
+          method = 'copyNotes';
+        } else if (templateMethod.id === 2) {
+          content = templateDescription;
+          method = 'generateTemplate';
+        } else if (templateMethod.id === 4) {
+          content = existingTemplateContent;
+          method = 'existingTemplate';
+        }
+        
+        await simulateAIProcessing(content, method);
+      } else if (currentStep === 2) {
+        // Final step - create template
+        console.log("Create Template Data", {
+          method: templateMethod,
+          name: templateName,
+          processedContent,
+          aiSummary
+        });
+        
+        setOpenCreateTemplate(false);
+        handleResetSteps();
+        setCurrentScreen('templateEditor');
+        setOpenModifyTemplate(true);
+        setShowTemplate(true);
+        setSectionList([]);
+      }
+    } else {
+      // For methods 3 and 5 - direct creation
+      if (!templateName.trim()) return;
+      
+      if (templateMethod.id === 5 && !selectedLibraryTemplate) return;
+      
+      console.log("Create Template Data", {
+        method: templateMethod,
+        name: templateName,
+        libraryTemplate: selectedLibraryTemplate
       });
-      // Add logic to import template to user's templates
-      setOpenImportConfirm(false);
-      setPreviewTemplate(null);
-      setSelectedImportType('');
+
+      setOpenCreateTemplate(false);
+      setCurrentScreen('templateEditor');
+      setOpenModifyTemplate(true);
+      setShowTemplate(true);
+      setSectionList([]);
     }
   };
 
-  const filteredLibraryTemplates = libraryTemplates.filter(template => {
-    return (!libraryFilters.specialty || template.specialty.toLowerCase().includes(libraryFilters.specialty.toLowerCase())) &&
-           (!libraryFilters.noteType || template.noteType === libraryFilters.noteType);
-  });
+  // Get steps for current method
+  const getStepsForMethod = (methodId: number) => {
+    switch (methodId) {
+      case 1: // Copy Previous Notes
+        return [
+          'Enter Template Details',
+          'AI Processing',
+          'Review & Confirm'
+        ];
+      case 2: // Generate Template
+        return [
+          'Describe Template',
+          'AI Generation',
+          'Review & Confirm'
+        ];
+      case 4: // Use Existing Template
+        return [
+          'Paste Template Content',
+          'AI Optimization',
+          'Review & Confirm'
+        ];
+      default:
+        return [];
+    }
+  };
+
+  // Render step content for multi-step workflows
+  const renderStepContent = (methodId: number, step: number) => {
+    switch (methodId) {
+      case 1: // Copy Previous Notes
+        if (step === 0) {
+          return (
+            <Box>
+              <TextField
+                fullWidth
+                label="Template Name *"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 3 }}
+              />
+              <TextField
+                fullWidth
+                multiline
+                rows={8}
+                label="Copy and paste your previous notes"
+                placeholder="Paste the previous notes that you want to convert into a template..."
+                value={previousNotes}
+                onChange={(e) => setPreviousNotes(e.target.value)}
+                variant="outlined"
+                size="small"
+              />
+              <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mt: 2, fontStyle: 'italic' }}>
+                AI will analyze your notes and create a structured template format.
+              </Typography>
+            </Box>
+          );
+        } else if (step === 1) {
+          return (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              {isProcessing ? (
+                <>
+                  <LinearProgress sx={{ mb: 3 }} />
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    AI is processing your notes...
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                    This may take a few moments while we analyze and structure your content.
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <CheckIcon sx={{ fontSize: 64, color: 'green', mb: 2 }} />
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Processing Complete!
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                    Your notes have been successfully processed. Click Next to review.
+                  </Typography>
+                </>
+              )}
+            </Box>
+          );
+        } else if (step === 2) {
+          return (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                AI Summary:
+              </Typography>
+              <Box sx={{ p: 2, backgroundColor: '#e3f2fd', borderRadius: 2, mb: 3 }}>
+                <Typography variant="body2">{aiSummary}</Typography>
+              </Box>
+              
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Generated Template:
+              </Typography>
+              <Box sx={{ p: 3, border: '1px solid #ddd', borderRadius: 2, backgroundColor: '#f9f9f9', maxHeight: 300, overflowY: 'auto' }}>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                  {processedContent}
+                </Typography>
+              </Box>
+            </Box>
+          );
+        }
+        break;
+        
+      case 2: // Generate Template
+        if (step === 0) {
+          return (
+            <Box>
+              <TextField
+                fullWidth
+                label="Template Name *"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 3 }}
+              />
+              <TextField
+                fullWidth
+                multiline
+                rows={8}
+                label="Describe the template you want AI to create"
+                placeholder="Describe what kind of template you need. For example: 'Create a cardiology consultation template for chest pain evaluation' or 'Generate a pediatric well-child visit template'..."
+                value={templateDescription}
+                onChange={(e) => setTemplateDescription(e.target.value)}
+                variant="outlined"
+                size="small"
+              />
+              <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mt: 2, fontStyle: 'italic' }}>
+                Be as specific as possible about what you need in your template.
+              </Typography>
+            </Box>
+          );
+        } else if (step === 1) {
+          return (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              {isProcessing ? (
+                <>
+                  <LinearProgress sx={{ mb: 3 }} />
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    AI is generating your template...
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                    Creating a customized template based on your description.
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <CheckIcon sx={{ fontSize: 64, color: 'green', mb: 2 }} />
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Template Generated!
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                    Your custom template has been created. Click Next to review.
+                  </Typography>
+                </>
+              )}
+            </Box>
+          );
+        } else if (step === 2) {
+          return (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                AI Summary:
+              </Typography>
+              <Box sx={{ p: 2, backgroundColor: '#e8f5e8', borderRadius: 2, mb: 3 }}>
+                <Typography variant="body2">{aiSummary}</Typography>
+              </Box>
+              
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Generated Template:
+              </Typography>
+              <Box sx={{ p: 3, border: '1px solid #ddd', borderRadius: 2, backgroundColor: '#f9f9f9', maxHeight: 300, overflowY: 'auto' }}>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                  {processedContent}
+                </Typography>
+              </Box>
+            </Box>
+          );
+        }
+        break;
+        
+      case 4: // Use Existing Template
+        if (step === 0) {
+          return (
+            <Box>
+              <TextField
+                fullWidth
+                label="Template Name *"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 3 }}
+              />
+              <TextField
+                fullWidth
+                multiline
+                rows={8}
+                label="Copy and paste your existing template content"
+                placeholder="Paste your existing template content here. AI will help optimize and structure it..."
+                value={existingTemplateContent}
+                onChange={(e) => setExistingTemplateContent(e.target.value)}
+                variant="outlined"
+                size="small"
+              />
+              <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mt: 2, fontStyle: 'italic' }}>
+                AI will review and optimize your template for better structure and completeness.
+              </Typography>
+            </Box>
+          );
+        } else if (step === 1) {
+          return (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              {isProcessing ? (
+                <>
+                  <LinearProgress sx={{ mb: 3 }} />
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    AI is optimizing your template...
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                    Analyzing structure and making improvements to your template.
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <CheckIcon sx={{ fontSize: 64, color: 'green', mb: 2 }} />
+                  <Typography variant="h6" sx={{ mb: 2 }}>
+                    Optimization Complete!
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                    Your template has been optimized. Click Next to review.
+                  </Typography>
+                </>
+              )}
+            </Box>
+          );
+        } else if (step === 2) {
+          return (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                AI Summary:
+              </Typography>
+              <Box sx={{ p: 2, backgroundColor: '#fff3e0', borderRadius: 2, mb: 3 }}>
+                <Typography variant="body2">{aiSummary}</Typography>
+              </Box>
+              
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Optimized Template:
+              </Typography>
+              <Box sx={{ p: 3, border: '1px solid #ddd', borderRadius: 2, backgroundColor: '#f9f9f9', maxHeight: 300, overflowY: 'auto' }}>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                  {processedContent}
+                </Typography>
+              </Box>
+            </Box>
+          );
+        }
+        break;
+    }
+    return null;
+  };
 
   // Render different content based on selected method
   const renderTemplateCreationContent = () => {
@@ -533,7 +862,41 @@ const TemplateBuilder: React.FC = () => {
       );
     }
 
-    // Show specific form based on selected method
+    // Multi-step workflow for methods 1, 2, 4
+    if ([1, 2, 4].includes(templateMethod.id)) {
+      const steps = getStepsForMethod(templateMethod.id);
+      
+      return (
+        <Box sx={{ mt: 3 }}>
+          <Box display="flex" alignItems="center" mb={3}>
+            <IconButton onClick={() => setTemplateMethod({})} sx={{ mr: 1 }}>
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h6" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              {templateMethod.title}
+            </Typography>
+          </Box>
+
+          {/* Stepper */}
+          <Box sx={{ mb: 4 }}>
+            <Stepper activeStep={currentStep} orientation="horizontal">
+              {steps.map((label, index) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
+
+          {/* Step Content */}
+          <Box sx={{ mb: 4 }}>
+            {renderStepContent(templateMethod.id, currentStep)}
+          </Box>
+        </Box>
+      );
+    }
+
+    // Show specific form for methods 3 and 5 (single step)
     return (
       <Box sx={{ mt: 3 }}>
         <Box display="flex" alignItems="center" mb={3}>
@@ -555,56 +918,11 @@ const TemplateBuilder: React.FC = () => {
           sx={{ mb: 3 }}
         />
 
-        {/* Copy Previous Notes */}
-        {templateMethod.id === 1 && (
-          <TextField
-            fullWidth
-            multiline
-            rows={8}
-            label="Copy and paste a Previous Notes"
-            placeholder="Copy and paste a Previous Notes"
-            value={previousNotes}
-            onChange={(e) => setPreviousNotes(e.target.value)}
-            variant="outlined"
-            size="small"
-          />
-        )}
-
-        {/* Generate Template */}
-        {templateMethod.id === 2 && (
-          <TextField
-            fullWidth
-            multiline
-            rows={8}
-            label="Describe the template you want"
-            placeholder="Describe the template you want"
-            value={templateDescription}
-            onChange={(e) => setTemplateDescription(e.target.value)}
-            variant="outlined"
-            size="small"
-          />
-        )}
-
         {/* Start from Scratch */}
         {templateMethod.id === 3 && (
           <Typography variant="body2" sx={{ color: bravoColors.text.secondary, fontStyle: 'italic' }}>
             You'll start with a blank template that you can customize completely.
           </Typography>
-        )}
-
-        {/* Use Existing Template */}
-        {templateMethod.id === 4 && (
-          <TextField
-            fullWidth
-            multiline
-            rows={8}
-            label="Copy and paste existing template content"
-            placeholder="Copy and paste existing template content"
-            value={existingTemplateContent}
-            onChange={(e) => setExistingTemplateContent(e.target.value)}
-            variant="outlined"
-            size="small"
-          />
         )}
 
         {/* Template Library */}
@@ -1221,53 +1539,109 @@ const TemplateBuilder: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button 
-            onClick={() => setOpenCreateTemplate(false)}
-            variant="outlined"
-            sx={{
-              borderColor: bravoColors.secondary,
-              color: bravoColors.secondary,
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                borderColor: bravoColors.primaryFlat,
-                backgroundColor: bravoColors.background.light,
-              }
-            }}
-          >
-            BACK
-          </Button>
-          <Button 
-            onClick={onCreateTemplate}
-            variant="contained"
-            disabled={!templateMethod.id || !templateName.trim() || 
-              (templateMethod.id === 1 && !previousNotes.trim()) ||
-              (templateMethod.id === 2 && !templateDescription.trim()) ||
-              (templateMethod.id === 4 && !existingTemplateContent.trim()) ||
-              (templateMethod.id === 5 && !selectedLibraryTemplate)
-            }
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat,
-              },
-              '&:disabled': {
-                backgroundColor: '#ccc',
-                color: '#666'
-              }
-            }}
-          >
-            {templateMethod.id === 5 ? 'IMPORT' : 'CREATE'}
-          </Button>
+          {/* Multi-step navigation for methods 1, 2, 4 */}
+          {[1, 2, 4].includes(templateMethod.id) ? (
+            <>
+              <Button 
+                onClick={currentStep === 0 ? () => setOpenCreateTemplate(false) : handlePrevStep}
+                variant="outlined"
+                disabled={isProcessing}
+                sx={{
+                  borderColor: bravoColors.secondary,
+                  color: bravoColors.secondary,
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                  '&:hover': {
+                    borderColor: bravoColors.primaryFlat,
+                    backgroundColor: bravoColors.background.light,
+                  }
+                }}
+              >
+                {currentStep === 0 ? 'CANCEL' : 'BACK'}
+              </Button>
+              <Button 
+                onClick={onCreateTemplate}
+                variant="contained"
+                disabled={isProcessing || 
+                  (currentStep === 0 && (!templateName.trim() || 
+                    (templateMethod.id === 1 && !previousNotes.trim()) ||
+                    (templateMethod.id === 2 && !templateDescription.trim()) ||
+                    (templateMethod.id === 4 && !existingTemplateContent.trim())
+                  )) ||
+                  (currentStep === 1 && isProcessing)
+                }
+                sx={{
+                  backgroundColor: bravoColors.secondary,
+                  color: 'white',
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                  '&:hover': {
+                    backgroundColor: bravoColors.primaryFlat,
+                  },
+                  '&:disabled': {
+                    backgroundColor: '#ccc',
+                    color: '#666'
+                  }
+                }}
+              >
+                {currentStep === 0 ? 'NEXT' : currentStep === 1 ? (isProcessing ? 'PROCESSING...' : 'NEXT') : 'CREATE TEMPLATE'}
+              </Button>
+            </>
+          ) : (
+            // Single step navigation for methods 3 and 5
+            <>
+              <Button 
+                onClick={() => setOpenCreateTemplate(false)}
+                variant="outlined"
+                sx={{
+                  borderColor: bravoColors.secondary,
+                  color: bravoColors.secondary,
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                  '&:hover': {
+                    borderColor: bravoColors.primaryFlat,
+                    backgroundColor: bravoColors.background.light,
+                  }
+                }}
+              >
+                BACK
+              </Button>
+              <Button 
+                onClick={onCreateTemplate}
+                variant="contained"
+                disabled={!templateMethod.id || !templateName.trim() || 
+                  (templateMethod.id === 5 && !selectedLibraryTemplate)
+                }
+                sx={{
+                  backgroundColor: bravoColors.secondary,
+                  color: 'white',
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                  '&:hover': {
+                    backgroundColor: bravoColors.primaryFlat,
+                  },
+                  '&:disabled': {
+                    backgroundColor: '#ccc',
+                    color: '#666'
+                  }
+                }}
+              >
+                {templateMethod.id === 5 ? 'IMPORT' : 'CREATE'}
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
 
