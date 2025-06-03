@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -18,7 +17,22 @@ import {
   Select,
   MenuItem,
   TextField,
-  Autocomplete
+  Autocomplete,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
+  LinearProgress,
+  Grid,
+  Paper,
+  Switch,
+  FormControlLabel,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Fab,
+  Fade,
+  Zoom
 } from '@mui/material';
 import {
   Download as ImportIcon,
@@ -31,7 +45,15 @@ import {
   Assignment as ChartIcon,
   LocalHospital as VisitIcon,
   Edit as EditIcon,
-  Map as MapIcon
+  Map as MapIcon,
+  Settings as SettingsIcon,
+  Save as SaveIcon,
+  Close as CloseIcon,
+  ArrowBack as ArrowBackIcon,
+  CheckCircle as CheckCircleIcon,
+  ExpandMore as ExpandMoreIcon,
+  Add as AddIcon,
+  DeleteOutline as DeleteIcon
 } from '@mui/icons-material';
 
 interface WorkflowTemplate {
@@ -58,9 +80,33 @@ const WorkflowLibrary: React.FC = () => {
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowTemplate | null>(null);
   const [viewDialog, setViewDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [configurationDialog, setConfigurationDialog] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [visitTypes, setVisitTypes] = useState<string[]>(['Initial Consultation', 'Follow-up Visit', 'Annual Physical', 'Urgent Care']);
+  const [selectedVisitTypes, setSelectedVisitTypes] = useState<string[]>([]);
+  const [ehrFieldMappings, setEhrFieldMappings] = useState<{[key: string]: string}>({});
+  const [editableBlocks, setEditableBlocks] = useState<{[key: string]: boolean}>({});
+  const [isImporting, setIsImporting] = useState(false);
+  const [importComplete, setImportComplete] = useState(false);
   
   // Mock user EHR - this would come from user profile
   const userEHR = 'Practice Fusion';
+
+  // Mock EHR fields for mapping
+  const ehrFields = [
+    'Chief Complaint',
+    'History of Present Illness',
+    'Past Medical History',
+    'Social History',
+    'Family History',
+    'Review of Systems',
+    'Physical Examination',
+    'Assessment',
+    'Plan',
+    'Medications',
+    'Allergies',
+    'Vital Signs'
+  ];
 
   const categories = [
     'Patient Encounter',
@@ -211,9 +257,306 @@ const WorkflowLibrary: React.FC = () => {
   };
 
   const handleImportWorkflow = (workflow: WorkflowTemplate) => {
-    console.log('Importing workflow:', workflow.name);
+    setSelectedWorkflow(workflow);
     setViewDialog(false);
-    // This will take user to configuration where they map to visit types and EHR fields
+    setConfigurationDialog(true);
+    setCurrentStep(0);
+    setSelectedVisitTypes([]);
+    setEhrFieldMappings({});
+    setEditableBlocks({});
+    setImportComplete(false);
+    
+    // Initialize editable blocks based on workflow
+    const initialEditableBlocks: {[key: string]: boolean} = {};
+    workflow.blocks.forEach(block => {
+      initialEditableBlocks[block.id] = block.isEditable || false;
+    });
+    setEditableBlocks(initialEditableBlocks);
+  };
+
+  const handleNextStep = () => {
+    setCurrentStep(prev => prev + 1);
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep(prev => prev - 1);
+  };
+
+  const handleFinalImport = async () => {
+    setIsImporting(true);
+    
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsImporting(false);
+    setImportComplete(true);
+    
+    console.log('Importing workflow with configuration:', {
+      workflow: selectedWorkflow?.name,
+      visitTypes: selectedVisitTypes,
+      ehrMappings: ehrFieldMappings,
+      editableBlocks
+    });
+    
+    // Close dialog after showing success
+    setTimeout(() => {
+      setConfigurationDialog(false);
+      setImportComplete(false);
+    }, 2000);
+  };
+
+  const getStepContent = (step: number) => {
+    switch (step) {
+      case 0:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Select Visit Types
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Choose which visit types this workflow should be available for:
+            </Typography>
+            
+            <Grid container spacing={2}>
+              {visitTypes.map((visitType) => (
+                <Grid item xs={12} sm={6} key={visitType}>
+                  <Card 
+                    sx={{ 
+                      cursor: 'pointer',
+                      border: selectedVisitTypes.includes(visitType) ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                      '&:hover': { borderColor: '#1976d2' }
+                    }}
+                    onClick={() => {
+                      setSelectedVisitTypes(prev => 
+                        prev.includes(visitType) 
+                          ? prev.filter(v => v !== visitType)
+                          : [...prev, visitType]
+                      );
+                    }}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      <Box display="flex" alignItems="center" justifyContent="space-between">
+                        <Typography variant="body1">{visitType}</Typography>
+                        {selectedVisitTypes.includes(visitType) && (
+                          <CheckCircleIcon color="primary" />
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+            
+            <Box sx={{ mt: 3 }}>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Add custom visit type..."
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && e.target.value.trim()) {
+                    const newType = e.target.value.trim();
+                    setVisitTypes(prev => [...prev, newType]);
+                    setSelectedVisitTypes(prev => [...prev, newType]);
+                    e.target.value = '';
+                  }
+                }}
+              />
+            </Box>
+          </Box>
+        );
+        
+      case 1:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Configure Editable Steps
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Choose which workflow steps users can customize:
+            </Typography>
+            
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {selectedWorkflow?.blocks.map((block, index) => (
+                <Card key={block.id} variant="outlined">
+                  <CardContent sx={{ p: 2 }}>
+                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                      <Box display="flex" alignItems="center" gap={2}>
+                        <Box sx={{ color: 'primary.main' }}>
+                          {block.icon}
+                        </Box>
+                        <Box>
+                          <Typography variant="subtitle2">
+                            {index + 1}. {block.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {block.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={editableBlocks[block.id] || false}
+                            onChange={(e) => setEditableBlocks(prev => ({
+                              ...prev,
+                              [block.id]: e.target.checked
+                            }))}
+                          />
+                        }
+                        label="Editable"
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </Box>
+        );
+        
+      case 2:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Map EHR Fields
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Map note blocks to your EHR fields:
+            </Typography>
+            
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {selectedWorkflow?.blocks
+                .filter(block => block.isNoteField)
+                .map((block) => (
+                  <Paper key={block.id} sx={{ p: 3 }}>
+                    <Box display="flex" alignItems="center" gap={2} mb={2}>
+                      <Box sx={{ color: 'primary.main' }}>
+                        {block.icon}
+                      </Box>
+                      <Typography variant="subtitle1" fontWeight={600}>
+                        {block.name}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      {block.description}
+                    </Typography>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Select EHR Field</InputLabel>
+                      <Select
+                        value={ehrFieldMappings[block.id] || ''}
+                        label="Select EHR Field"
+                        onChange={(e) => setEhrFieldMappings(prev => ({
+                          ...prev,
+                          [block.id]: e.target.value
+                        }))}
+                      >
+                        {ehrFields.map((field) => (
+                          <MenuItem key={field} value={field}>{field}</MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Paper>
+                ))}
+            </Box>
+          </Box>
+        );
+        
+      case 3:
+        return (
+          <Box>
+            {!isImporting && !importComplete ? (
+              <>
+                <Typography variant="h6" gutterBottom>
+                  Review Configuration
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  Please review your workflow configuration:
+                </Typography>
+                
+                <Accordion defaultExpanded>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      Visit Types ({selectedVisitTypes.length})
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box display="flex" flexWrap="wrap" gap={1}>
+                      {selectedVisitTypes.map((type) => (
+                        <Chip key={type} label={type} color="primary" size="small" />
+                      ))}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+                
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      Editable Steps ({Object.values(editableBlocks).filter(Boolean).length})
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box display="flex" flexDirection="column" gap={1}>
+                      {selectedWorkflow?.blocks
+                        .filter(block => editableBlocks[block.id])
+                        .map((block) => (
+                          <Typography key={block.id} variant="body2">
+                            • {block.name}
+                          </Typography>
+                        ))}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+                
+                <Accordion>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography variant="subtitle1" fontWeight={600}>
+                      EHR Field Mappings ({Object.keys(ehrFieldMappings).length})
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Box display="flex" flexDirection="column" gap={1}>
+                      {Object.entries(ehrFieldMappings).map(([blockId, ehrField]) => {
+                        const block = selectedWorkflow?.blocks.find(b => b.id === blockId);
+                        return (
+                          <Typography key={blockId} variant="body2">
+                            • {block?.name} → {ehrField}
+                          </Typography>
+                        );
+                      })}
+                    </Box>
+                  </AccordionDetails>
+                </Accordion>
+              </>
+            ) : isImporting ? (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <LinearProgress sx={{ mb: 3 }} />
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  Importing Workflow...
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Setting up your workflow with the specified configuration.
+                </Typography>
+              </Box>
+            ) : (
+              <Fade in={importComplete}>
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <Zoom in={importComplete}>
+                    <CheckCircleIcon sx={{ fontSize: 80, color: 'green', mb: 2 }} />
+                  </Zoom>
+                  <Typography variant="h5" sx={{ mb: 2, color: 'green' }}>
+                    Import Successful!
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    Your workflow has been configured and is ready to use.
+                  </Typography>
+                </Box>
+              </Fade>
+            )}
+          </Box>
+        );
+        
+      default:
+        return null;
+    }
   };
 
   const getBlockTypeColor = (type: string) => {
@@ -225,11 +568,17 @@ const WorkflowLibrary: React.FC = () => {
     }
   };
 
+  const filteredWorkflows = workflowTemplates.filter(wf => {
+    const ehrMatch = wf.ehrSystem === userEHR;
+    const categoryMatch = selectedCategory === 'all' || wf.category === selectedCategory;
+    return ehrMatch && categoryMatch;
+  });
+
   return (
     <Box sx={{ p: 3 }}>
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>EHR System:</strong> {userEHR} - These are predefined workflows that you can customize for your visit types
+          <strong>EHR System:</strong> {userEHR} - Import and customize predefined workflows for your practice
         </Typography>
       </Alert>
 
@@ -257,7 +606,16 @@ const WorkflowLibrary: React.FC = () => {
         gap: 3 
       }}>
         {filteredWorkflows.map((workflow) => (
-          <Card key={workflow.id} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Card key={workflow.id} sx={{ 
+            height: '100%', 
+            display: 'flex', 
+            flexDirection: 'column',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-4px)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+            }
+          }}>
             <CardContent sx={{ flexGrow: 1 }}>
               <Box sx={{ mb: 2 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
@@ -280,7 +638,7 @@ const WorkflowLibrary: React.FC = () => {
                 Workflow Steps: {workflow.blocks.length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                After importing, you'll map this to your visit types and configure EHR field mappings
+                Configure visit types and EHR field mappings after import
               </Typography>
             </CardContent>
             
@@ -299,7 +657,13 @@ const WorkflowLibrary: React.FC = () => {
                 startIcon={<ImportIcon />}
                 onClick={() => handleImportWorkflow(workflow)}
                 size="small"
-                sx={{ flex: 1 }}
+                sx={{ 
+                  flex: 1,
+                  background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #1565c0 30%, #1976d2 90%)',
+                  }
+                }}
               >
                 Import & Configure
               </Button>
@@ -417,6 +781,75 @@ const WorkflowLibrary: React.FC = () => {
             onClick={() => handleImportWorkflow(selectedWorkflow!)}
           >
             Import & Configure
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Configuration Dialog */}
+      <Dialog 
+        open={configurationDialog} 
+        onClose={() => setConfigurationDialog(false)} 
+        maxWidth="md" 
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3, minHeight: '600px' }
+        }}
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <SettingsIcon color="primary" />
+              Configure Workflow: {selectedWorkflow?.name}
+            </Box>
+            <IconButton onClick={() => setConfigurationDialog(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent sx={{ px: 3 }}>
+          <Stepper activeStep={currentStep} orientation="horizontal" sx={{ mb: 4 }}>
+            <Step>
+              <StepLabel>Visit Types</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Editable Steps</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>EHR Mapping</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Review & Import</StepLabel>
+            </Step>
+          </Stepper>
+          
+          {getStepContent(currentStep)}
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3, justifyContent: 'space-between' }}>
+          <Button
+            onClick={currentStep === 0 ? () => setConfigurationDialog(false) : handlePrevStep}
+            disabled={isImporting || importComplete}
+            startIcon={currentStep === 0 ? <CloseIcon /> : <ArrowBackIcon />}
+          >
+            {currentStep === 0 ? 'Cancel' : 'Back'}
+          </Button>
+          
+          <Button
+            variant="contained"
+            onClick={currentStep === 3 ? handleFinalImport : handleNextStep}
+            disabled={
+              isImporting || 
+              importComplete ||
+              (currentStep === 0 && selectedVisitTypes.length === 0) ||
+              (currentStep === 2 && Object.keys(ehrFieldMappings).length === 0)
+            }
+            startIcon={currentStep === 3 ? <SaveIcon /> : undefined}
+            sx={{
+              background: currentStep === 3 ? 'linear-gradient(45deg, #4caf50 30%, #66bb6a 90%)' : undefined
+            }}
+          >
+            {currentStep === 3 ? (isImporting ? 'Importing...' : 'Import Workflow') : 'Next'}
           </Button>
         </DialogActions>
       </Dialog>
