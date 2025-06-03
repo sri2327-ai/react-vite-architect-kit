@@ -14,7 +14,6 @@ import {
   IconButton,
   Chip,
   Divider,
-  Grid,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -36,47 +35,12 @@ import {
 } from '@mui/icons-material';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-
-interface TemplateField {
-  id: string;
-  type: 'TEXT' | 'NUMBER' | 'DATE' | 'DROPDOWN' | 'CHECKBOX' | 'TEXTAREA' | 'RADIO' | 'FILE_UPLOAD';
-  label: string;
-  placeholder?: string;
-  required: boolean;
-  visible: boolean;
-  options?: string[];
-  validation?: {
-    minLength?: number;
-    maxLength?: number;
-    min?: number;
-    max?: number;
-    pattern?: string;
-  };
-  description?: string;
-  defaultValue?: string;
-}
-
-interface TemplateSection {
-  id: string;
-  title: string;
-  description?: string;
-  visible: boolean;
-  fields: TemplateField[];
-}
-
-interface Template {
-  id: string;
-  name: string;
-  description?: string;
-  sections: TemplateSection[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { EditorTemplateField, EditorTemplateSection, EditorTemplate } from './types';
 
 interface TemplateEditorProps {
   templateName?: string;
-  initialSections?: TemplateSection[];
-  onSave?: (sections: TemplateSection[]) => void;
+  initialSections?: EditorTemplateSection[];
+  onSave?: (sections: EditorTemplateSection[]) => void;
   onBack?: () => void;
 }
 
@@ -92,12 +56,12 @@ const FIELD_TYPES = [
 ];
 
 interface DraggableFieldProps {
-  field: TemplateField;
+  field: EditorTemplateField;
   index: number;
   sectionId: string;
-  onEdit: (field: TemplateField) => void;
+  onEdit: (field: EditorTemplateField) => void;
   onDelete: (fieldId: string) => void;
-  onDuplicate: (field: TemplateField) => void;
+  onDuplicate: (field: EditorTemplateField) => void;
   onMove: (dragIndex: number, hoverIndex: number) => void;
   onToggleVisibility: (fieldId: string) => void;
 }
@@ -259,13 +223,13 @@ const DropZone: React.FC<DropZoneProps> = ({ sectionId }) => {
 };
 
 interface FieldEditorProps {
-  field: TemplateField;
-  onSave: (field: TemplateField) => void;
+  field: EditorTemplateField;
+  onSave: (field: EditorTemplateField) => void;
   onCancel: () => void;
 }
 
 const FieldEditor: React.FC<FieldEditorProps> = ({ field, onSave, onCancel }) => {
-  const [editedField, setEditedField] = useState<TemplateField>({ ...field });
+  const [editedField, setEditedField] = useState<EditorTemplateField>({ ...field });
   const [newOption, setNewOption] = useState('');
 
   const handleAddOption = () => {
@@ -311,7 +275,7 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onSave, onCancel }) =>
             label="Field Type"
             onChange={(e) => setEditedField(prev => ({ 
               ...prev, 
-              type: e.target.value as TemplateField['type']
+              type: e.target.value as EditorTemplateField['type']
             }))}
           >
             {FIELD_TYPES.map((type) => (
@@ -449,7 +413,7 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({
   onSave,
   onBack
 }) => {
-  const [template, setTemplate] = useState<Template>({
+  const [template, setTemplate] = useState<EditorTemplate>({
     id: '1',
     name: templateName,
     description: 'Comprehensive medical examination form',
@@ -458,12 +422,12 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({
     updatedAt: new Date().toISOString()
   });
 
-  const [editingField, setEditingField] = useState<TemplateField | null>(null);
+  const [editingField, setEditingField] = useState<EditorTemplateField | null>(null);
   const [editingSectionId, setEditingSectionId] = useState<string>('');
   const [showFieldDialog, setShowFieldDialog] = useState(false);
 
   const handleAddSection = () => {
-    const newSection: TemplateSection = {
+    const newSection: EditorTemplateSection = {
       id: `section-${Date.now()}`,
       title: 'New Section',
       description: '',
@@ -491,13 +455,13 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({
     setShowFieldDialog(true);
   };
 
-  const handleEditField = (field: TemplateField, sectionId: string) => {
+  const handleEditField = (field: EditorTemplateField, sectionId: string) => {
     setEditingSectionId(sectionId);
     setEditingField({ ...field });
     setShowFieldDialog(true);
   };
 
-  const handleSaveField = (field: TemplateField) => {
+  const handleSaveField = (field: EditorTemplateField) => {
     setTemplate(prev => ({
       ...prev,
       sections: prev.sections.map(section => 
@@ -530,8 +494,8 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({
     }));
   };
 
-  const handleDuplicateField = (sectionId: string, field: TemplateField) => {
-    const duplicatedField: TemplateField = {
+  const handleDuplicateField = (sectionId: string, field: EditorTemplateField) => {
+    const duplicatedField: EditorTemplateField = {
       ...field,
       id: `field-${Date.now()}`,
       label: `${field.label} (Copy)`

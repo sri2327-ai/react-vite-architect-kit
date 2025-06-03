@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -6,13 +7,18 @@ import {
   CardContent,
   Button,
   Chip,
-  Grid,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   Alert,
-  Divider
+  Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Autocomplete
 } from '@mui/material';
 import {
   Download as ImportIcon,
@@ -22,7 +28,8 @@ import {
   Today as TodayIcon,
   LocationOn as LocationIcon,
   Description as NoteIcon,
-  Assignment as ChartIcon
+  Assignment as ChartIcon,
+  LocalHospital as VisitIcon
 } from '@mui/icons-material';
 
 interface WorkflowTemplate {
@@ -31,6 +38,7 @@ interface WorkflowTemplate {
   description: string;
   ehrSystem: string;
   category: string;
+  visitType: string;
   blocks: WorkflowBlock[];
 }
 
@@ -42,157 +50,179 @@ interface WorkflowBlock {
   icon: React.ReactNode;
   templateMapping?: string;
   config: any;
+  isEditable?: boolean;
+  mappingOptions?: string[];
 }
 
 const WorkflowLibrary: React.FC = () => {
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowTemplate | null>(null);
   const [viewDialog, setViewDialog] = useState(false);
+  const [selectedVisitType, setSelectedVisitType] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
   // Mock user EHR - this would come from user profile
   const userEHR = 'Practice Fusion';
+
+  // Available visit types for clinicians
+  const visitTypes = [
+    'Annual Physical',
+    'Follow-up Visit',
+    'Acute Care',
+    'Preventive Care',
+    'Specialist Consultation',
+    'Urgent Care',
+    'Telemedicine',
+    'Pediatric Visit',
+    'Geriatric Assessment'
+  ];
+
+  const categories = [
+    'Patient Encounter',
+    'Prescription',
+    'Lab Review',
+    'Imaging Review',
+    'Care Coordination'
+  ];
 
   const workflowBlocks: WorkflowBlock[] = [
     {
       id: 'schedule-menu',
       type: 'trigger',
-      name: 'Schedule Menu',
-      description: 'Access patient schedule interface',
+      name: 'Access Schedule',
+      description: 'Navigate to patient schedule interface',
       icon: <ScheduleIcon />,
-      config: { automated: true }
+      config: { automated: true },
+      isEditable: false
     },
     {
       id: 'provider-filter',
       type: 'action',
-      name: 'Provider Name Filter',
-      description: 'Filter schedule by provider name',
+      name: 'Filter by Provider',
+      description: 'Select your name from provider list',
       icon: <PersonIcon />,
-      config: { dynamic: true, userInput: 'provider_name' }
+      config: { dynamic: true, userInput: 'provider_name' },
+      isEditable: true
     },
     {
       id: 'date-filter',
       type: 'action',
-      name: "Today's Date Filter",
-      description: 'Filter appointments for current date',
+      name: 'Select Date',
+      description: 'Choose appointment date',
       icon: <TodayIcon />,
-      config: { automated: true, value: 'current_date' }
-    },
-    {
-      id: 'location-filter',
-      type: 'action',
-      name: 'Location Filter',
-      description: 'Filter by clinic location',
-      icon: <LocationIcon />,
-      config: { dynamic: true, userInput: 'location' }
+      config: { automated: true, value: 'current_date' },
+      isEditable: true
     },
     {
       id: 'patient-select',
       type: 'action',
-      name: 'Patient Selection from Schedule',
-      description: 'Click patient name from filtered schedule',
+      name: 'Select Patient',
+      description: 'Click on patient from schedule',
       icon: <PersonIcon />,
-      config: { userAction: true }
-    },
-    {
-      id: 'chart-open',
-      type: 'action',
-      name: 'Open Encounter Chart',
-      description: 'Open patient chart for current date encounter',
-      icon: <ChartIcon />,
-      config: { automated: true, context: 'current_date' }
+      config: { userAction: true },
+      isEditable: false
     },
     {
       id: 'chief-complaint',
       type: 'action',
-      name: 'Enter Chief Complaint',
-      description: 'Input chief complaint into designated field',
+      name: 'Chief Complaint',
+      description: 'Document primary reason for visit',
       icon: <NoteIcon />,
       templateMapping: 'chief_complaint_block',
-      config: { templateField: true, required: true }
+      config: { templateField: true, required: true },
+      isEditable: true,
+      mappingOptions: ['Chief Complaint', 'Primary Concern', 'Reason for Visit', 'Main Issue']
     },
     {
       id: 'subjective',
       type: 'action',
-      name: 'Enter Subjective (HPI & ROS)',
-      description: 'Input history and review of systems',
+      name: 'History & Review',
+      description: 'Document patient history and symptoms',
       icon: <NoteIcon />,
       templateMapping: 'subjective_block',
-      config: { templateField: true, multiline: true }
+      config: { templateField: true, multiline: true },
+      isEditable: true,
+      mappingOptions: ['History of Present Illness', 'Review of Systems', 'Past Medical History', 'Social History']
     },
     {
       id: 'objective',
       type: 'action',
-      name: 'Enter Objective',
-      description: 'Input physical examination findings',
+      name: 'Physical Exam',
+      description: 'Record examination findings',
       icon: <NoteIcon />,
       templateMapping: 'objective_block',
-      config: { templateField: true, multiline: true }
+      config: { templateField: true, multiline: true },
+      isEditable: true,
+      mappingOptions: ['Physical Examination', 'Vital Signs', 'Clinical Findings', 'Objective Data']
     },
     {
       id: 'assessment',
       type: 'action',
-      name: 'Enter Assessment',
-      description: 'Input clinical assessment',
+      name: 'Clinical Assessment',
+      description: 'Document clinical impression',
       icon: <NoteIcon />,
       templateMapping: 'assessment_block',
-      config: { templateField: true, multiline: true }
+      config: { templateField: true, multiline: true },
+      isEditable: true,
+      mappingOptions: ['Assessment', 'Clinical Impression', 'Diagnosis', 'Problem List']
     },
     {
       id: 'plan',
       type: 'action',
-      name: 'Enter Plan',
-      description: 'Input treatment plan',
+      name: 'Treatment Plan',
+      description: 'Outline treatment approach',
       icon: <NoteIcon />,
       templateMapping: 'plan_block',
-      config: { templateField: true, multiline: true }
-    },
-    {
-      id: 'care-plan',
-      type: 'action',
-      name: 'Enter Care Plan',
-      description: 'Input ongoing care plan',
-      icon: <NoteIcon />,
-      templateMapping: 'care_plan_block',
-      config: { templateField: true, multiline: true }
-    },
-    {
-      id: 'diagnosis',
-      type: 'action',
-      name: 'Enter Diagnosis',
-      description: 'Input ICD-10 diagnosis codes',
-      icon: <NoteIcon />,
-      templateMapping: 'diagnosis_block',
-      config: { templateField: true, icd10: true }
+      config: { templateField: true, multiline: true },
+      isEditable: true,
+      mappingOptions: ['Plan', 'Treatment Plan', 'Management', 'Next Steps']
     }
   ];
 
   const workflowTemplates: WorkflowTemplate[] = [
     {
-      id: 'pf-patient-visit',
-      name: 'Practice Fusion - Complete Patient Visit Workflow',
-      description: 'End-to-end patient encounter workflow with automated SOAP note generation',
+      id: 'pf-annual-physical',
+      name: 'Annual Physical Exam Workflow',
+      description: 'Comprehensive annual physical examination with preventive care screening',
       ehrSystem: 'Practice Fusion',
       category: 'Patient Encounter',
+      visitType: 'Annual Physical',
       blocks: workflowBlocks
     },
     {
-      id: 'pf-prescription',
-      name: 'Practice Fusion - Prescription Management Workflow',
-      description: 'Streamlined prescription creation and management workflow',
+      id: 'pf-followup-visit',
+      name: 'Follow-up Visit Workflow',
+      description: 'Streamlined follow-up visit for ongoing conditions',
       ehrSystem: 'Practice Fusion',
-      category: 'Prescription',
-      blocks: workflowBlocks.slice(0, 6) // Simplified for prescription workflow
+      category: 'Patient Encounter',
+      visitType: 'Follow-up Visit',
+      blocks: workflowBlocks.slice(0, 7)
     },
     {
-      id: 'pf-lab-review',
-      name: 'Practice Fusion - Lab Results Review Workflow',
-      description: 'Systematic lab results review and documentation workflow',
+      id: 'pf-acute-care',
+      name: 'Acute Care Visit Workflow',
+      description: 'Efficient workflow for urgent medical concerns',
       ehrSystem: 'Practice Fusion',
-      category: 'Lab Review',
+      category: 'Patient Encounter',
+      visitType: 'Acute Care',
       blocks: workflowBlocks.slice(0, 8)
+    },
+    {
+      id: 'pf-prescription',
+      name: 'Prescription Management Workflow',
+      description: 'Dedicated workflow for medication management',
+      ehrSystem: 'Practice Fusion',
+      category: 'Prescription',
+      visitType: 'Follow-up Visit',
+      blocks: workflowBlocks.slice(0, 6)
     }
   ];
 
-  const filteredWorkflows = workflowTemplates.filter(wf => wf.ehrSystem === userEHR);
+  const filteredWorkflows = workflowTemplates.filter(wf => {
+    const ehrMatch = wf.ehrSystem === userEHR;
+    const visitMatch = selectedVisitType === 'all' || wf.visitType === selectedVisitType;
+    const categoryMatch = selectedCategory === 'all' || wf.category === selectedCategory;
+    return ehrMatch && visitMatch && categoryMatch;
+  });
 
   const handleViewWorkflow = (workflow: WorkflowTemplate) => {
     setSelectedWorkflow(workflow);
@@ -200,10 +230,9 @@ const WorkflowLibrary: React.FC = () => {
   };
 
   const handleImportWorkflow = (workflow: WorkflowTemplate) => {
-    // This would import the workflow to "My Workflows"
     console.log('Importing workflow:', workflow.name);
     setViewDialog(false);
-    // Show success message or navigate to My Workflows
+    // Navigate to My Workflows
   };
 
   const getBlockTypeColor = (type: string) => {
@@ -219,33 +248,76 @@ const WorkflowLibrary: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>EHR System:</strong> {userEHR} - Showing workflows optimized for your EHR system
+          <strong>EHR System:</strong> {userEHR} - Showing workflows optimized for your practice
         </Typography>
       </Alert>
 
+      {/* Filters */}
       <Box sx={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
+        gap: 2, 
+        mb: 3 
+      }}>
+        <FormControl size="small">
+          <InputLabel>Visit Type</InputLabel>
+          <Select
+            value={selectedVisitType}
+            label="Visit Type"
+            onChange={(e) => setSelectedVisitType(e.target.value)}
+          >
+            <MenuItem value="all">All Visit Types</MenuItem>
+            {visitTypes.map((type) => (
+              <MenuItem key={type} value={type}>{type}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        
+        <FormControl size="small">
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={selectedCategory}
+            label="Category"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            <MenuItem value="all">All Categories</MenuItem>
+            {categories.map((category) => (
+              <MenuItem key={category} value={category}>{category}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Workflow Cards */}
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
         gap: 3 
       }}>
         {filteredWorkflows.map((workflow) => (
           <Card key={workflow.id} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <CardContent sx={{ flexGrow: 1 }}>
               <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  {workflow.name}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                  <VisitIcon color="primary" />
+                  <Typography variant="h6">
+                    {workflow.name}
+                  </Typography>
+                </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {workflow.description}
                 </Typography>
-                <Chip label={workflow.category} size="small" color="primary" />
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <Chip label={workflow.visitType} size="small" color="primary" />
+                  <Chip label={workflow.category} size="small" color="secondary" />
+                </Box>
               </Box>
               
               <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Workflow Blocks: {workflow.blocks.length}
+                Workflow Steps: {workflow.blocks.length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Includes automated scheduling, patient selection, and SOAP note generation
+                Includes automated navigation, documentation, and template mapping
               </Typography>
             </CardContent>
             
@@ -257,7 +329,7 @@ const WorkflowLibrary: React.FC = () => {
                 size="small"
                 sx={{ flex: 1 }}
               >
-                View Details
+                Preview
               </Button>
               <Button
                 variant="contained"
@@ -266,34 +338,57 @@ const WorkflowLibrary: React.FC = () => {
                 size="small"
                 sx={{ flex: 1 }}
               >
-                Import
+                Add to My Workflows
               </Button>
             </Box>
           </Card>
         ))}
       </Box>
 
+      {filteredWorkflows.length === 0 && (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <VisitIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+          <Typography variant="h6" gutterBottom color="text.secondary">
+            No workflows found for selected filters
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Try adjusting your visit type or category filters
+          </Typography>
+        </Box>
+      )}
+
       {/* Workflow Details Dialog */}
       <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="md" fullWidth>
         <DialogTitle>
-          {selectedWorkflow?.name}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <VisitIcon color="primary" />
+            {selectedWorkflow?.name}
+          </Box>
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mb: 3 }}>
             {selectedWorkflow?.description}
           </Typography>
           
+          <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
+            <Chip label={`Visit Type: ${selectedWorkflow?.visitType}`} color="primary" />
+            <Chip label={`Category: ${selectedWorkflow?.category}`} color="secondary" />
+          </Box>
+          
           <Alert severity="info" sx={{ mb: 3 }}>
-            This workflow will map to your Template Builder components for seamless note generation
+            <Typography variant="body2">
+              <strong>Template Integration:</strong> This workflow will map to your template fields. 
+              You can customize field mappings after importing.
+            </Typography>
           </Alert>
 
           <Typography variant="h6" gutterBottom>
-            Workflow Blocks ({selectedWorkflow?.blocks.length})
+            Workflow Steps ({selectedWorkflow?.blocks.length})
           </Typography>
           
           <Box sx={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
             gap: 2 
           }}>
             {selectedWorkflow?.blocks.map((block, index) => (
@@ -306,12 +401,16 @@ const WorkflowLibrary: React.FC = () => {
                     <Typography variant="subtitle2">
                       {index + 1}. {block.name}
                     </Typography>
-                    <Chip 
-                      label={block.type} 
-                      size="small" 
-                      color={getBlockTypeColor(block.type)}
-                      sx={{ mt: 0.5 }}
-                    />
+                    <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                      <Chip 
+                        label={block.type} 
+                        size="small" 
+                        color={getBlockTypeColor(block.type)}
+                      />
+                      {block.isEditable && (
+                        <Chip label="Editable" size="small" color="success" />
+                      )}
+                    </Box>
                   </Box>
                 </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -330,7 +429,8 @@ const WorkflowLibrary: React.FC = () => {
           
           <Alert severity="success">
             <Typography variant="body2">
-              <strong>Template Integration:</strong> This workflow automatically maps note entries to your Template Builder components, ensuring consistent documentation across all patient encounters.
+              <strong>Clinician-Friendly Design:</strong> After importing, you can customize each step, 
+              map fields to your templates, and adjust the workflow to match your practice patterns.
             </Typography>
           </Alert>
         </DialogContent>
@@ -343,7 +443,7 @@ const WorkflowLibrary: React.FC = () => {
             startIcon={<ImportIcon />}
             onClick={() => handleImportWorkflow(selectedWorkflow!)}
           >
-            Import to My Workflows
+            Import Workflow
           </Button>
         </DialogActions>
       </Dialog>
