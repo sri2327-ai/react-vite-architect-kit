@@ -51,7 +51,8 @@ import {
   AccountTree as WorkflowIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
-  LocationOn as LocationIcon
+  LocationOn as LocationIcon,
+  Note as NoteIcon
 } from '@mui/icons-material';
 import { templateBuilderService } from '../../services/templateBuilderService';
 
@@ -74,6 +75,7 @@ interface VisitTypeMapping {
   visitType: string;
   templateFields: { [blockId: string]: string };
   scheduleConfig: ScheduleConfig;
+  noteType: string;
   isConfigured: boolean;
 }
 
@@ -120,6 +122,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               providerName: 'Dr. Smith',
               location: 'Main Clinic'
             },
+            noteType: 'Progress Note',
             isConfigured: true
           },
           {
@@ -129,6 +132,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               providerName: '',
               location: ''
             },
+            noteType: '',
             isConfigured: false
           }
         ],
@@ -328,6 +332,26 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
     });
   };
 
+  const handleNoteTypeChange = (visitType: string, noteType: string) => {
+    if (!selectedWorkflow) return;
+    
+    setSelectedWorkflow(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        visitTypeMappings: prev.visitTypeMappings.map(mapping =>
+          mapping.visitType === visitType
+            ? {
+                ...mapping,
+                noteType: noteType
+              }
+            : mapping
+        )
+      };
+    });
+  };
+
   const getTemplateSectionsForVisitType = (visitTypeName: string) => {
     const visitType = templateBuilderService.getVisitTypeByName(visitTypeName);
     return visitType?.template.sections || [];
@@ -352,7 +376,11 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
   };
 
   const getConfigurationStatus = (workflow: ImportedWorkflow) => {
-    const configuredMappings = workflow.visitTypeMappings.filter(m => m.isConfigured).length;
+    const configuredMappings = workflow.visitTypeMappings.filter(m => 
+      m.isConfigured && 
+      m.noteType && 
+      Object.keys(m.templateFields).length >= workflow.blocks.filter(b => b.type === 'note_entry').length
+    ).length;
     const totalMappings = workflow.visitTypeMappings.length;
     return `${configuredMappings}/${totalMappings} visit types configured`;
   };
@@ -634,7 +662,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         </DialogTitle>
         <DialogContent>
           <Alert severity="info" sx={{ mb: 3 }}>
-            Configure schedule settings and map workflow blocks to template note sections for each visit type. 
+            Configure schedule settings, note types, and map workflow blocks to template note sections for each visit type. 
             Visit types and template sections come from your Template Builder.
           </Alert>
           
@@ -715,10 +743,10 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             </Box>
           </Box>
 
-          {/* Visit Type Specific Template Mappings */}
+          {/* Visit Type Specific Configuration */}
           <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <AssignmentIcon color="primary" />
-            Template Field Mapping by Visit Type
+            Visit Type Configuration
           </Typography>
           
           {selectedWorkflow?.visitTypeMappings.map((mapping) => {
@@ -741,9 +769,30 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 </AccordionSummary>
                 <AccordionDetails>
                   <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Map workflow note blocks to template sections for {mapping.visitType}. 
-                      Template sections come from your Template Builder.
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                      Configure note type and map workflow blocks to template sections for {mapping.visitType}.
+                    </Typography>
+                    
+                    {/* Note Type Configuration */}
+                    <Box sx={{ mb: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <NoteIcon color="primary" />
+                        Note Type Configuration
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="EHR Note Type"
+                        value={mapping.noteType || ''}
+                        onChange={(e) => handleNoteTypeChange(mapping.visitType, e.target.value)}
+                        placeholder="e.g., Progress Note, SOAP Note, H&P Note"
+                        helperText="Specify the note type that will be selected in your EHR system"
+                      />
+                    </Box>
+
+                    {/* Template Field Mapping */}
+                    <Typography variant="subtitle2" sx={{ mb: 2 }}>
+                      Template Field Mapping
                     </Typography>
                     
                     {selectedWorkflow.blocks
