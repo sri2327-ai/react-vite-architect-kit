@@ -651,7 +651,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
 
           <Grid container spacing={2}>
             {PREDEFINED_SECTIONS.map((section) => (
-              <Grid xs={12} md={4} key={section.id}>
+              <Grid item xs={12} md={4} key={section.id}>
                 <Card
                   sx={{
                     cursor: 'pointer',
