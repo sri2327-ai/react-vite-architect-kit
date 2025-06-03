@@ -21,8 +21,6 @@ import {
   Workflow, 
   User, 
   History, 
-  Menu as MenuIcon, 
-  X as CloseIcon,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -112,7 +110,6 @@ const menuItems: MenuItem[] = [
 
 export const Dashboard: React.FC = () => {
   const [activeMenuItem, setActiveMenuItem] = useState<string>('template-builder');
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   
   const theme = useTheme();
@@ -121,21 +118,14 @@ export const Dashboard: React.FC = () => {
 
   const handleMenuItemClick = (itemId: string) => {
     setActiveMenuItem(itemId);
-    if (isMobile) {
-      setIsDrawerOpen(false);
-    }
   };
 
   const handleDrawerToggle = () => {
-    if (isMobile) {
-      setIsDrawerOpen(!isDrawerOpen);
-    } else {
-      setIsCollapsed(!isCollapsed);
-    }
+    setIsCollapsed(!isCollapsed);
   };
 
   const ActiveComponent = menuItems.find(item => item.id === activeMenuItem)?.component || TemplateBuilder;
-  const drawerWidth = isMobile ? DRAWER_WIDTH : (isCollapsed ? COLLAPSED_DRAWER_WIDTH : DRAWER_WIDTH);
+  const drawerWidth = isCollapsed ? COLLAPSED_DRAWER_WIDTH : DRAWER_WIDTH;
 
   const DrawerContent = () => (
     <Box sx={{ 
@@ -147,9 +137,9 @@ export const Dashboard: React.FC = () => {
     }}>
       {/* Header with Logo */}
       <Box sx={{
-        p: isCollapsed && !isMobile ? 2 : 3,
+        p: isCollapsed ? 2 : 3,
         borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-        minHeight: isCollapsed && !isMobile ? 80 : 100,
+        minHeight: isCollapsed ? 80 : 100,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -158,8 +148,8 @@ export const Dashboard: React.FC = () => {
           duration: theme.transitions.duration.standard,
         })
       }}>
-        {(!isCollapsed || isMobile) ? (
-          <Fade in={!isCollapsed || isMobile} timeout={300}>
+        {!isCollapsed ? (
+          <Fade in={!isCollapsed} timeout={300}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Box
                 component="img"
@@ -218,7 +208,7 @@ export const Dashboard: React.FC = () => {
           {menuItems.map((item) => (
             <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
               <Tooltip 
-                title={isCollapsed && !isMobile ? item.label : ''} 
+                title={isCollapsed ? item.label : ''} 
                 placement="right" 
                 arrow
               >
@@ -229,13 +219,14 @@ export const Dashboard: React.FC = () => {
                     borderRadius: 3,
                     mx: 1,
                     minHeight: 56,
-                    justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
-                    px: isCollapsed && !isMobile ? 2 : 3,
+                    justifyContent: isCollapsed ? 'center' : 'flex-start',
+                    px: isCollapsed ? 2 : 3,
                     transition: theme.transitions.create(['background-color', 'transform', 'box-shadow'], {
                       duration: theme.transitions.duration.short,
                     }),
                     position: 'relative',
                     overflow: 'hidden',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     '&.Mui-selected': {
                       backgroundColor: 'rgba(255, 255, 255, 0.15)',
                       color: 'white',
@@ -256,16 +247,23 @@ export const Dashboard: React.FC = () => {
                     },
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                      transform: 'translateX(4px)'
+                      transform: 'translateX(4px)',
+                      // Remove any border or outline that might cause white lines
+                      border: 'none',
+                      outline: 'none',
+                      boxShadow: 'none'
                     },
                     '&:active': {
                       transform: 'scale(0.98)'
-                    }
+                    },
+                    // Ensure no borders or outlines
+                    border: 'none',
+                    outline: 'none'
                   }}
                 >
                   <ListItemIcon sx={{
-                    minWidth: isCollapsed && !isMobile ? 0 : 48,
-                    color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                    minWidth: isCollapsed ? 0 : 48,
+                    color: 'inherit',
                     justifyContent: 'center',
                     transition: theme.transitions.create('color', {
                       duration: theme.transitions.duration.short,
@@ -273,14 +271,19 @@ export const Dashboard: React.FC = () => {
                   }}>
                     {item.icon}
                   </ListItemIcon>
-                  {(!isCollapsed || isMobile) && (
-                    <Fade in={!isCollapsed || isMobile} timeout={200}>
+                  {!isCollapsed && (
+                    <Fade in={!isCollapsed} timeout={200}>
                       <ListItemText
                         primary={item.label}
                         primaryTypographyProps={{
                           fontSize: '0.95rem',
                           fontWeight: activeMenuItem === item.id ? 600 : 500,
-                          color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.9)',
+                          color: 'inherit',
+                          sx: {
+                            transition: theme.transitions.create('all', {
+                              duration: theme.transitions.duration.short,
+                            })
+                          }
                         }}
                       />
                     </Fade>
@@ -292,125 +295,73 @@ export const Dashboard: React.FC = () => {
         </List>
       </Box>
 
-      {/* Collapse Toggle for Desktop */}
-      {!isMobile && (
-        <Box sx={{ 
-          p: 2, 
-          borderTop: '1px solid rgba(255, 255, 255, 0.12)',
-          display: 'flex',
-          justifyContent: 'center'
-        }}>
-          <Tooltip title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} placement="top" arrow>
-            <IconButton
-              onClick={handleDrawerToggle}
-              sx={{
-                width: isCollapsed ? 48 : '100%',
-                height: 48,
-                color: 'rgba(255, 255, 255, 0.9)',
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                borderRadius: 3,
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                transition: theme.transitions.create(['all'], {
-                  duration: theme.transitions.duration.short,
-                }),
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  borderColor: 'rgba(255, 255, 255, 0.25)',
-                  color: 'white',
-                  transform: 'scale(1.05)'
-                },
-                '&:active': {
-                  transform: 'scale(0.95)'
-                }
-              }}
-            >
-              {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-            </IconButton>
-          </Tooltip>
-        </Box>
-      )}
+      {/* Collapse Toggle */}
+      <Box sx={{ 
+        p: 2, 
+        borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        <Tooltip title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} placement="top" arrow>
+          <IconButton
+            onClick={handleDrawerToggle}
+            sx={{
+              width: isCollapsed ? 48 : '100%',
+              height: 48,
+              color: 'rgba(255, 255, 255, 0.9)',
+              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              borderRadius: 3,
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              transition: theme.transitions.create(['all'], {
+                duration: theme.transitions.duration.short,
+              }),
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                borderColor: 'rgba(255, 255, 255, 0.25)',
+                color: 'white',
+                transform: 'scale(1.05)',
+                // Remove any unwanted borders or outlines
+                outline: 'none',
+                boxShadow: 'none'
+              },
+              '&:active': {
+                transform: 'scale(0.95)'
+              },
+              // Ensure no unwanted borders
+              outline: 'none'
+            }}
+          >
+            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+          </IconButton>
+        </Tooltip>
+      </Box>
     </Box>
   );
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {/* Mobile Menu Button */}
-      {isMobile && (
-        <IconButton
-          onClick={handleDrawerToggle}
+      {/* Sidebar Navigation - Same for all devices */}
+      <Box component="nav" sx={{ width: drawerWidth, flexShrink: 0 }}>
+        <Drawer
+          variant="permanent"
           sx={{
-            position: 'fixed',
-            top: 16,
-            left: 16,
-            zIndex: theme.zIndex.drawer + 3,
-            width: 56,
-            height: 56,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(12px)',
-            color: bravoColors.primaryFlat,
-            border: '1px solid rgba(255, 255, 255, 0.8)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-            transition: theme.transitions.create(['all'], {
-              duration: theme.transitions.duration.short,
-            }),
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 1)',
-              transform: 'scale(1.05)',
-              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.18)'
-            },
-            '&:active': {
-              transform: 'scale(0.95)'
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+              background: bravoColors.primary,
+              transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.easeInOut,
+                duration: theme.transitions.duration.standard
+              }),
+              overflowX: 'hidden',
+              border: 'none',
+              boxShadow: '4px 0 20px rgba(0, 0, 0, 0.08)'
             }
           }}
+          open
         >
-          {isDrawerOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
-        </IconButton>
-      )}
-
-      {/* Sidebar Navigation */}
-      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
-        {/* Mobile Drawer */}
-        {isMobile ? (
-          <Drawer
-            variant="temporary"
-            open={isDrawerOpen}
-            onClose={() => setIsDrawerOpen(false)}
-            ModalProps={{ keepMounted: true }}
-            sx={{
-              '& .MuiDrawer-paper': {
-                boxSizing: 'border-box',
-                width: DRAWER_WIDTH,
-                background: bravoColors.primary,
-                border: 'none',
-                boxShadow: '8px 0 32px rgba(0, 0, 0, 0.15)'
-              }
-            }}
-          >
-            <DrawerContent />
-          </Drawer>
-        ) : (
-          /* Desktop Drawer */
-          <Drawer
-            variant="permanent"
-            sx={{
-              '& .MuiDrawer-paper': {
-                boxSizing: 'border-box',
-                width: drawerWidth,
-                background: bravoColors.primary,
-                transition: theme.transitions.create('width', {
-                  easing: theme.transitions.easing.easeInOut,
-                  duration: theme.transitions.duration.standard
-                }),
-                overflowX: 'hidden',
-                border: 'none',
-                boxShadow: '4px 0 20px rgba(0, 0, 0, 0.08)'
-              }
-            }}
-            open
-          >
-            <DrawerContent />
-          </Drawer>
-        )}
+          <DrawerContent />
+        </Drawer>
       </Box>
 
       {/* Main Content */}
@@ -419,9 +370,7 @@ export const Dashboard: React.FC = () => {
         sx={{
           flexGrow: 1,
           p: { xs: 2, sm: 3, md: 4 },
-          pt: { xs: 10, md: 4 }, // Extra top padding on mobile for menu button
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: 0 },
+          width: `calc(100% - ${drawerWidth}px)`,
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.easeInOut,
             duration: theme.transitions.duration.standard
