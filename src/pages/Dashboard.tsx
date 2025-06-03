@@ -12,8 +12,7 @@ import {
   useTheme, 
   useMediaQuery, 
   Container,
-  Tooltip,
-  Fade
+  Tooltip
 } from '@mui/material';
 import { 
   LayoutTemplate, 
@@ -24,6 +23,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { bravoColors } from '@/theme/colors';
+import TemplateBuilder from '@/components/TemplateBuilder/TemplateBuilder';
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -112,7 +112,6 @@ export const Dashboard: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleMenuItemClick = (itemId: string) => {
     setActiveMenuItem(itemId);
@@ -304,14 +303,13 @@ export const Dashboard: React.FC = () => {
         component="main"
         sx={{
           flexGrow: 1,
-          p: { xs: 2, sm: 3, md: 4 },
           width: `calc(100% - ${drawerWidth}px)`,
           backgroundColor: bravoColors.background.light,
           minHeight: '100vh',
           overflow: 'auto'
         }}
       >
-        <Container maxWidth="xl" sx={{ height: '100%' }}>
+        <Container maxWidth="xl" sx={{ height: '100%', p: 0 }}>
           <ActiveComponent />
         </Container>
       </Box>
