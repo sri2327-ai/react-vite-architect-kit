@@ -37,32 +37,6 @@ import {
   StepContent,
   LinearProgress
 } from '@mui/material';
-import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Save as SaveIcon,
-  Add as AddIcon,
-  Close as CloseIcon,
-  Assignment as AssignmentIcon,
-  ReceiptLong as ReceiptLongIcon,
-  Visibility as VisibilityIcon,
-  DoDisturb as DoDisturbIcon,
-  ArrowBack as ArrowBackIcon,
-  AutoFixHigh as AutoFixHighIcon,
-  EditNote as EditNoteIcon,
-  ContentCopy as ContentCopyIcon,
-  CopyAll as CopyAllIcon,
-  LibraryBooks as LibraryBooksIcon,
-  Description as DescriptionIcon,
-  FormatListBulleted as FormatListBulletedIcon,
-  Circle as CircleIcon,
-  Preview as PreviewIcon,
-  Note as NoteIcon,
-  NavigateNext as NavigateNextIcon,
-  NavigateBefore as NavigateBeforeIcon,
-  Check as CheckIcon
-} from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
@@ -1427,6 +1401,20 @@ const TemplateBuilder: React.FC = () => {
       setSelectedImportType('');
       setPreviewTemplate(null);
     }
+  };
+
+  const convertToEditorTemplate = (template: Template): EditorTemplate => {
+    return {
+      ...template,
+      sections: template.sections.map(section => ({
+        ...section,
+        visible: true,
+        fields: section.fields?.map(field => ({
+          ...field,
+          visible: true
+        })) || []
+      }))
+    };
   };
 
   return (
