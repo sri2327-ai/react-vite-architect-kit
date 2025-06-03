@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -16,7 +17,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  useTheme
+  useTheme,
+  Link,
+  IconButton
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -25,7 +28,12 @@ import {
   Business as BusinessIcon,
   Settings as SettingsIcon,
   Cancel as CancelIcon,
-  Storage as StorageIcon
+  Storage as StorageIcon,
+  Logout as LogoutIcon,
+  Extension as ExtensionIcon,
+  Login as LoginIcon,
+  PhoneAndroid as MobileIcon,
+  OpenInNew as OpenInNewIcon
 } from '@mui/icons-material';
 
 interface UserProfile {
@@ -42,6 +50,7 @@ interface UserProfile {
 const Profile: React.FC = () => {
   const theme = useTheme();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   
   // Mock user data - in real app this would come from signup data
   const [userProfile, setUserProfile] = useState<UserProfile>({
@@ -76,6 +85,14 @@ const Profile: React.FC = () => {
     // Handle subscription cancellation logic here
     console.log('Canceling subscription...');
     setShowCancelDialog(false);
+  };
+
+  const handleLogout = () => {
+    // Handle logout logic here
+    console.log('Logging out...');
+    setShowLogoutDialog(false);
+    // Redirect to login or home page
+    window.location.href = '/login';
   };
 
   const ProfileField = ({ 
@@ -126,7 +143,7 @@ const Profile: React.FC = () => {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid xs={12} md={8}>
+        <Grid item xs={12} md={8}>
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" gutterBottom sx={{ 
               display: 'flex', 
@@ -139,42 +156,42 @@ const Profile: React.FC = () => {
             </Typography>
 
             <Grid container spacing={2}>
-              <Grid xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <ProfileField
                   icon={<EmailIcon />}
                   label="Email Address"
                   value={userProfile.email}
                 />
               </Grid>
-              <Grid xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <ProfileField
                   icon={<PhoneIcon />}
                   label="Phone Number"
                   value={userProfile.phoneNumber}
                 />
               </Grid>
-              <Grid xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <ProfileField
                   icon={<PersonIcon />}
                   label="First Name"
                   value={userProfile.firstName}
                 />
               </Grid>
-              <Grid xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <ProfileField
                   icon={<PersonIcon />}
                   label="Last Name"
                   value={userProfile.lastName}
                 />
               </Grid>
-              <Grid xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <ProfileField
                   icon={<BusinessIcon />}
                   label="Specialty"
                   value={userProfile.specialty}
                 />
               </Grid>
-              <Grid xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <ProfileField
                   icon={<SettingsIcon />}
                   label="EHR Integration"
@@ -183,7 +200,7 @@ const Profile: React.FC = () => {
                 />
               </Grid>
               {userProfile.ehrMode && userProfile.ehrName && (
-                <Grid xs={12} sm={6}>
+                <Grid item xs={12} sm={6}>
                   <ProfileField
                     icon={<StorageIcon />}
                     label="EHR System"
@@ -235,7 +252,126 @@ const Profile: React.FC = () => {
           </Paper>
         </Grid>
 
-        <Grid xs={12} md={4}>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Quick Links
+            </Typography>
+            
+            <Divider sx={{ my: 2 }} />
+            
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Link
+                href="https://chrome.google.com/webstore/detail/s10ai-crush-extension"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1, 
+                  textDecoration: 'none',
+                  p: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  '&:hover': {
+                    backgroundColor: 'action.hover'
+                  }
+                }}
+              >
+                <ExtensionIcon color="primary" />
+                <Box>
+                  <Typography variant="body2" fontWeight={600}>
+                    S10.AI CRUSH EXTENSION
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Chrome extension for enhanced productivity
+                  </Typography>
+                </Box>
+                <OpenInNewIcon fontSize="small" sx={{ ml: 'auto' }} />
+              </Link>
+
+              <Link
+                href="https://app.s10.ai/login"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1, 
+                  textDecoration: 'none',
+                  p: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  '&:hover': {
+                    backgroundColor: 'action.hover'
+                  }
+                }}
+              >
+                <LoginIcon color="primary" />
+                <Box>
+                  <Typography variant="body2" fontWeight={600}>
+                    Product Login URL
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Access the main application
+                  </Typography>
+                </Box>
+                <OpenInNewIcon fontSize="small" sx={{ ml: 'auto' }} />
+              </Link>
+
+              <Link
+                href="https://play.google.com/store/apps/details?id=com.s10ai.mobile"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1, 
+                  textDecoration: 'none',
+                  p: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                  '&:hover': {
+                    backgroundColor: 'action.hover'
+                  }
+                }}
+              >
+                <MobileIcon color="primary" />
+                <Box>
+                  <Typography variant="body2" fontWeight={600}>
+                    Mobile App
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Download S10.AI mobile application
+                  </Typography>
+                </Box>
+                <OpenInNewIcon fontSize="small" sx={{ ml: 'auto' }} />
+              </Link>
+            </Box>
+          </Paper>
+
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Account Actions
+            </Typography>
+            
+            <Divider sx={{ my: 2 }} />
+            
+            <Button
+              variant="outlined"
+              color="primary"
+              fullWidth
+              startIcon={<LogoutIcon />}
+              onClick={() => setShowLogoutDialog(true)}
+              sx={{ mb: 2 }}
+            >
+              Logout
+            </Button>
+          </Paper>
+
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom color="error">
               Danger Zone
@@ -268,28 +404,26 @@ const Profile: React.FC = () => {
               You can reactivate your subscription at any time.
             </Typography>
           </Paper>
-
-          <Paper sx={{ p: 3, mt: 3, backgroundColor: 'primary.50' }}>
-            <Typography variant="h6" gutterBottom>
-              Account Summary
-            </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-              <Typography variant="body2">
-                <strong>Account Type:</strong> Premium
-              </Typography>
-              <Typography variant="body2">
-                <strong>Member Since:</strong> January 2024
-              </Typography>
-              <Typography variant="body2">
-                <strong>Templates Created:</strong> 5
-              </Typography>
-              <Typography variant="body2">
-                <strong>Notes Generated:</strong> 127
-              </Typography>
-            </Box>
-          </Paper>
         </Grid>
       </Grid>
+
+      {/* Logout Dialog */}
+      <Dialog open={showLogoutDialog} onClose={() => setShowLogoutDialog(false)}>
+        <DialogTitle>Logout</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Are you sure you want to logout? You will need to sign in again to access your account.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowLogoutDialog(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleLogout} color="primary" variant="contained">
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Cancel Subscription Dialog */}
       <Dialog open={showCancelDialog} onClose={() => setShowCancelDialog(false)}>

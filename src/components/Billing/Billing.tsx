@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -10,6 +11,7 @@ import {
   TableHead,
   TableRow,
   Chip,
+  TablePagination,
   IconButton,
   Link,
   Tooltip,
@@ -25,89 +27,106 @@ import {
   Payment as PaymentIcon,
   Schedule as ScheduleIcon,
   CheckCircle as CheckCircleIcon,
-  Warning as WarningIcon,
-  Error as ErrorIcon
+  Error as ErrorIcon,
+  Warning as WarningIcon
 } from '@mui/icons-material';
 
 interface Invoice {
   id: string;
   date: string;
+  invoiceNumber: string;
+  zohoInvoiceUrl: string;
+  status: 'paid' | 'pending' | 'overdue' | 'failed';
   dueDate: string;
   amount: number;
-  status: 'paid' | 'pending' | 'overdue' | 'failed';
-  zohoUrl: string;
   description: string;
 }
 
 const Billing: React.FC = () => {
-  // Mock invoice data
-  const [invoices] = useState<Invoice[]>([
-    {
-      id: 'INV-2024-001',
-      date: '2024-01-01',
-      dueDate: '2024-01-15',
-      amount: 79.99,
-      status: 'paid',
-      zohoUrl: 'https://zoho.com/invoice/INV-2024-001',
-      description: 'Monthly Premium Subscription'
-    },
-    {
-      id: 'INV-2024-002',
-      date: '2024-02-01',
-      dueDate: '2024-02-15',
-      amount: 79.99,
-      status: 'paid',
-      zohoUrl: 'https://zoho.com/invoice/INV-2024-002',
-      description: 'Monthly Premium Subscription'
-    },
-    {
-      id: 'INV-2024-003',
-      date: '2024-03-01',
-      dueDate: '2024-03-15',
-      amount: 79.99,
-      status: 'pending',
-      zohoUrl: 'https://zoho.com/invoice/INV-2024-003',
-      description: 'Monthly Premium Subscription'
-    },
-    {
-      id: 'INV-2024-004',
-      date: '2024-04-01',
-      dueDate: '2024-04-15',
-      amount: 79.99,
-      status: 'overdue',
-      zohoUrl: 'https://zoho.com/invoice/INV-2024-004',
-      description: 'Monthly Premium Subscription'
-    }
-  ]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const getStatusIcon = (status: Invoice['status']) => {
-    switch (status) {
-      case 'paid':
-        return <CheckCircleIcon color="success" />;
-      case 'pending':
-        return <ScheduleIcon color="warning" />;
-      case 'overdue':
-        return <WarningIcon color="error" />;
-      case 'failed':
-        return <ErrorIcon color="error" />;
-      default:
-        return <ScheduleIcon />;
+  // Mock invoice data
+  const invoices: Invoice[] = [
+    {
+      id: '1',
+      date: '2024-01-01',
+      invoiceNumber: 'INV-2024-001',
+      zohoInvoiceUrl: 'https://books.zoho.com/app/60009969114#/invoices/123456789',
+      status: 'paid',
+      dueDate: '2024-01-15',
+      amount: 99.99,
+      description: 'Monthly Subscription - Pro Plan'
+    },
+    {
+      id: '2',
+      date: '2024-02-01',
+      invoiceNumber: 'INV-2024-002',
+      zohoInvoiceUrl: 'https://books.zoho.com/app/60009969114#/invoices/123456790',
+      status: 'paid',
+      dueDate: '2024-02-15',
+      amount: 99.99,
+      description: 'Monthly Subscription - Pro Plan'
+    },
+    {
+      id: '3',
+      date: '2024-03-01',
+      invoiceNumber: 'INV-2024-003',
+      zohoInvoiceUrl: 'https://books.zoho.com/app/60009969114#/invoices/123456791',
+      status: 'pending',
+      dueDate: '2024-03-15',
+      amount: 99.99,
+      description: 'Monthly Subscription - Pro Plan'
+    },
+    {
+      id: '4',
+      date: '2024-04-01',
+      invoiceNumber: 'INV-2024-004',
+      zohoInvoiceUrl: 'https://books.zoho.com/app/60009969114#/invoices/123456792',
+      status: 'overdue',
+      dueDate: '2024-04-15',
+      amount: 99.99,
+      description: 'Monthly Subscription - Pro Plan'
+    },
+    {
+      id: '5',
+      date: '2024-05-01',
+      invoiceNumber: 'INV-2024-005',
+      zohoInvoiceUrl: 'https://books.zoho.com/app/60009969114#/invoices/123456793',
+      status: 'failed',
+      dueDate: '2024-05-15',
+      amount: 99.99,
+      description: 'Monthly Subscription - Pro Plan'
     }
+  ];
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
   };
 
-  const getStatusColor = (status: Invoice['status']) => {
-    switch (status) {
-      case 'paid':
-        return 'success';
-      case 'pending':
-        return 'warning';
-      case 'overdue':
-        return 'error';
-      case 'failed':
-        return 'error';
-      default:
-        return 'default';
-    }
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const getStatusChip = (status: Invoice['status']) => {
+    const statusConfig = {
+      paid: { label: 'Paid', color: 'success' as const, icon: <CheckCircleIcon fontSize="small" /> },
+      pending: { label: 'Pending', color: 'warning' as const, icon: <ScheduleIcon fontSize="small" /> },
+      overdue: { label: 'Overdue', color: 'error' as const, icon: <WarningIcon fontSize="small" /> },
+      failed: { label: 'Failed', color: 'error' as const, icon: <ErrorIcon fontSize="small" /> }
+    };
+
+    const config = statusConfig[status];
+    return (
+      <Chip
+        label={config.label}
+        color={config.color}
+        size="small"
+        icon={config.icon}
+        variant="filled"
+      />
+    );
   };
 
   const formatDate = (dateString: string) => {
@@ -118,77 +137,89 @@ const Billing: React.FC = () => {
     });
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatAmount = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
   };
 
-  const totalPaid = invoices
-    .filter(invoice => invoice.status === 'paid')
-    .reduce((sum, invoice) => sum + invoice.amount, 0);
-
-  const outstandingAmount = invoices
-    .filter(invoice => invoice.status === 'pending' || invoice.status === 'overdue')
-    .reduce((sum, invoice) => sum + invoice.amount, 0);
+  const paginatedInvoices = invoices.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-        Billing & Invoices
+        Billing History
       </Typography>
 
-      {/* Billing Summary */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid xs={12} sm={6} md={3}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <PaymentIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" color="primary">
+                <Typography variant="h6" fontWeight={600}>
                   Total Paid
                 </Typography>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 600 }}>
-                {formatCurrency(totalPaid)}
+              <Typography variant="h4" color="success.main" fontWeight={700}>
+                $199.98
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Lifetime payments
+                2 invoices paid
               </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <WarningIcon color="warning" sx={{ mr: 1 }} />
-                <Typography variant="h6" color="warning.main">
-                  Outstanding
+                <ScheduleIcon color="warning" sx={{ mr: 1 }} />
+                <Typography variant="h6" fontWeight={600}>
+                  Pending
                 </Typography>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 600 }}>
-                {formatCurrency(outstandingAmount)}
+              <Typography variant="h4" color="warning.main" fontWeight={700}>
+                $99.99
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Pending payments
+                1 invoice pending
               </Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={3}>
           <Card>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <ReceiptIcon color="success" sx={{ mr: 1 }} />
-                <Typography variant="h6" color="success.main">
+                <WarningIcon color="error" sx={{ mr: 1 }} />
+                <Typography variant="h6" fontWeight={600}>
+                  Overdue
+                </Typography>
+              </Box>
+              <Typography variant="h4" color="error.main" fontWeight={700}>
+                $99.99
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                1 invoice overdue
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <ReceiptIcon color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6" fontWeight={600}>
                   Total Invoices
                 </Typography>
               </Box>
-              <Typography variant="h4" sx={{ fontWeight: 600 }}>
+              <Typography variant="h4" color="primary.main" fontWeight={700}>
                 {invoices.length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -197,47 +228,11 @@ const Billing: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <CheckCircleIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" color="primary">
-                  Next Payment
-                </Typography>
-              </Box>
-              <Typography variant="h4" sx={{ fontWeight: 600 }}>
-                {formatCurrency(79.99)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                May 1, 2024
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
       </Grid>
 
-      {/* Outstanding Invoices Alert */}
-      {outstandingAmount > 0 && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
-          <Typography variant="body1" sx={{ fontWeight: 500 }}>
-            You have {formatCurrency(outstandingAmount)} in outstanding payments.
-          </Typography>
-          <Typography variant="body2">
-            Please review and pay any overdue invoices to avoid service interruption.
-          </Typography>
-        </Alert>
-      )}
-
-      {/* Invoice History Table */}
-      <Paper sx={{ overflow: 'hidden' }}>
-        <Box sx={{ p: 3, pb: 0 }}>
-          <Typography variant="h6" gutterBottom sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 1 
-          }}>
+      <Paper sx={{ mt: 4 }}>
+        <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
+          <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <ReceiptIcon color="primary" />
             Invoice History
           </Typography>
@@ -246,73 +241,53 @@ const Billing: React.FC = () => {
         <TableContainer>
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: 'grey.50' }}>
-                <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Invoice ID</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Due Date</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Amount</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Actions</TableCell>
+              <TableRow>
+                <TableCell>Date</TableCell>
+                <TableCell>Invoice</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Due Date</TableCell>
+                <TableCell align="right">Amount</TableCell>
+                <TableCell align="center">Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {invoices.map((invoice) => (
-                <TableRow 
-                  key={invoice.id}
-                  sx={{ 
-                    '&:hover': { backgroundColor: 'grey.50' },
-                    '&:last-child td, &:last-child th': { border: 0 }
-                  }}
-                >
+              {paginatedInvoices.map((invoice) => (
+                <TableRow key={invoice.id} hover>
                   <TableCell>
-                    <Typography variant="body2">
+                    <Typography variant="body2" fontWeight={500}>
                       {formatDate(invoice.date)}
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
-                      {invoice.id}
-                    </Typography>
+                    <Box>
+                      <Typography variant="body2" fontWeight={600}>
+                        {invoice.invoiceNumber}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {invoice.description}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    {getStatusChip(invoice.status)}
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {invoice.description}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      icon={getStatusIcon(invoice.status)}
-                      label={invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                      color={getStatusColor(invoice.status) as any}
-                      size="small"
-                      variant="outlined"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Typography 
-                      variant="body2"
-                      color={
-                        invoice.status === 'overdue' 
-                          ? 'error.main' 
-                          : 'text.primary'
-                      }
-                    >
                       {formatDate(invoice.dueDate)}
                     </Typography>
                   </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                      {formatCurrency(invoice.amount)}
+                  <TableCell align="right">
+                    <Typography variant="body2" fontWeight={600}>
+                      {formatAmount(invoice.amount)}
                     </Typography>
                   </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Tooltip title="View Invoice in Zoho">
+                  <TableCell align="center">
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                      <Tooltip title="View in Zoho">
                         <IconButton
                           size="small"
                           component={Link}
-                          href={invoice.zohoUrl}
+                          href={invoice.zohoInvoiceUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           color="primary"
@@ -323,10 +298,8 @@ const Billing: React.FC = () => {
                       <Tooltip title="Download PDF">
                         <IconButton
                           size="small"
-                          onClick={() => {
-                            // Handle PDF download
-                            console.log('Downloading invoice:', invoice.id);
-                          }}
+                          color="primary"
+                          onClick={() => console.log('Download PDF for', invoice.invoiceNumber)}
                         >
                           <DownloadIcon fontSize="small" />
                         </IconButton>
@@ -339,34 +312,22 @@ const Billing: React.FC = () => {
           </Table>
         </TableContainer>
 
-        {invoices.length === 0 && (
-          <Box sx={{ p: 4, textAlign: 'center' }}>
-            <ReceiptIcon sx={{ fontSize: 48, color: 'grey.400', mb: 2 }} />
-            <Typography variant="h6" color="text.secondary">
-              No invoices found
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Your invoice history will appear here once you start your subscription.
-            </Typography>
-          </Box>
-        )}
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={invoices.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
       </Paper>
 
-      {/* Payment Information */}
-      <Paper sx={{ p: 3, mt: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Payment Information
-        </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          All payments are processed securely through Stripe. For detailed invoice management, 
-          click the external link to view in Zoho Books.
-        </Typography>
-        <Alert severity="info">
-          <Typography variant="body2">
-            <strong>Need help?</strong> Contact our billing support team for any payment-related questions.
-          </Typography>
+      {invoices.some(invoice => invoice.status === 'overdue' || invoice.status === 'failed') && (
+        <Alert severity="warning" sx={{ mt: 3 }}>
+          You have overdue or failed invoices. Please update your payment method or contact support.
         </Alert>
-      </Paper>
+      )}
     </Box>
   );
 };

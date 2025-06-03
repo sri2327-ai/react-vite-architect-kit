@@ -37,17 +37,143 @@ interface MenuItem {
   component: React.ComponentType;
 }
 
-// Placeholder component for Workflow Builder
-const WorkflowBuilder: React.FC = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography variant="h4" gutterBottom>
-      Workflow Builder
-    </Typography>
-    <Typography variant="body1" color="text.secondary">
-      Design and configure your workflows here.
-    </Typography>
-  </Box>
-);
+// Enhanced Workflow Builder component with tabs
+const WorkflowBuilder: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'my-workflows' | 'workflow-library'>('my-workflows');
+  
+  // Mock user EHR data - this would come from user profile
+  const userEHR = 'Practice Fusion'; // This should come from user's profile
+
+  const MyWorkflows = () => (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h5" gutterBottom>
+        My Workflows
+      </Typography>
+      <Typography variant="body1" color="text.secondary">
+        Your custom workflows will appear here. Create and manage your personalized workflows.
+      </Typography>
+    </Box>
+  );
+
+  const WorkflowLibrary = () => (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h5" gutterBottom>
+        Workflow Library
+      </Typography>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+        Pre-built workflows for your EHR system: <strong>{userEHR}</strong>
+      </Typography>
+      
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ 
+          p: 3, 
+          border: '1px solid', 
+          borderColor: 'divider', 
+          borderRadius: 2,
+          '&:hover': { backgroundColor: 'action.hover' }
+        }}>
+          <Typography variant="h6" gutterBottom>
+            {userEHR} - Patient Check-in Workflow
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Streamlined patient check-in process optimized for {userEHR} EHR system.
+          </Typography>
+        </Box>
+        
+        <Box sx={{ 
+          p: 3, 
+          border: '1px solid', 
+          borderColor: 'divider', 
+          borderRadius: 2,
+          '&:hover': { backgroundColor: 'action.hover' }
+        }}>
+          <Typography variant="h6" gutterBottom>
+            {userEHR} - Prescription Management
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Efficient prescription workflow designed for {userEHR} platform.
+          </Typography>
+        </Box>
+        
+        <Box sx={{ 
+          p: 3, 
+          border: '1px solid', 
+          borderColor: 'divider', 
+          borderRadius: 2,
+          '&:hover': { backgroundColor: 'action.hover' }
+        }}>
+          <Typography variant="h6" gutterBottom>
+            {userEHR} - Lab Results Review
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Systematic lab results review workflow for {userEHR} users.
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Workflow Builder
+      </Typography>
+      
+      {/* Tab Navigation */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Box sx={{ display: 'flex', gap: 0 }}>
+          <Box
+            onClick={() => setActiveTab('my-workflows')}
+            sx={{
+              px: 3,
+              py: 2,
+              cursor: 'pointer',
+              borderBottom: activeTab === 'my-workflows' ? 2 : 0,
+              borderColor: 'primary.main',
+              backgroundColor: activeTab === 'my-workflows' ? 'action.selected' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <Typography 
+              variant="button" 
+              fontWeight={activeTab === 'my-workflows' ? 600 : 400}
+              color={activeTab === 'my-workflows' ? 'primary.main' : 'text.primary'}
+            >
+              My Workflows
+            </Typography>
+          </Box>
+          <Box
+            onClick={() => setActiveTab('workflow-library')}
+            sx={{
+              px: 3,
+              py: 2,
+              cursor: 'pointer',
+              borderBottom: activeTab === 'workflow-library' ? 2 : 0,
+              borderColor: 'primary.main',
+              backgroundColor: activeTab === 'workflow-library' ? 'action.selected' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <Typography 
+              variant="button" 
+              fontWeight={activeTab === 'workflow-library' ? 600 : 400}
+              color={activeTab === 'workflow-library' ? 'primary.main' : 'text.primary'}
+            >
+              Workflow Library
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+      
+      {/* Tab Content */}
+      {activeTab === 'my-workflows' ? <MyWorkflows /> : <WorkflowLibrary />}
+    </Box>
+  );
+};
 
 const menuItems: MenuItem[] = [
   {
