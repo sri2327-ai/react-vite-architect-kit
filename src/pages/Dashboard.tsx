@@ -140,6 +140,7 @@ export const Dashboard: React.FC = () => {
           borderBottom: 1,
           borderColor: 'divider',
           textAlign: 'center',
+          background: 'transparent',
         }}
       >
         <Box 
@@ -214,7 +215,8 @@ export const Dashboard: React.FC = () => {
             width: '100%',
             zIndex: theme.zIndex.drawer + 1,
             display: { md: 'none' },
-            background: bravoColors.background.gradient,
+            background: `${bravoColors.background.gradient} !important`,
+            backgroundColor: 'transparent !important',
           }}
         >
           <Toolbar>
@@ -248,14 +250,15 @@ export const Dashboard: React.FC = () => {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: 'block', md: 'none' },
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              background: bravoColors.background.gradient,
+              background: `${bravoColors.background.gradient} !important`,
+              backgroundColor: 'transparent !important',
             },
           }}
         >
@@ -272,7 +275,8 @@ export const Dashboard: React.FC = () => {
               width: drawerWidth,
               position: 'relative',
               height: '100vh',
-              background: bravoColors.background.gradient,
+              background: `${bravoColors.background.gradient} !important`,
+              backgroundColor: 'transparent !important',
             },
           }}
           open
@@ -289,7 +293,7 @@ export const Dashboard: React.FC = () => {
           width: { md: `calc(100% - ${drawerWidth}px)` },
           height: '100vh',
           overflow: 'auto',
-          pt: { xs: 8, md: 0 }, // Account for mobile app bar
+          pt: { xs: 8, md: 0 },
         }}
       >
         <Container maxWidth="xl" sx={{ height: '100%', py: { xs: 2, md: 3 } }}>
