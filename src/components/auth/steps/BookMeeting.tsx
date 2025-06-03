@@ -51,7 +51,6 @@ const meetingFeatures = [
 export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }) => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
-  const [notes, setNotes] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +58,6 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
       meetingScheduled: true,
       meetingDate: selectedDate,
       meetingTime: selectedTime,
-      meetingNotes: notes,
     });
   };
 
@@ -127,29 +125,48 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                   background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
                   border: '1px solid #E8F4F8',
                   borderRadius: 2,
-                  height: { xs: 60, sm: 70 }
+                  height: 80,
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
-                <CardContent sx={{ p: 1, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <CardContent sx={{ 
+                  p: 1.5, 
+                  textAlign: 'center', 
+                  width: '100%',
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  '&:last-child': { pb: 1.5 }
+                }}>
                   <Box
                     sx={{
-                      width: 24,
-                      height: 24,
+                      width: 28,
+                      height: 28,
                       borderRadius: '6px',
                       background: 'linear-gradient(135deg, #143151, #387E89)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto 4px auto',
+                      mb: 0.5,
                       color: 'white'
                     }}
                   >
                     {feature.icon}
                   </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '0.75rem' }}>
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 700, 
+                    mb: 0.25, 
+                    fontSize: '0.8rem',
+                    lineHeight: 1.2
+                  }}>
                     {feature.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.65rem' }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ 
+                    fontSize: '0.7rem',
+                    lineHeight: 1.2
+                  }}>
                     {feature.description}
                   </Typography>
                 </CardContent>
@@ -175,7 +192,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
 
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
-            <Grid container spacing={2} sx={{ mb: 1.5 }}>
+            <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
@@ -237,18 +254,6 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                 </TextField>
               </Grid>
             </Grid>
-
-            <TextField
-              fullWidth
-              label="Additional Notes (Optional)"
-              multiline
-              rows={2}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Tell us about your EHR setup or questions..."
-              size="small"
-              sx={{ mb: 1.5 }}
-            />
           </Box>
         </Box>
 
