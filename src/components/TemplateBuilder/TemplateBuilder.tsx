@@ -27,7 +27,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid2 as Grid
+  Grid
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
@@ -505,7 +505,7 @@ const TemplateBuilder: React.FC = () => {
 
             <Grid container spacing={2}>
               {filteredLibraryTemplates.map((template) => (
-                <Grid xs={12} sm={6} md={4} key={template.id}>
+                <Grid item xs={12} sm={6} md={4} key={template.id}>
                   <Card
                     sx={{
                       cursor: 'pointer',
