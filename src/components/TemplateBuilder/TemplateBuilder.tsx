@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
@@ -66,6 +67,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
+import DraggableGrid from './DraggableGrid';
 
 interface TemplateData {
   id: number;
@@ -91,12 +93,21 @@ interface LibraryTemplate {
   sampleNote?: string;
 }
 
-interface TemplateSection {
+interface TemplateItem {
   id: string;
-  title: string;
+  name: string;
+  type: string;
   content: string;
-  type: 'text' | 'list' | 'checkbox' | 'dropdown';
-  options?: string[];
+  description?: string;
+  paste_template?: string;
+  is_editing?: boolean;
+  is_editing_template?: boolean;
+  temp_description?: string;
+  temp_template?: string;
+  items?: Array<{
+    content: string;
+    name?: string;
+  }>;
 }
 
 const TemplateBuilder: React.FC = () => {
@@ -118,7 +129,7 @@ const TemplateBuilder: React.FC = () => {
   const [openAddType, setOpenAddType] = useState(false);
   const [showTemplate, setShowTemplate] = useState(false);
   const [templateMethod, setTemplateMethod] = useState<any>({});
-  const [sectionList, setSectionList] = useState<TemplateSection[]>([]);
+  const [sectionList, setSectionList] = useState<TemplateItem[]>([]);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
   const [openAddSection, setOpenAddSection] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -369,56 +380,6 @@ const TemplateBuilder: React.FC = () => {
     },
   ];
 
-  // Multi-step workflow handlers
-  const handleNextStep = () => {
-    setCurrentStep(prev => prev + 1);
-  };
-
-  const handlePrevStep = () => {
-    setCurrentStep(prev => prev - 1);
-  };
-
-  const handleResetSteps = () => {
-    setCurrentStep(0);
-    setIsProcessing(false);
-    setProcessedContent('');
-    setAiSummary('');
-  };
-
-  // Simulate AI processing for different methods
-  const simulateAIProcessing = async (content: string, method: string) => {
-    setIsProcessing(true);
-    
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    let result = '';
-    let summary = '';
-    
-    switch (method) {
-      case 'copyNotes':
-        result = `Processed Template Content:\n\n${content}\n\n[AI has analyzed and structured your previous notes into a template format]`;
-        summary = 'AI has successfully converted your previous notes into a structured template format, organizing key sections and improving readability.';
-        break;
-      case 'generateTemplate':
-        result = `Generated Template Based on Description:\n\nSubjective:\n[Patient's description of symptoms and concerns]\n\nObjective:\n[Physical examination findings and vital signs]\n\nAssessment:\n[Clinical diagnosis and differential diagnosis]\n\nPlan:\n[Treatment plan and follow-up instructions]\n\n[AI generated this template based on: "${content}"]`;
-        summary = 'AI has created a comprehensive template structure based on your description, following medical documentation best practices.';
-        break;
-      case 'existingTemplate':
-        result = `Optimized Template Content:\n\n${content}\n\n[AI has reviewed and optimized the existing template for better structure and completeness]`;
-        summary = 'AI has analyzed your existing template and made structural improvements while maintaining the original content intent.';
-        break;
-      default:
-        result = content;
-        summary = 'Content processed successfully.';
-    }
-    
-    setProcessedContent(result);
-    setAiSummary(summary);
-    setIsProcessing(false);
-    handleNextStep();
-  };
-
   // Event handlers
   const handleConsultTypeSelect = (consultType: ConsultType) => {
     setSelectedConsultType(consultType);
@@ -430,10 +391,10 @@ const TemplateBuilder: React.FC = () => {
     setCurrentScreen('templateEditor');
     
     // Convert template content to sections for the editor
-    const defaultSections: TemplateSection[] = [
+    const defaultSections: TemplateItem[] = [
       {
         id: 'section-1',
-        title: 'Template Content',
+        name: 'Template Content',
         content: template.content || 'No content available',
         type: 'text'
       }
@@ -485,667 +446,13 @@ const TemplateBuilder: React.FC = () => {
     }
   };
 
-  const handleSaveTemplate = (sections: TemplateSection[]) => {
-    console.log('Saving template with sections:', sections);
-    setSectionList(sections);
+  const handleSaveTemplate = (items: TemplateItem[]) => {
+    console.log('Saving template with items:', items);
+    setSectionList(items);
     // Here you would typically save the template to your backend
     // For now, just go back to templates list
     handleBackToTemplates();
   };
-
-  const onCreateTemplate = async () => {
-    // For methods 1, 2, 4 - go through the step process
-    if ([1, 2, 4].includes(templateMethod.id)) {
-      if (currentStep === 0) {
-        // Validate first step
-        if (!templateName.trim()) return;
-        
-        if (templateMethod.id === 1 && !previousNotes.trim()) return;
-        if (templateMethod.id === 2 && !templateDescription.trim()) return;
-        if (templateMethod.id === 4 && !existingTemplateContent.trim()) return;
-        
-        handleNextStep();
-      } else if (currentStep === 1) {
-        // Process content with AI
-        let content = '';
-        let method = '';
-        
-        if (templateMethod.id === 1) {
-          content = previousNotes;
-          method = 'copyNotes';
-        } else if (templateMethod.id === 2) {
-          content = templateDescription;
-          method = 'generateTemplate';
-        } else if (templateMethod.id === 4) {
-          content = existingTemplateContent;
-          method = 'existingTemplate';
-        }
-        
-        await simulateAIProcessing(content, method);
-      } else if (currentStep === 2) {
-        // Final step - create template
-        console.log("Create Template Data", {
-          method: templateMethod,
-          name: templateName,
-          processedContent,
-          aiSummary
-        });
-        
-        setOpenCreateTemplate(false);
-        handleResetSteps();
-        setCurrentScreen('templateEditor');
-        setOpenModifyTemplate(true);
-        setShowTemplate(true);
-        setSectionList([]);
-      }
-    } else {
-      // For methods 3 and 5 - direct creation
-      if (!templateName.trim()) return;
-      
-      if (templateMethod.id === 5 && !selectedLibraryTemplate) return;
-      
-      console.log("Create Template Data", {
-        method: templateMethod,
-        name: templateName,
-        libraryTemplate: selectedLibraryTemplate
-      });
-
-      setOpenCreateTemplate(false);
-      setCurrentScreen('templateEditor');
-      setOpenModifyTemplate(true);
-      setShowTemplate(true);
-      setSectionList([]);
-    }
-  };
-
-  // Get steps for current method
-  const getStepsForMethod = (methodId: number) => {
-    switch (methodId) {
-      case 1: // Copy Previous Notes
-        return [
-          'Enter Template Details',
-          'AI Processing',
-          'Review & Confirm'
-        ];
-      case 2: // Generate Template
-        return [
-          'Describe Template',
-          'AI Generation',
-          'Review & Confirm'
-        ];
-      case 4: // Use Existing Template
-        return [
-          'Paste Template Content',
-          'AI Optimization',
-          'Review & Confirm'
-        ];
-      default:
-        return [];
-    }
-  };
-
-  // Render step content for multi-step workflows
-  const renderStepContent = (methodId: number, step: number) => {
-    switch (methodId) {
-      case 1: // Copy Previous Notes
-        if (step === 0) {
-          return (
-            <Box>
-              <TextField
-                fullWidth
-                label="Template Name *"
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                variant="outlined"
-                size="small"
-                sx={{ mb: 3 }}
-              />
-              <TextField
-                fullWidth
-                multiline
-                rows={8}
-                label="Copy and paste your previous notes"
-                placeholder="Paste the previous notes that you want to convert into a template..."
-                value={previousNotes}
-                onChange={(e) => setPreviousNotes(e.target.value)}
-                variant="outlined"
-                size="small"
-              />
-              <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mt: 2, fontStyle: 'italic' }}>
-                AI will analyze your notes and create a structured template format.
-              </Typography>
-            </Box>
-          );
-        } else if (step === 1) {
-          return (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              {isProcessing ? (
-                <>
-                  <LinearProgress sx={{ mb: 3 }} />
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    AI is processing your notes...
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                    This may take a few moments while we analyze and structure your content.
-                  </Typography>
-                </>
-              ) : (
-                <>
-                  <CheckIcon sx={{ fontSize: 64, color: 'green', mb: 2 }} />
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    Processing Complete!
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                    Your notes have been successfully processed. Click Next to review.
-                  </Typography>
-                </>
-              )}
-            </Box>
-          );
-        } else if (step === 2) {
-          return (
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                AI Summary:
-              </Typography>
-              <Box sx={{ p: 2, backgroundColor: '#e3f2fd', borderRadius: 2, mb: 3 }}>
-                <Typography variant="body2">{aiSummary}</Typography>
-              </Box>
-              
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Generated Template:
-              </Typography>
-              <Box sx={{ p: 3, border: '1px solid #ddd', borderRadius: 2, backgroundColor: '#f9f9f9', maxHeight: 300, overflowY: 'auto' }}>
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
-                  {processedContent}
-                </Typography>
-              </Box>
-            </Box>
-          );
-        }
-        break;
-        
-      case 2: // Generate Template
-        if (step === 0) {
-          return (
-            <Box>
-              <TextField
-                fullWidth
-                label="Template Name *"
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                variant="outlined"
-                size="small"
-                sx={{ mb: 3 }}
-              />
-              <TextField
-                fullWidth
-                multiline
-                rows={8}
-                label="Describe the template you want AI to create"
-                placeholder="Describe what kind of template you need. For example: 'Create a cardiology consultation template for chest pain evaluation' or 'Generate a pediatric well-child visit template'..."
-                value={templateDescription}
-                onChange={(e) => setTemplateDescription(e.target.value)}
-                variant="outlined"
-                size="small"
-              />
-              <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mt: 2, fontStyle: 'italic' }}>
-                Be as specific as possible about what you need in your template.
-              </Typography>
-            </Box>
-          );
-        } else if (step === 1) {
-          return (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              {isProcessing ? (
-                <>
-                  <LinearProgress sx={{ mb: 3 }} />
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    AI is generating your template...
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                    Creating a customized template based on your description.
-                  </Typography>
-                </>
-              ) : (
-                <>
-                  <CheckIcon sx={{ fontSize: 64, color: 'green', mb: 2 }} />
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    Template Generated!
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                    Your custom template has been created. Click Next to review.
-                  </Typography>
-                </>
-              )}
-            </Box>
-          );
-        } else if (step === 2) {
-          return (
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                AI Summary:
-              </Typography>
-              <Box sx={{ p: 2, backgroundColor: '#e8f5e8', borderRadius: 2, mb: 3 }}>
-                <Typography variant="body2">{aiSummary}</Typography>
-              </Box>
-              
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Generated Template:
-              </Typography>
-              <Box sx={{ p: 3, border: '1px solid #ddd', borderRadius: 2, backgroundColor: '#f9f9f9', maxHeight: 300, overflowY: 'auto' }}>
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
-                  {processedContent}
-                </Typography>
-              </Box>
-            </Box>
-          );
-        }
-        break;
-        
-      case 4: // Use Existing Template
-        if (step === 0) {
-          return (
-            <Box>
-              <TextField
-                fullWidth
-                label="Template Name *"
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
-                variant="outlined"
-                size="small"
-                sx={{ mb: 3 }}
-              />
-              <TextField
-                fullWidth
-                multiline
-                rows={8}
-                label="Copy and paste your existing template content"
-                placeholder="Paste your existing template content here. AI will help optimize and structure it..."
-                value={existingTemplateContent}
-                onChange={(e) => setExistingTemplateContent(e.target.value)}
-                variant="outlined"
-                size="small"
-              />
-              <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mt: 2, fontStyle: 'italic' }}>
-                AI will review and optimize your template for better structure and completeness.
-              </Typography>
-            </Box>
-          );
-        } else if (step === 1) {
-          return (
-            <Box sx={{ textAlign: 'center', py: 4 }}>
-              {isProcessing ? (
-                <>
-                  <LinearProgress sx={{ mb: 3 }} />
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    AI is optimizing your template...
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                    Analyzing structure and making improvements to your template.
-                  </Typography>
-                </>
-              ) : (
-                <>
-                  <CheckIcon sx={{ fontSize: 64, color: 'green', mb: 2 }} />
-                  <Typography variant="h6" sx={{ mb: 2 }}>
-                    Optimization Complete!
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                    Your template has been optimized. Click Next to review.
-                  </Typography>
-                </>
-              )}
-            </Box>
-          );
-        } else if (step === 2) {
-          return (
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                AI Summary:
-              </Typography>
-              <Box sx={{ p: 2, backgroundColor: '#fff3e0', borderRadius: 2, mb: 3 }}>
-                <Typography variant="body2">{aiSummary}</Typography>
-              </Box>
-              
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Optimized Template:
-              </Typography>
-              <Box sx={{ p: 3, border: '1px solid #ddd', borderRadius: 2, backgroundColor: '#f9f9f9', maxHeight: 300, overflowY: 'auto' }}>
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
-                  {processedContent}
-                </Typography>
-              </Box>
-            </Box>
-          );
-        }
-        break;
-    }
-    return null;
-  };
-
-  // Render different content based on selected method
-  const renderTemplateCreationContent = () => {
-    if (!templateMethod.id) {
-      return (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mt: 2 }}>
-          {createTemplateOptions.map((option) => (
-            <Box 
-              key={option.id} 
-              sx={{ 
-                flexBasis: 'calc(50% - 12px)', 
-                minWidth: 280,
-                '@media (max-width: 900px)': {
-                  flexBasis: '100%'
-                }
-              }}
-            >
-              <Card
-                elevation={0}
-                sx={{
-                  cursor: "pointer",
-                  transition: "all 0.3s ease-in-out",
-                  border: `2px solid ${bravoColors.highlight.border}`,
-                  borderRadius: 3,
-                  p: 2,
-                  height: '100%',
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0px 12px 24px rgba(0,0,0,0.12)",
-                    borderColor: bravoColors.secondary,
-                  }
-                }}
-                onClick={() => handleCreateTemplateMethod(option)}
-              >
-                <CardContent sx={{ p: 0 }}>
-                  <Box display="flex" flexDirection="column" alignItems="flex-start" gap={1}>
-                    {option.icon}
-                    <Typography 
-                      variant="h6" 
-                      sx={{ 
-                        color: bravoColors.text.primary, 
-                        fontWeight: 600,
-                        fontSize: '1.1rem'
-                      }}
-                    >
-                      {option.title}
-                    </Typography>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: bravoColors.text.secondary,
-                        fontSize: '0.9rem',
-                        lineHeight: 1.4
-                      }}
-                    >
-                      {option.description}
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Box>
-          ))}
-        </Box>
-      );
-    }
-
-    // Multi-step workflow for methods 1, 2, 4
-    if ([1, 2, 4].includes(templateMethod.id)) {
-      const steps = getStepsForMethod(templateMethod.id);
-      
-      return (
-        <Box sx={{ mt: 3 }}>
-          <Box display="flex" alignItems="center" mb={3}>
-            <IconButton onClick={() => setTemplateMethod({})} sx={{ mr: 1 }}>
-              <ArrowBackIcon />
-            </IconButton>
-            <Typography variant="h6" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              {templateMethod.title}
-            </Typography>
-          </Box>
-
-          {/* Stepper */}
-          <Box sx={{ mb: 4 }}>
-            <Stepper activeStep={currentStep} orientation="horizontal">
-              {steps.map((label, index) => (
-                <Step key={label}>
-                  <StepLabel>{label}</StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-          </Box>
-
-          {/* Step Content */}
-          <Box sx={{ mb: 4 }}>
-            {renderStepContent(templateMethod.id, currentStep)}
-          </Box>
-        </Box>
-      );
-    }
-
-    // Show specific form for methods 3 and 5 (single step)
-    return (
-      <Box sx={{ mt: 3 }}>
-        <Box display="flex" alignItems="center" mb={3}>
-          <IconButton onClick={() => setTemplateMethod({})} sx={{ mr: 1 }}>
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-            {templateMethod.title}
-          </Typography>
-        </Box>
-
-        <TextField
-          fullWidth
-          label="Template Name *"
-          value={templateName}
-          onChange={(e) => setTemplateName(e.target.value)}
-          variant="outlined"
-          size="small"
-          sx={{ mb: 3 }}
-        />
-
-        {/* Start from Scratch */}
-        {templateMethod.id === 3 && (
-          <Typography variant="body2" sx={{ color: bravoColors.text.secondary, fontStyle: 'italic' }}>
-            You'll start with a blank template that you can customize completely.
-          </Typography>
-        )}
-
-        {/* Template Library */}
-        {templateMethod.id === 5 && (
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2, textAlign: 'center', fontWeight: 600 }}>
-              Template Library
-            </Typography>
-            
-            <Box display="flex" gap={2} mb={3} justifyContent="center">
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Specialty</InputLabel>
-                <Select
-                  value={libraryFilters.specialty}
-                  label="Specialty"
-                  onChange={(e) => setLibraryFilters(prev => ({ ...prev, specialty: e.target.value }))}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  <MenuItem value="cardiologist">Cardiologist</MenuItem>
-                  <MenuItem value="pyschologist">Psychologist</MenuItem>
-                  <MenuItem value="Dermatology">Dermatology</MenuItem>
-                </Select>
-              </FormControl>
-              
-              <FormControl size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Note Type</InputLabel>
-                <Select
-                  value={libraryFilters.noteType}
-                  label="Note Type"
-                  onChange={(e) => setLibraryFilters(prev => ({ ...prev, noteType: e.target.value }))}
-                >
-                  <MenuItem value="">All</MenuItem>
-                  <MenuItem value="SOAP">SOAP</MenuItem>
-                  <MenuItem value="DPD">DPD</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: 2,
-                mb: 3
-              }}
-            >
-              {filteredLibraryTemplates.map((template) => (
-                <Card
-                  key={template.id}
-                  sx={{
-                    cursor: 'pointer',
-                    border: selectedLibraryTemplate?.id === template.id ? `2px solid ${bravoColors.primaryFlat}` : '1px solid #e0e0e0',
-                    borderRadius: 2,
-                    p: 2,
-                    height: '100%',
-                    '&:hover': {
-                      borderColor: bravoColors.secondary,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                    }
-                  }}
-                  onClick={() => setSelectedLibraryTemplate(template)}
-                >
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: '1rem' }}>
-                    {template.name}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mb: 0.5 }}>
-                    Specialty: {template.specialty}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                    Note Type: {template.noteType}
-                  </Typography>
-                </Card>
-              ))}
-            </Box>
-
-            {selectedLibraryTemplate && (
-              <Box sx={{ mt: 3, p: 2, border: '2px dashed #ccc', borderRadius: 2 }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                  Template Preview
-                </Typography>
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: bravoColors.text.secondary }}>
-                  {selectedLibraryTemplate.content}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-        )}
-      </Box>
-    );
-  };
-
-  // Render Template Library Tab
-  const renderTemplateLibrary = () => (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600, mb: 4 }}>
-        Template Library
-      </Typography>
-      
-      <Box display="flex" gap={2} mb={3}>
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Specialty</InputLabel>
-          <Select
-            value={libraryFilters.specialty}
-            label="Specialty"
-            onChange={(e) => setLibraryFilters(prev => ({ ...prev, specialty: e.target.value }))}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="cardiologist">Cardiologist</MenuItem>
-            <MenuItem value="pyschologist">Psychologist</MenuItem>
-            <MenuItem value="Dermatology">Dermatology</MenuItem>
-          </Select>
-        </FormControl>
-        
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Note Type</InputLabel>
-          <Select
-            value={libraryFilters.noteType}
-            label="Note Type"
-            onChange={(e) => setLibraryFilters(prev => ({ ...prev, noteType: e.target.value }))}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="SOAP">SOAP</MenuItem>
-            <MenuItem value="DPD">DPD</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: 3
-        }}
-      >
-        {filteredLibraryTemplates.map((template) => (
-          <Card
-            key={template.id}
-            sx={{
-              borderRadius: 2,
-              border: '1px solid #e0e0e0',
-              overflow: 'hidden',
-              '&:hover': {
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                borderColor: bravoColors.secondary
-              }
-            }}
-          >
-            <CardContent sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: bravoColors.text.primary }}>
-                {template.name}
-              </Typography>
-              
-              <Box display="flex" gap={1} mb={2}>
-                <Chip 
-                  label={`Specialty: ${template.specialty}`} 
-                  size="small" 
-                  sx={{ 
-                    backgroundColor: bravoColors.primaryFlat, 
-                    color: 'white',
-                    fontSize: '0.75rem'
-                  }} 
-                />
-                <Chip 
-                  label={`Note Type: ${template.noteType}`} 
-                  size="small" 
-                  sx={{ 
-                    backgroundColor: bravoColors.secondary, 
-                    color: 'white',
-                    fontSize: '0.75rem'
-                  }} 
-                />
-              </Box>
-              
-              <Box display="flex" gap={1} mt={3}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  onClick={() => handleLibraryTemplatePreview(template)}
-                  sx={{
-                    borderColor: bravoColors.secondary,
-                    color: bravoColors.secondary,
-                    '&:hover': {
-                      borderColor: bravoColors.primaryFlat,
-                      backgroundColor: bravoColors.background.light
-                    }
-                  }}
-                >
-                  Preview
-                </Button>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
-    </Box>
-  );
 
   // Render Consult Types Screen
   const renderConsultTypes = () => (
@@ -1373,14 +680,129 @@ const TemplateBuilder: React.FC = () => {
     if (!editingTemplate) return null;
     
     return (
-      <TemplateEditor
-        templateName={editingTemplate.title}
-        initialSections={sectionList}
-        onSave={handleSaveTemplate}
-        onBack={handleBackToTemplates}
-      />
+      <Box sx={{ p: 3 }}>
+        <Box display="flex" alignItems="center" mb={3}>
+          <IconButton 
+            onClick={handleBackToTemplates}
+            sx={{ mr: 2, color: bravoColors.primaryFlat }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+            Template Editor: {editingTemplate.title}
+          </Typography>
+        </Box>
+        
+        <DraggableGrid />
+      </Box>
     );
   };
+
+  // Render Template Library Tab
+  const renderTemplateLibrary = () => (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600, mb: 4 }}>
+        Template Library
+      </Typography>
+      
+      <Box display="flex" gap={2} mb={3}>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Specialty</InputLabel>
+          <Select
+            value={libraryFilters.specialty}
+            label="Specialty"
+            onChange={(e) => setLibraryFilters(prev => ({ ...prev, specialty: e.target.value }))}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="cardiologist">Cardiologist</MenuItem>
+            <MenuItem value="pyschologist">Psychologist</MenuItem>
+            <MenuItem value="Dermatology">Dermatology</MenuItem>
+          </Select>
+        </FormControl>
+        
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Note Type</InputLabel>
+          <Select
+            value={libraryFilters.noteType}
+            label="Note Type"
+            onChange={(e) => setLibraryFilters(prev => ({ ...prev, noteType: e.target.value }))}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="SOAP">SOAP</MenuItem>
+            <MenuItem value="DPD">DPD</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: 3
+        }}
+      >
+        {filteredLibraryTemplates.map((template) => (
+          <Card
+            key={template.id}
+            sx={{
+              borderRadius: 2,
+              border: '1px solid #e0e0e0',
+              overflow: 'hidden',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                borderColor: bravoColors.secondary
+              }
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: bravoColors.text.primary }}>
+                {template.name}
+              </Typography>
+              
+              <Box display="flex" gap={1} mb={2}>
+                <Chip 
+                  label={`Specialty: ${template.specialty}`} 
+                  size="small" 
+                  sx={{ 
+                    backgroundColor: bravoColors.primaryFlat, 
+                    color: 'white',
+                    fontSize: '0.75rem'
+                  }} 
+                />
+                <Chip 
+                  label={`Note Type: ${template.noteType}`} 
+                  size="small" 
+                  sx={{ 
+                    backgroundColor: bravoColors.secondary, 
+                    color: 'white',
+                    fontSize: '0.75rem'
+                  }} 
+                />
+              </Box>
+              
+              <Box display="flex" gap={1} mt={3}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleLibraryTemplatePreview(template)}
+                  sx={{
+                    borderColor: bravoColors.secondary,
+                    color: bravoColors.secondary,
+                    '&:hover': {
+                      borderColor: bravoColors.primaryFlat,
+                      backgroundColor: bravoColors.background.light
+                    }
+                  }}
+                >
+                  Preview
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+    </Box>
+  );
 
   // Main render logic for My Templates tab
   const renderMyTemplatesContent = () => {
@@ -1541,154 +963,6 @@ const TemplateBuilder: React.FC = () => {
           >
             ADD
           </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Create Template Dialog */}
-      <Dialog
-        open={openCreateTemplate}
-        onClose={() => setOpenCreateTemplate(false)}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: { 
-            borderRadius: 3,
-            p: 2,
-            maxHeight: '90vh'
-          }
-        }}
-      >
-        <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Create Template
-            </Typography>
-            <IconButton onClick={() => setOpenCreateTemplate(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-        <DialogContent sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
-          {renderTemplateCreationContent()}
-
-          {templateMethod.id && (
-            <Typography 
-              variant="body2" 
-              sx={{ 
-                color: bravoColors.text.secondary,
-                mt: 3,
-                textAlign: 'center',
-                fontStyle: 'italic'
-              }}
-            >
-              Always double-check the template to confirm it's correct, complete, and safe to use based on medical advice.
-            </Typography>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
-          {/* Multi-step navigation for methods 1, 2, 4 */}
-          {[1, 2, 4].includes(templateMethod.id) ? (
-            <>
-              <Button 
-                onClick={currentStep === 0 ? () => setOpenCreateTemplate(false) : handlePrevStep}
-                variant="outlined"
-                disabled={isProcessing}
-                sx={{
-                  borderColor: bravoColors.secondary,
-                  color: bravoColors.secondary,
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
-                  '&:hover': {
-                    borderColor: bravoColors.primaryFlat,
-                    backgroundColor: bravoColors.background.light,
-                  }
-                }}
-              >
-                {currentStep === 0 ? 'CANCEL' : 'BACK'}
-              </Button>
-              <Button 
-                onClick={onCreateTemplate}
-                variant="contained"
-                disabled={isProcessing || 
-                  (currentStep === 0 && (!templateName.trim() || 
-                    (templateMethod.id === 1 && !previousNotes.trim()) ||
-                    (templateMethod.id === 2 && !templateDescription.trim()) ||
-                    (templateMethod.id === 4 && !existingTemplateContent.trim())
-                  )) ||
-                  (currentStep === 1 && isProcessing)
-                }
-                sx={{
-                  backgroundColor: bravoColors.secondary,
-                  color: 'white',
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
-                  '&:hover': {
-                    backgroundColor: bravoColors.primaryFlat,
-                  },
-                  '&:disabled': {
-                    backgroundColor: '#ccc',
-                    color: '#666'
-                  }
-                }}
-              >
-                {currentStep === 0 ? 'NEXT' : currentStep === 1 ? (isProcessing ? 'PROCESSING...' : 'NEXT') : 'CREATE TEMPLATE'}
-              </Button>
-            </>
-          ) : (
-            // Single step navigation for methods 3 and 5
-            <>
-              <Button 
-                onClick={() => setOpenCreateTemplate(false)}
-                variant="outlined"
-                sx={{
-                  borderColor: bravoColors.secondary,
-                  color: bravoColors.secondary,
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
-                  '&:hover': {
-                    borderColor: bravoColors.primaryFlat,
-                    backgroundColor: bravoColors.background.light,
-                  }
-                }}
-              >
-                BACK
-              </Button>
-              <Button 
-                onClick={onCreateTemplate}
-                variant="contained"
-                disabled={!templateMethod.id || !templateName.trim() || 
-                  (templateMethod.id === 5 && !selectedLibraryTemplate)
-                }
-                sx={{
-                  backgroundColor: bravoColors.secondary,
-                  color: 'white',
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
-                  '&:hover': {
-                    backgroundColor: bravoColors.primaryFlat,
-                  },
-                  '&:disabled': {
-                    backgroundColor: '#ccc',
-                    color: '#666'
-                  }
-                }}
-              >
-                {templateMethod.id === 5 ? 'IMPORT' : 'CREATE'}
-              </Button>
-            </>
-          )}
         </DialogActions>
       </Dialog>
 
