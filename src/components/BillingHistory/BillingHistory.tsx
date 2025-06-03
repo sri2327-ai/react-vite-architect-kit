@@ -19,7 +19,7 @@ import {
   Card,
   CardContent,
   Container,
-  Grid,
+  Grid2 as Grid,
   useTheme,
   useMediaQuery,
   Collapse,
@@ -280,7 +280,7 @@ const BillingHistory: React.FC = () => {
       {/* Summary Cards */}
       <Grid container spacing={{ xs: 1.5, md: 3 }} sx={{ mb: { xs: 3, md: 4 } }}>
         {summaryStats.map((stat, index) => (
-          <Grid item xs={6} md={3} key={index}>
+          <Grid xs={6} md={3} key={index}>
             <Card sx={{ 
               height: '100%',
               borderRadius: 2,
