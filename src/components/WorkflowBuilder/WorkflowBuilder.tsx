@@ -62,14 +62,18 @@ const WorkflowBuilder: React.FC = () => {
       visitTypeMappings: availableVisitTypes.map((visitType: string) => ({
         visitType,
         templateFields: {},
+        scheduleConfig: {
+          providerName: '',
+          location: ''
+        },
         isConfigured: false
       }))
     };
 
     setImportedWorkflows(prev => [...prev, importedWorkflow]);
     
-    // Switch to My Workflows tab to show the imported workflow
-    setTabValue(1);
+    // Stay on My Workflows tab to show the imported workflow
+    setTabValue(0);
   };
 
   return (
@@ -80,28 +84,28 @@ const WorkflowBuilder: React.FC = () => {
       
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>Agentic EHR Automation:</strong> Import pre-built workflows from the library, 
-          configure them for your visit types (from Template Builder), map workflow blocks to your 
-          template note sections, then execute with your EHR credentials for seamless automation.
+          <strong>Agentic EHR Automation:</strong> Configure and manage your EHR workflows, 
+          map them to your visit types (from Template Builder), set up schedule preferences, 
+          then execute with your EHR credentials for seamless automation.
         </Typography>
       </Alert>
 
       <Paper sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="workflow builder tabs">
-            <Tab label="Workflow Library" />
             <Tab 
               label={`My Workflows ${importedWorkflows.length > 0 ? `(${importedWorkflows.length})` : ''}`} 
             />
+            <Tab label="Workflow Library" />
           </Tabs>
         </Box>
         
         <TabPanel value={tabValue} index={0}>
-          <WorkflowLibrary onImportWorkflow={handleImportWorkflow} />
+          <MyWorkflows importedWorkflows={importedWorkflows} setImportedWorkflows={setImportedWorkflows} />
         </TabPanel>
         
         <TabPanel value={tabValue} index={1}>
-          <MyWorkflows importedWorkflows={importedWorkflows} setImportedWorkflows={setImportedWorkflows} />
+          <WorkflowLibrary onImportWorkflow={handleImportWorkflow} />
         </TabPanel>
       </Paper>
     </Box>

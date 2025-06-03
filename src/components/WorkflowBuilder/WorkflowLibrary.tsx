@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -45,7 +44,9 @@ import {
   ExpandMore as ExpandMoreIcon,
   AccountTree as WorkflowIcon,
   LocalHospital as EHRIcon,
-  Assignment as TaskIcon
+  Assignment as TaskIcon,
+  LocationOn as LocationIcon,
+  Today as TodayIcon
 } from '@mui/icons-material';
 
 interface WorkflowBlock {
@@ -78,20 +79,41 @@ const predefinedWorkflows: PredefinedWorkflow[] = [
     supportedVisitTypes: ['Office Visit', 'Follow-up', 'Annual Physical', 'Consultation'],
     blocks: [
       {
-        id: 'schedule-filter',
+        id: 'schedule-menu',
         type: 'schedule',
         name: 'Schedule Menu',
-        description: 'Access provider schedule with filters',
+        description: 'Access provider schedule with date and location filters',
         isEditable: true,
         config: {
           filters: ['Provider Name', 'Date', 'Location']
         }
       },
       {
+        id: 'provider-filter',
+        type: 'schedule',
+        name: 'Provider Name Filter',
+        description: 'Filter schedule by provider name',
+        isEditable: true
+      },
+      {
+        id: 'date-filter',
+        type: 'schedule',
+        name: "Today's Date",
+        description: 'Set schedule to current date',
+        isEditable: false
+      },
+      {
+        id: 'location-filter',
+        type: 'schedule',
+        name: 'Location Filter',
+        description: 'Filter schedule by clinic location',
+        isEditable: true
+      },
+      {
         id: 'patient-select',
         type: 'patient_select', 
         name: 'Patient Selection',
-        description: 'Select patient from schedule',
+        description: 'Select patient from filtered schedule',
         isEditable: false
       },
       {
@@ -168,22 +190,43 @@ const predefinedWorkflows: PredefinedWorkflow[] = [
       {
         id: 'schedule-access',
         type: 'schedule',
-        name: 'Access Schedule',
+        name: 'Schedule Menu',
         description: 'Navigate to provider schedule',
+        isEditable: true
+      },
+      {
+        id: 'provider-name-filter',
+        type: 'schedule',
+        name: 'Provider Name Filter',
+        description: 'Filter by provider name',
+        isEditable: true
+      },
+      {
+        id: 'current-date',
+        type: 'schedule',
+        name: "Today's Date",
+        description: 'Set to current date',
+        isEditable: false
+      },
+      {
+        id: 'location-select',
+        type: 'schedule',
+        name: 'Location Filter',
+        description: 'Select clinic location',
         isEditable: true
       },
       {
         id: 'patient-chart',
         type: 'patient_select',
         name: 'Open Patient Chart',
-        description: 'Select and open patient chart',
+        description: 'Select and open patient chart from schedule',
         isEditable: false
       },
       {
         id: 'note-creation',
         type: 'encounter_open',
         name: 'Create Progress Note',
-        description: 'Create new progress note',
+        description: 'Create new progress note for current date',
         isEditable: false
       },
       {
@@ -290,15 +333,16 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
             Workflow Library
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Pre-built EHR workflows ready to import and customize
+            Pre-built EHR workflows with schedule setup and automation blocks
           </Typography>
         </Box>
       </Box>
 
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>How it works:</strong> Browse predefined workflows, view their automation blocks, 
-          then import to "My Workflows" where you can map them to your visit types and customize field mappings.
+          <strong>Enhanced workflows:</strong> All workflows now include schedule setup blocks 
+          (Schedule Menu, Provider Filter, Date Filter, Location Filter) before patient selection. 
+          Import and configure these with your provider name and location preferences.
         </Typography>
       </Alert>
       

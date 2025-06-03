@@ -33,7 +33,8 @@ import {
   Select,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  Grid
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -48,7 +49,10 @@ import {
   Map as MapIcon,
   Assignment as AssignmentIcon,
   ExpandMore as ExpandMoreIcon,
-  AccountTree as WorkflowIcon
+  AccountTree as WorkflowIcon,
+  Schedule as ScheduleIcon,
+  Person as PersonIcon,
+  LocationOn as LocationIcon
 } from '@mui/icons-material';
 import { templateBuilderService } from '../../services/templateBuilderService';
 
@@ -62,9 +66,15 @@ interface WorkflowBlock {
   config?: any;
 }
 
+interface ScheduleConfig {
+  providerName: string;
+  location: string;
+}
+
 interface VisitTypeMapping {
   visitType: string;
   templateFields: { [blockId: string]: string };
+  scheduleConfig: ScheduleConfig;
   isConfigured: boolean;
 }
 
@@ -107,21 +117,64 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               'subjective-note': 'History of Present Illness',
               'objective-note': 'Physical Examination'
             },
+            scheduleConfig: {
+              providerName: 'Dr. Smith',
+              location: 'Main Clinic'
+            },
             isConfigured: true
           },
           {
             visitType: 'Follow-up',
             templateFields: {},
+            scheduleConfig: {
+              providerName: '',
+              location: ''
+            },
             isConfigured: false
           }
         ],
         blocks: [
           {
-            id: 'schedule-filter',
+            id: 'schedule-menu',
             type: 'schedule',
             name: 'Schedule Menu',
-            description: 'Access provider schedule with filters',
+            description: 'Access provider schedule with date and location filters',
             isEditable: true
+          },
+          {
+            id: 'provider-filter',
+            type: 'schedule',
+            name: 'Provider Name Filter',
+            description: 'Filter schedule by provider name',
+            isEditable: true
+          },
+          {
+            id: 'date-filter',
+            type: 'schedule',
+            name: "Today's Date",
+            description: 'Set schedule to current date',
+            isEditable: false
+          },
+          {
+            id: 'location-filter',
+            type: 'schedule',
+            name: 'Location Filter',
+            description: 'Filter schedule by clinic location',
+            isEditable: true
+          },
+          {
+            id: 'patient-select',
+            type: 'patient_select',
+            name: 'Patient Selection',
+            description: 'Select patient from filtered schedule',
+            isEditable: false
+          },
+          {
+            id: 'encounter-open',
+            type: 'encounter_open',
+            name: 'Open Encounter Chart',
+            description: 'Open patient encounter for current date',
+            isEditable: false
           },
           {
             id: 'chief-complaint',
@@ -154,19 +207,6 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
   const [executionStep, setExecutionStep] = useState(0);
   const [isExecuting, setIsExecuting] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  // Mock template fields - in real app, these would come from template builder
-  const availableTemplateFields = [
-    'Chief Complaint',
-    'History of Present Illness', 
-    'Review of Systems',
-    'Physical Examination',
-    'Assessment',
-    'Plan',
-    'Subjective Note',
-    'Objective Note',
-    'Diagnosis'
-  ];
 
   const executionSteps = [
     'Visit Type Selection',
@@ -259,6 +299,29 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   ...mapping.templateFields,
                   [blockId]: templateField
                 }).length >= prev.blocks.filter(b => b.type === 'note_entry').length
+              }
+            : mapping
+        )
+      };
+    });
+  };
+
+  const handleScheduleConfigChange = (visitType: string, field: keyof ScheduleConfig, value: string) => {
+    if (!selectedWorkflow) return;
+    
+    setSelectedWorkflow(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        visitTypeMappings: prev.visitTypeMappings.map(mapping =>
+          mapping.visitType === visitType
+            ? {
+                ...mapping,
+                scheduleConfig: {
+                  ...mapping.scheduleConfig,
+                  [field]: value
+                }
               }
             : mapping
         )
@@ -572,8 +635,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         </DialogTitle>
         <DialogContent>
           <Alert severity="info" sx={{ mb: 3 }}>
-            Map your workflow blocks to template note sections for each visit type. Visit types and template sections 
-            come from your Template Builder. This ensures the automation populates the correct fields in your templates.
+            Configure schedule settings and map workflow blocks to template note sections for each visit type. 
+            Visit types and template sections come from your Template Builder.
           </Alert>
           
           {selectedWorkflow?.visitTypeMappings.map((mapping) => {
@@ -595,39 +658,84 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   </Box>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    Map workflow blocks to template note sections for {mapping.visitType}. 
-                    Template sections come from your Template Builder.
-                  </Typography>
-                  
-                  {selectedWorkflow.blocks
-                    .filter(block => block.type === 'note_entry')
-                    .map((block) => (
-                      <Box key={block.id} sx={{ mb: 2 }}>
-                        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                          {block.name}
-                        </Typography>
-                        <FormControl fullWidth size="small">
-                          <InputLabel>Template Note Section</InputLabel>
-                          <Select
-                            value={mapping.templateFields[block.id] || ''}
-                            label="Template Note Section"
-                            onChange={(e) => handleFieldMapping(mapping.visitType, block.id, e.target.value)}
-                          >
-                            {templateSections.map((section) => (
-                              <MenuItem key={section.id} value={section.name}>
-                                {section.name} ({section.type})
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                        {mapping.templateFields[block.id] && (
-                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                            Maps to: {mapping.templateFields[block.id]}
+                  {/* Schedule Configuration Section */}
+                  <Box sx={{ mb: 4 }}>
+                    <Typography variant="subtitle1" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <ScheduleIcon color="primary" />
+                      Schedule Configuration
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} md={6}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Provider Name"
+                          value={mapping.scheduleConfig.providerName}
+                          onChange={(e) => handleScheduleConfigChange(mapping.visitType, 'providerName', e.target.value)}
+                          placeholder="e.g., Dr. Smith"
+                          InputProps={{
+                            startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label="Location"
+                          value={mapping.scheduleConfig.location}
+                          onChange={(e) => handleScheduleConfigChange(mapping.visitType, 'location', e.target.value)}
+                          placeholder="e.g., Main Clinic"
+                          InputProps={{
+                            startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+
+                  <Divider sx={{ my: 3 }} />
+
+                  {/* Template Field Mapping Section */}
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <AssignmentIcon color="primary" />
+                      Template Field Mapping
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Map workflow note blocks to template sections for {mapping.visitType}. 
+                      Template sections come from your Template Builder.
+                    </Typography>
+                    
+                    {selectedWorkflow.blocks
+                      .filter(block => block.type === 'note_entry')
+                      .map((block) => (
+                        <Box key={block.id} sx={{ mb: 2 }}>
+                          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                            {block.name}
                           </Typography>
-                        )}
-                      </Box>
-                    ))}
+                          <FormControl fullWidth size="small">
+                            <InputLabel>Template Note Section</InputLabel>
+                            <Select
+                              value={mapping.templateFields[block.id] || ''}
+                              label="Template Note Section"
+                              onChange={(e) => handleFieldMapping(mapping.visitType, block.id, e.target.value)}
+                            >
+                              {templateSections.map((section) => (
+                                <MenuItem key={section.id} value={section.name}>
+                                  {section.name} ({section.type})
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          {mapping.templateFields[block.id] && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              Maps to: {mapping.templateFields[block.id]}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))}
+                  </Box>
                 </AccordionDetails>
               </Accordion>
             );
