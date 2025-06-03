@@ -390,6 +390,8 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({
       id: 'section-1',
       title: 'Patient Information',
       description: 'Basic patient details',
+      content: '',
+      type: 'text',
       visible: true,
       fields: [
         {
@@ -431,6 +433,8 @@ export const TemplateEditor: React.FC<TemplateEditorProps> = ({
       id: `section-${Date.now()}`,
       title: 'New Section',
       description: '',
+      content: '',
+      type: 'text',
       visible: true,
       fields: []
     };

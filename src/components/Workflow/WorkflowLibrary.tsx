@@ -31,7 +31,7 @@ import {
   Assignment as ChartIcon,
   LocalHospital as VisitIcon,
   Edit as EditIcon,
-  MapIcon
+  Map as MapIcon
 } from '@mui/icons-material';
 
 interface WorkflowTemplate {

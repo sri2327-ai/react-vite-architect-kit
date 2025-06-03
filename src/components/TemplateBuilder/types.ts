@@ -1,3 +1,4 @@
+
 export interface TemplateField {
   id: string;
   type: 'TEXT' | 'NUMBER' | 'DATE' | 'DROPDOWN' | 'CHECKBOX' | 'TEXTAREA' | 'RADIO' | 'FILE_UPLOAD';
@@ -21,7 +22,7 @@ export interface TemplateSection {
   title: string;
   description?: string;
   content: string;
-  type: 'header' | 'content' | 'field';
+  type: 'text' | 'list' | 'checkbox' | 'dropdown';
   fields?: TemplateField[];
 }
 
@@ -39,11 +40,11 @@ export interface EditorTemplateField extends TemplateField {
   visible: boolean;
 }
 
-export interface EditorTemplateSection extends TemplateSection {
+export interface EditorTemplateSection extends Omit<TemplateSection, 'fields'> {
   visible: boolean;
   fields: EditorTemplateField[];
 }
 
-export interface EditorTemplate extends Template {
+export interface EditorTemplate extends Omit<Template, 'sections'> {
   sections: EditorTemplateSection[];
 }
