@@ -65,7 +65,7 @@ import {
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
-import DragDropList from './DragDropList';
+import TemplateEditor from './TemplateEditor';
 
 interface TemplateData {
   id: number;
@@ -91,6 +91,14 @@ interface LibraryTemplate {
   sampleNote?: string;
 }
 
+interface TemplateSection {
+  id: string;
+  title: string;
+  content: string;
+  type: 'text' | 'list' | 'checkbox' | 'dropdown';
+  options?: string[];
+}
+
 const TemplateBuilder: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -102,6 +110,7 @@ const TemplateBuilder: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<'consultTypes' | 'templates' | 'templateEditor' | 'templateView'>('consultTypes');
   const [selectedConsultType, setSelectedConsultType] = useState<ConsultType | null>(null);
   const [viewingTemplate, setViewingTemplate] = useState<TemplateData | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<TemplateData | null>(null);
   
   // Modal states
   const [openCreateTemplate, setOpenCreateTemplate] = useState(false);
@@ -109,7 +118,7 @@ const TemplateBuilder: React.FC = () => {
   const [openAddType, setOpenAddType] = useState(false);
   const [showTemplate, setShowTemplate] = useState(false);
   const [templateMethod, setTemplateMethod] = useState<any>({});
-  const [sectionList, setSectionList] = useState<any[]>([]);
+  const [sectionList, setSectionList] = useState<TemplateSection[]>([]);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
   const [openAddSection, setOpenAddSection] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
@@ -417,10 +426,19 @@ const TemplateBuilder: React.FC = () => {
   };
 
   const handleTemplateEdit = (template: TemplateData) => {
+    setEditingTemplate(template);
     setCurrentScreen('templateEditor');
-    setOpenModifyTemplate(true);
-    setShowTemplate(true);
-    setSectionList([]);
+    
+    // Convert template content to sections for the editor
+    const defaultSections: TemplateSection[] = [
+      {
+        id: 'section-1',
+        title: 'Template Content',
+        content: template.content || 'No content available',
+        type: 'text'
+      }
+    ];
+    setSectionList(defaultSections);
   };
 
   const handleTemplateView = (template: TemplateData) => {
@@ -438,6 +456,7 @@ const TemplateBuilder: React.FC = () => {
     setOpenModifyTemplate(false);
     setShowTemplate(false);
     setViewingTemplate(null);
+    setEditingTemplate(null);
   };
 
   const handleCreateTemplateMethod = (method: any) => {
@@ -464,6 +483,14 @@ const TemplateBuilder: React.FC = () => {
       setNewTypeName('');
       setOpenAddType(false);
     }
+  };
+
+  const handleSaveTemplate = (sections: TemplateSection[]) => {
+    console.log('Saving template with sections:', sections);
+    setSectionList(sections);
+    // Here you would typically save the template to your backend
+    // For now, just go back to templates list
+    handleBackToTemplates();
   };
 
   const onCreateTemplate = async () => {
@@ -1342,32 +1369,22 @@ const TemplateBuilder: React.FC = () => {
   );
 
   // Render Template Editor Screen
-  const renderTemplateEditor = () => (
-    <Box sx={{ p: 3 }}>
-      <Box display="flex" alignItems="center" mb={3}>
-        <IconButton 
-          onClick={handleBackToTemplates}
-          sx={{ mr: 2, color: bravoColors.primaryFlat }}
-        >
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-          Verify Template Changes
-        </Typography>
-      </Box>
-      
-      <Typography sx={{ fontSize: 14, color: "#808080", width: '70%', mb: 4 }}>
-        Based on its analysis, the AI has generated documentation improvements tailored to your template. 
-        Please review and approve the suggested edits below.
-      </Typography>
-
-      <DragDropList onFinalApi={() => {}} />
-    </Box>
-  );
+  const renderTemplateEditor = () => {
+    if (!editingTemplate) return null;
+    
+    return (
+      <TemplateEditor
+        templateName={editingTemplate.title}
+        initialSections={sectionList}
+        onSave={handleSaveTemplate}
+        onBack={handleBackToTemplates}
+      />
+    );
+  };
 
   // Main render logic for My Templates tab
   const renderMyTemplatesContent = () => {
-    if (currentScreen === 'templateEditor' && openModifyTemplate && showTemplate) {
+    if (currentScreen === 'templateEditor' && editingTemplate) {
       return renderTemplateEditor();
     }
 
