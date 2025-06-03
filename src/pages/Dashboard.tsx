@@ -22,7 +22,9 @@ import {
   User, 
   History, 
   Menu as MenuIcon, 
-  X as CloseIcon 
+  X as CloseIcon,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { bravoColors } from '@/theme/colors';
 
@@ -159,7 +161,7 @@ export const Dashboard: React.FC = () => {
               src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
               alt="S10.AI Logo"
               sx={{
-                height: 32,
+                height: 40,
                 mb: 1,
                 objectFit: 'contain'
               }}
@@ -174,8 +176,8 @@ export const Dashboard: React.FC = () => {
             src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
             alt="S10.AI"
             sx={{
-              height: 28,
-              width: 28,
+              height: 36,
+              width: 36,
               objectFit: 'contain'
             }}
           />
@@ -239,12 +241,14 @@ export const Dashboard: React.FC = () => {
             sx={{
               width: '100%',
               color: 'white',
+              display: 'flex',
+              justifyContent: 'center',
               '&:hover': {
                 backgroundColor: 'rgba(255, 255, 255, 0.1)'
               }
             }}
           >
-            <MenuIcon size={20} />
+            {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
           </IconButton>
         </Box>
       )}
@@ -333,7 +337,7 @@ export const Dashboard: React.FC = () => {
                 background: bravoColors.primary,
                 transition: theme.transitions.create('width', {
                   easing: theme.transitions.easing.sharp,
-                  duration: theme.transitions.duration.leavingScreen
+                  duration: theme.transitions.duration.enteringScreen
                 }),
                 overflowX: 'hidden'
               }
@@ -356,7 +360,7 @@ export const Dashboard: React.FC = () => {
           mt: { xs: 9, md: 0 },
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen
+            duration: theme.transitions.duration.enteringScreen
           })
         }}
       >
