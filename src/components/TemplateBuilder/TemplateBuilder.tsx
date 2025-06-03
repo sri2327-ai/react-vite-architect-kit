@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Card,
   CardContent,
-  Grid,
   TextField,
   Dialog,
   Chip,
@@ -486,159 +486,7 @@ const TemplateBuilder: React.FC = () => {
             Please review and approve the suggested edits below.
           </Typography>
 
-          <Stack spacing={3}>
-            {sectionList.map((item, idx) => (
-              <Card
-                key={idx}
-                elevation={3}
-                sx={{
-                  bgcolor: "white",
-                  borderRadius: 2,
-                  border: `2px solid ${bravoColors.secondary}`,
-                  "&:hover": {
-                    boxShadow: "0px 8px 16px rgba(0,0,0,0.15)",
-                  },
-                }}
-              >
-                <CardContent>
-                  <Box display="flex" flexDirection="column" gap={2}>
-                    <Box display="flex" flexDirection="column" gap={1}>
-                      <Typography sx={{ color: bravoColors.text.primary, fontSize: 18, fontWeight: 600 }}>
-                        {item.name}
-                      </Typography>
-                      <Chip 
-                        icon={item.type === 'bulleted_list' ? <FormatListBulletedIcon /> : <DescriptionIcon />} 
-                        label={item.type} 
-                        size="small" 
-                        sx={{ 
-                          width: 150,
-                          backgroundColor: bravoColors.highlight.selected,
-                          color: bravoColors.primaryFlat
-                        }}
-                      />
-                      {!item.is_editing && (
-                        <Typography sx={{ color: "#808080", fontSize: 14 }}>
-                          Description: {item.description}
-                        </Typography>
-                      )}
-                    </Box>
-
-                    {item.is_editing ? (
-                      <>
-                        <TextField
-                          fullWidth
-                          variant="outlined"
-                          autoFocus
-                          value={item.temp_description || ''}
-                          onChange={(event) => editItem(idx, "temp_description", event.target.value)}
-                          size="small"
-                        />
-                        <Box display="flex" gap={2}>
-                          <Button
-                            onClick={() => {
-                              editItem(idx, "description", item.temp_description);
-                              editItem(idx, "is_editing", false);
-                            }}
-                            variant="contained"
-                            startIcon={<SaveIcon />}
-                            size="small"
-                          >
-                            Save
-                          </Button>
-                          <Button
-                            onClick={() => editItem(idx, "is_editing", false)}
-                            variant="outlined"
-                            startIcon={<DoDisturbIcon />}
-                            size="small"
-                          >
-                            Cancel
-                          </Button>
-                        </Box>
-                      </>
-                    ) : item.is_editing_template ? (
-                      <>
-                        <TextField
-                          fullWidth
-                          variant="outlined"
-                          multiline
-                          rows={6}
-                          autoFocus
-                          value={item.temp_template || ''}
-                          onChange={(event) => editItem(idx, "temp_template", event.target.value)}
-                          size="small"
-                        />
-                        <Box display="flex" gap={2}>
-                          <Button
-                            onClick={() => {
-                              editItem(idx, "paste_template", item.temp_template);
-                              editItem(idx, "is_editing_template", false);
-                            }}
-                            variant="contained"
-                            startIcon={<SaveIcon />}
-                            size="small"
-                          >
-                            Save template
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              editItem(idx, "is_editing_template", false);
-                              editItem(idx, "temp_template", "");
-                            }}
-                            variant="outlined"
-                            startIcon={<DoDisturbIcon />}
-                            size="small"
-                          >
-                            Cancel
-                          </Button>
-                        </Box>
-                      </>
-                    ) : (
-                      <Box display="flex" gap={2} flexWrap="wrap">
-                        <Button
-                          onClick={() => {
-                            editItem(idx, "temp_description", item.description);
-                            editItem(idx, "is_editing", true);
-                          }}
-                          variant="contained"
-                          startIcon={<EditIcon />}
-                          size="small"
-                        >
-                          Modify Instruction
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            editItem(idx, "temp_template", item.paste_template);
-                            editItem(idx, "is_editing_template", true);
-                          }}
-                          variant="contained"
-                          startIcon={<CopyAllIcon />}
-                          size="small"
-                        >
-                          Paste Template
-                        </Button>
-                        <Button
-                          onClick={() => deleteItem(idx)}
-                          variant="outlined"
-                          startIcon={<DeleteIcon />}
-                          size="small"
-                          sx={{
-                            borderColor: '#d32f2f',
-                            color: '#d32f2f',
-                            '&:hover': {
-                              borderColor: '#b71c1c',
-                              backgroundColor: 'rgba(211, 47, 47, 0.04)'
-                            }
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </Box>
-                    )}
-                  </Box>
-                </CardContent>
-              </Card>
-            ))}
-          </Stack>
+          <DragDropList onFinalApi={() => {}} />
         </Box>
       );
     }
@@ -721,9 +569,9 @@ const TemplateBuilder: React.FC = () => {
             </Typography>
           </DialogTitle>
           <DialogContent>
-            <Grid container spacing={3} sx={{ mt: 1 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mt: 1 }}>
               {createTemplateItems.map((item) => (
-                <Grid xs={12} sm={6} md={4} key={item.type}>
+                <Box key={item.type} sx={{ flexBasis: 'calc(33.333% - 16px)', minWidth: 250 }}>
                   <Card
                     elevation={2}
                     sx={{
@@ -751,9 +599,9 @@ const TemplateBuilder: React.FC = () => {
                       </Box>
                     </CardContent>
                   </Card>
-                </Grid>
+                </Box>
               ))}
-            </Grid>
+            </Box>
 
             {Object.keys(templateMethod).length > 0 && (
               <Box sx={{ mt: 4 }}>
@@ -761,8 +609,8 @@ const TemplateBuilder: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 2, color: bravoColors.primaryFlat }}>
                   Template Details
                 </Typography>
-                <Grid container spacing={2}>
-                  <Grid xs={12} sm={6}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                  <Box sx={{ flexBasis: 'calc(50% - 8px)', minWidth: 250 }}>
                     <Controller
                       name="template_name"
                       control={control}
@@ -778,8 +626,8 @@ const TemplateBuilder: React.FC = () => {
                         />
                       )}
                     />
-                  </Grid>
-                  <Grid xs={12} sm={6}>
+                  </Box>
+                  <Box sx={{ flexBasis: 'calc(50% - 8px)', minWidth: 250 }}>
                     <FormControl fullWidth size="small">
                       <InputLabel>Consultation Type</InputLabel>
                       <Select
@@ -792,8 +640,8 @@ const TemplateBuilder: React.FC = () => {
                         <MenuItem value="routine">Routine Check</MenuItem>
                       </Select>
                     </FormControl>
-                  </Grid>
-                  <Grid xs={12}>
+                  </Box>
+                  <Box sx={{ width: '100%' }}>
                     <Controller
                       name="description"
                       control={control}
@@ -808,8 +656,8 @@ const TemplateBuilder: React.FC = () => {
                         />
                       )}
                     />
-                  </Grid>
-                </Grid>
+                  </Box>
+                </Box>
               </Box>
             )}
           </DialogContent>

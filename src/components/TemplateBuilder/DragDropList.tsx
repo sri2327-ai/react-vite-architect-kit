@@ -164,7 +164,14 @@ function FieldCard({ id, item }: { id: string; item: FieldItem }) {
 
   return (
     <>
-      <Grid item xs={12} ref={setNodeRef} {...attributes}>
+      <Box
+        ref={setNodeRef}
+        {...attributes}
+        sx={{
+          width: "100%",
+          mb: 2,
+        }}
+      >
         <Box
           sx={{
             bgcolor: "white",
@@ -256,7 +263,7 @@ function FieldCard({ id, item }: { id: string; item: FieldItem }) {
             </Box>
           </Box>
         </Box>
-      </Grid>
+      </Box>
 
       {/* Help Me Dialog */}
       <Dialog
@@ -373,18 +380,17 @@ const DragDropList: React.FC<DragDropListProps> = ({ onFinalApi }) => {
     <Box sx={{ padding: 2 }}>
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={fields} strategy={rectSortingStrategy}>
-          <Grid container spacing={2} sx={{
+          <Box sx={{
             maxHeight: "65vh",
             overflowY: "auto",
             overflowX: "hidden",
             width: "100%",
             paddingRight: 1,
-            margin: 0,
           }}>
             {fields.map((item) => (
               <FieldCard key={item.id} id={item.id} item={item} />
             ))}
-          </Grid>
+          </Box>
         </SortableContext>
       </DndContext>
     </Box>
