@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef } from 'react';
 import {
   Box,
@@ -285,114 +284,121 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onSave, onCancel }) =>
 
   return (
     <Box sx={{ pt: 1 }}>
-      <Grid container spacing={2}>
-        <Grid xs={12} md={6}>
-          <TextField
-            fullWidth
-            label="Field Label"
-            value={editedField.label}
-            onChange={(e) => setEditedField(prev => ({ ...prev, label: e.target.value }))}
-            size="small"
-          />
-        </Grid>
-        <Grid xs={12} md={6}>
-          <FormControl fullWidth size="small">
-            <InputLabel>Field Type</InputLabel>
-            <Select
-              value={editedField.type}
-              label="Field Type"
-              onChange={(e) => setEditedField(prev => ({ 
-                ...prev, 
-                type: e.target.value as TemplateField['type']
-              }))}
-            >
-              {FIELD_TYPES.map((type) => (
-                <MenuItem key={type.value} value={type.value}>
-                  {type.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid xs={12}>
-          <TextField
-            fullWidth
-            label="Placeholder Text"
-            value={editedField.placeholder || ''}
-            onChange={(e) => setEditedField(prev => ({ ...prev, placeholder: e.target.value }))}
-            size="small"
-          />
-        </Grid>
-        <Grid xs={12}>
-          <TextField
-            fullWidth
-            label="Description"
-            value={editedField.description || ''}
-            onChange={(e) => setEditedField(prev => ({ ...prev, description: e.target.value }))}
-            multiline
-            rows={2}
-            size="small"
-          />
-        </Grid>
-        <Grid xs={6}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={editedField.required}
-                onChange={(e) => setEditedField(prev => ({ ...prev, required: e.target.checked }))}
-              />
-            }
-            label="Required Field"
-          />
-        </Grid>
-        <Grid xs={6}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={editedField.visible}
-                onChange={(e) => setEditedField(prev => ({ ...prev, visible: e.target.checked }))}
-              />
-            }
-            label="Visible"
-          />
-        </Grid>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
+        gap: 2,
+        mb: 2
+      }}>
+        <TextField
+          fullWidth
+          label="Field Label"
+          value={editedField.label}
+          onChange={(e) => setEditedField(prev => ({ ...prev, label: e.target.value }))}
+          size="small"
+        />
+        <FormControl fullWidth size="small">
+          <InputLabel>Field Type</InputLabel>
+          <Select
+            value={editedField.type}
+            label="Field Type"
+            onChange={(e) => setEditedField(prev => ({ 
+              ...prev, 
+              type: e.target.value as TemplateField['type']
+            }))}
+          >
+            {FIELD_TYPES.map((type) => (
+              <MenuItem key={type.value} value={type.value}>
+                {type.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
 
-        {(editedField.type === 'DROPDOWN' || editedField.type === 'RADIO') && (
-          <Grid xs={12}>
-            <Typography variant="subtitle2" sx={{ mb: 1 }}>
-              Options
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-              <TextField
-                fullWidth
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          label="Placeholder Text"
+          value={editedField.placeholder || ''}
+          onChange={(e) => setEditedField(prev => ({ ...prev, placeholder: e.target.value }))}
+          size="small"
+        />
+      </Box>
+
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          label="Description"
+          value={editedField.description || ''}
+          onChange={(e) => setEditedField(prev => ({ ...prev, description: e.target.value }))}
+          multiline
+          rows={2}
+          size="small"
+        />
+      </Box>
+
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
+        gap: 2,
+        mb: 2
+      }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={editedField.required}
+              onChange={(e) => setEditedField(prev => ({ ...prev, required: e.target.checked }))}
+            />
+          }
+          label="Required Field"
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={editedField.visible}
+              onChange={(e) => setEditedField(prev => ({ ...prev, visible: e.target.checked }))}
+            />
+          }
+          label="Visible"
+        />
+      </Box>
+
+      {(editedField.type === 'DROPDOWN' || editedField.type === 'RADIO') && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+            Options
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Add new option"
+              value={newOption}
+              onChange={(e) => setNewOption(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddOption();
+                }
+              }}
+            />
+            <Button variant="outlined" onClick={handleAddOption}>
+              Add
+            </Button>
+          </Box>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            {editedField.options?.map((option, index) => (
+              <Chip
+                key={index}
+                label={option}
+                onDelete={() => handleRemoveOption(index)}
                 size="small"
-                placeholder="Add new option"
-                value={newOption}
-                onChange={(e) => setNewOption(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddOption();
-                  }
-                }}
               />
-              <Button variant="outlined" onClick={handleAddOption}>
-                Add
-              </Button>
-            </Box>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {editedField.options?.map((option, index) => (
-                <Chip
-                  key={index}
-                  label={option}
-                  onDelete={() => handleRemoveOption(index)}
-                  size="small"
-                />
-              ))}
-            </Box>
-          </Grid>
-        )}
-      </Grid>
+            ))}
+          </Box>
+        </Box>
+      )}
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 3 }}>
         <Button onClick={onCancel}>
@@ -567,202 +573,202 @@ export const TemplateEditor: React.FC = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <Box sx={{ height: '100%', overflow: 'auto', p: 3 }}>
-        <Grid container spacing={3}>
-          <Grid xs={12} md={8}>
-            <Paper sx={{ p: 3, height: 'fit-content' }}>
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h5" gutterBottom>
-                  Template Editor
-                </Typography>
-                <TextField
-                  fullWidth
-                  label="Template Name"
-                  value={template.name}
-                  onChange={(e) => setTemplate(prev => ({ ...prev, name: e.target.value }))}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  fullWidth
-                  label="Template Description"
-                  value={template.description || ''}
-                  onChange={(e) => setTemplate(prev => ({ ...prev, description: e.target.value }))}
-                  multiline
-                  rows={2}
-                />
-              </Box>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, 
+          gap: 3 
+        }}>
+          <Paper sx={{ p: 3, height: 'fit-content' }}>
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h5" gutterBottom>
+                Template Editor
+              </Typography>
+              <TextField
+                fullWidth
+                label="Template Name"
+                value={template.name}
+                onChange={(e) => setTemplate(prev => ({ ...prev, name: e.target.value }))}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                fullWidth
+                label="Template Description"
+                value={template.description || ''}
+                onChange={(e) => setTemplate(prev => ({ ...prev, description: e.target.value }))}
+                multiline
+                rows={2}
+              />
+            </Box>
 
-              <Divider sx={{ my: 3 }} />
+            <Divider sx={{ my: 3 }} />
 
-              {template.sections.map((section) => (
-                <Paper key={section.id} sx={{ p: 3, mb: 3, border: '1px solid', borderColor: 'divider' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h6">{section.title}</Typography>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      startIcon={<AddIcon />}
-                      onClick={() => handleAddField(section.id)}
+            {template.sections.map((section) => (
+              <Paper key={section.id} sx={{ p: 3, mb: 3, border: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                  <Typography variant="h6">{section.title}</Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={() => handleAddField(section.id)}
+                  >
+                    Add Field
+                  </Button>
+                </Box>
+
+                {section.description && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {section.description}
+                  </Typography>
+                )}
+
+                <Box>
+                  {section.fields.map((field, index) => (
+                    <DraggableField
+                      key={field.id}
+                      field={field}
+                      index={index}
+                      sectionId={section.id}
+                      onEdit={(field) => handleEditField(field, section.id)}
+                      onDelete={(fieldId) => handleDeleteField(section.id, fieldId)}
+                      onDuplicate={(field) => handleDuplicateField(section.id, field)}
+                      onMove={(dragIndex, hoverIndex) => handleMoveField(section.id, dragIndex, hoverIndex)}
+                      onToggleVisibility={(fieldId) => handleToggleFieldVisibility(section.id, fieldId)}
+                    />
+                  ))}
+
+                  {section.fields.length === 0 && (
+                    <Box
+                      sx={{
+                        p: 4,
+                        textAlign: 'center',
+                        border: '2px dashed',
+                        borderColor: 'grey.300',
+                        borderRadius: 1,
+                        backgroundColor: 'grey.50'
+                      }}
                     >
-                      Add Field
-                    </Button>
-                  </Box>
+                      <Typography variant="body2" color="text.secondary">
+                        No fields in this section. Click "Add Field" to get started.
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+              </Paper>
+            ))}
 
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={handleAddSection}
+              fullWidth
+              sx={{ mt: 2 }}
+            >
+              Add Section
+            </Button>
+          </Paper>
+
+          <Paper sx={{ p: 3, position: 'sticky', top: 0 }}>
+            <Typography variant="h6" gutterBottom>
+              Template Preview
+            </Typography>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              This is how your template will appear to users
+            </Alert>
+            
+            {/* Template Preview Content */}
+            <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 2 }}>
+              <Typography variant="h6" gutterBottom>
+                {template.name}
+              </Typography>
+              {template.description && (
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  {template.description}
+                </Typography>
+              )}
+              
+              {template.sections.filter(s => s.visible).map((section) => (
+                <Box key={section.id} sx={{ mb: 3 }}>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                    {section.title}
+                  </Typography>
                   {section.description && (
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       {section.description}
                     </Typography>
                   )}
-
-                  <Box>
-                    {section.fields.map((field, index) => (
-                      <DraggableField
-                        key={field.id}
-                        field={field}
-                        index={index}
-                        sectionId={section.id}
-                        onEdit={(field) => handleEditField(field, section.id)}
-                        onDelete={(fieldId) => handleDeleteField(section.id, fieldId)}
-                        onDuplicate={(field) => handleDuplicateField(section.id, field)}
-                        onMove={(dragIndex, hoverIndex) => handleMoveField(section.id, dragIndex, hoverIndex)}
-                        onToggleVisibility={(fieldId) => handleToggleFieldVisibility(section.id, fieldId)}
-                      />
-                    ))}
-
-                    {section.fields.length === 0 && (
-                      <Box
-                        sx={{
-                          p: 4,
-                          textAlign: 'center',
-                          border: '2px dashed',
-                          borderColor: 'grey.300',
-                          borderRadius: 1,
-                          backgroundColor: 'grey.50'
-                        }}
-                      >
-                        <Typography variant="body2" color="text.secondary">
-                          No fields in this section. Click "Add Field" to get started.
-                        </Typography>
-                      </Box>
-                    )}
-                  </Box>
-                </Paper>
-              ))}
-
-              <Button
-                variant="outlined"
-                startIcon={<AddIcon />}
-                onClick={handleAddSection}
-                fullWidth
-                sx={{ mt: 2 }}
-              >
-                Add Section
-              </Button>
-            </Paper>
-          </Grid>
-
-          <Grid xs={12} md={4}>
-            <Paper sx={{ p: 3, position: 'sticky', top: 0 }}>
-              <Typography variant="h6" gutterBottom>
-                Template Preview
-              </Typography>
-              <Alert severity="info" sx={{ mb: 2 }}>
-                This is how your template will appear to users
-              </Alert>
-              
-              {/* Template Preview Content */}
-              <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1, p: 2 }}>
-                <Typography variant="h6" gutterBottom>
-                  {template.name}
-                </Typography>
-                {template.description && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                    {template.description}
-                  </Typography>
-                )}
-                
-                {template.sections.filter(s => s.visible).map((section) => (
-                  <Box key={section.id} sx={{ mb: 3 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                      {section.title}
-                    </Typography>
-                    {section.description && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        {section.description}
+                  
+                  {section.fields.filter(f => f.visible).map((field) => (
+                    <Box key={field.id} sx={{ mb: 2 }}>
+                      <Typography variant="body2" sx={{ mb: 1 }}>
+                        {field.label}
+                        {field.required && <span style={{ color: 'red' }}> *</span>}
                       </Typography>
-                    )}
-                    
-                    {section.fields.filter(f => f.visible).map((field) => (
-                      <Box key={field.id} sx={{ mb: 2 }}>
-                        <Typography variant="body2" sx={{ mb: 1 }}>
-                          {field.label}
-                          {field.required && <span style={{ color: 'red' }}> *</span>}
-                        </Typography>
-                        {field.type === 'TEXT' && (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            placeholder={field.placeholder}
-                            disabled
-                          />
-                        )}
-                        {field.type === 'TEXTAREA' && (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            multiline
-                            rows={3}
-                            placeholder={field.placeholder}
-                            disabled
-                          />
-                        )}
-                        {field.type === 'NUMBER' && (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            type="number"
-                            placeholder={field.placeholder}
-                            disabled
-                          />
-                        )}
-                        {field.type === 'DATE' && (
-                          <TextField
-                            fullWidth
-                            size="small"
-                            type="date"
-                            disabled
-                          />
-                        )}
-                        {field.type === 'DROPDOWN' && (
-                          <Select
-                            fullWidth
-                            size="small"
-                            disabled
-                            displayEmpty
-                          >
-                            <MenuItem value="">
-                              {field.placeholder || 'Select an option'}
+                      {field.type === 'TEXT' && (
+                        <TextField
+                          fullWidth
+                          size="small"
+                          placeholder={field.placeholder}
+                          disabled
+                        />
+                      )}
+                      {field.type === 'TEXTAREA' && (
+                        <TextField
+                          fullWidth
+                          size="small"
+                          multiline
+                          rows={3}
+                          placeholder={field.placeholder}
+                          disabled
+                        />
+                      )}
+                      {field.type === 'NUMBER' && (
+                        <TextField
+                          fullWidth
+                          size="small"
+                          type="number"
+                          placeholder={field.placeholder}
+                          disabled
+                        />
+                      )}
+                      {field.type === 'DATE' && (
+                        <TextField
+                          fullWidth
+                          size="small"
+                          type="date"
+                          disabled
+                        />
+                      )}
+                      {field.type === 'DROPDOWN' && (
+                        <Select
+                          fullWidth
+                          size="small"
+                          disabled
+                          displayEmpty
+                        >
+                          <MenuItem value="">
+                            {field.placeholder || 'Select an option'}
+                          </MenuItem>
+                          {field.options?.map((option, idx) => (
+                            <MenuItem key={idx} value={option}>
+                              {option}
                             </MenuItem>
-                            {field.options?.map((option, idx) => (
-                              <MenuItem key={idx} value={option}>
-                                {option}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        )}
-                        {field.type === 'CHECKBOX' && (
-                          <FormControlLabel
-                            control={<Switch disabled size="small" />}
-                            label={field.placeholder || 'Check this option'}
-                          />
-                        )}
-                      </Box>
-                    ))}
-                  </Box>
-                ))}
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
+                          ))}
+                        </Select>
+                      )}
+                      {field.type === 'CHECKBOX' && (
+                        <FormControlLabel
+                          control={<Switch disabled size="small" />}
+                          label={field.placeholder || 'Check this option'}
+                        />
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              ))}
+            </Box>
+          </Paper>
+        </Box>
 
         {/* Field Editor Dialog */}
         <Dialog 
