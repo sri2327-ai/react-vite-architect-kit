@@ -3,7 +3,7 @@ import {
   Box,
   Card,
   CardContent,
-  Grid,
+  Grid2 as Grid,
   TextField,
   Dialog,
   Chip,
@@ -723,7 +723,7 @@ const TemplateBuilder: React.FC = () => {
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
               {createTemplateItems.map((item) => (
-                <Grid item xs={12} sm={6} md={4} key={item.type}>
+                <Grid xs={12} sm={6} md={4} key={item.type}>
                   <Card
                     elevation={2}
                     sx={{
@@ -762,7 +762,7 @@ const TemplateBuilder: React.FC = () => {
                   Template Details
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid xs={12} sm={6}>
                     <Controller
                       name="template_name"
                       control={control}
@@ -779,7 +779,7 @@ const TemplateBuilder: React.FC = () => {
                       )}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid xs={12} sm={6}>
                     <FormControl fullWidth size="small">
                       <InputLabel>Consultation Type</InputLabel>
                       <Select
@@ -793,7 +793,7 @@ const TemplateBuilder: React.FC = () => {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid xs={12}>
                     <Controller
                       name="description"
                       control={control}
