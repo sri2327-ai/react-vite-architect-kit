@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -180,7 +179,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             </Typography>
             <Grid container spacing={2}>
               {createTemplateOptions.map((option) => (
-                <Grid item xs={12} sm={6} key={option.id}>
+                <Grid size={{ xs: 12, sm: 6 }} key={option.id}>
                   <Card 
                     sx={{ 
                       height: '100%',
@@ -233,7 +232,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <Chip 
                 icon={selectedMethod?.icon} 
-                label={selectedMethod?.title || ''}
+                label={<span>{selectedMethod?.title || ''}</span>}
                 color="primary"
                 sx={{ mr: 2 }}
               />
