@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -19,7 +18,7 @@ import {
   Chip,
   Stack,
   Divider,
-  Grid,
+  Grid2 as Grid,
   List,
   ListItem,
   ListItemText,
@@ -651,7 +650,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
 
           <Grid container spacing={2}>
             {PREDEFINED_SECTIONS.map((section) => (
-              <Grid item xs={12} md={4} key={section.id}>
+              <Grid xs={12} md={4} key={section.id}>
                 <Card
                   sx={{
                     cursor: 'pointer',
