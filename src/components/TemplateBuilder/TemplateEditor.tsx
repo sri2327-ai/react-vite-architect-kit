@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -662,7 +663,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
             </Typography>
             <Grid container spacing={2}>
               {PREDEFINED_SECTIONS.map((section) => (
-                <Grid item key={section.id} xs={12} md={6}>
+                <Grid key={section.id} xs={12} md={6}>
                   <Card 
                     sx={{ 
                       cursor: 'pointer',
@@ -771,3 +772,4 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
 };
 
 export default TemplateEditor;
+
