@@ -45,11 +45,13 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
 
   return (
     <Box sx={{ 
-      minHeight: '60vh',
+      height: '100%',
       display: 'flex', 
-      flexDirection: 'column'
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
-      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: { xs: 1, sm: 1.5 }, flexShrink: 0 }}>
         <Typography
           variant="h3"
           sx={{
@@ -58,8 +60,8 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 1,
-            fontSize: { xs: '1.5rem', sm: '2rem' }
+            mb: 0.5,
+            fontSize: { xs: '1.3rem', sm: '1.6rem' }
           }}
         >
           Professional Information
@@ -69,7 +71,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           color="text.secondary"
           sx={{ 
             fontWeight: 500,
-            fontSize: { xs: '0.9rem', sm: '1rem' },
+            fontSize: { xs: '0.8rem', sm: '0.9rem' },
             maxWidth: 400,
             mx: 'auto'
           }}
@@ -78,7 +80,8 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {/* Content with controlled height */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         <Card
           sx={{
             flex: 1,
@@ -86,11 +89,23 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             border: '1px solid #F0F8FF',
             backgroundColor: 'background.paper',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            minHeight: 0
           }}
         >
-          <CardContent sx={{ p: { xs: 2, sm: 3 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+          <CardContent sx={{ 
+            p: { xs: 1.5, sm: 2 }, 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column',
+            minHeight: 0
+          }}>
+            <Box component="form" onSubmit={handleSubmit} sx={{ 
+              flex: 1, 
+              display: 'flex', 
+              flexDirection: 'column',
+              overflow: 'auto'
+            }}>
               <TextField
                 fullWidth
                 label="Phone Number"
@@ -103,7 +118,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Phone size={16} color="#888888" />
+                      <Phone size={14} color="#888888" />
                     </InputAdornment>
                   ),
                 }}
@@ -116,12 +131,12 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 value={formData.specialty}
                 onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
                 required
-                sx={{ mb: 2 }}
+                sx={{ mb: 1.5 }}
                 size="small"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Stethoscope size={16} color="#888888" />
+                      <Stethoscope size={14} color="#888888" />
                     </InputAdornment>
                   ),
                 }}
@@ -133,14 +148,14 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 ))}
               </TextField>
 
-              <FormControl component="fieldset" sx={{ flex: 1 }}>
+              <FormControl component="fieldset" sx={{ flex: 1, minHeight: 0 }}>
                 <FormLabel
                   component="legend"
                   sx={{
                     color: 'text.primary',
                     fontWeight: 700,
-                    mb: 1.5,
-                    fontSize: '1rem'
+                    mb: 1,
+                    fontSize: '0.9rem'
                   }}
                 >
                   Documentation Mode
@@ -152,7 +167,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 >
                   <Card
                     sx={{
-                      mb: 1.5,
+                      mb: 1,
                       cursor: 'pointer',
                       border: formData.ehrMode ? '2px solid #387E89' : '1px solid #E0E7FF',
                       borderRadius: 2,
@@ -168,11 +183,11 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                         value={true}
                         control={<Radio sx={{ display: 'none' }} />}
                         label={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                            <Database size={20} color={formData.ehrMode ? '#387E89' : '#888888'} />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%' }}>
+                            <Database size={18} color={formData.ehrMode ? '#387E89' : '#888888'} />
                             <Box sx={{ flex: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 0.5 }}>
-                                <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.95rem' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+                                <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.85rem' }}>
                                   EHR Integration Mode
                                 </Typography>
                                 <Chip 
@@ -181,11 +196,12 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                                   sx={{
                                     backgroundColor: '#E8F5E8',
                                     color: '#2E7D32',
-                                    fontSize: '0.7rem'
+                                    fontSize: '0.65rem',
+                                    height: 18
                                   }}
                                 />
                               </Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                                 Connect with your EHR system for seamless workflow
                               </Typography>
                             </Box>
@@ -213,11 +229,11 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                         value={false}
                         control={<Radio sx={{ display: 'none' }} />}
                         label={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                            <X size={20} color={!formData.ehrMode ? '#387E89' : '#888888'} />
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%' }}>
+                            <X size={18} color={!formData.ehrMode ? '#387E89' : '#888888'} />
                             <Box sx={{ flex: 1 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 0.5 }}>
-                                <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.95rem' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+                                <Typography variant="h6" fontWeight={700} sx={{ fontSize: '0.85rem' }}>
                                   No EHR Mode
                                 </Typography>
                                 <Chip 
@@ -226,11 +242,12 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                                   sx={{
                                     backgroundColor: '#FFF8E8',
                                     color: '#F57C00',
-                                    fontSize: '0.7rem'
+                                    fontSize: '0.65rem',
+                                    height: 18
                                   }}
                                 />
                               </Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                                 Start documenting immediately without EHR integration
                               </Typography>
                             </Box>
@@ -246,20 +263,23 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           </CardContent>
         </Card>
 
+        {/* Fixed buttons at bottom */}
         <Box sx={{ 
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
+          gap: 1.5,
           flexShrink: 0,
-          pt: 2
+          pt: 1.5,
+          mt: 'auto'
         }}>
           <SecondaryButton
             onClick={onBack}
             sx={{ 
               flex: 1,
               order: { xs: 2, sm: 1 },
-              py: 1.5,
-              borderRadius: 2
+              py: { xs: 1.2, sm: 1.5 },
+              borderRadius: 2,
+              fontSize: { xs: '0.85rem', sm: '0.9rem' }
             }}
           >
             ← Back
@@ -270,10 +290,10 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             sx={{ 
               flex: 2, 
               order: { xs: 1, sm: 2 },
-              py: 1.5,
+              py: { xs: 1.2, sm: 1.5 },
               fontWeight: 700,
               borderRadius: 2,
-              fontSize: { xs: '0.9rem', sm: '1rem' }
+              fontSize: { xs: '0.85rem', sm: '0.9rem' }
             }}
           >
             Continue to {formData.ehrMode ? 'EHR Setup' : 'Configuration'} →

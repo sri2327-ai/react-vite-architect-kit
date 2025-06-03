@@ -65,11 +65,13 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
 
   return (
     <Box sx={{ 
-      minHeight: '60vh',
+      height: '100%',
       display: 'flex', 
-      flexDirection: 'column'
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
-      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: { xs: 1, sm: 1.5 }, flexShrink: 0 }}>
         <Typography
           variant="h3"
           sx={{
@@ -78,8 +80,8 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 1,
-            fontSize: { xs: '1.5rem', sm: '2rem' }
+            mb: 0.5,
+            fontSize: { xs: '1.3rem', sm: '1.6rem' }
           }}
         >
           Create Your Account
@@ -89,7 +91,7 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
           color="text.secondary"
           sx={{ 
             fontWeight: 500,
-            fontSize: { xs: '0.9rem', sm: '1rem' },
+            fontSize: { xs: '0.8rem', sm: '0.9rem' },
             maxWidth: 400,
             mx: 'auto'
           }}
@@ -98,14 +100,16 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {/* Content with controlled height */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
         {error && (
           <Alert 
             severity="error" 
             sx={{ 
-              mb: 2, 
+              mb: 1.5, 
               borderRadius: 2,
-              flexShrink: 0
+              flexShrink: 0,
+              fontSize: '0.8rem'
             }}
           >
             {error}
@@ -119,226 +123,229 @@ export const AccountCreation: React.FC<AccountCreationProps> = ({ onNext, data }
             border: '1px solid #F0F8FF',
             backgroundColor: 'background.paper',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            minHeight: 0
           }}
         >
           <CardContent sx={{ 
-            p: { xs: 2, sm: 3 }, 
+            p: { xs: 1.5, sm: 2 }, 
             flex: 1, 
             display: 'flex', 
-            flexDirection: 'column'
+            flexDirection: 'column',
+            minHeight: 0,
+            overflow: 'auto'
           }}>
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              {!formData.isGoogleSignup && (
-                <>
-                  <SecondaryButton
-                    fullWidth
-                    onClick={handleGoogleSignup}
-                    startIcon={
-                      <Box 
-                        component="img" 
-                        src="https://developers.google.com/identity/images/g-logo.png" 
-                        alt="Google" 
-                        sx={{ width: 18, height: 18 }} 
-                      />
-                    }
-                    sx={{
-                      mb: 2,
-                      py: 1.5,
-                      fontSize: { xs: '0.9rem', sm: '1rem' },
-                      fontWeight: 600,
-                      borderRadius: 2
-                    }}
-                  >
-                    Continue with Google
-                  </SecondaryButton>
-
-                  <Divider sx={{ my: 1.5 }}>
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ 
-                        backgroundColor: 'background.paper',
-                        px: 2,
-                        fontSize: '0.85rem'
-                      }}
-                    >
-                      or create with email
-                    </Typography>
-                  </Divider>
-                </>
-              )}
-
-              <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
-                <Box sx={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                  gap: 1.5, 
-                  mb: 1.5 
-                }}>
-                  <TextField
-                    fullWidth
-                    label="First Name"
-                    value={formData.firstName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                    required
-                    disabled={formData.isGoogleSignup}
-                    size="small"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <User size={16} color="#888888" />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <TextField
-                    fullWidth
-                    label="Last Name"
-                    value={formData.lastName}
-                    onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                    required
-                    disabled={formData.isGoogleSignup}
-                    size="small"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <User size={16} color="#888888" />
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </Box>
-
-                <TextField
+            {!formData.isGoogleSignup && (
+              <>
+                <SecondaryButton
                   fullWidth
-                  label="Email Address"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                  disabled={formData.isGoogleSignup}
-                  sx={{ mb: 1.5 }}
-                  size="small"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Mail size={16} color="#888888" />
-                      </InputAdornment>
-                    ),
+                  onClick={handleGoogleSignup}
+                  startIcon={
+                    <Box 
+                      component="img" 
+                      src="https://developers.google.com/identity/images/g-logo.png" 
+                      alt="Google" 
+                      sx={{ width: 16, height: 16 }} 
+                    />
+                  }
+                  sx={{
+                    mb: 1.5,
+                    py: 1.2,
+                    fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                    fontWeight: 600,
+                    borderRadius: 2
                   }}
-                />
+                >
+                  Continue with Google
+                </SecondaryButton>
 
-                <TextField
-                  fullWidth
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                  sx={{ mb: 1.5 }}
-                  size="small"
-                  helperText="Minimum 8 characters"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Lock size={16} color="#888888" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                          size="small"
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-
-                <Box sx={{ mb: 1.5 }}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formData.agreedToBAA}
-                        onChange={(e) => setFormData(prev => ({ ...prev, agreedToBAA: e.target.checked }))}
-                        size="small"
-                      />
-                    }
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Shield size={14} color="#387E89" />
-                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                          I agree to the{' '}
-                          <Link href="#" color="primary" sx={{ textDecoration: 'none', fontWeight: 600 }}>
-                            Business Associate Agreement (BAA)
-                          </Link>
-                        </Typography>
-                      </Box>
-                    }
-                    sx={{ mb: 1 }}
-                  />
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={formData.agreedToTerms}
-                        onChange={(e) => setFormData(prev => ({ ...prev, agreedToTerms: e.target.checked }))}
-                        size="small"
-                      />
-                    }
-                    label={
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Shield size={14} color="#387E89" />
-                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                          I agree to the{' '}
-                          <Link href="#" color="primary" sx={{ textDecoration: 'none', fontWeight: 600 }}>
-                            Terms of Service
-                          </Link>
-                        </Typography>
-                      </Box>
-                    }
-                  />
-                </Box>
-
-                <Box sx={{ textAlign: 'center', mb: 1.5 }}>
+                <Divider sx={{ my: 1.5 }}>
                   <Typography 
                     variant="body2" 
                     color="text.secondary"
-                    sx={{ fontSize: '0.8rem' }}
+                    sx={{ 
+                      backgroundColor: 'background.paper',
+                      px: 2,
+                      fontSize: '0.75rem'
+                    }}
                   >
-                    Already have an account?{' '}
-                    <Link
-                      href="/login"
-                      sx={{
-                        color: 'primary.main',
-                        textDecoration: 'none',
-                        fontWeight: 600
-                      }}
-                    >
-                      Sign in here
-                    </Link>
+                    or create with email
                   </Typography>
-                </Box>
+                </Divider>
+              </>
+            )}
+
+            <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
+              <Box sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                gap: 1.5, 
+                mb: 1.5 
+              }}>
+                <TextField
+                  fullWidth
+                  label="First Name"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                  required
+                  disabled={formData.isGoogleSignup}
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <User size={14} color="#888888" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  label="Last Name"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                  required
+                  disabled={formData.isGoogleSignup}
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <User size={14} color="#888888" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Box>
+
+              <TextField
+                fullWidth
+                label="Email Address"
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                required
+                disabled={formData.isGoogleSignup}
+                sx={{ mb: 1.5 }}
+                size="small"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Mail size={14} color="#888888" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <TextField
+                fullWidth
+                label="Password"
+                type={showPassword ? 'text' : 'password'}
+                value={formData.password}
+                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                required
+                sx={{ mb: 1.5 }}
+                size="small"
+                helperText="Minimum 8 characters"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Lock size={14} color="#888888" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        size="small"
+                      >
+                        {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <Box sx={{ mb: 1.5 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formData.agreedToBAA}
+                      onChange={(e) => setFormData(prev => ({ ...prev, agreedToBAA: e.target.checked }))}
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Shield size={12} color="#387E89" />
+                      <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
+                        I agree to the{' '}
+                        <Link href="#" color="primary" sx={{ textDecoration: 'none', fontWeight: 600 }}>
+                          Business Associate Agreement (BAA)
+                        </Link>
+                      </Typography>
+                    </Box>
+                  }
+                  sx={{ mb: 1 }}
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formData.agreedToTerms}
+                      onChange={(e) => setFormData(prev => ({ ...prev, agreedToTerms: e.target.checked }))}
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Shield size={12} color="#387E89" />
+                      <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
+                        I agree to the{' '}
+                        <Link href="#" color="primary" sx={{ textDecoration: 'none', fontWeight: 600 }}>
+                          Terms of Service
+                        </Link>
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Box>
+
+              <Box sx={{ textAlign: 'center', mb: 1.5 }}>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary"
+                  sx={{ fontSize: '0.75rem' }}
+                >
+                  Already have an account?{' '}
+                  <Link
+                    href="/login"
+                    sx={{
+                      color: 'primary.main',
+                      textDecoration: 'none',
+                      fontWeight: 600
+                    }}
+                  >
+                    Sign in here
+                  </Link>
+                </Typography>
               </Box>
             </Box>
           </CardContent>
         </Card>
 
+        {/* Fixed button at bottom */}
         <Box sx={{ 
           flexShrink: 0,
-          pt: 2
+          pt: 1.5,
+          mt: 'auto'
         }}>
           <PrimaryButton
             fullWidth
             type="submit"
             onClick={handleSubmit}
             sx={{
-              py: 1.5,
+              py: { xs: 1.2, sm: 1.5 },
               fontWeight: 700,
-              fontSize: { xs: '0.9rem', sm: '1rem' },
+              fontSize: { xs: '0.85rem', sm: '0.9rem' },
               borderRadius: 2
             }}
           >

@@ -56,7 +56,7 @@ const CustomStepIcon = ({ active, completed, icon }: any) => {
       <CheckCircle 
         sx={{ 
           color: '#2E8B57', // Sea green color - more elegant and sophisticated
-          fontSize: { xs: 20, sm: 24 }
+          fontSize: { xs: 18, sm: 22 }
         }} 
       />
     );
@@ -65,15 +65,15 @@ const CustomStepIcon = ({ active, completed, icon }: any) => {
   return (
     <Box
       sx={{
-        width: { xs: 20, sm: 24 },
-        height: { xs: 20, sm: 24 },
+        width: { xs: 18, sm: 22 },
+        height: { xs: 18, sm: 22 },
         borderRadius: '50%',
         backgroundColor: active ? 'primary.main' : '#E5E7EB',
         color: active ? 'white' : '#9CA3AF',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+        fontSize: { xs: '0.7rem', sm: '0.8rem' },
         fontWeight: 600,
         transition: 'all 0.3s ease'
       }}
@@ -156,30 +156,43 @@ export const SignupFlow: React.FC = () => {
 
   return (
     <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2 } }}>
-      <Box sx={{ py: { xs: 0.5, sm: 1 } }}>
+      <Box 
+        sx={{ 
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          py: { xs: 1, sm: 2 }
+        }}
+      >
         <Paper
           elevation={0}
           sx={{
-            p: { xs: 2, sm: 3, md: 4 },
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            p: { xs: 2, sm: 3 },
             borderRadius: 3,
             backgroundColor: 'background.paper',
             border: `1px solid ${(theme) => theme.palette.divider}`,
             boxShadow: '0 8px 32px rgba(20, 49, 81, 0.08)',
+            maxHeight: { xs: 'calc(100vh - 16px)', sm: 'calc(100vh - 32px)' },
+            overflow: 'hidden'
           }}
         >
           {/* Progress indicator for mobile */}
           <Box sx={{ 
             display: { xs: 'block', md: 'none' }, 
-            mb: 1.5,
-            textAlign: 'center'
+            mb: { xs: 1, sm: 1.5 },
+            textAlign: 'center',
+            flexShrink: 0
           }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.8rem' }}>
               Step {activeStep + 1} of {visibleSteps.length}
             </Typography>
             <Box
               sx={{
                 width: '100%',
-                height: 4,
+                height: 3,
                 backgroundColor: '#F0F8FF',
                 borderRadius: 2,
                 overflow: 'hidden'
@@ -200,10 +213,11 @@ export const SignupFlow: React.FC = () => {
           <Stepper 
             activeStep={activeStep} 
             sx={{ 
-              mb: 2,
+              mb: { md: 1.5 },
               display: { xs: 'none', md: 'flex' },
+              flexShrink: 0,
               '& .MuiStepLabel-label': {
-                fontSize: '0.875rem',
+                fontSize: '0.8rem',
                 fontWeight: 500
               },
               '& .MuiStepLabel-label.Mui-active': {
@@ -232,7 +246,7 @@ export const SignupFlow: React.FC = () => {
                   StepIconComponent={CustomStepIcon}
                   sx={{
                     '& .MuiStepLabel-iconContainer': {
-                      pr: 1
+                      pr: 0.5
                     }
                   }}
                 >
@@ -248,15 +262,28 @@ export const SignupFlow: React.FC = () => {
             sx={{
               display: { xs: 'block', md: 'none' },
               textAlign: 'center',
-              mb: 1.5,
+              mb: { xs: 1, sm: 1.5 },
               fontWeight: 600,
-              color: 'primary.main'
+              color: 'primary.main',
+              fontSize: '1rem',
+              flexShrink: 0
             }}
           >
             {visibleSteps[activeStep]}
           </Typography>
 
-          {renderStep()}
+          {/* Step content with controlled height */}
+          <Box 
+            sx={{ 
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: 0,
+              overflow: 'hidden'
+            }}
+          >
+            {renderStep()}
+          </Box>
         </Paper>
       </Box>
     </Container>

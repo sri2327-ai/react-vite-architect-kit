@@ -32,17 +32,17 @@ const timeSlots = [
 
 const meetingFeatures = [
   {
-    icon: <Video size={18} />,
+    icon: <Video size={16} />,
     title: 'Video Conference',
     description: 'HD video call'
   },
   {
-    icon: <Users size={18} />,
+    icon: <Users size={16} />,
     title: 'Expert Support',
     description: 'Integration specialists'
   },
   {
-    icon: <CheckCircle2 size={18} />,
+    icon: <CheckCircle2 size={16} />,
     title: 'Complete Setup',
     description: 'Full EHR integration'
   }
@@ -69,11 +69,13 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
 
   return (
     <Box sx={{ 
-      minHeight: '60vh',
+      height: '100%',
       display: 'flex', 
-      flexDirection: 'column'
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
-      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: { xs: 1, sm: 1.5 }, flexShrink: 0 }}>
         <Typography
           variant="h4"
           sx={{
@@ -82,8 +84,8 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 1,
-            fontSize: { xs: '1.4rem', sm: '1.8rem' }
+            mb: 0.5,
+            fontSize: { xs: '1.3rem', sm: '1.6rem' }
           }}
         >
           Schedule Integration Call
@@ -92,8 +94,8 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
           variant="body1"
           color="text.secondary"
           sx={{ 
-            fontSize: { xs: '0.85rem', sm: '0.95rem' },
-            mb: 1
+            fontSize: { xs: '0.75rem', sm: '0.85rem' },
+            mb: 0.5
           }}
         >
           Set up a session to integrate your EHR system
@@ -102,54 +104,56 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
         <Box sx={{ 
           display: 'inline-flex', 
           alignItems: 'center', 
-          gap: 1,
+          gap: 0.5,
           backgroundColor: '#E8F5E8',
-          px: 1.5,
-          py: 0.5,
+          px: 1,
+          py: 0.25,
           borderRadius: 1,
           border: '1px solid #C8E6C9'
         }}>
-          <Clock size={14} color="#2E7D32" />
-          <Typography variant="body2" sx={{ color: '#2E7D32', fontWeight: 600, fontSize: '0.8rem' }}>
+          <Clock size={12} color="#2E7D32" />
+          <Typography variant="body2" sx={{ color: '#2E7D32', fontWeight: 600, fontSize: '0.7rem' }}>
             30-45 minutes • Free consultation
           </Typography>
         </Box>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Grid container spacing={1.5} sx={{ mb: 1.5, flexShrink: 0 }}>
+      {/* Content with controlled height */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        {/* Features grid - compressed */}
+        <Grid container spacing={1} sx={{ mb: 1, flexShrink: 0 }}>
           {meetingFeatures.map((feature, index) => (
             <Grid key={index} size={{ xs: 12, sm: 4 }}>
               <Card
                 sx={{
                   background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
                   border: '1px solid #E8F4F8',
-                  borderRadius: 2,
-                  height: 80,
+                  borderRadius: 1.5,
+                  height: { xs: 60, sm: 70 },
                   display: 'flex',
                   alignItems: 'center'
                 }}
               >
                 <CardContent sx={{ 
-                  p: 1.5, 
+                  p: 1, 
                   textAlign: 'center', 
                   width: '100%',
                   display: 'flex', 
                   flexDirection: 'column', 
                   justifyContent: 'center',
                   alignItems: 'center',
-                  '&:last-child': { pb: 1.5 }
+                  '&:last-child': { pb: 1 }
                 }}>
                   <Box
                     sx={{
-                      width: 28,
-                      height: 28,
+                      width: 24,
+                      height: 24,
                       borderRadius: '6px',
                       background: 'linear-gradient(135deg, #143151, #387E89)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      mb: 0.5,
+                      mb: 0.25,
                       color: 'white'
                     }}
                   >
@@ -158,14 +162,14 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                   <Typography variant="h6" sx={{ 
                     fontWeight: 700, 
                     mb: 0.25, 
-                    fontSize: '0.8rem',
-                    lineHeight: 1.2
+                    fontSize: '0.7rem',
+                    lineHeight: 1.1
                   }}>
                     {feature.title}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ 
-                    fontSize: '0.7rem',
-                    lineHeight: 1.2
+                    fontSize: '0.65rem',
+                    lineHeight: 1.1
                   }}>
                     {feature.description}
                   </Typography>
@@ -182,17 +186,23 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
             borderRadius: 2,
             flexShrink: 0,
             '& .MuiAlert-message': {
-              fontSize: '0.8rem'
+              fontSize: '0.75rem'
             }
           }}
-          icon={<Calendar size={18} />}
+          icon={<Calendar size={16} />}
         >
           Our specialists will help connect your EHR system via secure video conference.
         </Alert>
 
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
-            <Grid container spacing={2} sx={{ mb: 2 }}>
+        {/* Form section with scrollable content */}
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ 
+            flex: 1, 
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'auto'
+          }}>
+            <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
@@ -233,7 +243,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Clock size={14} color={slot.available ? '#387E89' : '#ccc'} />
+                        <Clock size={12} color={slot.available ? '#387E89' : '#ccc'} />
                         {slot.label}
                       </Box>
                       {slot.available ? (
@@ -257,20 +267,23 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
           </Box>
         </Box>
 
+        {/* Fixed buttons at bottom */}
         <Box sx={{ 
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
+          gap: 1.5,
           flexShrink: 0,
-          pt: 2
+          pt: 1.5,
+          mt: 'auto'
         }}>
           <SecondaryButton
             onClick={onBack}
             sx={{ 
               flex: 1,
               order: { xs: 2, sm: 1 },
-              py: 1.5,
-              borderRadius: 2
+              py: { xs: 1.2, sm: 1.5 },
+              borderRadius: 2,
+              fontSize: { xs: '0.85rem', sm: '0.9rem' }
             }}
           >
             Back
@@ -282,9 +295,9 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
               flex: 2, 
               fontWeight: 700,
               order: { xs: 1, sm: 2 },
-              py: 1.5,
+              py: { xs: 1.2, sm: 1.5 },
               borderRadius: 2,
-              fontSize: { xs: '0.9rem', sm: '1rem' }
+              fontSize: { xs: '0.85rem', sm: '0.9rem' }
             }}
           >
             Schedule Meeting →
