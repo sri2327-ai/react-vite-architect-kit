@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   CardContent,
-  Grid,
   Chip,
   IconButton,
   Dialog,
@@ -110,10 +109,20 @@ const WorkflowLibrary: React.FC = () => {
     setWorkflowTemplates(prev => prev.filter(workflow => workflow.id !== workflowId));
   };
 
-  const handleSaveWorkflow = (updatedWorkflow: WorkflowTemplate) => {
+  const handleSaveWorkflow = (updatedWorkflow: any) => {
+    // Convert the workflow to our WorkflowTemplate format
+    const workflowTemplate: WorkflowTemplate = {
+      id: updatedWorkflow.id || selectedWorkflow?.id || `workflow-${Date.now()}`,
+      name: updatedWorkflow.name || 'Untitled Workflow',
+      description: updatedWorkflow.description || '',
+      category: updatedWorkflow.category || 'General',
+      ehrSystem: updatedWorkflow.ehrSystem || 'Generic',
+      blocks: updatedWorkflow.blocks || []
+    };
+
     setWorkflowTemplates(prev =>
       prev.map(workflow =>
-        workflow.id === updatedWorkflow.id ? updatedWorkflow : workflow
+        workflow.id === workflowTemplate.id ? workflowTemplate : workflow
       )
     );
     setShowBuilder(false);
@@ -157,9 +166,9 @@ const WorkflowLibrary: React.FC = () => {
         </Box>
       </Box>
       
-      <Grid container spacing={3}>
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
         {workflowTemplates.map((workflow) => (
-          <Grid item xs={12} sm={6} md={4} key={workflow.id}>
+          <Box key={workflow.id} sx={{ width: { xs: '100%', sm: '48%', md: '31%' } }}>
             <Card 
               sx={{ 
                 height: '100%',
@@ -215,9 +224,9 @@ const WorkflowLibrary: React.FC = () => {
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       <Dialog open={showBuilder} onClose={handleCancelWorkflow} maxWidth="md" fullWidth>
         <DialogTitle>{selectedWorkflow ? `Edit Workflow: ${selectedWorkflow.name}` : 'Workflow Builder'}</DialogTitle>

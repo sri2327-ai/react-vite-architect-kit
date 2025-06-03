@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   Box,
@@ -243,9 +242,9 @@ const TemplateBuilder: React.FC = () => {
               Create Template
             </Button>
           </Box>
-          <Grid container spacing={3}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
             {templates.map(template => (
-              <Grid item xs={12} sm={6} md={4} key={template.id}>
+              <Box key={template.id} sx={{ width: { xs: '100%', sm: '48%', md: '31%' } }}>
                 <Card sx={{ height: '100%' }}>
                   <CardContent>
                     <Typography variant="h6" component="div">
@@ -280,9 +279,9 @@ const TemplateBuilder: React.FC = () => {
                     </Tooltip>
                   </Box>
                 </Card>
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Box>
       ) : (
         <TemplateEditor

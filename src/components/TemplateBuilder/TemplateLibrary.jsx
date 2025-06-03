@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   useMediaQuery,
+  ThemeProvider,
+  CssBaseline,
   Card,
   CardContent,
-  Grid,
-  Menu,
   TextField,
   Dialog,
   Chip,
@@ -22,234 +22,86 @@ import {
   DialogTitle,
   DialogContent,
   Divider,
-  Autocomplete,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  IconButton,
-  CircularProgress
-} from '@mui/material';
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import {
-  DriveFileRenameOutlineOutlined as DriveFileRenameOutlineOutlinedIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Save as SaveIcon,
-  Add as AddIcon,
-  Close as CloseIcon,
-  Assignment as AssignmentIcon,
-  ReceiptLong as ReceiptLongIcon,
-  Visibility as VisibilityIcon,
-  DoDisturb as DoDisturbIcon,
-  ArrowBack as ArrowBackIcon,
-  AutoFixHigh as AutoFixHighIcon,
-  EditNote as EditNoteIcon,
-  ContentCopy as ContentCopyIcon,
-  CopyAll as CopyAllIcon,
-  LibraryBooks as LibraryBooksIcon,
-  FormatListBulleted as FormatListBulletedIcon,
-  Description as DescriptionIcon,
-  Circle as CircleIcon
-} from '@mui/icons-material';
+  Autocomplete
+} from "@mui/material";
+import { DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
+import { tokens } from "../../theme";
+import DriveFileRenameOutlineOutlinedIcon from '@mui/icons-material/DriveFileRenameOutlineOutlined';
+import Header from "../../reuseable-components/Header";
+import { IconButton } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { useZusGetMyDoctor, useZusGetMyNotes, useZusDocDetail } from '../../store.js';
+import { fetchDataPy } from "../util/fetchDataPy.ts";
+import { toast } from 'react-toastify';
+import NoteDialog from "../../reuseable-components/CustomDialog/CustomNotesForm.jsx";
+import generateCustomID from '../../reuseable-components/generateCustomID.js'
+import { theme } from "../../mui-theme.jsx";
+import CircularProgress from '@mui/material/CircularProgress';
+import { useTabStore, useLoaderStore, useAddsectionClick } from "../../store.js";
+import { useFetchData } from "../../reuseable-components/Api/Instruction.js";
+import SaveIcon from '@mui/icons-material/Save';
+import CustomLoadingOverlay from "../../CustomLoadingOverlay.js";
+import AddIcon from '@mui/icons-material/Add';
+import CloseIcon from '@mui/icons-material/Close';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { useForm, Controller } from 'react-hook-form';
-import { templateService } from '../../services/templateService';
-
-const NoDataOverlay = () => (
-  <Box
-    sx={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: '100%',
-      color: 'gray',
-      fontSize: '16px',
-      fontFamily: 'Poppins, sans-serif',
-    }}
-  >
-    No data to display
-  </Box>
-);
-
-const style = {
-  borderRadius: '8px',
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'white',
-  boxShadow: 24,
-  p: 4,
-  fontFamily: 'Poppins, sans-serif',
-};
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { blue } from "@mui/material/colors";
+import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CustomDialog from "../../reuseable-components/DialogCustom/DialogCustom.jsx";
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CopyAllIcon from '@mui/icons-material/CopyAll';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
+import * as yup from 'yup';
+import { Description } from "@mui/icons-material";
+import FormWizard from "../../reuseable-components/FormWizard.jsx";
+import AILoader from "../../reuseable-components/AILoader.jsx";
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import DescriptionIcon from '@mui/icons-material/Description';
+import { wizardTabStore } from "../../store.js";
+import CircleIcon from '@mui/icons-material/Circle';
+import DragDropList from "../../reuseable-components/DragDropList.jsx";
+import CustomDrawer from "../../reuseable-components/CustomDrawer.jsx";
+import AnimatedTabs from "../../reuseable-components/AnimatedTabs.jsx";
 
 const TemplateLibrary = () => {
-  const [open, setOpen] = useState(false);
-  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
-  const [bugData, setBugData] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [isSwitchOn, setIsSwitchOn] = useState(false);
-  const theme = useTheme();
-  const [deletenotespopup, setDeletenotespopup] = useState(false);
-  const [notesListWithIds, setNotesListWithIds] = useState([]);
-  const [selectedNote, setSelectedNote] = useState(null);
-  const [editnotePopup, setEditnotePopup] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [url, setUrl] = useState(null);
-  const [payload, setPayload] = useState(null);
-  const [isYesClicked, setIsYesClicked] = useState(false);
-  const isMobile = useMediaQuery("(max-width:950px)");
-  const [openCreateTemplate, setopenCreateTemplate] = useState(false);
-  const [openAddType, setOpenAddType] = useState(false);
-  const [openModifyTemplate, setOpenModifyTemplate] = useState(false);
-  const [openAddExType, setOpenAddExType] = useState(false);
-  const [openAddSection, setOpenAddSection] = useState(false);
-  const [showknowImprovr, setShowknowImprovr] = useState(false);
-  const [templateType, setTemplateType] = useState("none");
-  const [templateScreen, setTemplateScreen] = useState("conTypePage");
-  const [selectedconsType, setSelectedconsType] = useState("");
-  const [showTemplate, setShowTemplate] = useState(false);
+  const [drop1, setDrop1] = useState(10);
+  const [drop2, setDrop2] = useState(10);
   const [showTemplatePreview, setshowTemplatePreview] = useState(false);
-  const [tempArr, settempArr] = useState([
-    { name: "template 01", id: 1 },
-    { name: "template 02", id: 2 },
-    { name: "template 03", id: 3 },
-    { name: "template 04", id: 4 },
-    { name: "template 05", id: 5 },
-    { name: "template 06", id: 6 },
-    { name: "template 07", id: 7 },
-    { name: "template 08", id: 8 },
-    { name: "template 09", id: 9 }
-  ]);
+  const [openAddSection, setOpenAddSection] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [sectionList, setSectionList] = useState([]);
+  const [templateMethod, setTemplateMethod] = useState(null);
+  const [showknowImprovr, setShowknowImprovr] = useState(false);
 
-  const { control, reset, getValues, setError, clearErrors, setValue, formState: { errors } } = useForm({
-    defaultValues: {
-      title: '',
-      notes: '',
-      special: ''
-    },
-  });
-
-  const {
-    register: registerLogin,
-    control: addtypecontrol,
-    handleSubmit: handleAddtypeSubmit,
-    formState: { errors: addtypeErrors },
-    trigger: triggerAddType,
-    getValues: getAddTypeValues
-  } = useForm();
-
-  const onAddtypeSubmit = (data) => {
-    console.log('Login:', data);
+  const handleChange1 = (event) => {
+    setDrop1(event.target.value);
   };
 
-  const onAddTypeClick = async () => {
-    const isValid = await triggerAddType();
-    if (isValid) {
-      console.log("Add Type Form Data", getAddTypeValues());
-      try {
-        const data = getAddTypeValues();
-        const payload = {
-          doc_name: "Test Doctor",
-          doc_id: "test_id",
-          location_present: true
-        };
-        const finalpayload = { ...payload, ...data };
-        // Simulate API call
-        console.log("Final payload:", finalpayload);
-      } catch (error) {
-        console.error('Error fetching doctors:', error);
-      }
-    } else {
-      console.warn("Add Type Form Invalid");
-    }
+  const handleChange2 = (event) => {
+    setDrop2(event.target.value);
   };
 
-  const sectiondata = [
-    {
-      "name": "CHIEF COMPLAINT",
-      "action": "add",
-      "type": "paragraph",
-      "is_editing": false,
-      "is_editing_template": false,
-      "paste_template": "",
-      "description": "Capture the main reason for the visit, such as symptom or condition reported by the patient."
-    },
-    {
-      "name": "SUBJECTIVE NOTE",
-      "action": "add",
-      "type": "paragraph",
-      "is_editing": false,
-      "is_editing_template": false,
-      "paste_template": "",
-      "description": "Brief summary of the reason for visit, including urgency or specific instructions provided by patient or referring doctor."
-    },
-    {
-      "name": "HISTORY OF PRESENT ILLNESS (HPI)",
-      "action": "add",
-      "type": "paragraph",
-      "is_editing": false,
-      "is_editing_template": false,
-      "paste_template": "",
-      "description": "Detailed narrative of the current condition including onset, duration, characteristics, associated symptoms, and relevant background such as lifestyle and family medical history."
-    },
-    {
-      "name": "ALLERGIES",
-      "action": "add",
-      "type": "bulleted_list",
-      "is_editing": false,
-      "is_editing_template": false,
-      "paste_template": "",
-      "description": "List known allergies or lack thereof, to medications or other substances."
-    },
-    {
-      "name": "FAMILY HEALTH HISTORY",
-      "action": "add",
-      "type": "bulleted_list",
-      "is_editing": false,
-      "is_editing_template": false,
-      "paste_template": "",
-      "description": "Summary of known family health history, focusing on immediate family members and relevant hereditary conditions."
-    }
-  ];
+  const editItem = (idx, key, value) => {
+    setSectionList(prev => {
+      const newList = [...prev];
+      newList[idx] = { ...newList[idx], [key]: value };
+      return newList;
+    });
+  };
 
-  const {
-    register: registertemplate,
-    control: addtemplatecontrol,
-    handleSubmit: handleaddtemplate,
-    formState: { errors: addtemplateErrors },
-    trigger: triggeraddtemplate,
-    getValues: getaddtemplate
-  } = useForm();
-
-  const [wizardActions, setWizardActions] = useState(null);
-  const nextButtonRef = useRef(null);
-
-  const onaddtemplate = async () => {
-    const isValid = await triggeraddtemplate();
-    if (isValid) {
-      try {
-        const data = getaddtemplate();
-        const payload = {
-          doc_name: "Test Doctor",
-          doc_id: "test_id",
-          template_type: templateMethod?.title,
-          consult_type: selectedconsType,
-        };
-        const finalpayload = { ...payload, ...data };
-        setOpenModifyTemplate(true);
-        setShowTemplate(true);
-        setopenCreateTemplate(false);
-        setTemplateType("none");
-        setSectionList(sectiondata);
-        console.log("Template created:", finalpayload);
-      } catch (error) {
-        console.error('Error creating template:', error);
-      }
-    } else {
-      console.warn("Add Type Form Invalid");
-    }
+  const deleteItem = (idx) => {
+    setSectionList(prev => {
+      const newList = [...prev];
+      newList.splice(idx, 1);
+      return newList;
+    });
   };
 
   const data = [
@@ -258,180 +110,19 @@ const TemplateLibrary = () => {
     { id: 3, title: "CLINICAL INTERVIEW3", specality: "cardiologist", type: "DPD", feilds: [] },
     { id: 4, title: "Dermatology Intake", specality: "Dermatology", type: "SOAP", feilds: [] },
     { id: 5, title: "Neurology Followup", specality: "pyscologist", type: "SOAP", feilds: [] },
-    { id: 6, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] }
+    { id: 6, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 7, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 8, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 9, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 10, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 11, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 12, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 13, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 14, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 15, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 16, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
+    { id: 17, title: "Dermatology Intake1", specality: "cardiologist", type: "DPD", feilds: [] },
   ];
-
-  const columns = [
-    { field: "sno", headerName: "S.NO", width: 80 },
-    {
-      field: 'title',
-      headerName: 'Title',
-      width: 200,
-      renderCell: (params) => (
-        <div style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {params.value}
-        </div>
-      ),
-    },
-    {
-      field: 'specality',
-      headerName: 'Specialty',
-      width: 200,
-      renderCell: (params) => (
-        <div style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
-          {params.value}
-        </div>
-      ),
-    },
-    {
-      field: 'type',
-      headerName: 'Type',
-      width: 150,
-      renderCell: (params) => (
-        <Chip label={params.value} color="primary" size="small" />
-      ),
-    },
-    {
-      field: 'actions',
-      type: 'actions',
-      headerName: 'Actions',
-      width: 150,
-      getActions: (params) => [
-        <GridActionsCellItem
-          key="edit-action"
-          icon={<EditIcon sx={{ color: '#1d4556' }} />}
-          label="Edit"
-          onClick={() => handleNotesEdit(params.row)}
-        />,
-        <GridActionsCellItem
-          key="view-action"
-          icon={<VisibilityIcon sx={{ color: '#1d4556' }} />}
-          label="View"
-          onClick={() => handleTemplatePreview(params.row)}
-        />,
-        <GridActionsCellItem
-          key="delete-action"
-          icon={<DeleteIcon sx={{ color: '#1d4556' }} />}
-          label="Delete"
-          onClick={() => handleNotesDelete(params.row)}
-        />,
-      ],
-    },
-  ];
-
-  const handleNotesDelete = (note) => {
-    setSelectedNote(note);
-    setDeletenotespopup(true);
-    console.log('Template to delete:', note);
-  };
-
-  const handleNotesEdit = (note) => {
-    setSelectedNote(note);
-    setEditnotePopup(true);
-  };
-
-  const handleTemplatePreview = (template) => {
-    setSelectedNote(template);
-    setshowTemplatePreview(true);
-  };
-
-  const handleEditNotesClose = () => {
-    setEditnotePopup(false);
-  };
-
-  const handleDialogClose = () => {
-    setOpen(false);
-  };
-
-  const [textFields, setTextFields] = useState([]);
-
-  const handleAddClick = () => {
-    const nextSectionNumber = (textFields.length / 2) + 2;
-    setTextFields(prevFields => [
-      ...prevFields,
-      { id: `section${nextSectionNumber}Title`, label: `Section ${nextSectionNumber} Title` },
-      { id: `section${nextSectionNumber}Instruction`, label: `Section ${nextSectionNumber} Instruction` }
-    ]);
-  };
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const openmenu = Boolean(anchorEl);
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const options = ['ALL', 'EHR', 'No EHR'];
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const createTemplateItems = [
-    {
-      type: 1,
-      title: 'Copy Previous Notes',
-      Description: "Reuse the last note you copied.",
-      icon: <CopyAllIcon sx={{ width: 60, height: 60, color: "#1d4556" }} />,
-    },
-    {
-      type: 2,
-      title: 'Generate Template',
-      Description: "AI-assisted template creation with summary.",
-      icon: <AutoFixHighIcon sx={{ width: 60, height: 60, color: "#1d4556" }} />
-    },
-    {
-      type: 3,
-      title: 'Start from Scratch',
-      Description: "Begin with a blank slate.",
-      icon: <EditNoteIcon sx={{ width: 60, height: 60, color: "#1d4556" }} />,
-    },
-    {
-      type: 4,
-      title: 'Use Existing Template',
-      Description: "Copy-paste existing template.",
-      icon: <ContentCopyIcon sx={{ width: 60, height: 60, color: "#1d4556" }} />,
-    },
-    {
-      type: 5,
-      title: 'Template Library',
-      Description: "Access and manage all your templates.",
-      icon: <LibraryBooksIcon sx={{ width: 60, height: 60, color: "#1d4556" }} />,
-    },
-  ];
-
-  const [templateMethod, setTemplateMethod] = useState({});
-  const [sectionList, setSectionList] = useState([]);
-  const [tempTextEdit, setTempTextEdit] = useState('');
-
-  const addItem = () => {
-    const newItem = { id: Date.now(), name: 'New Section' };
-    setSectionList(prev => [...prev, newItem]);
-  };
-
-  const editItem = (idx, key, value) => {
-    setSectionList(prev =>
-      prev.map((item, index) =>
-        index === idx ? { ...item, [key]: value } : item
-      )
-    );
-  };
-
-  const deleteItem = (indexToRemove) => {
-    setSectionList(prev => prev.filter((_, index) => index !== indexToRemove));
-  };
-
-  const [drop1, setdrop1] = useState('');
-  const [drop2, setdrop2] = useState('');
-  const [selectedOptions, setSelectedOptions] = useState([]);
-
-  const handleChange1 = (event) => {
-    setdrop1(event.target.value);
-  };
-
-  const handleChange2 = (event) => {
-    setdrop2(event.target.value);
-  };
 
   const templatePreview = [
     {
@@ -693,167 +384,119 @@ const TemplateLibrary = () => {
     }
   ];
 
-  // Initialize template library data
-  useEffect(() => {
-    // Mock library templates data - in real app, this would come from API
-    const mockLibraryTemplates = [
-      {
-        id: 1,
-        title: "CLINICAL INTERVIEW",
-        specality: "General Medicine",
-        type: "SOAP",
-        sections: [
-          {
-            name: "CHIEF COMPLAINT",
-            type: "paragraph",
-            description: "Capture the main reason for the visit"
-          },
-          {
-            name: "HISTORY OF PRESENT ILLNESS",
-            type: "paragraph", 
-            description: "Detailed narrative of the current condition"
-          },
-          {
-            name: "ALLERGIES",
-            type: "bulleted_list",
-            description: "List known allergies"
-          }
-        ]
-      },
-      {
-        id: 2,
-        title: "Dermatology Intake",
-        specality: "Dermatology",
-        type: "SOAP",
-        sections: [
-          {
-            name: "CHIEF COMPLAINT",
-            type: "paragraph",
-            description: "Primary skin concern"
-          },
-          {
-            name: "SKIN EXAMINATION",
-            type: "paragraph",
-            description: "Detailed skin assessment"
-          }
-        ]
-      }
-    ];
-
-    // Register library templates with the service
-    templateService.registerLibraryTemplates(mockLibraryTemplates);
-  }, []);
-
-  // Add data with IDs for DataGrid
-  useEffect(() => {
-    const updatedData = data.map((item, index) => ({
-      ...item,
-      sno: index + 1,
-    }));
-    setNotesListWithIds(updatedData);
-  }, []);
-
-  // Remaining components and helper functions
   const Step2 = () => (
     <Box>
       <Typography sx={{ color: '#1d4556', fontWeight: '600', fontSize: 24 }}>Verify Template Changes</Typography>
-      <Typography sx={{fontSize:12, color:"#808080", width:'60%'}}>Based on its analysis, the AI has generated documentation improvements tailored to your template. Please review and approve the suggested edits below.</Typography>
+      <Typography sx={{ fontSize: 12, color: "#808080", width: '60%' }}>Based on its analysis, the AI has generated documentation improvements tailored to your template. Please review and approve the suggested edits below.</Typography>
       <Stack flexDirection={"column"} justifyContent={"center"} gap={2} mt={5}>
-        {sectionList && sectionList.length > 0 &&
+        {
+          sectionList && sectionList.length > 0 &&
           sectionList.map((item, idx) => (
             <Card
-              elevation={3}
+              elevation={5}
               sx={{
+                bgcolor: "white",
+                borderRadius: 2,
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                cursor: "pointer",
+                boxShadow: "0px 8px 16px rgba(0,0,0,0.2)",
                 border: "2px solid #408DA9",
-                '&:hover': {
+                "&:hover": {
                   boxShadow: "0px 8px 16px rgba(0,0,0,0.2)",
+                  border: "2px solid #408DA9",
                 },
               }}
-              key={idx}
+              onClick={() => { setTemplateMethod(item); }}
             >
-              <CardContent sx={{ p: 2 }}>
-                <Box display="flex" flexDirection="column" gap={1}>
-                  <Box display="flex" alignItems="center" gap={2}>
-                    <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>
-                      {item.name}
-                    </Typography>
-                    <Chip
-                      icon={item.type === 'bulleted_list' ? <FormatListBulletedIcon /> : <DescriptionIcon />}
-                      label={item.type}
-                      size="small"
-                      color="success"
-                      variant="outlined"
-                    />
-                  </Box>
-                  
-                  {!item.is_editing && (
-                    <Typography sx={{ color: "#808080", fontSize: 14, fontWeight: 400 }}>
-                      Description: {item.description}
-                    </Typography>
-                  )}
-
-                  {item.is_editing ? (
+              <Box display="flex" flexDirection={"column"} p={2} >
+                <Box display="flex" flexDirection={"column"} ml={1} mb={1} gap={1}>
+                  <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>{item.name}</Typography>
+                  <Chip icon={item.type == 'bulleted_list' ? <FormatListBulletedIcon /> : <DescriptionIcon />} label={item.type} size="small" color="success" variant="outlined" sx={{ width: 150 }} />
+                  {!item.is_editing && <Typography sx={{ color: "#808080", fontSize: 14, fontWeight: 400 }}>Description: {item.description}</Typography>}
+                </Box>
+                {
+                  item.is_editing ? (<>
                     <Box>
-                      <TextField
-                        fullWidth
-                        variant="outlined"
-                        margin="normal"
-                        autoFocus
-                        value={item.temp_description || ''}
+                      <TextField fullWidth variant="outlined" margin="normal" autoFocus value={item.temp_description}
                         onChange={(event) => {
                           editItem(idx, "temp_description", event.target.value);
-                        }}
-                      />
-                      <Box display="flex" gap={2} sx={{ mt: 1 }}>
-                        <Button
-                          onClick={() => {
-                            editItem(idx, "description", item.temp_description);
-                            editItem(idx, "is_editing", false);
-                          }}
-                          variant="contained"
-                          startIcon={<SaveIcon />}
-                          color="primary"
-                        >
-                          Save
+                        }} />
+                    </Box>
+                    <Box display="flex" flexDirection={"row"} gap={2}>
+                      <Button onClick={() => { editItem(idx, "description", item.temp_description); editItem(idx, "is_editing", false) }} variant="contained" sx={{
+                        borderRadius: "5px", padding: "5px 10px",
+                        color: "#F4FCFF",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                      }} startIcon={<SaveIcon />} color="primary">
+                        Save
+                      </Button>
+                      <Button onClick={() => { editItem(idx, "is_editing", false) }} variant="contained" sx={{
+                        borderRadius: "5px", padding: "5px 10px",
+                        color: "#F4FCFF",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                      }} startIcon={<DoDisturbIcon />} color="primary">
+                        Cancel
+                      </Button>
+                    </Box>
+                  </>) :
+                    item.is_editing_template ? (<>
+                      <Box >
+                        <TextField fullWidth variant="outlined" margin="normal" multiline
+                          rows={6} autoFocus value={item.temp_template}
+                          onChange={(event) => {
+                            editItem(idx, "temp_template", event.target.value);
+                          }} />
+                      </Box>
+                      <Box display="flex" flexDirection={"row"} gap={2}>
+                        <Button onClick={() => { editItem(idx, "paste_template", item.temp_template); editItem(idx, "is_editing_template", false); }} variant="contained" sx={{
+                          borderRadius: "5px", padding: "5px 10px",
+                          color: "#F4FCFF",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                        }} startIcon={<SaveIcon />} color="primary">
+                          Save template
                         </Button>
-                        <Button
-                          onClick={() => {
-                            editItem(idx, "is_editing", false);
-                          }}
-                          variant="outlined"
-                          startIcon={<DoDisturbIcon />}
-                        >
+                        <Button onClick={() => { editItem(idx, "is_editing_template", false); editItem(idx, "temp_template", "") }} variant="contained" sx={{
+                          borderRadius: "5px", padding: "5px 10px",
+                          color: "#F4FCFF",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                        }} startIcon={<DoDisturbIcon />} color="primary">
                           Cancel
                         </Button>
                       </Box>
-                    </Box>
-                  ) : (
-                    <Box display="flex" gap={2}>
-                      <Button
-                        onClick={() => {
-                          editItem(idx, "temp_description", item.description);
-                          editItem(idx, "is_editing", true);
-                        }}
-                        variant="contained"
-                        startIcon={<EditIcon />}
-                        color="primary"
-                        size="small"
-                      >
-                        Modify
-                      </Button>
-                      <Button
-                        onClick={() => deleteItem(idx)}
-                        variant="outlined"
-                        startIcon={<DeleteIcon />}
-                        color="error"
-                        size="small"
-                      >
-                        Delete
-                      </Button>
-                    </Box>
-                  )}
-                </Box>
-              </CardContent>
+                    </>) :
+                      <Box display="flex" flexDirection={"row"} gap={2}>
+                        <Button onClick={() => { editItem(idx, "temp_description", item.description); editItem(idx, "is_editing", true) }} variant="contained" sx={{
+                          borderRadius: "5px",
+                          padding: "5px 10px",
+                          color: "#F4FCFF",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                        }} startIcon={<EditIcon />} color="primary">
+                          Modify Instruction
+                        </Button>
+                        <Button onClick={() => { editItem(idx, "temp_template", item.paste_template); editItem(idx, "is_editing_template", true) }} variant="contained" sx={{
+                          borderRadius: "5px", padding: "5px 10px",
+                          color: "#F4FCFF",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                        }} startIcon={<CopyAllIcon />} color="primary">
+                          Paste Template
+                        </Button>
+                        <Button onClick={() => { deleteItem(idx) }} variant="contained" sx={{
+                          borderRadius: "5px", padding: "5px 10px",
+                          color: "#F4FCFF",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                        }} startIcon={<DeleteIcon />} color="primary">
+                          Delete
+                        </Button>
+                      </Box>
+                }
+              </Box>
             </Card>
           ))
         }
@@ -863,448 +506,345 @@ const TemplateLibrary = () => {
 
   const Step3 = () => (
     <Box>
-      <Typography sx={{fontSize:12, color:"#808080", width:'60%', pb:2}}>Template has been modified. Please review the changes below</Typography>
-      <Box p={2} sx={{ border: '2px dashed #808080', p:1}}>
-        <Typography sx={{fontSize:18, color:"black", width:'60%', p:2, fontWeight:600}}>Template Preview</Typography>
-        <Divider />
-        {templatePreview && templatePreview.map((item, idx) => (
-          <Box p={2} key={idx}>
-            <Typography sx={{fontSize:18, color:"black", fontWeight:700}}>{item.name}</Typography>
-            <Typography sx={{fontSize:16, color:"black"}}>{item.content}</Typography>
-            
-            {item.items && item.items.length > 0 && item.items.map((data, index) => (
-              <Stack flexDirection={"row"} alignItems={"flex-start"} key={index}>
-                <CircleIcon sx={{ fontSize: 8, color: 'black', mt:1}} />
-                <Typography sx={{fontSize:16, color: 'black', pl:1}}>{data.content}</Typography>
-              </Stack>
-            ))}
-          </Box>
-        ))}
+      <Typography sx={{ fontSize: 12, color: "#808080", width: '60%', pb: 2 }}>Template has been modified. Please review the changes below</Typography>
+      <Box p={2} sx={{ border: '2px dashed #808080', p: 1 }}>
+        <Typography sx={{ fontSize: 18, color: "black", width: '60%', p: 2, fontWeight: 600 }}>Template Preview</Typography>
+        <Divider></Divider>
+        {
+          templatePreview && templatePreview.map((item, idx) => {
+            return (
+              <Box p={2} key={idx}>
+                <Typography sx={{ fontSize: 18, color: "black", fontWeight: 700 }}>{item.name}</Typography>
+                <Typography sx={{ fontSize: 16, color: "black" }}>{item.content}</Typography>
+
+                {
+                  item.items && item.items.length > 0 && item.items.map((data, index) => (
+                    <Stack key={index} flexDirection={"row"} alignItems={"flex-start"}>
+                      <CircleIcon sx={{ fontSize: 8, color: 'black', mt: 1 }} />
+                      <Typography sx={{ fontSize: 16, color: 'black', pl: 1 }}>{data.content}</Typography>
+                    </Stack>
+                  ))
+                }
+              </Box>
+            )
+          })
+        }
       </Box>
     </Box>
   );
 
+  const steps = [
+    { label: 'Template Analysis', component: <AILoader /> },
+    { label: 'Review', component: <Step2 /> },
+    { label: 'Customize', component: <AILoader loadingMessages={[
+        "AI modifying content...",
+        "Please Wait...",
+        "Applying AI optimizations...",
+        "Finalizing template Preview...",
+      ]} /> },
+    { label: 'Finalize', component: <Step3 /> }
+  ];
+
   return (
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" sx={{ color: '#1d4556', fontWeight: 600 }}>
-          Template Library
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setopenCreateTemplate(true)}
-          sx={{
-            backgroundColor: '#1d4556',
-            '&:hover': { backgroundColor: '#143d4f' }
-          }}
-        >
-          Create Template
-        </Button>
-      </Box>
-
-      {/* Filter Section */}
-      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Specialty</InputLabel>
-          <Select value={drop1} label="Specialty" onChange={handleChange1}>
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="cardiologist">Cardiologist</MenuItem>
-            <MenuItem value="pyscologist">Psychologist</MenuItem>
-            <MenuItem value="Dermatology">Dermatology</MenuItem>
-          </Select>
-        </FormControl>
-        
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Type</InputLabel>
-          <Select value={drop2} label="Type" onChange={handleChange2}>
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="SOAP">SOAP</MenuItem>
-            <MenuItem value="DPD">DPD</MenuItem>
-          </Select>
-        </FormControl>
-      </Box>
-
-      {/* Templates Grid */}
-      <Box sx={{ height: 600, width: '100%' }}>
-        <DataGrid
-          rows={notesListWithIds}
-          columns={columns}
-          pageSize={10}
-          rowsPerPageOptions={[10]}
-          disableSelectionOnClick
-          slots={{
-            noRowsOverlay: NoDataOverlay,
-          }}
-          sx={{
-            '& .MuiDataGrid-cell': {
-              fontSize: '0.875rem',
-              fontFamily: 'Poppins, sans-serif',
-            },
-            '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: '#f5f5f5',
-              fontSize: '0.9rem',
-              fontWeight: 600,
-            },
-          }}
-        />
-      </Box>
-
-      {/* Create Template Dialog */}
-      <Dialog
-        open={openCreateTemplate}
-        onClose={() => setopenCreateTemplate(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle sx={{ color: '#1d4556', fontWeight: 600 }}>
-          Choose Template Creation Method
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={3} sx={{ mt: 1 }}>
-            {createTemplateItems.map((item) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.type}>
-                <Card
-                  sx={{
-                    cursor: 'pointer',
-                    height: '100%',
-                    '&:hover': {
-                      boxShadow: '0px 8px 16px rgba(0,0,0,0.2)',
-                      transform: 'translateY(-2px)',
-                    },
-                    transition: 'all 0.3s ease',
-                  }}
-                  onClick={() => {
-                    setTemplateMethod(item);
-                    setopenCreateTemplate(false);
-                    setOpenModifyTemplate(true);
-                  }}
-                >
-                  <CardContent sx={{ textAlign: 'center', p: 3 }}>
-                    <Box sx={{ mb: 2 }}>
-                      {item.icon}
-                    </Box>
-                    <Typography variant="h6" sx={{ mb: 1, color: '#1d4556', fontWeight: 600 }}>
-                      {item.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {item.Description}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setopenCreateTemplate(false)}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Template Preview Dialog */}
-      <Dialog
-        open={showTemplatePreview}
-        onClose={() => setshowTemplatePreview(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          Template Preview: {selectedNote?.title}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ p: 2 }}>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              <strong>Specialty:</strong> {selectedNote?.specality}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              <strong>Type:</strong> {selectedNote?.type}
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="h6" sx={{ mb: 2 }}>Template Sections</Typography>
-            {sectiondata.map((section, index) => (
-              <Box key={index} sx={{ mb: 2, p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                  {section.name}
-                </Typography>
-                <Chip 
-                  label={section.type} 
-                  size="small" 
-                  color="primary" 
-                  sx={{ mb: 1 }}
-                />
-                <Typography variant="body2" color="text.secondary">
-                  {section.description}
-                </Typography>
-              </Box>
-            ))}
+    <>
+      <Box m="20px">
+        <>
+          <Box display={"flex"} alignItems={"center"} justifyContent={"center"}>
+            <Typography sx={{ color: "#1d4556", fontSize: 24, fontWeight: 600, my: 2 }}>Template Library</Typography>
           </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setshowTemplatePreview(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
+          {
+            (<>
+              <Box mb={2} display={"flex"} alignItems={"center"} justifyContent={"center"}>
+                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                  <InputLabel id="demo-select-small-label">Specialty</InputLabel>
+                  <Select
+                    labelId="demo-select-small-label"
+                    id="demo-select-small"
+                    value={drop1}
+                    label="Specialty"
+                    onChange={handleChange1}
+                    style={{ color: '#000', backgroundColor: '#fff' }}
+                    MenuProps={{ PaperProps: { style: { backgroundColor: '#fff', color: '#000', }, }, }}
+                  >
+                    <MenuItem value={10}>ALL</MenuItem>
+                    <MenuItem value={20}>General Practitioner</MenuItem>
+                    <MenuItem value={30}>Psychologist</MenuItem>
+                    <MenuItem value={40}>Family Medicine Specialist</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                  <InputLabel id="demo-select-small-label">Select</InputLabel>
+                  <Select
+                    labelId="demo-select-small-label"
+                    id="demo-select-small"
+                    value={drop2}
+                    label="Note Type"
+                    onChange={handleChange2}
+                    style={{ color: '#000', backgroundColor: '#fff' }}
+                    MenuProps={{ PaperProps: { style: { backgroundColor: '#fff', color: '#000', }, }, }}
+                  >
+                    <MenuItem value={10}>ALL</MenuItem>
+                    <MenuItem value={20}>EHR</MenuItem>
+                    <MenuItem value={30}>No EHR</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deletenotespopup} onClose={() => setDeletenotespopup(false)}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete this template? This action cannot be undone.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeletenotespopup(false)}>Cancel</Button>
-          <Button 
-            onClick={() => {
-              console.log('Deleting template:', selectedNote);
-              setDeletenotespopup(false);
-            }} 
-            color="error"
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 3,
+                  alignItems: "stretch",
+                  p: 1,
+                  maxHeight: "65vh",
+                  overflowY: "auto",
+                }}
+              >
+                {data.map((item) => (
+                  <Card
+                    key={item.id}
+                    onClick={() => setshowTemplatePreview(true)}
+                    sx={{
+                      width: 250,
+                      borderRadius: 3,
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+                      transition: "all 0.2s ease-in-out",
+                      cursor: "pointer",
+                      "&:hover": {
+                        boxShadow: "0 4px 14px rgba(64, 141, 169, 0.3)",
+                        border: "1px solid #408DA9",
+                      },
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      p: 2,
+                      backgroundColor: "#fff",
+                    }}
+                  >
+                    <CardContent
+                      sx={{
+                        textAlign: "center",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 1,
+                        width: "100%",
+                        p: 0,
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: 16,
+                          fontWeight: 600,
+                          color: "#222",
+                          lineHeight: 1.4,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          width: "100%",
+                        }}
+                      >
+                        {item.title}
+                      </Typography>
 
-      {/* Template Modification Dialog */}
-      <Dialog
-        open={openModifyTemplate}
-        onClose={() => setOpenModifyTemplate(false)}
-        maxWidth="lg"
-        fullWidth
-      >
-        <DialogTitle sx={{ color: '#1d4556', fontWeight: 600 }}>
-          Modify Template: {templateMethod?.title}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Template Sections
-            </Typography>
-            <Stack spacing={2}>
-              {sectionList.map((item, idx) => (
-                <Card
-                  key={idx}
-                  elevation={3}
-                  sx={{
-                    border: "2px solid #408DA9",
-                    '&:hover': {
-                      boxShadow: "0px 8px 16px rgba(0,0,0,0.2)",
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 2 }}>
-                    <Box display="flex" flexDirection="column" gap={1}>
-                      <Box display="flex" alignItems="center" gap={2}>
-                        <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>
-                          {item.name}
-                        </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 0.5,
+                          mt: 1,
+                        }}
+                      >
                         <Chip
-                          icon={item.type === 'bulleted_list' ? <FormatListBulletedIcon /> : <DescriptionIcon />}
-                          label={item.type}
+                          label={`Specialty: ${item.specality}`}
                           size="small"
-                          color="success"
-                          variant="outlined"
+                          sx={{ fontSize: 11, backgroundColor: "#408DA9" }}
+                        />
+                        <Chip
+                          label={`Note Type: ${item.type}`}
+                          color="primary"
+                          size="small"
+                          sx={{ fontSize: 11, backgroundColor: "#408DA9" }}
                         />
                       </Box>
-                      
-                      {!item.is_editing && (
-                        <Typography sx={{ color: "#808080", fontSize: 14, fontWeight: 400 }}>
-                          Description: {item.description}
-                        </Typography>
-                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </Box>
 
-                      {item.is_editing ? (
-                        <Box>
-                          <TextField
-                            fullWidth
-                            variant="outlined"
-                            margin="normal"
-                            autoFocus
-                            value={item.temp_description || ''}
-                            onChange={(event) => {
-                              editItem(idx, "temp_description", event.target.value);
-                            }}
-                          />
-                          <Box display="flex" gap={2} sx={{ mt: 1 }}>
-                            <Button
-                              onClick={() => {
-                                editItem(idx, "description", item.temp_description);
-                                editItem(idx, "is_editing", false);
-                              }}
-                              variant="contained"
-                              startIcon={<SaveIcon />}
-                              color="primary"
-                            >
-                              Save
-                            </Button>
-                            <Button
-                              onClick={() => {
-                                editItem(idx, "is_editing", false);
-                              }}
-                              variant="outlined"
-                              startIcon={<DoDisturbIcon />}
-                            >
-                              Cancel
-                            </Button>
-                          </Box>
-                        </Box>
-                      ) : item.is_editing_template ? (
-                        <Box>
-                          <TextField
-                            fullWidth
-                            variant="outlined"
-                            margin="normal"
-                            multiline
-                            rows={6}
-                            autoFocus
-                            value={item.temp_template || ''}
-                            onChange={(event) => {
-                              editItem(idx, "temp_template", event.target.value);
-                            }}
-                          />
-                          <Box display="flex" gap={2} sx={{ mt: 1 }}>
-                            <Button
-                              onClick={() => {
-                                editItem(idx, "paste_template", item.temp_template);
-                                editItem(idx, "is_editing_template", false);
-                              }}
-                              variant="contained"
-                              startIcon={<SaveIcon />}
-                              color="primary"
-                            >
-                              Save template
-                            </Button>
-                            <Button
-                              onClick={() => {
-                                editItem(idx, "is_editing_template", false);
-                                editItem(idx, "temp_template", "");
-                              }}
-                              variant="outlined"
-                              startIcon={<DoDisturbIcon />}
-                            >
-                              Cancel
-                            </Button>
-                          </Box>
-                        </Box>
-                      ) : (
-                        <Box display="flex" gap={2}>
-                          <Button
-                            onClick={() => {
-                              editItem(idx, "temp_description", item.description);
-                              editItem(idx, "is_editing", true);
-                            }}
-                            variant="contained"
-                            startIcon={<EditIcon />}
-                            color="primary"
-                            size="small"
-                          >
-                            Modify Instruction
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              editItem(idx, "temp_template", item.paste_template);
-                              editItem(idx, "is_editing_template", true);
-                            }}
-                            variant="contained"
-                            startIcon={<CopyAllIcon />}
-                            color="primary"
-                            size="small"
-                          >
-                            Paste Template
-                          </Button>
-                          <Button
-                            onClick={() => deleteItem(idx)}
-                            variant="contained"
-                            startIcon={<DeleteIcon />}
-                            color="primary"
-                            size="small"
-                          >
-                            Delete
-                          </Button>
-                        </Box>
-                      )}
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
-            </Stack>
-            
-            <Button
-              onClick={addItem}
-              variant="outlined"
-              startIcon={<AddIcon />}
-              sx={{ mt: 2 }}
-              fullWidth
-            >
-              Add New Section
+            </>)
+          }
+
+        </>
+      </Box>
+
+      <CustomDrawer
+        open={showTemplatePreview}
+        onClose={() => { setshowTemplatePreview(false); }}
+        actionButton={true}
+        actions={
+          <>
+            <Button onClick={() => { setshowTemplatePreview(false) }} variant="contained" sx={{
+              borderRadius: "5px", padding: "5px 10px",
+              color: "#F4FCFF",
+              fontSize: "0.9rem",
+              fontWeight: 600,
+            }} color="primary" >
+              Cancel
             </Button>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenModifyTemplate(false)}>Cancel</Button>
-          <Button
-            onClick={() => {
-              console.log('Saving template with sections:', sectionList);
-              setOpenModifyTemplate(false);
-            }}
-            variant="contained"
-            startIcon={<SaveIcon />}
-          >
-            Save Template
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <Button onClick={() => { setshowTemplatePreview(false); setOpenAddSection(true) }} variant="contained" sx={{
+              borderRadius: "5px", padding: "5px 10px",
+              color: "#F4FCFF",
+              fontSize: "0.9rem",
+              fontWeight: 600,
+            }} color="primary" >
+              Add to Library
+            </Button>
+          </>
+        }
+        title={"Template Preview"}
+        showHowitwork={false}
+      >
+        <Box p={2}>
+          <AnimatedTabs
+            tabs={[
+              {
+                title: 'Template Preview',
+                content: <Box>
+                  <Box p={2} sx={{ border: '2px dashed #808080', p: 1 }}>
+                    <Typography sx={{ fontSize: 18, color: "black", width: '60%', p: 2, fontWeight: 600 }}>Template Preview</Typography>
+                    <Divider></Divider>
 
-      {/* Add Section Dialog */}
-      <Dialog open={openAddSection} onClose={() => setOpenAddSection(false)}>
-        <DialogTitle>Add Template to</DialogTitle>
-        <DialogContent>
-          <Box p={2}>
-            <Autocomplete
-              multiple
-              options={options}
-              value={selectedOptions}
-              onChange={(event, newValue) => setSelectedOptions(newValue)}
-              sx={{ width: 400 }}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => (
-                  <Chip
-                    key={option}
-                    label={option}
-                    {...getTagProps({ index })}
-                    sx={{
-                      backgroundColor: '#1976d2',
-                      color: 'white',
-                      fontWeight: 500,
-                    }}
-                  />
-                ))
+                    {
+                      templatePreview && templatePreview.map((item, idx) => {
+                        return (
+                          <Box p={2} key={idx}>
+                            <Typography sx={{ fontSize: 18, color: "black", fontWeight: 700 }}>{item.name}</Typography>
+                            <Typography sx={{ fontSize: 16, color: "black" }}>{item.content}</Typography>
+
+                            {
+                              item.items && item.items.length > 0 && item.items.map((data, index) => (
+                                <Stack key={index} flexDirection={"row"} alignItems={"flex-start"}>
+                                  <CircleIcon sx={{ fontSize: 8, color: 'black', mt: 1 }} />
+                                  <Typography sx={{ fontSize: 16, color: 'black', pl: 1 }}>{data.content}</Typography>
+                                </Stack>
+                              ))
+                            }
+
+                          </Box>
+                        )
+                      })
+                    }
+                  </Box>
+                </Box>,
+              },
+              {
+                title: 'Example Note',
+                content: <Typography sx={{
+                  fontSize: 16,
+                  color: "black",
+                  flexWrap: "wrap",
+                  wordWrap: "break-word",
+                  overflow: "hidden",
+                  whiteSpace: 'pre-line'
+                }}>
+                  {"Subjective:\n- Patient's Description: [Details of the patient's experience, symptoms, and concerns (only include if applicable)]\n- Emotional State: [Patient's emotional condition and stress levels (only include if applicable)]\n- Lifestyle Factors: [Diet, exercise, sleep patterns (only include if applicable)]\n- Treatment History: [Previous acupuncture treatments and outcomes (only include if applicable)]\n\nObjective:\n- Physical Examination: [Findings from physical assessment, including pulse diagnosis and tongue observation (only include if applicable)]\n- Vital Signs: [BP, HR, Temp, and any other relevant measures (only include if applicable)]\n\nAssessment:\n- Diagnosis: [TCM diagnosis and differentiation (only include if explicitly mentioned)]\n- Problem List: [Identified issues to be addressed (only include if applicable)]\n\nPlan:\n- [Treatment Plan: Acupuncture points used, technique, and rationale (only include if applicable)]\n- [Lifestyle Recommendations: Dietary advice, exercise, stress management techniques (only include if applicable)]\n- [Follow-Up: Scheduling of next appointment and goals for next session (only include if applicable)] convert to json string or string has key"}
+                </Typography>
               }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  label="Select"
-                  placeholder="Search or select"
-                />
-              )}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenAddSection(false)}>Cancel</Button>
-          <Button 
-            onClick={() => setOpenAddSection(false)} 
-            variant="contained" 
-            color="primary"
-          >
-            Import all
+            ]}
+          />
+        </Box>
+      </CustomDrawer>
+
+      <CustomDialog
+        isOpen={openAddSection}
+        onClose={() => { setOpenAddSection(false) }}
+        title={'Add Template to'}
+        actions={<>
+          <Button onClick={() => { }} variant="contained">
+            Cancel
           </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+
+          <Button onClick={() => { setOpenAddSection(false) }} type="submit" variant="contained" color="primary" >
+            {'Import all'}
+          </Button>
+        </>
+        }
+        maxWidthdialog="sm"
+        maxHeightdialog="40vh"
+      >
+        <Box p={2}>
+          <Autocomplete
+            multiple
+            options={[]}
+            value={selectedOptions}
+            onChange={(event, newValue) => setSelectedOptions(newValue)}
+            sx={{
+              width: 400,
+              '& .MuiInputBase-root': {
+                backgroundColor: '#f0f7ff',
+                color: '#1976d2',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#1976d2',
+              },
+              '& .MuiInputLabel-root': {
+                color: '#1976d2',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#1565c0',
+              },
+              '& .MuiAutocomplete-listbox': {
+                backgroundColor: '#f3f3f3',
+                borderRadius: 4,
+                boxShadow: '0px 4px 6px rgba(0,0,0,0.1)',
+              },
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => (
+                <Chip
+                  key={option}
+                  label={option}
+                  {...getTagProps({ index })}
+                  sx={{
+                    backgroundColor: '#1976d2',
+                    color: 'white',
+                    fontWeight: 500,
+                  }}
+                />
+              ))
+            }
+            renderOption={(props, option, { selected }) => (
+              <Box
+                component="li"
+                {...props}
+                sx={{
+                  color: selected ? '#1565c0' : '#333',
+                  fontWeight: selected ? 600 : 400,
+                  backgroundColor: selected ? '#e3f2fd' : 'white',
+                  '&:hover': {
+                    backgroundColor: '#e3f2fd',
+                  },
+                }}
+              >
+                {option}
+              </Box>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                label="Select"
+                placeholder="Search or select"
+              />
+            )}
+          />
+        </Box>
+      </CustomDialog>
+    </>
   );
 };
 
