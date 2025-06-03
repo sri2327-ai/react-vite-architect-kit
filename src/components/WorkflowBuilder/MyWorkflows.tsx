@@ -54,7 +54,7 @@ import {
   LocationOn as LocationIcon,
   Note as NoteIcon,
   History as HistoryIcon,
-  ListCheck as ListCheckIcon
+  Checklist as ChecklistIcon
 } from '@mui/icons-material';
 import { templateBuilderService } from '../../services/templateBuilderService';
 
@@ -783,7 +783,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 }
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ListCheckIcon color="primary" />
+                    <ChecklistIcon color="primary" />
                     <Typography variant="body2">
                       Import previous visit note as checklist
                     </Typography>
