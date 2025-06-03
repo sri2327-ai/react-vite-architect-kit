@@ -1,11 +1,33 @@
 
 import React, { useState } from 'react';
-import { Box, Drawer, AppBar, Toolbar, Typography, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, useTheme, useMediaQuery, Container } from '@mui/material';
-import { LayoutTemplate, Workflow, User, History, Menu as MenuIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { 
+  Box, 
+  Drawer, 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  List, 
+  ListItem, 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  IconButton, 
+  useTheme, 
+  useMediaQuery, 
+  Container 
+} from '@mui/material';
+import { 
+  LayoutTemplate, 
+  Workflow, 
+  User, 
+  History, 
+  Menu as MenuIcon, 
+  X as CloseIcon 
+} from 'lucide-react';
 import { bravoColors } from '@/theme/colors';
 
-const drawerWidth = 280;
-const collapsedDrawerWidth = 64;
+const DRAWER_WIDTH = 280;
+const COLLAPSED_DRAWER_WIDTH = 72;
 
 interface MenuItem {
   id: string;
@@ -14,7 +36,7 @@ interface MenuItem {
   component: React.ComponentType;
 }
 
-// Placeholder components for each menu item
+// Placeholder components
 const TemplateBuilder: React.FC = () => (
   <Box sx={{ p: 3 }}>
     <Typography variant="h4" gutterBottom>
@@ -88,75 +110,72 @@ const menuItems: MenuItem[] = [
 
 export const Dashboard: React.FC = () => {
   const [activeMenuItem, setActiveMenuItem] = useState<string>('template-builder');
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const handleDesktopToggle = () => {
-    setDesktopCollapsed(!desktopCollapsed);
-  };
 
   const handleMenuItemClick = (itemId: string) => {
     setActiveMenuItem(itemId);
     if (isMobile) {
-      setMobileOpen(false);
+      setIsDrawerOpen(false);
     }
   };
 
-  const activeComponent = menuItems.find(item => item.id === activeMenuItem)?.component || TemplateBuilder;
-  const ActiveComponent = activeComponent;
-  const currentDrawerWidth = isMobile ? drawerWidth : desktopCollapsed ? collapsedDrawerWidth : drawerWidth;
+  const handleDrawerToggle = () => {
+    if (isMobile) {
+      setIsDrawerOpen(!isDrawerOpen);
+    } else {
+      setIsCollapsed(!isCollapsed);
+    }
+  };
 
-  const drawer = (
-    <Box sx={{
-      height: '100%',
-      display: 'flex',
+  const ActiveComponent = menuItems.find(item => item.id === activeMenuItem)?.component || TemplateBuilder;
+  const drawerWidth = isMobile ? DRAWER_WIDTH : (isCollapsed ? COLLAPSED_DRAWER_WIDTH : DRAWER_WIDTH);
+
+  const DrawerContent = () => (
+    <Box sx={{ 
+      height: '100%', 
+      display: 'flex', 
       flexDirection: 'column',
-      background: bravoColors.primary
+      background: bravoColors.primary,
+      overflow: 'hidden'
     }}>
-      {/* Logo/Brand */}
+      {/* Header */}
       <Box sx={{
-        p: desktopCollapsed && !isMobile ? 1 : 3,
-        borderBottom: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        textAlign: 'center',
-        background: 'transparent',
+        p: 2,
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
         minHeight: 80,
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center'
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column'
       }}>
-        {(!desktopCollapsed || isMobile) && (
+        {(!isCollapsed || isMobile) ? (
           <>
             <Box
               component="img"
               src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
               alt="S10.AI Logo"
               sx={{
-                height: 40,
+                height: 32,
                 mb: 1,
                 objectFit: 'contain'
               }}
             />
-            <Typography variant="h6" fontWeight={700} color="white">
+            <Typography variant="h6" fontWeight={600} color="white" sx={{ fontSize: '1rem' }}>
               S10.AI Dashboard
             </Typography>
           </>
-        )}
-        {desktopCollapsed && !isMobile && (
+        ) : (
           <Box
             component="img"
             src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
-            alt="S10.AI Logo"
+            alt="S10.AI"
             sx={{
-              height: 32,
-              width: 32,
-              margin: '0 auto',
+              height: 28,
+              width: 28,
               objectFit: 'contain'
             }}
           />
@@ -164,64 +183,59 @@ export const Dashboard: React.FC = () => {
       </Box>
 
       {/* Navigation Menu */}
-      <List sx={{ flex: 1, pt: 2 }}>
-        {menuItems.map((item) => (
-          <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
-            <ListItemButton
-              onClick={() => handleMenuItemClick(item.id)}
-              selected={activeMenuItem === item.id}
-              sx={{
-                mx: 2,
-                borderRadius: 2,
-                minHeight: 48,
-                justifyContent: desktopCollapsed && !isMobile ? 'center' : 'flex-start',
-                px: desktopCollapsed && !isMobile ? 1 : 2,
-                '&.Mui-selected': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  color: 'white',
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.3)'
+      <Box sx={{ flex: 1, py: 2 }}>
+        <List>
+          {menuItems.map((item) => (
+            <ListItem key={item.id} disablePadding sx={{ px: 1, mb: 0.5 }}>
+              <ListItemButton
+                onClick={() => handleMenuItemClick(item.id)}
+                selected={activeMenuItem === item.id}
+                sx={{
+                  borderRadius: 2,
+                  mx: 1,
+                  minHeight: 48,
+                  justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
+                  px: isCollapsed && !isMobile ? 1 : 2,
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                    }
                   },
-                  '& .MuiListItemIcon-root': {
-                    color: 'white'
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
                   }
-                },
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                }
-              }}
-            >
-              <ListItemIcon sx={{
-                minWidth: desktopCollapsed && !isMobile ? 0 : 40,
-                color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.7)',
-                justifyContent: 'center'
-              }}>
-                {item.icon}
-              </ListItemIcon>
-              {(!desktopCollapsed || isMobile) && (
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{
-                    fontWeight: activeMenuItem === item.id ? 600 : 500,
-                    fontSize: '0.875rem',
-                    color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.9)'
-                  }}
-                />
-              )}
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+                }}
+              >
+                <ListItemIcon sx={{
+                  minWidth: isCollapsed && !isMobile ? 0 : 40,
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  justifyContent: 'center'
+                }}>
+                  {item.icon}
+                </ListItemIcon>
+                {(!isCollapsed || isMobile) && (
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      color: 'rgba(255, 255, 255, 0.9)'
+                    }}
+                  />
+                )}
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      </Box>
 
-      {/* Collapse Toggle Button - Desktop Only */}
+      {/* Collapse Toggle for Desktop */}
       {!isMobile && (
-        <Box sx={{
-          p: 2,
-          borderTop: 1,
-          borderColor: 'rgba(255, 255, 255, 0.1)'
-        }}>
+        <Box sx={{ p: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <IconButton
-            onClick={handleDesktopToggle}
+            onClick={handleDrawerToggle}
             sx={{
               width: '100%',
               color: 'white',
@@ -230,7 +244,7 @@ export const Dashboard: React.FC = () => {
               }
             }}
           >
-            {desktopCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            <MenuIcon size={20} />
           </IconButton>
         </Box>
       )}
@@ -244,98 +258,84 @@ export const Dashboard: React.FC = () => {
         <AppBar
           position="fixed"
           sx={{
-            zIndex: theme.zIndex.drawer + 1,
             background: bravoColors.primary,
-            display: { xs: 'block', md: 'none' }
+            zIndex: theme.zIndex.drawer + 1
           }}
         >
           <Toolbar>
             <IconButton
               color="inherit"
-              aria-label="open drawer"
-              edge="start"
               onClick={handleDrawerToggle}
+              edge="start"
               sx={{ mr: 2 }}
             >
-              <MenuIcon />
+              {isDrawerOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
+            <Typography variant="h6" noWrap>
               S10.AI Dashboard
             </Typography>
           </Toolbar>
         </AppBar>
       )}
 
-      {/* Navigation Drawer */}
-      <Box
-        component="nav"
-        sx={{
-          width: { md: currentDrawerWidth },
-          flexShrink: { md: 0 }
-        }}
-      >
-        {/* Mobile drawer */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-              background: bravoColors.primary
-            }
-          }}
-        >
-          {drawer}
-        </Drawer>
-        
-        {/* Desktop drawer */}
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: currentDrawerWidth,
-              position: 'relative',
-              height: '100vh',
-              background: bravoColors.primary,
-              transition: theme.transitions.create('width', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen
-              })
-            }
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
+      {/* Sidebar Navigation */}
+      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
+        {/* Mobile Drawer */}
+        {isMobile ? (
+          <Drawer
+            variant="temporary"
+            open={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            ModalProps={{ keepMounted: true }}
+            sx={{
+              '& .MuiDrawer-paper': {
+                boxSizing: 'border-box',
+                width: DRAWER_WIDTH,
+                background: bravoColors.primary
+              }
+            }}
+          >
+            <DrawerContent />
+          </Drawer>
+        ) : (
+          /* Desktop Drawer */
+          <Drawer
+            variant="permanent"
+            sx={{
+              '& .MuiDrawer-paper': {
+                boxSizing: 'border-box',
+                width: drawerWidth,
+                background: bravoColors.primary,
+                transition: theme.transitions.create('width', {
+                  easing: theme.transitions.easing.sharp,
+                  duration: theme.transitions.duration.leavingScreen
+                }),
+                overflowX: 'hidden'
+              }
+            }}
+            open
+          >
+            <DrawerContent />
+          </Drawer>
+        )}
       </Box>
 
-      {/* Main content */}
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          width: { md: `calc(100% - ${currentDrawerWidth}px)` },
-          height: '100vh',
-          overflow: 'auto',
-          pt: { xs: 8, md: 0 },
-          transition: theme.transitions.create(['width', 'margin'], {
+          p: 3,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          ml: { md: 0 },
+          mt: { xs: 8, md: 0 },
+          transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen
+            duration: theme.transitions.duration.leavingScreen
           })
         }}
       >
-        <Container maxWidth="xl" sx={{
-          height: '100%',
-          py: { xs: 2, md: 3 }
-        }}>
+        <Container maxWidth="xl">
           <ActiveComponent />
         </Container>
       </Box>
