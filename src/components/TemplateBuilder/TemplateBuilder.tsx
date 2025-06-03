@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
@@ -26,8 +25,7 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem,
-  Grid
+  MenuItem
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
@@ -503,36 +501,42 @@ const TemplateBuilder: React.FC = () => {
               </FormControl>
             </Box>
 
-            <Grid container spacing={2}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: 2,
+                mb: 3
+              }}
+            >
               {filteredLibraryTemplates.map((template) => (
-                <Grid item xs={12} sm={6} md={4} key={template.id}>
-                  <Card
-                    sx={{
-                      cursor: 'pointer',
-                      border: selectedLibraryTemplate?.id === template.id ? `2px solid ${bravoColors.primaryFlat}` : '1px solid #e0e0e0',
-                      borderRadius: 2,
-                      p: 2,
-                      height: '100%',
-                      '&:hover': {
-                        borderColor: bravoColors.secondary,
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                      }
-                    }}
-                    onClick={() => setSelectedLibraryTemplate(template)}
-                  >
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: '1rem' }}>
-                      {template.name}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mb: 0.5 }}>
-                      Specialty: {template.specialty}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
-                      Note Type: {template.noteType}
-                    </Typography>
-                  </Card>
-                </Grid>
+                <Card
+                  key={template.id}
+                  sx={{
+                    cursor: 'pointer',
+                    border: selectedLibraryTemplate?.id === template.id ? `2px solid ${bravoColors.primaryFlat}` : '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    p: 2,
+                    height: '100%',
+                    '&:hover': {
+                      borderColor: bravoColors.secondary,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                    }
+                  }}
+                  onClick={() => setSelectedLibraryTemplate(template)}
+                >
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: '1rem' }}>
+                    {template.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mb: 0.5 }}>
+                    Specialty: {template.specialty}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                    Note Type: {template.noteType}
+                  </Typography>
+                </Card>
               ))}
-            </Grid>
+            </Box>
 
             {selectedLibraryTemplate && (
               <Box sx={{ mt: 3, p: 2, border: '2px dashed #ccc', borderRadius: 2 }}>
