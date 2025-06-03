@@ -25,7 +25,9 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Tabs,
+  Tab
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
@@ -78,6 +80,9 @@ const TemplateBuilder: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
+  // Tab state
+  const [currentTab, setCurrentTab] = useState(0);
+  
   // Navigation state
   const [currentScreen, setCurrentScreen] = useState<'consultTypes' | 'templates' | 'templateEditor'>('consultTypes');
   const [selectedConsultType, setSelectedConsultType] = useState<ConsultType | null>(null);
@@ -101,6 +106,10 @@ const TemplateBuilder: React.FC = () => {
     specialty: '',
     noteType: ''
   });
+
+  // Template preview states
+  const [previewTemplate, setPreviewTemplate] = useState<LibraryTemplate | null>(null);
+  const [openPreview, setOpenPreview] = useState(false);
 
   // Form controls
   const { control, handleSubmit, formState: { errors }, trigger, getValues } = useForm();
@@ -343,6 +352,20 @@ const TemplateBuilder: React.FC = () => {
     setSectionList([]);
   };
 
+  const handleLibraryTemplatePreview = (template: LibraryTemplate) => {
+    setPreviewTemplate(template);
+    setOpenPreview(true);
+  };
+
+  const handleImportToMyTemplates = () => {
+    if (previewTemplate) {
+      console.log('Importing template to my templates:', previewTemplate);
+      // Add logic to import template to user's templates
+      setOpenPreview(false);
+      setPreviewTemplate(null);
+    }
+  };
+
   const filteredLibraryTemplates = libraryTemplates.filter(template => {
     return (!libraryFilters.specialty || template.specialty.toLowerCase().includes(libraryFilters.specialty.toLowerCase())) &&
            (!libraryFilters.noteType || template.noteType === libraryFilters.noteType);
@@ -554,6 +577,112 @@ const TemplateBuilder: React.FC = () => {
     );
   };
 
+  // Render Template Library Tab
+  const renderTemplateLibrary = () => (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600, mb: 4 }}>
+        Template Library
+      </Typography>
+      
+      <Box display="flex" gap={2} mb={3}>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Specialty</InputLabel>
+          <Select
+            value={libraryFilters.specialty}
+            label="Specialty"
+            onChange={(e) => setLibraryFilters(prev => ({ ...prev, specialty: e.target.value }))}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="cardiologist">Cardiologist</MenuItem>
+            <MenuItem value="pyschologist">Psychologist</MenuItem>
+            <MenuItem value="Dermatology">Dermatology</MenuItem>
+          </Select>
+        </FormControl>
+        
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Note Type</InputLabel>
+          <Select
+            value={libraryFilters.noteType}
+            label="Note Type"
+            onChange={(e) => setLibraryFilters(prev => ({ ...prev, noteType: e.target.value }))}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="SOAP">SOAP</MenuItem>
+            <MenuItem value="DPD">DPD</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: 3
+        }}
+      >
+        {filteredLibraryTemplates.map((template) => (
+          <Card
+            key={template.id}
+            sx={{
+              borderRadius: 2,
+              border: '1px solid #e0e0e0',
+              overflow: 'hidden',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                borderColor: bravoColors.secondary
+              }
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: bravoColors.text.primary }}>
+                {template.name}
+              </Typography>
+              
+              <Box display="flex" gap={1} mb={2}>
+                <Chip 
+                  label={`Specialty: ${template.specialty}`} 
+                  size="small" 
+                  sx={{ 
+                    backgroundColor: bravoColors.primaryFlat, 
+                    color: 'white',
+                    fontSize: '0.75rem'
+                  }} 
+                />
+                <Chip 
+                  label={`Note Type: ${template.noteType}`} 
+                  size="small" 
+                  sx={{ 
+                    backgroundColor: bravoColors.secondary, 
+                    color: 'white',
+                    fontSize: '0.75rem'
+                  }} 
+                />
+              </Box>
+              
+              <Box display="flex" gap={1} mt={3}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleLibraryTemplatePreview(template)}
+                  sx={{
+                    borderColor: bravoColors.secondary,
+                    color: bravoColors.secondary,
+                    '&:hover': {
+                      borderColor: bravoColors.primaryFlat,
+                      backgroundColor: bravoColors.background.light
+                    }
+                  }}
+                >
+                  Preview
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+    </Box>
+  );
+
   // Render Consult Types Screen
   const renderConsultTypes = () => (
     <Box sx={{ p: 3 }}>
@@ -746,8 +875,8 @@ const TemplateBuilder: React.FC = () => {
     </Box>
   );
 
-  // Main render logic
-  const renderContent = () => {
+  // Main render logic for My Templates tab
+  const renderMyTemplatesContent = () => {
     if (currentScreen === 'templateEditor' && openModifyTemplate && showTemplate) {
       return renderTemplateEditor();
     }
@@ -761,7 +890,37 @@ const TemplateBuilder: React.FC = () => {
 
   return (
     <>
-      {renderContent()}
+      <Box sx={{ p: 3 }}>
+        {/* Tab Navigation */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs 
+            value={currentTab} 
+            onChange={(event, newValue) => setCurrentTab(newValue)}
+            sx={{
+              '& .MuiTab-root': {
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '1rem',
+                color: bravoColors.text.secondary,
+                '&.Mui-selected': {
+                  color: bravoColors.primaryFlat,
+                }
+              },
+              '& .MuiTabs-indicator': {
+                backgroundColor: bravoColors.primaryFlat,
+                height: 3,
+              }
+            }}
+          >
+            <Tab label="My Templates" />
+            <Tab label="Template Library" />
+          </Tabs>
+        </Box>
+
+        {/* Tab Content */}
+        {currentTab === 0 && renderMyTemplatesContent()}
+        {currentTab === 1 && renderTemplateLibrary()}
+      </Box>
 
       {/* Create Template Dialog */}
       <Dialog
@@ -850,6 +1009,108 @@ const TemplateBuilder: React.FC = () => {
             }}
           >
             {templateMethod.id === 5 ? 'IMPORT' : 'CREATE'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Template Preview Dialog */}
+      <Dialog
+        open={openPreview}
+        onClose={() => setOpenPreview(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            p: 2,
+            maxHeight: '90vh'
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Template Preview
+            </Typography>
+            <IconButton onClick={() => setOpenPreview(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+          {previewTemplate && (
+            <Box>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                  {previewTemplate.name}
+                </Typography>
+                <Box display="flex" gap={1} mb={2}>
+                  <Chip 
+                    label={`Specialty: ${previewTemplate.specialty}`} 
+                    size="small" 
+                    sx={{ 
+                      backgroundColor: bravoColors.primaryFlat, 
+                      color: 'white',
+                      fontSize: '0.75rem'
+                    }} 
+                  />
+                  <Chip 
+                    label={`Note Type: ${previewTemplate.noteType}`} 
+                    size="small" 
+                    sx={{ 
+                      backgroundColor: bravoColors.secondary, 
+                      color: 'white',
+                      fontSize: '0.75rem'
+                    }} 
+                  />
+                </Box>
+              </Box>
+              
+              <Box sx={{ p: 3, border: '2px dashed #ccc', borderRadius: 2, backgroundColor: '#f9f9f9' }}>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: bravoColors.text.primary, lineHeight: 1.6 }}>
+                  {previewTemplate.content}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button 
+            onClick={() => setOpenPreview(false)}
+            variant="outlined"
+            sx={{
+              borderColor: bravoColors.secondary,
+              color: bravoColors.secondary,
+              borderRadius: 2,
+              px: 3,
+              py: 1.5,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              '&:hover': {
+                borderColor: bravoColors.primaryFlat,
+                backgroundColor: bravoColors.background.light,
+              }
+            }}
+          >
+            CANCEL
+          </Button>
+          <Button 
+            onClick={handleImportToMyTemplates}
+            variant="contained"
+            sx={{
+              backgroundColor: bravoColors.secondary,
+              color: 'white',
+              borderRadius: 2,
+              px: 3,
+              py: 1.5,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              '&:hover': {
+                backgroundColor: bravoColors.primaryFlat,
+              }
+            }}
+          >
+            ADD TO LIBRARY
           </Button>
         </DialogActions>
       </Dialog>
