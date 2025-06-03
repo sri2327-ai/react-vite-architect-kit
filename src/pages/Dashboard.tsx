@@ -3,8 +3,6 @@ import React, { useState } from 'react';
 import { 
   Box, 
   Drawer, 
-  AppBar, 
-  Toolbar, 
   Typography, 
   List, 
   ListItem, 
@@ -14,7 +12,9 @@ import {
   IconButton, 
   useTheme, 
   useMediaQuery, 
-  Container 
+  Container,
+  Tooltip,
+  Fade
 } from '@mui/material';
 import { 
   LayoutTemplate, 
@@ -145,128 +145,154 @@ export const Dashboard: React.FC = () => {
       background: bravoColors.primary,
       overflow: 'hidden'
     }}>
-      {/* Enhanced Header with better logo sizing */}
+      {/* Header with Logo */}
       <Box sx={{
-        p: isCollapsed && !isMobile ? 1.5 : 3,
+        p: isCollapsed && !isMobile ? 2 : 3,
         borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-        minHeight: isCollapsed && !isMobile ? 72 : 88,
+        minHeight: isCollapsed && !isMobile ? 80 : 100,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        transition: 'all 0.3s ease'
+        transition: theme.transitions.create(['padding', 'min-height'], {
+          duration: theme.transitions.duration.standard,
+        })
       }}>
         {(!isCollapsed || isMobile) ? (
-          <>
+          <Fade in={!isCollapsed || isMobile} timeout={300}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Box
+                component="img"
+                src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
+                alt="S10.AI Logo"
+                sx={{
+                  height: isMobile ? 44 : isTablet ? 48 : 52,
+                  mb: 1.5,
+                  objectFit: 'contain',
+                  transition: theme.transitions.create('height', {
+                    duration: theme.transitions.duration.short,
+                  })
+                }}
+              />
+              <Typography 
+                variant="h6" 
+                fontWeight={700} 
+                color="white" 
+                sx={{ 
+                  fontSize: isMobile ? '1rem' : '1.1rem',
+                  textAlign: 'center',
+                  letterSpacing: '0.02em'
+                }}
+              >
+                S10.AI Dashboard
+              </Typography>
+            </Box>
+          </Fade>
+        ) : (
+          <Tooltip title="S10.AI Dashboard" placement="right" arrow>
             <Box
               component="img"
               src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
-              alt="S10.AI Logo"
+              alt="S10.AI"
               sx={{
-                height: isMobile ? 48 : isTablet ? 52 : 56,
-                mb: 1.5,
+                height: 44,
+                width: 44,
                 objectFit: 'contain',
-                transition: 'height 0.3s ease'
+                transition: theme.transitions.create(['height', 'width'], {
+                  duration: theme.transitions.duration.short,
+                }),
+                cursor: 'pointer',
+                '&:hover': {
+                  transform: 'scale(1.1)'
+                }
               }}
+              onClick={() => setIsCollapsed(false)}
             />
-            <Typography 
-              variant="h6" 
-              fontWeight={700} 
-              color="white" 
-              sx={{ 
-                fontSize: isMobile ? '1.05rem' : '1.2rem',
-                textAlign: 'center',
-                letterSpacing: '0.02em',
-                transition: 'all 0.3s ease'
-              }}
-            >
-              S10.AI Dashboard
-            </Typography>
-          </>
-        ) : (
-          <Box
-            component="img"
-            src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
-            alt="S10.AI"
-            sx={{
-              height: 48,
-              width: 48,
-              objectFit: 'contain',
-              transition: 'all 0.3s ease'
-            }}
-          />
+          </Tooltip>
         )}
       </Box>
 
-      {/* Enhanced Navigation Menu */}
-      <Box sx={{ flex: 1, py: 2, px: 1 }}>
+      {/* Navigation Menu */}
+      <Box sx={{ flex: 1, py: 2, px: 1, overflow: 'auto' }}>
         <List sx={{ px: 0 }}>
           {menuItems.map((item) => (
-            <ListItem key={item.id} disablePadding sx={{ mb: 0.5 }}>
-              <ListItemButton
-                onClick={() => handleMenuItemClick(item.id)}
-                selected={activeMenuItem === item.id}
-                sx={{
-                  borderRadius: 3,
-                  mx: 1,
-                  minHeight: 56,
-                  justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
-                  px: isCollapsed && !isMobile ? 1.5 : 2.5,
-                  transition: 'all 0.2s ease',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  '&.Mui-selected': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.18)',
-                    color: 'white',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.22)'
-                    },
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      width: 4,
-                      backgroundColor: 'white',
-                      borderRadius: '0 2px 2px 0'
-                    }
-                  },
-                  '&:hover': {
-                    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-                    transform: 'translateX(2px)'
-                  }
-                }}
+            <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
+              <Tooltip 
+                title={isCollapsed && !isMobile ? item.label : ''} 
+                placement="right" 
+                arrow
               >
-                <ListItemIcon sx={{
-                  minWidth: isCollapsed && !isMobile ? 0 : 44,
-                  color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.85)',
-                  justifyContent: 'center',
-                  transition: 'color 0.2s ease'
-                }}>
-                  {item.icon}
-                </ListItemIcon>
-                {(!isCollapsed || isMobile) && (
-                  <ListItemText
-                    primary={item.label}
-                    primaryTypographyProps={{
-                      fontSize: '0.95rem',
-                      fontWeight: activeMenuItem === item.id ? 600 : 500,
-                      color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.9)',
-                    }}
-                    sx={{
-                      transition: 'all 0.2s ease'
-                    }}
-                  />
-                )}
-              </ListItemButton>
+                <ListItemButton
+                  onClick={() => handleMenuItemClick(item.id)}
+                  selected={activeMenuItem === item.id}
+                  sx={{
+                    borderRadius: 3,
+                    mx: 1,
+                    minHeight: 56,
+                    justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
+                    px: isCollapsed && !isMobile ? 2 : 3,
+                    transition: theme.transitions.create(['background-color', 'transform', 'box-shadow'], {
+                      duration: theme.transitions.duration.short,
+                    }),
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      color: 'white',
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                      },
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        bottom: 0,
+                        width: 4,
+                        backgroundColor: 'white',
+                        borderRadius: '0 2px 2px 0'
+                      }
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                      transform: 'translateX(4px)'
+                    },
+                    '&:active': {
+                      transform: 'scale(0.98)'
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{
+                    minWidth: isCollapsed && !isMobile ? 0 : 48,
+                    color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.8)',
+                    justifyContent: 'center',
+                    transition: theme.transitions.create('color', {
+                      duration: theme.transitions.duration.short,
+                    })
+                  }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  {(!isCollapsed || isMobile) && (
+                    <Fade in={!isCollapsed || isMobile} timeout={200}>
+                      <ListItemText
+                        primary={item.label}
+                        primaryTypographyProps={{
+                          fontSize: '0.95rem',
+                          fontWeight: activeMenuItem === item.id ? 600 : 500,
+                          color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.9)',
+                        }}
+                      />
+                    </Fade>
+                  )}
+                </ListItemButton>
+              </Tooltip>
             </ListItem>
           ))}
         </List>
       </Box>
 
-      {/* Enhanced Collapse Toggle for Desktop */}
+      {/* Collapse Toggle for Desktop */}
       {!isMobile && (
         <Box sx={{ 
           p: 2, 
@@ -274,29 +300,33 @@ export const Dashboard: React.FC = () => {
           display: 'flex',
           justifyContent: 'center'
         }}>
-          <IconButton
-            onClick={handleDrawerToggle}
-            sx={{
-              width: isCollapsed ? 48 : '100%',
-              height: 48,
-              color: 'rgba(255, 255, 255, 0.9)',
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              borderRadius: 3,
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                borderColor: 'rgba(255, 255, 255, 0.25)',
-                color: 'white',
-                transform: 'scale(1.02)'
-              },
-              '&:active': {
-                transform: 'scale(0.98)'
-              }
-            }}
-          >
-            {isCollapsed ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
-          </IconButton>
+          <Tooltip title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} placement="top" arrow>
+            <IconButton
+              onClick={handleDrawerToggle}
+              sx={{
+                width: isCollapsed ? 48 : '100%',
+                height: 48,
+                color: 'rgba(255, 255, 255, 0.9)',
+                backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                borderRadius: 3,
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                transition: theme.transitions.create(['all'], {
+                  duration: theme.transitions.duration.short,
+                }),
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  borderColor: 'rgba(255, 255, 255, 0.25)',
+                  color: 'white',
+                  transform: 'scale(1.05)'
+                },
+                '&:active': {
+                  transform: 'scale(0.95)'
+                }
+              }}
+            >
+              {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+            </IconButton>
+          </Tooltip>
         </Box>
       )}
     </Box>
@@ -304,23 +334,25 @@ export const Dashboard: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {/* Enhanced Mobile Menu Button */}
+      {/* Mobile Menu Button */}
       {isMobile && (
         <IconButton
           onClick={handleDrawerToggle}
           sx={{
             position: 'fixed',
-            top: 20,
-            left: 20,
+            top: 16,
+            left: 16,
             zIndex: theme.zIndex.drawer + 3,
             width: 56,
             height: 56,
             backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(16px)',
+            backdropFilter: 'blur(12px)',
             color: bravoColors.primaryFlat,
             border: '1px solid rgba(255, 255, 255, 0.8)',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
-            transition: 'all 0.3s ease',
+            transition: theme.transitions.create(['all'], {
+              duration: theme.transitions.duration.short,
+            }),
             '&:hover': {
               backgroundColor: 'rgba(255, 255, 255, 1)',
               transform: 'scale(1.05)',
@@ -331,7 +363,7 @@ export const Dashboard: React.FC = () => {
             }
           }}
         >
-          {isDrawerOpen ? <CloseIcon size={26} /> : <MenuIcon size={26} />}
+          {isDrawerOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
         </IconButton>
       )}
 
@@ -357,7 +389,7 @@ export const Dashboard: React.FC = () => {
             <DrawerContent />
           </Drawer>
         ) : (
-          /* Enhanced Desktop Drawer */
+          /* Desktop Drawer */
           <Drawer
             variant="permanent"
             sx={{
@@ -381,12 +413,13 @@ export const Dashboard: React.FC = () => {
         )}
       </Box>
 
-      {/* Enhanced Main Content */}
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: { xs: 2, sm: 3, md: 4 },
+          pt: { xs: 10, md: 4 }, // Extra top padding on mobile for menu button
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: 0 },
           transition: theme.transitions.create(['margin', 'width'], {
