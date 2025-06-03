@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
@@ -26,7 +27,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Grid
+  Grid2 as Grid
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
@@ -504,7 +505,7 @@ const TemplateBuilder: React.FC = () => {
 
             <Grid container spacing={2}>
               {filteredLibraryTemplates.map((template) => (
-                <Grid item xs={12} sm={6} md={4} key={template.id}>
+                <Grid xs={12} sm={6} md={4} key={template.id}>
                   <Card
                     sx={{
                       cursor: 'pointer',
