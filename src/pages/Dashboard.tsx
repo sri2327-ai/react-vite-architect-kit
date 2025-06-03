@@ -26,6 +26,8 @@ import { bravoColors } from '@/theme/colors';
 import TemplateBuilder from '@/components/TemplateBuilder/TemplateBuilder';
 import Profile from '@/components/Profile/Profile';
 import Billing from '@/components/Billing/Billing';
+import MyWorkflows from '@/components/Workflow/MyWorkflows';
+import WorkflowLibrary from '@/components/Workflow/WorkflowLibrary';
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -44,74 +46,8 @@ const WorkflowBuilder: React.FC = () => {
   // Mock user EHR data - this would come from user profile
   const userEHR = 'Practice Fusion'; // This should come from user's profile
 
-  const MyWorkflows = () => (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        My Workflows
-      </Typography>
-      <Typography variant="body1" color="text.secondary">
-        Your custom workflows will appear here. Create and manage your personalized workflows.
-      </Typography>
-    </Box>
-  );
-
-  const WorkflowLibrary = () => (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Workflow Library
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        Pre-built workflows for your EHR system: <strong>{userEHR}</strong>
-      </Typography>
-      
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Box sx={{ 
-          p: 3, 
-          border: '1px solid', 
-          borderColor: 'divider', 
-          borderRadius: 2,
-          '&:hover': { backgroundColor: 'action.hover' }
-        }}>
-          <Typography variant="h6" gutterBottom>
-            {userEHR} - Patient Check-in Workflow
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Streamlined patient check-in process optimized for {userEHR} EHR system.
-          </Typography>
-        </Box>
-        
-        <Box sx={{ 
-          p: 3, 
-          border: '1px solid', 
-          borderColor: 'divider', 
-          borderRadius: 2,
-          '&:hover': { backgroundColor: 'action.hover' }
-        }}>
-          <Typography variant="h6" gutterBottom>
-            {userEHR} - Prescription Management
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Efficient prescription workflow designed for {userEHR} platform.
-          </Typography>
-        </Box>
-        
-        <Box sx={{ 
-          p: 3, 
-          border: '1px solid', 
-          borderColor: 'divider', 
-          borderRadius: 2,
-          '&:hover': { backgroundColor: 'action.hover' }
-        }}>
-          <Typography variant="h6" gutterBottom>
-            {userEHR} - Lab Results Review
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Systematic lab results review workflow for {userEHR} users.
-          </Typography>
-        </Box>
-      </Box>
-    </Box>
-  );
+  const MyWorkflowsTab = () => <MyWorkflows />;
+  const WorkflowLibraryTab = () => <WorkflowLibrary />;
 
   return (
     <Box sx={{ p: 3 }}>
@@ -170,7 +106,7 @@ const WorkflowBuilder: React.FC = () => {
       </Box>
       
       {/* Tab Content */}
-      {activeTab === 'my-workflows' ? <MyWorkflows /> : <WorkflowLibrary />}
+      {activeTab === 'my-workflows' ? <MyWorkflowsTab /> : <WorkflowLibraryTab />}
     </Box>
   );
 };
