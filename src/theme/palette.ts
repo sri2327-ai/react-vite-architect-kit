@@ -5,7 +5,7 @@ import { bravoColors } from './colors';
 export const lightPalette: PaletteOptions = {
   mode: 'light',
   primary: {
-    main: bravoColors.primaryFlat,
+    main: bravoColors.primaryFlat, // Use flat color for MUI components that don't support gradients
     dark: bravoColors.primaryDark,
   },
   secondary: {

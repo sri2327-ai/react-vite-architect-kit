@@ -131,7 +131,7 @@ export const Dashboard: React.FC = () => {
       height: '100%', 
       display: 'flex', 
       flexDirection: 'column',
-      background: bravoColors.background.gradient,
+      background: bravoColors.primary, // Use the gradient directly
     }}>
       {/* Logo/Brand */}
       <Box
@@ -152,7 +152,7 @@ export const Dashboard: React.FC = () => {
             mb: 1
           }} 
         />
-        <Typography variant="h6" fontWeight={700} color="primary.main">
+        <Typography variant="h6" fontWeight={700} color="white">
           S10.AI Dashboard
         </Typography>
       </Box>
@@ -169,24 +169,24 @@ export const Dashboard: React.FC = () => {
                 borderRadius: 2,
                 minHeight: 48,
                 '&.Mui-selected': {
-                  backgroundColor: 'primary.main',
-                  color: 'primary.contrastText',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  color: 'white',
                   '&:hover': {
-                    backgroundColor: 'primary.dark',
+                    backgroundColor: 'rgba(255, 255, 255, 0.3)',
                   },
                   '& .MuiListItemIcon-root': {
-                    color: 'primary.contrastText',
+                    color: 'white',
                   },
                 },
                 '&:hover': {
-                  backgroundColor: 'action.hover',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
                 },
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 40,
-                  color: activeMenuItem === item.id ? 'inherit' : 'text.secondary',
+                  color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.7)',
                 }}
               >
                 {item.icon}
@@ -196,6 +196,7 @@ export const Dashboard: React.FC = () => {
                 primaryTypographyProps={{
                   fontWeight: activeMenuItem === item.id ? 600 : 500,
                   fontSize: '0.875rem',
+                  color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.9)',
                 }}
               />
             </ListItemButton>
@@ -215,7 +216,7 @@ export const Dashboard: React.FC = () => {
             width: '100%',
             zIndex: theme.zIndex.drawer + 1,
             display: { md: 'none' },
-            background: `${bravoColors.background.gradient} !important`,
+            background: `${bravoColors.primary} !important`, // Use gradient directly
             backgroundColor: 'transparent !important',
           }}
         >
@@ -225,11 +226,11 @@ export const Dashboard: React.FC = () => {
               aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ mr: 2 }}
+              sx={{ mr: 2, color: 'white' }}
             >
               <MenuIcon size={24} />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
+            <Typography variant="h6" noWrap component="div" sx={{ color: 'white' }}>
               S10.AI Dashboard
             </Typography>
           </Toolbar>
@@ -257,7 +258,7 @@ export const Dashboard: React.FC = () => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              background: `${bravoColors.background.gradient} !important`,
+              background: `${bravoColors.primary} !important`, // Use gradient directly
               backgroundColor: 'transparent !important',
             },
           }}
@@ -275,7 +276,7 @@ export const Dashboard: React.FC = () => {
               width: drawerWidth,
               position: 'relative',
               height: '100vh',
-              background: `${bravoColors.background.gradient} !important`,
+              background: `${bravoColors.primary} !important`, // Use gradient directly
               backgroundColor: 'transparent !important',
             },
           }}
