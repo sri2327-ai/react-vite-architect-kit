@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -19,7 +18,7 @@ import {
   LayoutTemplate, 
   Workflow, 
   User, 
-  History, 
+  History,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -27,6 +26,8 @@ import { bravoColors } from '@/theme/colors';
 import TemplateBuilder from '@/components/TemplateBuilder/TemplateBuilder';
 import Profile from '@/components/Profile/Profile';
 import BillingHistory from '@/components/BillingHistory/BillingHistory';
+// Replace the placeholder WorkflowBuilder component
+import WorkflowBuilder from '@/components/WorkflowBuilder/WorkflowBuilder';
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -37,18 +38,6 @@ interface MenuItem {
   icon: React.ReactNode;
   component: React.ComponentType;
 }
-
-// Placeholder component for Workflow Builder
-const WorkflowBuilder: React.FC = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography variant="h4" gutterBottom>
-      Workflow Builder
-    </Typography>
-    <Typography variant="body1" color="text.secondary">
-      Design and configure your workflows here.
-    </Typography>
-  </Box>
-);
 
 const menuItems: MenuItem[] = [
   {
@@ -61,7 +50,7 @@ const menuItems: MenuItem[] = [
     id: 'workflow-builder',
     label: 'Workflow Builder',
     icon: <Workflow size={20} />,
-    component: WorkflowBuilder
+    component: WorkflowBuilder // Updated to use the real component
   },
   {
     id: 'profile',
