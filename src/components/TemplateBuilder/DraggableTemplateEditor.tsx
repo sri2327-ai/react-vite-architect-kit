@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -13,8 +12,16 @@ import {
   DialogActions,
   TextField,
   MenuItem,
-  Alert
+  Alert,
+  Chip,
+  Stack,
+  Divider,
+  Tooltip,
+  Paper,
+  Fade,
+  useTheme
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import {
   Add as AddIcon,
   DragIndicator as DragIndicatorIcon,
@@ -25,7 +32,8 @@ import {
   KeyboardArrowDown as KeyboardArrowDownIcon,
   Help as HelpIcon,
   AutoFixHigh as AutoFixHighIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  Psychology as PsychologyIcon
 } from '@mui/icons-material';
 import AddSectionOverlay from './AddSectionOverlay';
 import SectionConfigDialog from './SectionConfigDialog';
@@ -57,6 +65,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   initialItems = [],
   onSave
 }) => {
+  const theme = useTheme();
   const [items, setItems] = useState<TemplateItem[]>(initialItems);
   const [addSectionOpen, setAddSectionOpen] = useState(false);
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
@@ -78,13 +87,35 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     { value: 'other', label: 'Other' }
   ];
 
+  const getTypeColor = (type: string) => {
+    const colors = {
+      paragraph: theme.palette.primary.main,
+      'bulleted-list': theme.palette.secondary.main,
+      'section-header': theme.palette.info.main,
+      'exam-list': theme.palette.warning.main,
+      checklist: theme.palette.success.main,
+      'static-text': theme.palette.grey[600]
+    };
+    return colors[type as keyof typeof colors] || theme.palette.grey[500];
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'paragraph': return '📝';
+      case 'bulleted-list': return '• ';
+      case 'section-header': return '📋';
+      case 'exam-list': return '🔍';
+      case 'checklist': return '✅';
+      case 'static-text': return '📄';
+      default: return '📋';
+    }
+  };
+
   const handleAddSection = (section: any) => {
-    // Check if it's a custom block that needs configuration
     if (['paragraph', 'section-header', 'bulleted-list', 'exam-list', 'checklist', 'static-text'].includes(section.id)) {
       setPendingSection(section);
       setSectionConfigOpen(true);
     } else {
-      // Add section directly
       const newItem: TemplateItem = {
         id: Date.now().toString(),
         name: section.name,
@@ -184,111 +215,410 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     setAiDescription('');
   };
 
-  const renderSectionBlock = (item: TemplateItem) => (
-    <Card key={item.id} sx={{ mb: 2, position: 'relative' }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-          <DragIndicatorIcon sx={{ color: 'text.secondary', mt: 0.5, cursor: 'grab' }} />
-          
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="h6" gutterBottom>
-              {item.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {item.description}
-            </Typography>
-            {item.items && (
-              <Box sx={{ mt: 1 }}>
-                {item.items.map((subItem, index) => (
-                  <Typography key={index} variant="body2" sx={{ ml: 2 }}>
-                    • {subItem.content}
-                  </Typography>
-                ))}
-              </Box>
-            )}
+  const renderSectionBlock = (item: TemplateItem, index: number) => (
+    <Fade in={true} timeout={300} key={item.id}>
+      <Card 
+        sx={{ 
+          mb: 3,
+          position: 'relative',
+          borderRadius: 3,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          transition: 'all 0.3s ease',
+          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          '&:hover': {
+            boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+            transform: 'translateY(-2px)'
+          }
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          {/* Header Section */}
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+            <Tooltip title="Drag to reorder">
+              <IconButton 
+                sx={{ 
+                  cursor: 'grab',
+                  color: theme.palette.text.secondary,
+                  '&:active': { cursor: 'grabbing' }
+                }}
+              >
+                <DragIndicatorIcon />
+              </IconButton>
+            </Tooltip>
+            
+            <Box sx={{ flex: 1 }}>
+              <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600,
+                    color: theme.palette.text.primary,
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  {getTypeIcon(item.type)} {item.name}
+                </Typography>
+                <Chip
+                  label={item.type.replace('-', ' ').toUpperCase()}
+                  size="small"
+                  sx={{
+                    backgroundColor: alpha(getTypeColor(item.type), 0.1),
+                    color: getTypeColor(item.type),
+                    fontWeight: 600,
+                    fontSize: '0.75rem'
+                  }}
+                />
+              </Stack>
+              
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: theme.palette.text.secondary,
+                  lineHeight: 1.6,
+                  mb: 2
+                }}
+              >
+                {item.description}
+              </Typography>
+
+              {/* Content Preview */}
+              <Paper 
+                sx={{ 
+                  p: 2, 
+                  backgroundColor: alpha(theme.palette.primary.main, 0.02),
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                  borderRadius: 2
+                }}
+              >
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    fontStyle: 'italic',
+                    color: theme.palette.text.secondary
+                  }}
+                >
+                  {item.content}
+                </Typography>
+                
+                {item.items && item.items.length > 0 && (
+                  <Box sx={{ mt: 1.5 }}>
+                    {item.items.map((subItem, idx) => (
+                      <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 0.5 }}>
+                        <Box 
+                          sx={{ 
+                            width: 4, 
+                            height: 4, 
+                            borderRadius: '50%', 
+                            backgroundColor: theme.palette.primary.main,
+                            mt: 1,
+                            flexShrink: 0
+                          }} 
+                        />
+                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                          {subItem.name && `${subItem.name}: `}{subItem.content}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Paper>
+            </Box>
+
+            {/* Action Buttons */}
+            <Stack direction="column" spacing={1}>
+              <Tooltip title="Get AI Help">
+                <IconButton
+                  size="small"
+                  onClick={() => handleHelp(item.id)}
+                  sx={{ 
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    color: theme.palette.primary.main,
+                    '&:hover': { 
+                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
+                      transform: 'scale(1.05)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <HelpIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Edit AI Instructions">
+                <IconButton
+                  size="small"
+                  onClick={() => handleAiEdit(item.id)}
+                  sx={{ 
+                    backgroundColor: alpha(theme.palette.secondary.main, 0.1),
+                    color: theme.palette.secondary.main,
+                    '&:hover': { 
+                      backgroundColor: alpha(theme.palette.secondary.main, 0.2),
+                      transform: 'scale(1.05)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <AutoFixHighIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Duplicate Section">
+                <IconButton
+                  size="small"
+                  onClick={() => handleCopyItem(item.id)}
+                  sx={{ 
+                    backgroundColor: alpha(theme.palette.info.main, 0.1),
+                    color: theme.palette.info.main,
+                    '&:hover': { 
+                      backgroundColor: alpha(theme.palette.info.main, 0.2),
+                      transform: 'scale(1.05)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Divider sx={{ my: 1 }} />
+
+              <Tooltip title="Move Up">
+                <IconButton
+                  size="small"
+                  onClick={() => handleMoveUp(item.id)}
+                  disabled={index === 0}
+                  sx={{ 
+                    backgroundColor: alpha(theme.palette.grey[600], 0.1),
+                    color: theme.palette.grey[600],
+                    '&:hover': { 
+                      backgroundColor: alpha(theme.palette.grey[600], 0.2),
+                      transform: 'scale(1.05)'
+                    },
+                    '&:disabled': {
+                      backgroundColor: 'transparent',
+                      color: theme.palette.grey[300]
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <KeyboardArrowUpIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Move Down">
+                <IconButton
+                  size="small"
+                  onClick={() => handleMoveDown(item.id)}
+                  disabled={index === items.length - 1}
+                  sx={{ 
+                    backgroundColor: alpha(theme.palette.grey[600], 0.1),
+                    color: theme.palette.grey[600],
+                    '&:hover': { 
+                      backgroundColor: alpha(theme.palette.grey[600], 0.2),
+                      transform: 'scale(1.05)'
+                    },
+                    '&:disabled': {
+                      backgroundColor: 'transparent',
+                      color: theme.palette.grey[300]
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <KeyboardArrowDownIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Divider sx={{ my: 1 }} />
+
+              <Tooltip title="Delete Section">
+                <IconButton
+                  size="small"
+                  onClick={() => handleDeleteItem(item.id)}
+                  sx={{ 
+                    backgroundColor: alpha(theme.palette.error.main, 0.1),
+                    color: theme.palette.error.main,
+                    '&:hover': { 
+                      backgroundColor: alpha(theme.palette.error.main, 0.2),
+                      transform: 'scale(1.05)'
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Stack>
           </Box>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            <IconButton
-              size="small"
-              onClick={() => handleHelp(item.id)}
-              sx={{ bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}
-            >
-              <HelpIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
+          {/* Action Bar */}
+          <Box sx={{ display: 'flex', gap: 2, mt: 2, pt: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
+            <Button
+              variant="contained"
+              startIcon={<AutoFixHighIcon />}
               onClick={() => handleAiEdit(item.id)}
-              sx={{ bgcolor: 'secondary.main', color: 'white', '&:hover': { bgcolor: 'secondary.dark' } }}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 3,
+                boxShadow: 'none',
+                '&:hover': {
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                }
+              }}
             >
-              <AutoFixHighIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={() => handleDeleteItem(item.id)}
-              sx={{ bgcolor: 'error.main', color: 'white', '&:hover': { bgcolor: 'error.dark' } }}
+              Edit AI Instructions
+            </Button>
+
+            <Button
+              variant="outlined"
+              startIcon={<HelpIcon />}
+              onClick={() => handleHelp(item.id)}
+              sx={{
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 3,
+                borderWidth: 2,
+                '&:hover': {
+                  borderWidth: 2,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.04)
+                }
+              }}
             >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={() => handleCopyItem(item.id)}
-              sx={{ bgcolor: 'info.main', color: 'white', '&:hover': { bgcolor: 'info.dark' } }}
-            >
-              <ContentCopyIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={() => handleMoveUp(item.id)}
-              sx={{ bgcolor: 'grey.600', color: 'white', '&:hover': { bgcolor: 'grey.700' } }}
-            >
-              <KeyboardArrowUpIcon fontSize="small" />
-            </IconButton>
-            <IconButton
-              size="small"
-              onClick={() => handleMoveDown(item.id)}
-              sx={{ bgcolor: 'grey.600', color: 'white', '&:hover': { bgcolor: 'grey.700' } }}
-            >
-              <KeyboardArrowDownIcon fontSize="small" />
-            </IconButton>
+              Get Help
+            </Button>
           </Box>
-        </Box>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </Fade>
   );
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600 }}>
-          Template Editor
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setAddSectionOpen(true)}
-        >
-          Add Section
-        </Button>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
+      {/* Header */}
+      <Paper 
+        elevation={0}
+        sx={{ 
+          p: 4, 
+          mb: 4, 
+          borderRadius: 3,
+          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
+          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box>
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                fontWeight: 700,
+                color: theme.palette.text.primary,
+                mb: 1
+              }}
+            >
+              Template Editor
+            </Typography>
+            <Typography 
+              variant="body1" 
+              sx={{ 
+                color: theme.palette.text.secondary,
+                maxWidth: 600
+              }}
+            >
+              Build your AI-powered template by adding and configuring sections. Each section will be intelligently generated based on your instructions.
+            </Typography>
+          </Box>
+          
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<AddIcon />}
+            onClick={() => setAddSectionOpen(true)}
+            sx={{
+              borderRadius: 3,
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 4,
+              py: 1.5,
+              fontSize: '1rem',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              '&:hover': {
+                boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+                transform: 'translateY(-1px)'
+              },
+              transition: 'all 0.3s ease'
+            }}
+          >
+            Add Section
+          </Button>
+        </Box>
+      </Paper>
+
+      {/* Template Sections */}
+      <Box>
+        {items.map((item, index) => renderSectionBlock(item, index))}
       </Box>
 
-      {items.map(renderSectionBlock)}
-
+      {/* Empty State */}
       {items.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            No sections added yet
+        <Paper 
+          sx={{ 
+            textAlign: 'center', 
+            py: 8,
+            borderRadius: 3,
+            border: `2px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
+            backgroundColor: alpha(theme.palette.primary.main, 0.02)
+          }}
+        >
+          <PsychologyIcon 
+            sx={{ 
+              fontSize: 80, 
+              color: alpha(theme.palette.primary.main, 0.3),
+              mb: 2
+            }} 
+          />
+          <Typography 
+            variant="h5" 
+            sx={{ 
+              fontWeight: 600,
+              color: theme.palette.text.primary,
+              mb: 1
+            }}
+          >
+            Start Building Your Template
+          </Typography>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: theme.palette.text.secondary,
+              mb: 4,
+              maxWidth: 500,
+              mx: 'auto'
+            }}
+          >
+            Add your first section to begin creating an AI-powered template that will generate intelligent content based on your specifications.
           </Typography>
           <Button
             variant="contained"
+            size="large"
             startIcon={<AddIcon />}
             onClick={() => setAddSectionOpen(true)}
+            sx={{
+              borderRadius: 3,
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 4,
+              py: 1.5,
+              fontSize: '1rem'
+            }}
           >
             Add Your First Section
           </Button>
-        </Box>
+        </Paper>
       )}
 
+      {/* Dialogs */}
       <AddSectionOverlay
         open={addSectionOpen}
         onClose={() => setAddSectionOpen(false)}
@@ -311,18 +641,29 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       />
 
       {/* Help Dialog */}
-      <Dialog open={helpDialogOpen} onClose={() => setHelpDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit Auto-Generated Section</DialogTitle>
+      <Dialog 
+        open={helpDialogOpen} 
+        onClose={() => setHelpDialogOpen(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            AI Section Assistant
+          </Typography>
+        </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" gutterBottom>
-            Select an option:
+          <Typography variant="body2" gutterBottom sx={{ mb: 3 }}>
+            How would you like to modify this AI-generated section?
           </Typography>
           <TextField
             fullWidth
             select
             value={helpOption}
             onChange={(e) => setHelpOption(e.target.value)}
-            sx={{ mt: 2 }}
+            label="Select modification type"
+            variant="outlined"
           >
             {helpOptions.map((option) => (
               <MenuItem key={option.value} value={option.value}>
@@ -331,84 +672,96 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
             ))}
           </TextField>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setHelpDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={() => setHelpDialogOpen(false)}>Apply</Button>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button onClick={() => setHelpDialogOpen(false)} variant="outlined">
+            Cancel
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={() => setHelpDialogOpen(false)}
+            disabled={!helpOption}
+          >
+            Apply Changes
+          </Button>
         </DialogActions>
       </Dialog>
 
       {/* AI Edit Dialog */}
-      <Dialog open={aiEditDialogOpen} onClose={() => setAiEditDialogOpen(false)} maxWidth="md" fullWidth>
+      <Dialog 
+        open={aiEditDialogOpen} 
+        onClose={() => setAiEditDialogOpen(false)} 
+        maxWidth="md" 
+        fullWidth
+        PaperProps={{ sx: { borderRadius: 3 } }}
+      >
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h6">Edit Instructions for AI</Typography>
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              Configure AI Instructions
+            </Typography>
             <IconButton onClick={() => setAiEditDialogOpen(false)}>
               <CloseIcon />
             </IconButton>
           </Box>
         </DialogTitle>
         <DialogContent>
-          <Alert severity="info" sx={{ mb: 3 }}>
-            <Typography variant="subtitle2" gutterBottom>
-              How this works
+          <Alert 
+            severity="info" 
+            sx={{ 
+              mb: 3,
+              borderRadius: 2,
+              '& .MuiAlert-message': { width: '100%' }
+            }}
+          >
+            <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+              💡 How AI Instructions Work
             </Typography>
-            <Typography variant="body2" gutterBottom>
-              <strong>Instruct as you would to a human</strong><br />
-              Tell Medwriter what you want it to write, as you would tell another human (or ChatGPT) how to write this section. Explain what you it should do, where it should focus, etc.
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              <strong>Suggest Length</strong><br />
-              State the brevity or length (e.g., keep this brief, 2-3 paragraphs).
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              <strong>Placeholders: {'{}'}</strong><br />
-              Use for info the AI should fill in: Summary for {'{Scale Result}'}.
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              <strong>Verbatim Text: ""</strong><br />
-              Use double quotes for text to include exactly: Conclude with "Follow up as needed."
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              <strong>Hidden Instructions: ()</strong><br />
-              Use parentheses for notes to the AI (won't appear in output): Physical exam findings (focus on cardio).
-            </Typography>
-            <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic' }}>
-              <strong>Example:</strong><br />
-              "Summarize any assessments discussed in this session; keep it brief. Use the following format: {'{Scale Name}'}: {'{Scale Result}'}. (If none discussed, leave this blank)."
-            </Typography>
+            <Box component="ul" sx={{ pl: 2, mb: 0, '& li': { mb: 1 } }}>
+              <li><strong>Natural Language:</strong> Write instructions as you would explain to a colleague</li>
+              <li><strong>Placeholders:</strong> Use {'{variable}'} for dynamic content</li>
+              <li><strong>Exact Text:</strong> Use "quotes" for text that must appear exactly</li>
+              <li><strong>Hidden Notes:</strong> Use (parentheses) for AI-only instructions</li>
+            </Box>
           </Alert>
           
-          <TextField
-            fullWidth
-            label="Title"
-            value={aiTitle}
-            onChange={(e) => setAiTitle(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          
-          <TextField
-            fullWidth
-            label="Description"
-            value={aiDescription}
-            onChange={(e) => setAiDescription(e.target.value)}
-            multiline
-            rows={3}
-            sx={{ mb: 2 }}
-          />
-          
-          <TextField
-            fullWidth
-            label="Instructions for AI"
-            value={aiInstructions}
-            onChange={(e) => setAiInstructions(e.target.value)}
-            multiline
-            rows={4}
-            placeholder="Enter detailed instructions for how the AI should write this section..."
-          />
+          <Stack spacing={3}>
+            <TextField
+              fullWidth
+              label="Section Title"
+              value={aiTitle}
+              onChange={(e) => setAiTitle(e.target.value)}
+              variant="outlined"
+            />
+            
+            <TextField
+              fullWidth
+              label="Description"
+              value={aiDescription}
+              onChange={(e) => setAiDescription(e.target.value)}
+              multiline
+              rows={3}
+              variant="outlined"
+            />
+            
+            <TextField
+              fullWidth
+              label="Detailed AI Instructions"
+              value={aiInstructions}
+              onChange={(e) => setAiInstructions(e.target.value)}
+              multiline
+              rows={6}
+              placeholder="Provide detailed instructions for how the AI should generate this section..."
+              variant="outlined"
+            />
+          </Stack>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAiEditDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSaveAiEdit}>Save</Button>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button onClick={() => setAiEditDialogOpen(false)} variant="outlined">
+            Cancel
+          </Button>
+          <Button variant="contained" onClick={handleSaveAiEdit}>
+            Save Instructions
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
