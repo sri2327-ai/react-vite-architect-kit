@@ -35,7 +35,7 @@ import {
   AlertTitle,
   Snackbar
 } from '@mui/material';
-import { Delete, Add, Edit, DragHandle } from 'lucide-react';
+import { Delete, Plus, Edit, GripVertical } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useTheme } from '@mui/material/styles';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -416,7 +416,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
                         disableGutters
                         secondaryAction={
                           <Box {...provided.dragHandleProps}>
-                            <DragHandle color={theme.palette.action.active} />
+                            <GripVertical color={theme.palette.action.active} />
                           </Box>
                         }
                         sx={{
@@ -499,7 +499,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
           <DialogContent>
             <Grid container spacing={2}>
               {PREDEFINED_SECTIONS.map((section) => (
-                <Grid item xs={12} md={4} key={section.id}>
+                <Grid key={section.id} xs={12} md={4}>
                   <Card
                     sx={{
                       cursor: 'pointer',
