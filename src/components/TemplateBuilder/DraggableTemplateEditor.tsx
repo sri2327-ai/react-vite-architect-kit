@@ -22,7 +22,12 @@ import {
   Menu,
   MenuList,
   ListItemIcon,
-  ListItemText
+  ListItemText,
+  Alert,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Paper
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -32,7 +37,9 @@ import {
   Close as CloseIcon,
   AutoFixHigh as AutoFixHighIcon,
   HelpOutline as HelpOutlineIcon,
-  MoreVert as MoreVertIcon
+  MoreVert as MoreVertIcon,
+  ContentCopy as ContentCopyIcon,
+  SwapVert as SwapVertIcon
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -79,6 +86,8 @@ interface SortableItemProps {
   index: number;
   onEdit: (index: number, field: string, value: any) => void;
   onDelete: (index: number) => void;
+  onCopy: (index: number) => void;
+  onMove: (index: number, direction: 'up' | 'down') => void;
   onAiEdit: (index: number) => void;
   onHelp: (index: number) => void;
 }
@@ -87,7 +96,9 @@ const SortableItem: React.FC<SortableItemProps> = ({
   item, 
   index, 
   onEdit, 
-  onDelete, 
+  onDelete,
+  onCopy,
+  onMove,
   onAiEdit, 
   onHelp 
 }) => {
@@ -160,7 +171,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                 {item.name}
               </Typography>
               <Chip 
-                label={item.type.replace('_', ' ')} 
+                label={<span>{item.type.replace('_', ' ')}</span>}
                 size="small" 
                 variant="outlined"
                 sx={{ textTransform: 'capitalize' }}
@@ -204,6 +215,18 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
                   <ListItemText>Edit</ListItemText>
                 </MenuItem>
+                <MenuItem onClick={() => { onCopy(index); handleMenuClose(); }}>
+                  <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>Copy</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => { onMove(index, 'up'); handleMenuClose(); }}>
+                  <ListItemIcon><SwapVertIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>Move Up</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => { onMove(index, 'down'); handleMenuClose(); }}>
+                  <ListItemIcon><SwapVertIcon fontSize="small" /></ListItemIcon>
+                  <ListItemText>Move Down</ListItemText>
+                </MenuItem>
                 <MenuItem onClick={() => { onDelete(index); handleMenuClose(); }}>
                   <ListItemIcon><DeleteIcon fontSize="small" /></ListItemIcon>
                   <ListItemText>Delete</ListItemText>
@@ -218,14 +241,14 @@ const SortableItem: React.FC<SortableItemProps> = ({
         {item.is_editing ? (
           <Stack spacing={2}>
             <TextField
-              label="Section Name"
+              label="Section Title"
               value={item.temp_description || item.name}
               onChange={(e) => onEdit(index, "temp_description", e.target.value)}
               fullWidth
               size="small"
             />
             <TextField
-              label="Instructions for A.I."
+              label="Section Description"
               value={item.temp_template || item.content}
               onChange={(e) => onEdit(index, "temp_template", e.target.value)}
               multiline
@@ -304,6 +327,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [newSectionName, setNewSectionName] = useState('');
   const [newSectionContent, setNewSectionContent] = useState('');
   const [aiPrompt, setAiPrompt] = useState('');
+  const [helpOption, setHelpOption] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -335,6 +359,28 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     setSectionList(prev => prev.filter((_, idx) => idx !== index));
   };
 
+  const copyItem = (index: number) => {
+    const itemToCopy = sectionList[index];
+    const newItem = {
+      ...itemToCopy,
+      id: Date.now().toString(),
+      name: `${itemToCopy.name} (Copy)`
+    };
+    setSectionList(prev => [...prev, newItem]);
+  };
+
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+    setSectionList(prev => {
+      const newItems = [...prev];
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      
+      if (targetIndex >= 0 && targetIndex < newItems.length) {
+        return arrayMove(newItems, index, targetIndex);
+      }
+      return newItems;
+    });
+  };
+
   const handleAiEdit = (index: number) => {
     setSelectedItemIndex(index);
     setAiEditDialog(true);
@@ -347,11 +393,39 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
 
   const applyAiEdit = () => {
     if (selectedItemIndex >= 0 && aiPrompt.trim()) {
-      // Simulate AI enhancement
       const enhancedContent = `${sectionList[selectedItemIndex].content}\n\nAI Enhancement: ${aiPrompt}`;
       editItem(selectedItemIndex, "content", enhancedContent);
       setAiEditDialog(false);
       setAiPrompt('');
+      setSelectedItemIndex(-1);
+    }
+  };
+
+  const applyHelpOption = () => {
+    if (selectedItemIndex >= 0 && helpOption) {
+      let updatedContent = sectionList[selectedItemIndex].content;
+      
+      switch (helpOption) {
+        case 'change_to_list':
+          updatedContent = `• ${updatedContent.split('.').join('\n• ')}`;
+          break;
+        case 'increase_detail':
+          updatedContent = `${updatedContent} (Provide detailed information with specific examples and comprehensive explanations)`;
+          break;
+        case 'decrease_detail':
+          updatedContent = `${updatedContent} (Keep this brief and concise)`;
+          break;
+        case 'format_specific':
+          updatedContent = `${updatedContent} (Use specific medical formatting and terminology)`;
+          break;
+        case 'other':
+          updatedContent = `${updatedContent} (Custom formatting applied)`;
+          break;
+      }
+      
+      editItem(selectedItemIndex, "content", updatedContent);
+      setHelpDialog(false);
+      setHelpOption('');
       setSelectedItemIndex(-1);
     }
   };
@@ -454,6 +528,8 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
                 index={idx}
                 onEdit={editItem}
                 onDelete={deleteItem}
+                onCopy={copyItem}
+                onMove={moveItem}
                 onAiEdit={handleAiEdit}
                 onHelp={handleHelp}
               />
@@ -529,10 +605,10 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       </Dialog>
 
       {/* AI Edit Dialog */}
-      <Dialog open={aiEditDialog} onClose={() => setAiEditDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog open={aiEditDialog} onClose={() => setAiEditDialog(false)} maxWidth="md" fullWidth>
         <DialogTitle>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">AI Edit Section</Typography>
+            <Typography variant="h6">AI Edit Instructions</Typography>
             <IconButton onClick={() => setAiEditDialog(false)}>
               <CloseIcon />
             </IconButton>
@@ -540,18 +616,51 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         </DialogTitle>
         
         <DialogContent>
-          <Stack spacing={2} sx={{ mt: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              Tell AI how to enhance this section:
-            </Typography>
+          <Stack spacing={3} sx={{ mt: 1 }}>
+            <Paper sx={{ p: 2, backgroundColor: '#f5f5f5' }}>
+              <Typography variant="h6" gutterBottom>How this works</Typography>
+              
+              <Typography variant="subtitle2" gutterBottom>Instruct as you would to a human</Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Tell Medwriter what you want it to write, as you would tell another human (or ChatGPT) how to write this section. Explain what you it should do, where it should focus, etc.
+              </Typography>
+              
+              <Typography variant="subtitle2" gutterBottom>Suggest Length</Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                State the brevity or length (e.g., keep this brief, 2-3 paragraphs).
+              </Typography>
+              
+              <Typography variant="subtitle2" gutterBottom>Placeholders: {'{}'}</Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Use for info the AI should fill in: Summary for {'{Scale Result}'}.
+              </Typography>
+              
+              <Typography variant="subtitle2" gutterBottom>Verbatim Text: ""</Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Use double quotes for text to include exactly: Conclude with "Follow up as needed."
+              </Typography>
+              
+              <Typography variant="subtitle2" gutterBottom>Hidden Instructions: ()</Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                Use parentheses for notes to the AI (won't appear in output): Physical exam findings (focus on cardio).
+              </Typography>
+              
+              <Alert severity="info" sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" gutterBottom>Example</Typography>
+                <Typography variant="body2">
+                  "Summarize any assessments discussed in this session; keep it brief. Use the following format: {'{Scale Name}'}: {'{Scale Result}'}. (If none discussed, leave this blank)."
+                </Typography>
+              </Alert>
+            </Paper>
+            
             <TextField
               label="AI Instructions"
               value={aiPrompt}
               onChange={(e) => setAiPrompt(e.target.value)}
               multiline
-              rows={4}
+              rows={6}
               fullWidth
-              placeholder="e.g., 'Make this more detailed', 'Add medical terminology', 'Simplify the language'"
+              placeholder="Enter your instructions for the AI here..."
             />
           </Stack>
         </DialogContent>
@@ -573,7 +682,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       <Dialog open={helpDialog} onClose={() => setHelpDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">Section Help</Typography>
+            <Typography variant="h6">Edit Auto-Generated Section</Typography>
             <IconButton onClick={() => setHelpDialog(false)}>
               <CloseIcon />
             </IconButton>
@@ -582,25 +691,51 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <Typography variant="h6">Tips for this section:</Typography>
-            <Typography variant="body2">
-              • Use clear, concise language
+            <Typography variant="body1" gutterBottom>
+              Select an option:
             </Typography>
-            <Typography variant="body2">
-              • Include specific instructions for AI
-            </Typography>
-            <Typography variant="body2">
-              • Consider medical accuracy and compliance
-            </Typography>
-            <Typography variant="body2">
-              • Drag sections to reorder them
-            </Typography>
+            
+            <RadioGroup
+              value={helpOption}
+              onChange={(e) => setHelpOption(e.target.value)}
+            >
+              <FormControlLabel 
+                value="change_to_list" 
+                control={<Radio />} 
+                label="Change to List" 
+              />
+              <FormControlLabel 
+                value="increase_detail" 
+                control={<Radio />} 
+                label="Increase Detail" 
+              />
+              <FormControlLabel 
+                value="decrease_detail" 
+                control={<Radio />} 
+                label="Decrease Detail" 
+              />
+              <FormControlLabel 
+                value="format_specific" 
+                control={<Radio />} 
+                label="Format Specific" 
+              />
+              <FormControlLabel 
+                value="other" 
+                control={<Radio />} 
+                label="Other" 
+              />
+            </RadioGroup>
           </Stack>
         </DialogContent>
         
         <DialogActions>
-          <Button onClick={() => setHelpDialog(false)} variant="contained">
-            Got it
+          <Button onClick={() => setHelpDialog(false)}>Cancel</Button>
+          <Button 
+            variant="contained" 
+            onClick={applyHelpOption}
+            disabled={!helpOption}
+          >
+            Apply Changes
           </Button>
         </DialogActions>
       </Dialog>
