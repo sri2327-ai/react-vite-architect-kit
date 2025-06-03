@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -6,56 +6,36 @@ import {
   CardContent,
   Button,
   Chip,
+  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Alert,
-  Divider,
+  TextField,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  TextField,
-  Autocomplete,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  LinearProgress,
-  Grid,
-  Paper,
   Switch,
   FormControlLabel,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Fab,
-  Fade,
-  Zoom,
-  IconButton
+  Alert,
+  Grid2 as Grid,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon
 } from '@mui/material';
 import {
-  Download as ImportIcon,
-  Visibility as ViewIcon,
-  Schedule as ScheduleIcon,
-  Person as PersonIcon,
-  Today as TodayIcon,
-  LocationOn as LocationIcon,
-  Description as NoteIcon,
-  Assignment as ChartIcon,
-  LocalHospital as VisitIcon,
-  Edit as EditIcon,
-  Map as MapIcon,
-  Settings as SettingsIcon,
-  Save as SaveIcon,
-  Close as CloseIcon,
-  ArrowBack as ArrowBackIcon,
-  CheckCircle as CheckCircleIcon,
-  ExpandMore as ExpandMoreIcon,
   Add as AddIcon,
-  DeleteOutline as DeleteIcon
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  PlayArrow as PlayIcon,
+  Pause as PauseIcon,
+  Visibility as VisibilityIcon,
+  FileCopy as CopyIcon
 } from '@mui/icons-material';
+import DynamicWorkflowBuilder from './DynamicWorkflowBuilder';
 
 interface WorkflowTemplate {
   id: string;
@@ -64,6 +44,10 @@ interface WorkflowTemplate {
   ehrSystem: string;
   category: string;
   blocks: WorkflowBlock[];
+  isActive: boolean;
+  templateType: string;
+  visitTypes: string[];
+  steps: WorkflowBlock[];
 }
 
 interface WorkflowBlock {
@@ -89,7 +73,11 @@ const WorkflowLibrary: React.FC = () => {
   const [editableBlocks, setEditableBlocks] = useState<{[key: string]: boolean}>({});
   const [isImporting, setIsImporting] = useState(false);
   const [importComplete, setImportComplete] = useState(false);
-  
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [editingWorkflow, setEditingWorkflow] = useState<WorkflowTemplate | null>(null);
+  const [availableTemplates, setAvailableTemplates] = useState<WorkflowTemplate[]>([]);
+  const [workflows, setWorkflows] = useState<WorkflowTemplate[]>([]);
+
   // Mock user EHR - this would come from user profile
   const userEHR = 'Practice Fusion';
 
@@ -218,7 +206,11 @@ const WorkflowLibrary: React.FC = () => {
       description: 'Full patient encounter workflow with comprehensive documentation',
       ehrSystem: 'Practice Fusion',
       category: 'Patient Encounter',
-      blocks: workflowBlocks
+      blocks: workflowBlocks,
+      isActive: true,
+      templateType: 'Default',
+      visitTypes: ['Initial Consultation', 'Follow-up Visit'],
+      steps: workflowBlocks
     },
     {
       id: 'pf-quick-visit',
@@ -226,7 +218,11 @@ const WorkflowLibrary: React.FC = () => {
       description: 'Streamlined workflow for brief encounters',
       ehrSystem: 'Practice Fusion',
       category: 'Patient Encounter',
-      blocks: workflowBlocks.slice(0, 7)
+      blocks: workflowBlocks.slice(0, 7),
+      isActive: true,
+      templateType: 'Default',
+      visitTypes: ['Initial Consultation', 'Follow-up Visit'],
+      steps: workflowBlocks.slice(0, 7)
     },
     {
       id: 'pf-prescription-only',
@@ -234,7 +230,11 @@ const WorkflowLibrary: React.FC = () => {
       description: 'Workflow optimized for medication management visits',
       ehrSystem: 'Practice Fusion',
       category: 'Prescription',
-      blocks: workflowBlocks.slice(0, 6)
+      blocks: workflowBlocks.slice(0, 6),
+      isActive: true,
+      templateType: 'Default',
+      visitTypes: ['Initial Consultation', 'Follow-up Visit'],
+      steps: workflowBlocks.slice(0, 6)
     },
     {
       id: 'pf-follow-up',
@@ -242,11 +242,21 @@ const WorkflowLibrary: React.FC = () => {
       description: 'Efficient workflow for follow-up appointments',
       ehrSystem: 'Practice Fusion',
       category: 'Patient Encounter',
-      blocks: workflowBlocks.slice(0, 8)
+      blocks: workflowBlocks.slice(0, 8),
+      isActive: true,
+      templateType: 'Default',
+      visitTypes: ['Initial Consultation', 'Follow-up Visit'],
+      steps: workflowBlocks.slice(0, 8)
     }
   ];
 
-  const filteredWorkflows = workflowTemplates.filter(wf => {
+  useEffect(() => {
+    // Fetch available templates and workflows from API
+    setAvailableTemplates(workflowTemplates);
+    setWorkflows(workflowTemplates);
+  }, []);
+
+  const filteredWorkflows = workflows.filter(wf => {
     const ehrMatch = wf.ehrSystem === userEHR;
     const categoryMatch = selectedCategory === 'all' || wf.category === selectedCategory;
     return ehrMatch && categoryMatch;
@@ -569,103 +579,147 @@ const WorkflowLibrary: React.FC = () => {
     }
   };
 
+  const handleEditWorkflow = (workflow: WorkflowTemplate) => {
+    setEditingWorkflow(workflow);
+    setShowBuilder(true);
+  };
+
+  const handleCloneWorkflow = (workflow: WorkflowTemplate) => {
+    const newWorkflow = { ...workflow, id: `clone-${workflow.id}`, isActive: false };
+    setWorkflows(prev => [...prev, newWorkflow]);
+    setShowBuilder(true);
+  };
+
+  const handlePreviewWorkflow = (workflow: WorkflowTemplate) => {
+    setSelectedWorkflow(workflow);
+    setViewDialog(true);
+  };
+
+  const handleToggleWorkflow = (workflowId: string) => {
+    setWorkflows(prev => prev.map(wf => {
+      if (wf.id === workflowId) {
+        return { ...wf, isActive: !wf.isActive };
+      }
+      return wf;
+    }));
+  };
+
+  const handleDeleteWorkflow = (workflowId: string) => {
+    setWorkflows(prev => prev.filter(wf => wf.id !== workflowId));
+  };
+
+  const handleSaveWorkflow = (updatedWorkflow: WorkflowTemplate) => {
+    setWorkflows(prev => {
+      const updatedWorkflows = prev.map(wf => {
+        if (wf.id === updatedWorkflow.id) {
+          return updatedWorkflow;
+        }
+        return wf;
+      });
+      return updatedWorkflows;
+    });
+    setShowBuilder(false);
+    setEditingWorkflow(null);
+  };
+
   return (
     <Box sx={{ p: 3 }}>
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          <strong>EHR System:</strong> {userEHR} - Import and customize predefined workflows for your practice
-        </Typography>
-      </Alert>
+      {!showBuilder ? (
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Typography variant="h5">
+              Workflow Library
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setShowBuilder(true)}
+            >
+              Create Workflow
+            </Button>
+          </Box>
 
-      {/* Category Filter */}
-      <Box sx={{ mb: 3 }}>
-        <FormControl size="small" sx={{ minWidth: 200 }}>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={selectedCategory}
-            label="Category"
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <MenuItem value="all">All Categories</MenuItem>
-            {categories.map((category) => (
-              <MenuItem key={category} value={category}>{category}</MenuItem>
+          <Grid container spacing={3}>
+            {workflows.map(workflow => (
+              <Grid size={{ xs: 12, sm: 6 }} key={workflow.id}>
+                <Card>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                      <Typography variant="h6" component="div">
+                        {workflow.name}
+                      </Typography>
+                      <Chip 
+                        label={workflow.isActive ? 'Active' : 'Inactive'} 
+                        color={workflow.isActive ? 'success' : 'default'}
+                        size="small"
+                      />
+                    </Box>
+                    
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      Template: {workflow.templateType}
+                    </Typography>
+                    
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="caption" display="block" gutterBottom>
+                        Visit Types:
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {workflow.visitTypes.map((visitType) => (
+                          <Chip key={visitType} label={visitType} size="small" />
+                        ))}
+                      </Box>
+                    </Box>
+
+                    <Typography variant="caption" color="text.secondary">
+                      {workflow.steps.length} steps configured
+                    </Typography>
+                  </CardContent>
+
+                  <Box sx={{ p: 2, pt: 0, display: 'flex', justifyContent: 'space-between' }}>
+                    <Box>
+                      <IconButton onClick={() => handleEditWorkflow(workflow)} size="small">
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton onClick={() => handleCloneWorkflow(workflow)} size="small">
+                        <CopyIcon />
+                      </IconButton>
+                      <IconButton onClick={() => handlePreviewWorkflow(workflow)} size="small">
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Box>
+                    <Box>
+                      <IconButton 
+                        onClick={() => handleToggleWorkflow(workflow.id)} 
+                        size="small"
+                        color={workflow.isActive ? 'success' : 'default'}
+                      >
+                        {workflow.isActive ? <PauseIcon /> : <PlayIcon />}
+                      </IconButton>
+                      <IconButton 
+                        onClick={() => handleDeleteWorkflow(workflow.id)} 
+                        size="small"
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </Card>
+              </Grid>
             ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-      {/* Workflow Cards */}
-      <Box sx={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
-        gap: 3 
-      }}>
-        {filteredWorkflows.map((workflow) => (
-          <Card key={workflow.id} sx={{ 
-            height: '100%', 
-            display: 'flex', 
-            flexDirection: 'column',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              transform: 'translateY(-4px)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
-            }
-          }}>
-            <CardContent sx={{ flexGrow: 1 }}>
-              <Box sx={{ mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                  <VisitIcon color="primary" />
-                  <Typography variant="h6">
-                    {workflow.name}
-                  </Typography>
-                </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {workflow.description}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <Chip label={workflow.category} size="small" color="secondary" />
-                  <Chip label={`${workflow.blocks.filter(b => b.isEditable).length} Editable Steps`} size="small" color="primary" />
-                  <Chip label={`${workflow.blocks.filter(b => b.isNoteField).length} Note Fields`} size="small" color="warning" />
-                </Box>
-              </Box>
-              
-              <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                Workflow Steps: {workflow.blocks.length}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Configure visit types and EHR field mappings after import
-              </Typography>
-            </CardContent>
-            
-            <Box sx={{ p: 2, pt: 0, display: 'flex', gap: 1 }}>
-              <Button
-                variant="outlined"
-                startIcon={<ViewIcon />}
-                onClick={() => handleViewWorkflow(workflow)}
-                size="small"
-                sx={{ flex: 1 }}
-              >
-                Preview
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<ImportIcon />}
-                onClick={() => handleImportWorkflow(workflow)}
-                size="small"
-                sx={{ 
-                  flex: 1,
-                  background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #1565c0 30%, #1976d2 90%)',
-                  }
-                }}
-              >
-                Import & Configure
-              </Button>
-            </Box>
-          </Card>
-        ))}
-      </Box>
+          </Grid>
+        </Box>
+      ) : (
+        <DynamicWorkflowBuilder
+          availableTemplates={availableTemplates}
+          existingWorkflow={editingWorkflow}
+          onSave={handleSaveWorkflow}
+          onCancel={() => {
+            setShowBuilder(false);
+            setEditingWorkflow(null);
+          }}
+        />
+      )}
 
       {/* Workflow Details Dialog */}
       <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="md" fullWidth>
@@ -682,7 +736,8 @@ const WorkflowLibrary: React.FC = () => {
           
           <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
             <Chip label={`Category: ${selectedWorkflow?.category}`} color="secondary" />
-            <Chip label={`EHR: ${selectedWorkflow?.ehrSystem}`} color="primary" />
+            <Chip label={`${selectedWorkflow?.blocks.filter(b => b.isEditable).length} Editable Steps`} size="small" color="primary" />
+            <Chip label={`${selectedWorkflow?.blocks.filter(b => b.isNoteField).length} Note Fields`} size="small" color="warning" />
           </Box>
           
           <Alert severity="info" sx={{ mb: 3 }}>

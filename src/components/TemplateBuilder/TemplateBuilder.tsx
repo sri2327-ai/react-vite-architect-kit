@@ -18,7 +18,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid,
+  Grid2 as Grid,
   Card,
   CardContent,
   Dialog,
@@ -49,6 +49,7 @@ import {
 } from '@mui/icons-material';
 import { Template, TemplateSection, TemplateField, EditorTemplate, EditorTemplateSection, EditorTemplateField } from './types';
 import TemplateEditor from './TemplateEditor';
+import { templateService } from '../../services/templateService';
 
 interface FieldOption {
   id: string;
@@ -224,6 +225,11 @@ const TemplateBuilder: React.FC = () => {
     setShowEditor(true);
   };
 
+  // Register templates with the service when they change
+  React.useEffect(() => {
+    templateService.registerTemplates(templates);
+  }, [templates]);
+
   return (
     <Box sx={{ p: 3 }}>
       {!showEditor ? (
@@ -238,7 +244,7 @@ const TemplateBuilder: React.FC = () => {
           </Box>
           <Grid container spacing={3}>
             {templates.map(template => (
-              <Grid item xs={12} sm={6} md={4} key={template.id}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={template.id}>
                 <Card sx={{ height: '100%' }}>
                   <CardContent>
                     <Typography variant="h6" component="div">

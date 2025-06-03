@@ -434,6 +434,317 @@ const TemplateLibrary = () => {
     setdrop2(event.target.value);
   };
 
+  const templatePreview = [
+    {
+      "content": "Provide a comprehensive narrative of the patient's current condition. Include details about the onset, duration, and characteristics of the present illness. Note any associated symptoms, and incorporate relevant background information such as lifestyle factors and family medical history. Be sure to structure the narrative in a chronological manner, emphasizing the progression of the condition over time.",
+      "id": "cb1129e5-81e7-6dbd-d9f8-91d8a502d0b1",
+      "name": "History of Present Illness",
+      "type": "paragraph"
+    },
+    {
+      "content": "List any known allergies the patient has, including reactions to medications, foods, or other substances. If there are no known allergies, indicate this as well.",
+      "id": "dccbe5e5-6645-e3e2-b2b7-1fd45baf1477",
+      "items": [
+        {
+          "content": "Create a bullet for each known allergy, specifying the substance and the type of reaction."
+        },
+        {
+          "content": "Include a bullet to indicate if there are no known allergies."
+        }
+      ],
+      "name": "Allergies",
+      "type": "bulleted_list"
+    },
+    {
+      "content": "Summarize the known family health history, focusing on immediate family members and highlighting relevant hereditary conditions.",
+      "id": "22faa4a9-1436-5882-7fcb-87a986aed3c6",
+      "items": [
+        {
+          "content": "Include a bullet for each immediate family member (parents, siblings, children) and mention their known health conditions."
+        },
+        {
+          "content": "For each individual mentioned, specify hereditary conditions that may be relevant to the patient's health."
+        },
+        {
+          "content": "If applicable, include information about the age of onset for any hereditary diseases."
+        }
+      ],
+      "name": "Family Health History",
+      "type": "bulleted_list"
+    },
+    {
+      "content": "Record a list of significant past medical events or procedures relevant to the patient's current health.",
+      "id": "e40cb25c-ad63-74cc-73d9-54c0f314fa6f",
+      "items": [
+        {
+          "content": "Include a bullet for each significant past medical event or procedure. Provide the event or procedure name, date, and any relevant notes on its impact on the patient's current health."
+        }
+      ],
+      "name": "Major Events",
+      "type": "bulleted_list"
+    },
+    {
+      "content": "List of current known medical problems affecting the patient.",
+      "id": "e5c2efe1-b847-75a4-2462-95ae3ea52aba",
+      "items": [
+        {
+          "content": "Create a bullet for each ongoing medical problem the patient is currently experiencing. Include the problem name and any relevant details such as severity, duration, and current management strategies."
+        }
+      ],
+      "name": "Ongoing Medical Problems",
+      "type": "bulleted_list"
+    },
+    {
+      "content": "Record of preventive measures or history such as vaccinations or routine screenings.",
+      "id": "84b2f7d2-e0b8-40f4-7b3d-061a6a1221d8",
+      "items": [
+        {
+          "content": "Create a bullet item for each vaccination the patient has received, including the date it was administered and if applicable, any booster shots."
+        },
+        {
+          "content": "List any routine screenings the patient has undergone, specifying the type of screening (e.g., mammogram, colonoscopy) and the date it was last performed."
+        },
+        {
+          "content": "Include other preventive measures taken by the patient, such as regular health check-ups, dietary adjustments, and any preventive medications they are on."
+        }
+      ],
+      "name": "Preventive Care",
+      "type": "bulleted_list"
+    },
+    {
+      "content": "Include lifestyle factors such as alcohol, tobacco, and recreational drug use, along with marital status, children, and occupation.",
+      "id": "87a65e46-bdbd-73c8-255d-80c278135056",
+      "items": [
+        {
+          "content": "Create a bullet for alcohol use including frequency and amount."
+        },
+        {
+          "content": "Create a bullet for tobacco use including type, frequency, and duration."
+        },
+        {
+          "content": "Create a bullet for any recreational drug use including type and frequency."
+        },
+        {
+          "content": "Create a bullet for marital status."
+        },
+        {
+          "content": "Create a bullet for number and ages of children."
+        },
+        {
+          "content": "Create a bullet for current occupation including job title and duration of employment."
+        }
+      ],
+      "name": "Social History",
+      "type": "bulleted_list"
+    },
+    {
+      "content": "Create a bullet for each body system reviewed. Include relevant positives and negatives as reported by the patient.",
+      "id": "42d00036-eb64-9f47-cc11-2eff2d62a96d",
+      "items": [
+        {
+          "content": "General: {Report on fatigue, fever, chills, or weight changes. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Skin: {Report on rashes, changes in moles, or dryness. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Head/Eyes/Ears/Nose/Throat (HEENT): {Report on headaches, vision changes, ear pain, nasal congestion, sore throat. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Respiratory: {Report on cough, difficulty breathing, or wheezing. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Cardiovascular: {Report on chest pain, palpitations, or edema. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Gastrointestinal: {Report on nausea, vomiting, diarrhea, constipation, or abdominal pain. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Genitourinary: {Report on urinary frequency, urgency, or changes in urine. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Musculoskeletal: {Report on joint pain, muscle aches, or stiffness. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Neurological: {Report on dizziness, numbness, tingling, or weakness. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Psychiatric: {Report on anxiety, depression, or mood changes. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Endocrine: {Report on changes in thirst, appetite, or energy levels. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Hematologic/Lymphatic: {Report on easy bruising, bleeding, or lymph node enlargement. Include relevant positives and negatives.}"
+        },
+        {
+          "content": "Allergic/Immunologic: {Report on allergies, recurrent infections, or immune system concerns. Include relevant positives and negatives.}"
+        }
+      ],
+      "name": "Review of Systems",
+      "type": "bulleted_list"
+    },
+    {
+      "id": "b9dae99a-77ce-2595-ab8d-d93f880073da",
+      "items": [
+        {
+          "content": "Recap the patient's general appearance, including observations like alertness, apparent distress, and nutritional status.",
+          "name": "General Appearance",
+          "withinNormalLimitsText": "Patient appears well-nourished, alert, and in no apparent distress."
+        },
+        {
+          "content": "Recap the examination of the skin, noting any rashes, lesions, or abnormalities.",
+          "name": "Skin",
+          "withinNormalLimitsText": "Skin is warm, dry, and intact with no rashes or lesions."
+        },
+        {
+          "content": "Recap head examination, noting any deformities or abnormalities.",
+          "name": "Head",
+          "withinNormalLimitsText": "Head is normocephalic and atraumatic."
+        },
+        {
+          "content": "Recap eye examination including pupil reaction, conjunctivae, and sclera.",
+          "name": "Eyes",
+          "withinNormalLimitsText": "Pupils equal, round, reactive to light and accommodation; conjunctivae clear and sclera white."
+        },
+        {
+          "content": "Recap ear examination, noting any discharge or abnormalities.",
+          "name": "Ears",
+          "withinNormalLimitsText": "Ear canals clear and tympanic membranes intact with no discharge."
+        },
+        {
+          "content": "Recap the examination of the nose and sinuses.",
+          "name": "Nose",
+          "withinNormalLimitsText": "Nasal passages clear with no discharge; sinuses non-tender."
+        },
+        {
+          "content": "Recap the examination of the mouth and throat.",
+          "name": "Mouth/Throat",
+          "withinNormalLimitsText": "Oral mucosa moist and pink; no lesions or tonsillar enlargement."
+        },
+        {
+          "content": "Recap of neck exam, noting thyroid and cervical lymph nodes status.",
+          "name": "Neck",
+          "withinNormalLimitsText": "Neck supple with no lymphadenopathy; thyroid not enlarged."
+        },
+        {
+          "content": "Recap examination of cardiovascular system including heart sounds and peripheral pulses.",
+          "name": "Cardiovascular",
+          "withinNormalLimitsText": "Regular rate and rhythm; normal S1 and S2; no murmurs, rubs, or gallops; peripheral pulses 2+. "
+        },
+        {
+          "content": "Recap examination of the respiratory system including auscultatory findings.",
+          "name": "Respiratory",
+          "withinNormalLimitsText": "Clear to auscultation bilaterally with no wheezes, rales, or rhonchi."
+        },
+        {
+          "content": "Recap examination of the abdomen, noting any masses, or tenderness.",
+          "name": "Abdomen",
+          "withinNormalLimitsText": "Abdomen soft, non-tender, non-distended with normoactive bowel sounds and no masses."
+        },
+        {
+          "content": "Recap examination of musculoskeletal system noting range of motion and any deformities.",
+          "name": "Musculoskeletal",
+          "withinNormalLimitsText": "Full range of motion in all extremities, no deformities or joint swelling."
+        },
+        {
+          "content": "Recap examination of the neurological system, noting any deficits or abnormal findings.",
+          "name": "Neurological",
+          "withinNormalLimitsText": "Alert and oriented x3, cranial nerves II-XII intact, motor and sensory functions intact."
+        },
+        {
+          "content": "Recap examination of peripheral and central lymph nodes.",
+          "name": "Lymphatic",
+          "withinNormalLimitsText": "No cervical, axillary, or inguinal lymphadenopathy."
+        },
+        {
+          "content": "Recap of genitourinary system examination, noting any findings in external genitalia or bladder.",
+          "name": "Genitourinary",
+          "withinNormalLimitsText": "No suprapubic tenderness; external genitalia normal."
+        }
+      ],
+      "name": "Physical Exam",
+      "promptVersion": "exam_list_2.0",
+      "required": true,
+      "shouldAutomaticallyGenerateWNLText": false,
+      "shouldUseWNLTextIfItemNotDiscussed": false,
+      "type": "exam_list"
+    },
+    {
+      "content": "Create a bullet point for each diagnosis identified during this visit. Include the diagnosis name followed by its ICD-10 code if applicable. Ensure accurate representation of each condition based on the clinical findings and patient assessment.",
+      "id": "b82bb8f0-d8b8-4afe-ea9f-f01d47223cda",
+      "items": [
+        {
+          "content": "Diagnosis Name: {Diagnosis}, ICD-10: {ICD-10 Code}"
+        }
+      ],
+      "name": "Diagnosis",
+      "type": "bulleted_list"
+    },
+    {
+      "content": "Create a detailed plan of management for each diagnosis the patient has. For each diagnosis, include any tests to be ordered, follow-ups required, and treatments initiated or considered.",
+      "id": "fce99b6b-1a72-9cc5-9cc9-bfe6fed4f355",
+      "items": [
+        {
+          "content": "For each diagnosis, include specifics such as additional tests to be scheduled, frequency of follow-up appointments, and any treatments that have been initiated or are under consideration, including their dosage and duration where applicable. Use structured formatting: {Diagnosis}: - Tests Ordered: {Test Details} - Follow-up: {Follow-up Details} - Treatment: {Treatment Details}."
+        }
+      ],
+      "name": "Plan",
+      "type": "bulleted_list"
+    }
+  ];
+
+  // Initialize template library data
+  useEffect(() => {
+    // Mock library templates data - in real app, this would come from API
+    const mockLibraryTemplates = [
+      {
+        id: 1,
+        title: "CLINICAL INTERVIEW",
+        specality: "General Medicine",
+        type: "SOAP",
+        sections: [
+          {
+            name: "CHIEF COMPLAINT",
+            type: "paragraph",
+            description: "Capture the main reason for the visit"
+          },
+          {
+            name: "HISTORY OF PRESENT ILLNESS",
+            type: "paragraph", 
+            description: "Detailed narrative of the current condition"
+          },
+          {
+            name: "ALLERGIES",
+            type: "bulleted_list",
+            description: "List known allergies"
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Dermatology Intake",
+        specality: "Dermatology",
+        type: "SOAP",
+        sections: [
+          {
+            name: "CHIEF COMPLAINT",
+            type: "paragraph",
+            description: "Primary skin concern"
+          },
+          {
+            name: "SKIN EXAMINATION",
+            type: "paragraph",
+            description: "Detailed skin assessment"
+          }
+        ]
+      }
+    ];
+
+    // Register library templates with the service
+    templateService.registerLibraryTemplates(mockLibraryTemplates);
+  }, []);
+
   // Add data with IDs for DataGrid
   useEffect(() => {
     const updatedData = data.map((item, index) => ({
@@ -442,6 +753,137 @@ const TemplateLibrary = () => {
     }));
     setNotesListWithIds(updatedData);
   }, []);
+
+  // Remaining components and helper functions
+  const Step2 = () => (
+    <Box>
+      <Typography sx={{ color: '#1d4556', fontWeight: '600', fontSize: 24 }}>Verify Template Changes</Typography>
+      <Typography sx={{fontSize:12, color:"#808080", width:'60%'}}>Based on its analysis, the AI has generated documentation improvements tailored to your template. Please review and approve the suggested edits below.</Typography>
+      <Stack flexDirection={"column"} justifyContent={"center"} gap={2} mt={5}>
+        {sectionList && sectionList.length > 0 &&
+          sectionList.map((item, idx) => (
+            <Card
+              elevation={3}
+              sx={{
+                border: "2px solid #408DA9",
+                '&:hover': {
+                  boxShadow: "0px 8px 16px rgba(0,0,0,0.2)",
+                },
+              }}
+              key={idx}
+            >
+              <CardContent sx={{ p: 2 }}>
+                <Box display="flex" flexDirection="column" gap={1}>
+                  <Box display="flex" alignItems="center" gap={2}>
+                    <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>
+                      {item.name}
+                    </Typography>
+                    <Chip
+                      icon={item.type === 'bulleted_list' ? <FormatListBulletedIcon /> : <DescriptionIcon />}
+                      label={item.type}
+                      size="small"
+                      color="success"
+                      variant="outlined"
+                    />
+                  </Box>
+                  
+                  {!item.is_editing && (
+                    <Typography sx={{ color: "#808080", fontSize: 14, fontWeight: 400 }}>
+                      Description: {item.description}
+                    </Typography>
+                  )}
+
+                  {item.is_editing ? (
+                    <Box>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        margin="normal"
+                        autoFocus
+                        value={item.temp_description || ''}
+                        onChange={(event) => {
+                          editItem(idx, "temp_description", event.target.value);
+                        }}
+                      />
+                      <Box display="flex" gap={2} sx={{ mt: 1 }}>
+                        <Button
+                          onClick={() => {
+                            editItem(idx, "description", item.temp_description);
+                            editItem(idx, "is_editing", false);
+                          }}
+                          variant="contained"
+                          startIcon={<SaveIcon />}
+                          color="primary"
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            editItem(idx, "is_editing", false);
+                          }}
+                          variant="outlined"
+                          startIcon={<DoDisturbIcon />}
+                        >
+                          Cancel
+                        </Button>
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box display="flex" gap={2}>
+                      <Button
+                        onClick={() => {
+                          editItem(idx, "temp_description", item.description);
+                          editItem(idx, "is_editing", true);
+                        }}
+                        variant="contained"
+                        startIcon={<EditIcon />}
+                        color="primary"
+                        size="small"
+                      >
+                        Modify
+                      </Button>
+                      <Button
+                        onClick={() => deleteItem(idx)}
+                        variant="outlined"
+                        startIcon={<DeleteIcon />}
+                        color="error"
+                        size="small"
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          ))
+        }
+      </Stack>
+    </Box>
+  );
+
+  const Step3 = () => (
+    <Box>
+      <Typography sx={{fontSize:12, color:"#808080", width:'60%', pb:2}}>Template has been modified. Please review the changes below</Typography>
+      <Box p={2} sx={{ border: '2px dashed #808080', p:1}}>
+        <Typography sx={{fontSize:18, color:"black", width:'60%', p:2, fontWeight:600}}>Template Preview</Typography>
+        <Divider />
+        {templatePreview && templatePreview.map((item, idx) => (
+          <Box p={2} key={idx}>
+            <Typography sx={{fontSize:18, color:"black", fontWeight:700}}>{item.name}</Typography>
+            <Typography sx={{fontSize:16, color:"black"}}>{item.content}</Typography>
+            
+            {item.items && item.items.length > 0 && item.items.map((data, index) => (
+              <Stack flexDirection={"row"} alignItems={"flex-start"} key={index}>
+                <CircleIcon sx={{ fontSize: 8, color: 'black', mt:1}} />
+                <Typography sx={{fontSize:16, color: 'black', pl:1}}>{data.content}</Typography>
+              </Stack>
+            ))}
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
 
   return (
     <Box sx={{ p: 3 }}>
@@ -709,6 +1151,44 @@ const TemplateLibrary = () => {
                             </Button>
                           </Box>
                         </Box>
+                      ) : item.is_editing_template ? (
+                        <Box>
+                          <TextField
+                            fullWidth
+                            variant="outlined"
+                            margin="normal"
+                            multiline
+                            rows={6}
+                            autoFocus
+                            value={item.temp_template || ''}
+                            onChange={(event) => {
+                              editItem(idx, "temp_template", event.target.value);
+                            }}
+                          />
+                          <Box display="flex" gap={2} sx={{ mt: 1 }}>
+                            <Button
+                              onClick={() => {
+                                editItem(idx, "paste_template", item.temp_template);
+                                editItem(idx, "is_editing_template", false);
+                              }}
+                              variant="contained"
+                              startIcon={<SaveIcon />}
+                              color="primary"
+                            >
+                              Save template
+                            </Button>
+                            <Button
+                              onClick={() => {
+                                editItem(idx, "is_editing_template", false);
+                                editItem(idx, "temp_template", "");
+                              }}
+                              variant="outlined"
+                              startIcon={<DoDisturbIcon />}
+                            >
+                              Cancel
+                            </Button>
+                          </Box>
+                        </Box>
                       ) : (
                         <Box display="flex" gap={2}>
                           <Button
@@ -721,13 +1201,25 @@ const TemplateLibrary = () => {
                             color="primary"
                             size="small"
                           >
-                            Modify
+                            Modify Instruction
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              editItem(idx, "temp_template", item.paste_template);
+                              editItem(idx, "is_editing_template", true);
+                            }}
+                            variant="contained"
+                            startIcon={<CopyAllIcon />}
+                            color="primary"
+                            size="small"
+                          >
+                            Paste Template
                           </Button>
                           <Button
                             onClick={() => deleteItem(idx)}
-                            variant="outlined"
+                            variant="contained"
                             startIcon={<DeleteIcon />}
-                            color="error"
+                            color="primary"
                             size="small"
                           >
                             Delete
@@ -762,6 +1254,54 @@ const TemplateLibrary = () => {
             startIcon={<SaveIcon />}
           >
             Save Template
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Add Section Dialog */}
+      <Dialog open={openAddSection} onClose={() => setOpenAddSection(false)}>
+        <DialogTitle>Add Template to</DialogTitle>
+        <DialogContent>
+          <Box p={2}>
+            <Autocomplete
+              multiple
+              options={options}
+              value={selectedOptions}
+              onChange={(event, newValue) => setSelectedOptions(newValue)}
+              sx={{ width: 400 }}
+              renderTags={(value, getTagProps) =>
+                value.map((option, index) => (
+                  <Chip
+                    key={option}
+                    label={option}
+                    {...getTagProps({ index })}
+                    sx={{
+                      backgroundColor: '#1976d2',
+                      color: 'white',
+                      fontWeight: 500,
+                    }}
+                  />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Select"
+                  placeholder="Search or select"
+                />
+              )}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddSection(false)}>Cancel</Button>
+          <Button 
+            onClick={() => setOpenAddSection(false)} 
+            variant="contained" 
+            color="primary"
+          >
+            Import all
           </Button>
         </DialogActions>
       </Dialog>
