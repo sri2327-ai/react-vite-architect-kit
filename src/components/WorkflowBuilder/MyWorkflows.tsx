@@ -52,7 +52,8 @@ import {
   Schedule as ScheduleIcon,
   Person as PersonIcon,
   LocationOn as LocationIcon,
-  Note as NoteIcon
+  Note as NoteIcon,
+  History as HistoryIcon
 } from '@mui/icons-material';
 import { templateBuilderService } from '../../services/templateBuilderService';
 
@@ -69,6 +70,7 @@ interface WorkflowBlock {
 interface ScheduleConfig {
   providerName: string;
   location: string;
+  importPreviousNote: boolean;
 }
 
 interface VisitTypeMapping {
@@ -120,7 +122,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             },
             scheduleConfig: {
               providerName: 'Dr. Smith',
-              location: 'Main Clinic'
+              location: 'Main Clinic',
+              importPreviousNote: false
             },
             noteType: 'Progress Note',
             isConfigured: true
@@ -130,7 +133,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             templateFields: {},
             scheduleConfig: {
               providerName: '',
-              location: ''
+              location: '',
+              importPreviousNote: false
             },
             noteType: '',
             isConfigured: false
@@ -309,7 +313,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
     });
   };
 
-  const handleScheduleConfigChange = (visitType: string, field: keyof ScheduleConfig, value: string) => {
+  const handleScheduleConfigChange = (visitType: string, field: keyof ScheduleConfig, value: string | boolean) => {
     if (!selectedWorkflow) return;
     
     setSelectedWorkflow(prev => {
@@ -457,6 +461,39 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       size="small" 
                       variant="outlined"
                     />
+                  </Box>
+
+                  {/* Automation Blocks with Note Type Configuration */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                      Automation Blocks:
+                    </Typography>
+                    <List dense sx={{ bgcolor: 'grey.50', borderRadius: 1, p: 1 }}>
+                      {workflow.blocks.map((block, index) => (
+                        <ListItem key={block.id} sx={{ py: 0.5, px: 1 }}>
+                          <ListItemText
+                            primary={
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                  {index + 1}. {block.name}
+                                </Typography>
+                                {block.isEditable && (
+                                  <Chip label="Editable" size="small" color="warning" variant="outlined" />
+                                )}
+                                {block.type === 'encounter_open' && (
+                                  <Chip label="Note Type Configurable" size="small" color="info" variant="outlined" />
+                                )}
+                              </Box>
+                            }
+                            secondary={
+                              <Typography variant="caption" color="text.secondary">
+                                {block.description}
+                              </Typography>
+                            }
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
                   </Box>
 
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -678,7 +715,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             <Box sx={{ 
               display: 'flex', 
               flexDirection: { xs: 'column', md: 'row' }, 
-              gap: 2 
+              gap: 2,
+              mb: 3
             }}>
               <Box sx={{ flex: 1 }}>
                 <TextField
@@ -741,6 +779,46 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 />
               </Box>
             </Box>
+            
+            {/* Previous Visit Note Import Option */}
+            <Box sx={{ p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote || false}
+                    onChange={(e) => {
+                      // Update all visit types with the same setting
+                      if (selectedWorkflow) {
+                        setSelectedWorkflow(prev => {
+                          if (!prev) return null;
+                          return {
+                            ...prev,
+                            visitTypeMappings: prev.visitTypeMappings.map(mapping => ({
+                              ...mapping,
+                              scheduleConfig: {
+                                ...mapping.scheduleConfig,
+                                importPreviousNote: e.target.checked
+                              }
+                            }))
+                          };
+                        });
+                      }
+                    }}
+                  />
+                }
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <HistoryIcon color="primary" />
+                    <Typography variant="body2">
+                      Import previous visit note as checklist
+                    </Typography>
+                  </Box>
+                }
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block' }}>
+                Automatically import the last visit note to reference during the current encounter
+              </Typography>
+            </Box>
           </Box>
 
           {/* Visit Type Specific Configuration */}
@@ -786,7 +864,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         value={mapping.noteType || ''}
                         onChange={(e) => handleNoteTypeChange(mapping.visitType, e.target.value)}
                         placeholder="e.g., Progress Note, SOAP Note, H&P Note"
-                        helperText="Specify the note type that will be selected in your EHR system"
+                        helperText="Specify the note type that will be selected in your EHR system for this visit type"
                       />
                     </Box>
 
