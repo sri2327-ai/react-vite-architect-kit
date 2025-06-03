@@ -65,6 +65,7 @@ interface TemplateData {
   specialty: string;
   type: string;
   fields: any[];
+  content?: string;
 }
 
 interface ConsultType {
@@ -90,12 +91,14 @@ const TemplateBuilder: React.FC = () => {
   const [currentTab, setCurrentTab] = useState(0);
   
   // Navigation state
-  const [currentScreen, setCurrentScreen] = useState<'consultTypes' | 'templates' | 'templateEditor'>('consultTypes');
+  const [currentScreen, setCurrentScreen] = useState<'consultTypes' | 'templates' | 'templateEditor' | 'templateView'>('consultTypes');
   const [selectedConsultType, setSelectedConsultType] = useState<ConsultType | null>(null);
+  const [viewingTemplate, setViewingTemplate] = useState<TemplateData | null>(null);
   
   // Modal states
   const [openCreateTemplate, setOpenCreateTemplate] = useState(false);
   const [openModifyTemplate, setOpenModifyTemplate] = useState(false);
+  const [openAddType, setOpenAddType] = useState(false);
   const [showTemplate, setShowTemplate] = useState(false);
   const [templateMethod, setTemplateMethod] = useState<any>({});
   const [sectionList, setSectionList] = useState<any[]>([]);
@@ -107,11 +110,13 @@ const TemplateBuilder: React.FC = () => {
   const [templateName, setTemplateName] = useState('');
   const [previousNotes, setPreviousNotes] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
+  const [existingTemplateContent, setExistingTemplateContent] = useState('');
   const [selectedLibraryTemplate, setSelectedLibraryTemplate] = useState<LibraryTemplate | null>(null);
   const [libraryFilters, setLibraryFilters] = useState({
     specialty: '',
     noteType: ''
   });
+  const [newTypeName, setNewTypeName] = useState('');
 
   // Template preview states
   const [previewTemplate, setPreviewTemplate] = useState<LibraryTemplate | null>(null);
@@ -126,18 +131,60 @@ const TemplateBuilder: React.FC = () => {
   const { control, handleSubmit, formState: { errors }, trigger, getValues } = useForm();
 
   // Sample data
-  const consultTypes: ConsultType[] = [
+  const [consultTypes, setConsultTypes] = useState<ConsultType[]>([
     { id: 1, name: "SOAP NOTE", isNew: true },
     { id: 2, name: "SOAP NOTE VIRTUAL", isNew: true },
-  ];
+  ]);
 
   const templates: TemplateData[] = [
-    { id: 1, title: "template 01", specialty: "General", type: "SOAP", fields: [] },
-    { id: 2, title: "template 02", specialty: "General", type: "SOAP", fields: [] },
-    { id: 3, title: "template 03", specialty: "General", type: "SOAP", fields: [] },
-    { id: 4, title: "template 04", specialty: "General", type: "SOAP", fields: [] },
-    { id: 5, title: "template 05", specialty: "General", type: "SOAP", fields: [] },
-    { id: 6, title: "template 05", specialty: "General", type: "SOAP", fields: [] },
+    { 
+      id: 1, 
+      title: "template 01", 
+      specialty: "General", 
+      type: "SOAP", 
+      fields: [],
+      content: "Sample template content for template 01\n\nChief Complaint:\n[Patient's primary concern]\n\nHistory of Present Illness:\n[Detailed description of current condition]\n\nPast Medical History:\n[Previous medical conditions and treatments]\n\nAssessment and Plan:\n[Clinical assessment and treatment plan]"
+    },
+    { 
+      id: 2, 
+      title: "template 02", 
+      specialty: "General", 
+      type: "SOAP", 
+      fields: [],
+      content: "Sample template content for template 02\n\nSubjective:\n[Patient's description of symptoms]\n\nObjective:\n[Physical examination findings]\n\nAssessment:\n[Clinical diagnosis]\n\nPlan:\n[Treatment recommendations]"
+    },
+    { 
+      id: 3, 
+      title: "template 03", 
+      specialty: "General", 
+      type: "SOAP", 
+      fields: [],
+      content: "Sample template content for template 03"
+    },
+    { 
+      id: 4, 
+      title: "template 04", 
+      specialty: "General", 
+      type: "SOAP", 
+      fields: [],
+      content: "Sample template content for template 04"
+    },
+    { 
+      id: 5, 
+      title: "template 05", 
+      specialty: "General", 
+      type: "SOAP", 
+      fields: [],
+      content: "Sample template content for template 05"
+    },
+    { 
+      id: 6, 
+      title: "template 06", 
+      specialty: "General", 
+      type: "SOAP", 
+      fields: [],
+      content: "Sample template content for template 06"
+    },
   ];
 
   const libraryTemplates: LibraryTemplate[] = [
@@ -313,7 +360,8 @@ const TemplateBuilder: React.FC = () => {
   };
 
   const handleTemplateView = (template: TemplateData) => {
-    console.log('View template:', template);
+    setViewingTemplate(template);
+    setCurrentScreen('templateView');
   };
 
   const handleBackToConsultTypes = () => {
@@ -325,6 +373,7 @@ const TemplateBuilder: React.FC = () => {
     setCurrentScreen('templates');
     setOpenModifyTemplate(false);
     setShowTemplate(false);
+    setViewingTemplate(null);
   };
 
   const handleCreateTemplateMethod = (method: any) => {
@@ -333,7 +382,21 @@ const TemplateBuilder: React.FC = () => {
     setTemplateName('');
     setPreviousNotes('');
     setTemplateDescription('');
+    setExistingTemplateContent('');
     setSelectedLibraryTemplate(null);
+  };
+
+  const handleAddType = () => {
+    if (newTypeName.trim()) {
+      const newType: ConsultType = {
+        id: consultTypes.length + 1,
+        name: newTypeName.trim(),
+        isNew: true
+      };
+      setConsultTypes([...consultTypes, newType]);
+      setNewTypeName('');
+      setOpenAddType(false);
+    }
   };
 
   const onCreateTemplate = async () => {
@@ -350,6 +413,10 @@ const TemplateBuilder: React.FC = () => {
       return;
     }
 
+    if (templateMethod.id === 4 && !existingTemplateContent.trim()) {
+      return;
+    }
+
     if (templateMethod.id === 5 && !selectedLibraryTemplate) {
       return;
     }
@@ -359,6 +426,7 @@ const TemplateBuilder: React.FC = () => {
       name: templateName,
       previousNotes,
       description: templateDescription,
+      existingContent: existingTemplateContent,
       libraryTemplate: selectedLibraryTemplate
     });
 
@@ -512,6 +580,28 @@ const TemplateBuilder: React.FC = () => {
             placeholder="Describe the template you want"
             value={templateDescription}
             onChange={(e) => setTemplateDescription(e.target.value)}
+            variant="outlined"
+            size="small"
+          />
+        )}
+
+        {/* Start from Scratch */}
+        {templateMethod.id === 3 && (
+          <Typography variant="body2" sx={{ color: bravoColors.text.secondary, fontStyle: 'italic' }}>
+            You'll start with a blank template that you can customize completely.
+          </Typography>
+        )}
+
+        {/* Use Existing Template */}
+        {templateMethod.id === 4 && (
+          <TextField
+            fullWidth
+            multiline
+            rows={8}
+            label="Copy and paste existing template content"
+            placeholder="Copy and paste existing template content"
+            value={existingTemplateContent}
+            onChange={(e) => setExistingTemplateContent(e.target.value)}
             variant="outlined"
             size="small"
           />
@@ -722,6 +812,7 @@ const TemplateBuilder: React.FC = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
+          onClick={() => setOpenAddType(true)}
           sx={{
             backgroundColor: bravoColors.secondary,
             color: 'white',
@@ -880,6 +971,58 @@ const TemplateBuilder: React.FC = () => {
     </Box>
   );
 
+  // Render Template View Screen
+  const renderTemplateView = () => (
+    <Box sx={{ p: 3 }}>
+      <Box display="flex" alignItems="center" mb={3}>
+        <IconButton 
+          onClick={handleBackToTemplates}
+          sx={{ mr: 2, color: bravoColors.primaryFlat }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+          Template View: {viewingTemplate?.title}
+        </Typography>
+      </Box>
+      
+      {viewingTemplate && (
+        <Card sx={{ p: 3, borderRadius: 2 }}>
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            Template Content:
+          </Typography>
+          <Box sx={{ p: 3, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
+            <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+              {viewingTemplate.content || 'No content available for this template.'}
+            </Typography>
+          </Box>
+          
+          <Box display="flex" gap={2} mt={3}>
+            <Button
+              variant="contained"
+              startIcon={<EditIcon />}
+              onClick={() => handleTemplateEdit(viewingTemplate)}
+              sx={{
+                backgroundColor: bravoColors.primaryFlat,
+                color: 'white',
+                borderRadius: 2,
+                px: 3,
+                py: 1.5,
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                '&:hover': {
+                  backgroundColor: bravoColors.secondary,
+                }
+              }}
+            >
+              EDIT TEMPLATE
+            </Button>
+          </Box>
+        </Card>
+      )}
+    </Box>
+  );
+
   // Render Template Editor Screen
   const renderTemplateEditor = () => (
     <Box sx={{ p: 3 }}>
@@ -908,6 +1051,10 @@ const TemplateBuilder: React.FC = () => {
   const renderMyTemplatesContent = () => {
     if (currentScreen === 'templateEditor' && openModifyTemplate && showTemplate) {
       return renderTemplateEditor();
+    }
+
+    if (currentScreen === 'templateView') {
+      return renderTemplateView();
     }
 
     if (currentScreen === 'templates') {
@@ -950,6 +1097,87 @@ const TemplateBuilder: React.FC = () => {
         {currentTab === 0 && renderMyTemplatesContent()}
         {currentTab === 1 && renderTemplateLibrary()}
       </Box>
+
+      {/* Add Type Dialog */}
+      <Dialog
+        open={openAddType}
+        onClose={() => setOpenAddType(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            p: 2
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Add New Consult Type
+            </Typography>
+            <IconButton onClick={() => setOpenAddType(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Consult Type Name"
+            value={newTypeName}
+            onChange={(e) => setNewTypeName(e.target.value)}
+            variant="outlined"
+            size="small"
+            sx={{ mt: 2 }}
+            placeholder="Enter consult type name"
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button 
+            onClick={() => setOpenAddType(false)}
+            variant="outlined"
+            sx={{
+              borderColor: bravoColors.secondary,
+              color: bravoColors.secondary,
+              borderRadius: 2,
+              px: 3,
+              py: 1.5,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              '&:hover': {
+                borderColor: bravoColors.primaryFlat,
+                backgroundColor: bravoColors.background.light,
+              }
+            }}
+          >
+            CANCEL
+          </Button>
+          <Button 
+            onClick={handleAddType}
+            variant="contained"
+            disabled={!newTypeName.trim()}
+            sx={{
+              backgroundColor: bravoColors.secondary,
+              color: 'white',
+              borderRadius: 2,
+              px: 3,
+              py: 1.5,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              '&:hover': {
+                backgroundColor: bravoColors.primaryFlat,
+              },
+              '&:disabled': {
+                backgroundColor: '#ccc',
+                color: '#666'
+              }
+            }}
+          >
+            ADD
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Create Template Dialog */}
       <Dialog
@@ -1018,6 +1246,7 @@ const TemplateBuilder: React.FC = () => {
             disabled={!templateMethod.id || !templateName.trim() || 
               (templateMethod.id === 1 && !previousNotes.trim()) ||
               (templateMethod.id === 2 && !templateDescription.trim()) ||
+              (templateMethod.id === 4 && !existingTemplateContent.trim()) ||
               (templateMethod.id === 5 && !selectedLibraryTemplate)
             }
             sx={{
