@@ -67,7 +67,22 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
-import DraggableGrid from './DraggableGrid';
+import TemplateCreationDialog from './TemplateCreationDialog';
+
+interface TemplateItem {
+  id: string;
+  name: string;
+  content: string;
+  type: string;
+  description?: string;
+  is_editing?: boolean;
+  temp_description?: string;
+  temp_template?: string;
+  items?: Array<{
+    name?: string;
+    content: string;
+  }>;
+}
 
 interface TemplateData {
   id: number;
@@ -89,25 +104,7 @@ interface LibraryTemplate {
   name: string;
   specialty: string;
   noteType: string;
-  content: string;
-  sampleNote?: string;
-}
-
-interface TemplateItem {
-  id: string;
-  name: string;
-  type: string;
-  content: string;
-  description?: string;
-  paste_template?: string;
-  is_editing?: boolean;
-  is_editing_template?: boolean;
-  temp_description?: string;
-  temp_template?: string;
-  items?: Array<{
-    content: string;
-    name?: string;
-  }>;
+  content?: string;
 }
 
 const TemplateBuilder: React.FC = () => {
@@ -134,30 +131,15 @@ const TemplateBuilder: React.FC = () => {
   const [openAddSection, setOpenAddSection] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
-  // Multi-step workflow states
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processedContent, setProcessedContent] = useState('');
-  const [aiSummary, setAiSummary] = useState('');
-
-  // Form states for different creation methods
-  const [templateName, setTemplateName] = useState('');
-  const [previousNotes, setPreviousNotes] = useState('');
-  const [templateDescription, setTemplateDescription] = useState('');
-  const [existingTemplateContent, setExistingTemplateContent] = useState('');
-  const [selectedLibraryTemplate, setSelectedLibraryTemplate] = useState<LibraryTemplate | null>(null);
+  // Library and filter states
   const [libraryFilters, setLibraryFilters] = useState({
     specialty: '',
     noteType: ''
   });
   const [newTypeName, setNewTypeName] = useState('');
-
-  // Template preview states
   const [previewTemplate, setPreviewTemplate] = useState<LibraryTemplate | null>(null);
   const [openPreview, setOpenPreview] = useState(false);
   const [previewType, setPreviewType] = useState<'template' | 'sample'>('template');
-  
-  // Import confirmation states
   const [openImportConfirm, setOpenImportConfirm] = useState(false);
   const [selectedImportType, setSelectedImportType] = useState<string>('');
 
@@ -170,214 +152,47 @@ const TemplateBuilder: React.FC = () => {
     { id: 2, name: "SOAP NOTE VIRTUAL", isNew: true },
   ]);
 
-  const templates: TemplateData[] = [
-    { 
-      id: 1, 
-      title: "template 01", 
-      specialty: "General", 
-      type: "SOAP", 
+  const [templates, setTemplates] = useState<TemplateData[]>([
+    {
+      id: 1,
+      title: "General Consultation",
+      specialty: "General Medicine",
+      type: "Standard",
       fields: [],
-      content: "Sample template content for template 01\n\nChief Complaint:\n[Patient's primary concern]\n\nHistory of Present Illness:\n[Detailed description of current condition]\n\nPast Medical History:\n[Previous medical conditions and treatments]\n\nAssessment and Plan:\n[Clinical assessment and treatment plan]"
+      content: "Chief Complaint:\n\nHistory of Present Illness:\n\nPhysical Examination:\n\nAssessment and Plan:"
     },
-    { 
-      id: 2, 
-      title: "template 02", 
-      specialty: "General", 
-      type: "SOAP", 
+    {
+      id: 2,
+      title: "Follow-up Visit",
+      specialty: "General Medicine",
+      type: "Follow-up",
       fields: [],
-      content: "Sample template content for template 02\n\nSubjective:\n[Patient's description of symptoms]\n\nObjective:\n[Physical examination findings]\n\nAssessment:\n[Clinical diagnosis]\n\nPlan:\n[Treatment recommendations]"
-    },
-    { 
-      id: 3, 
-      title: "template 03", 
-      specialty: "General", 
-      type: "SOAP", 
-      fields: [],
-      content: "Sample template content for template 03"
-    },
-    { 
-      id: 4, 
-      title: "template 04", 
-      specialty: "General", 
-      type: "SOAP", 
-      fields: [],
-      content: "Sample template content for template 04"
-    },
-    { 
-      id: 5, 
-      title: "template 05", 
-      specialty: "General", 
-      type: "SOAP", 
-      fields: [],
-      content: "Sample template content for template 05"
-    },
-    { 
-      id: 6, 
-      title: "template 06", 
-      specialty: "General", 
-      type: "SOAP", 
-      fields: [],
-      content: "Sample template content for template 06"
-    },
-  ];
+      content: "Follow-up for:\n\nCurrent Status:\n\nMedications:\n\nPlan:"
+    }
+  ]);
 
   const libraryTemplates: LibraryTemplate[] = [
     {
       id: 1,
-      name: "CLINICAL INTERVIEW1",
+      name: "Cardiology Consultation",
       specialty: "cardiologist",
       noteType: "SOAP",
-      content: "History of Present Illness\nProvide a comprehensive narrative of the patient's current condition. Include details about the onset, duration, and characteristics of the present illness. Note any associated symptoms, and incorporate relevant background information such as lifestyle factors and family medical history. Be sure to structure the narrative in a chronological manner, emphasizing the progression of the condition over time.\n\nAllergies\nList any known allergies the patient has, including reactions to medications, foods, or other substances. If there are no known allergies, indicate this as well.\n• Create a bullet for each known allergy, specifying the substance and the type of reaction.\n• Include a bullet to indicate if there are no known allergies.\n\nFamily Health History\nSummarize the known family health history, focusing on immediate family members and highlighting relevant hereditary conditions.",
-      sampleNote: "PATIENT: John Doe, 45-year-old male\n\nHISTORY OF PRESENT ILLNESS:\nThe patient presents with a 3-week history of chest pain that began gradually and has progressively worsened. The pain is described as a dull, aching sensation located in the center of the chest, radiating to the left arm. Episodes typically last 15-20 minutes and are triggered by physical exertion such as climbing stairs or walking briskly. The patient reports associated shortness of breath and mild diaphoresis during episodes. He denies any nausea, vomiting, or palpitations.\n\nALLERGIES:\n• Penicillin - rash and hives\n• Shellfish - facial swelling and difficulty breathing\n• No known environmental allergies\n\nFAMILY HEALTH HISTORY:\nFather: Myocardial infarction at age 52, hypertension\nMother: Type 2 diabetes, alive at age 68\nPaternal grandfather: Stroke at age 65\nNo known family history of cancer or genetic disorders"
+      content: "Chief Complaint:\n\nHistory of Present Illness:\n\nCardiovascular Examination:\n\nECG/Echo findings:\n\nAssessment and Plan:"
     },
     {
       id: 2,
-      name: "CLINICAL INTERVIEW2",
+      name: "Psychology Assessment",
       specialty: "pyschologist",
-      noteType: "SOAP",
-      content: "Psychological assessment content...",
-      sampleNote: "Sample psychological assessment note..."
+      noteType: "DPD",
+      content: "Mental Status Exam:\n\nPsychological Assessment:\n\nBehavioral Observations:\n\nTreatment Plan:"
     },
     {
       id: 3,
-      name: "CLINICAL INTERVIEW3",
-      specialty: "cardiologist",
-      noteType: "DPD",
-      content: "Cardiology specific content...",
-      sampleNote: "Sample cardiology note..."
-    },
-    {
-      id: 4,
-      name: "Dermatology Intake",
+      name: "Dermatology Exam",
       specialty: "Dermatology",
       noteType: "SOAP",
-      content: "Dermatology intake content...",
-      sampleNote: "Sample dermatology intake note..."
-    },
-    {
-      id: 5,
-      name: "Neurology Followup",
-      specialty: "pyschologist",
-      noteType: "SOAP",
-      content: "Neurology followup content...",
-      sampleNote: "Sample neurology followup note..."
-    },
-    {
-      id: 6,
-      name: "Dermatology Intake1",
-      specialty: "cardiologist",
-      noteType: "DPD",
-      content: "Another dermatology intake content...",
-      sampleNote: "Another sample dermatology note..."
+      content: "Chief Complaint:\n\nSkin Examination:\n\nDermatologic Assessment:\n\nTreatment Recommendations:"
     }
-  ];
-
-  const createTemplateOptions = [
-    {
-      id: 1,
-      title: 'Copy Previous Notes',
-      description: "Reuse the last note you copied.",
-      icon: (
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            backgroundColor: bravoColors.primaryFlat,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mb: 2
-          }}
-        >
-          <ContentCopyIcon sx={{ color: 'white', fontSize: 24 }} />
-        </Box>
-      ),
-    },
-    {
-      id: 2,
-      title: 'Generate Template',
-      description: "AI-assisted template creation with summary.",
-      icon: (
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            backgroundColor: bravoColors.primaryFlat,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mb: 2
-          }}
-        >
-          <AutoFixHighIcon sx={{ color: 'white', fontSize: 24 }} />
-        </Box>
-      ),
-    },
-    {
-      id: 3,
-      title: 'Start from Scratch',
-      description: "Begin with a blank slate.",
-      icon: (
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            backgroundColor: bravoColors.primaryFlat,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mb: 2
-          }}
-        >
-          <EditNoteIcon sx={{ color: 'white', fontSize: 24 }} />
-        </Box>
-      ),
-    },
-    {
-      id: 4,
-      title: 'Use Existing Template',
-      description: "Copy-paste existing template.",
-      icon: (
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            backgroundColor: bravoColors.primaryFlat,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mb: 2
-          }}
-        >
-          <DescriptionIcon sx={{ color: 'white', fontSize: 24 }} />
-        </Box>
-      ),
-    },
-    {
-      id: 5,
-      title: 'Template Library',
-      description: "Access and manage all your templates.",
-      icon: (
-        <Box
-          sx={{
-            width: 48,
-            height: 48,
-            borderRadius: 2,
-            backgroundColor: bravoColors.primaryFlat,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mb: 2
-          }}
-        >
-          <LibraryBooksIcon sx={{ color: 'white', fontSize: 24 }} />
-        </Box>
-      ),
-    },
   ];
 
   // Event handlers
@@ -420,17 +235,18 @@ const TemplateBuilder: React.FC = () => {
     setEditingTemplate(null);
   };
 
-  const handleCreateTemplateMethod = (method: any) => {
-    setTemplateMethod(method);
-    setCurrentStep(0);
-    // Reset form states
-    setTemplateName('');
-    setPreviousNotes('');
-    setTemplateDescription('');
-    setExistingTemplateContent('');
-    setSelectedLibraryTemplate(null);
-    setProcessedContent('');
-    setAiSummary('');
+  const handleCreateTemplateFromDialog = (templateData: any) => {
+    const newTemplate: TemplateData = {
+      id: templates.length + 1,
+      title: templateData.name,
+      specialty: selectedConsultType?.name || 'General',
+      type: 'Custom',
+      fields: [],
+      content: templateData.content || 'New template content'
+    };
+    
+    setTemplates(prev => [...prev, newTemplate]);
+    console.log('Created new template:', templateData);
   };
 
   const handleAddType = () => {
@@ -449,14 +265,33 @@ const TemplateBuilder: React.FC = () => {
   const handleSaveTemplate = (items: TemplateItem[]) => {
     console.log('Saving template with items:', items);
     setSectionList(items);
-    // Here you would typically save the template to your backend
-    // For now, just go back to templates list
     handleBackToTemplates();
+  };
+
+  const handleLibraryTemplatePreview = (template: LibraryTemplate) => {
+    setPreviewTemplate(template);
+    setOpenPreview(true);
+  };
+
+  const handleImportToMyTemplates = () => {
+    if (previewTemplate) {
+      setOpenPreview(false);
+      setOpenImportConfirm(true);
+    }
+  };
+
+  const handleConfirmImport = () => {
+    if (previewTemplate && selectedImportType) {
+      console.log("Importing template to:", selectedImportType, previewTemplate);
+      setOpenImportConfirm(false);
+      setSelectedImportType('');
+      setPreviewTemplate(null);
+    }
   };
 
   // Render Consult Types Screen
   const renderConsultTypes = () => (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
         <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
           Consult Type List
@@ -532,7 +367,7 @@ const TemplateBuilder: React.FC = () => {
 
   // Render Templates Screen
   const renderTemplates = () => (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
         <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
           {selectedConsultType?.name}
@@ -574,7 +409,7 @@ const TemplateBuilder: React.FC = () => {
               }
             }}
           >
-            ADD
+            ADD TEMPLATE
           </Button>
         </Box>
       </Box>
@@ -594,27 +429,46 @@ const TemplateBuilder: React.FC = () => {
           >
             <CardContent sx={{ py: 3 }}>
               <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Typography
-                  variant="h6"
-                  sx={{
-                    color: bravoColors.primaryFlat,
-                    fontWeight: 500,
-                    fontSize: '1.1rem'
-                  }}
-                >
-                  {template.title}
-                </Typography>
-                <IconButton
-                  onClick={() => handleTemplateView(template)}
-                  sx={{
-                    color: bravoColors.secondary,
-                    '&:hover': {
-                      backgroundColor: bravoColors.highlight.hover,
-                    }
-                  }}
-                >
-                  <VisibilityIcon />
-                </IconButton>
+                <Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      color: bravoColors.primaryFlat,
+                      fontWeight: 500,
+                      fontSize: '1.1rem',
+                      mb: 1
+                    }}
+                  >
+                    {template.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Specialty: {template.specialty} • Type: {template.type}
+                  </Typography>
+                </Box>
+                <Box display="flex" gap={1}>
+                  <IconButton
+                    onClick={() => handleTemplateView(template)}
+                    sx={{
+                      color: bravoColors.secondary,
+                      '&:hover': {
+                        backgroundColor: bravoColors.highlight?.hover || '#f0f0f0',
+                      }
+                    }}
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleTemplateEdit(template)}
+                    sx={{
+                      color: bravoColors.primaryFlat,
+                      '&:hover': {
+                        backgroundColor: bravoColors.highlight?.hover || '#f0f0f0',
+                      }
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </Box>
               </Box>
             </CardContent>
           </Card>
@@ -625,7 +479,7 @@ const TemplateBuilder: React.FC = () => {
 
   // Render Template View Screen
   const renderTemplateView = () => (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <Box display="flex" alignItems="center" mb={3}>
         <IconButton 
           onClick={handleBackToTemplates}
@@ -634,7 +488,7 @@ const TemplateBuilder: React.FC = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-          Template View: {viewingTemplate?.title}
+          Template: {viewingTemplate?.title}
         </Typography>
       </Box>
       
@@ -675,32 +529,9 @@ const TemplateBuilder: React.FC = () => {
     </Box>
   );
 
-  // Render Template Editor Screen
-  const renderTemplateEditor = () => {
-    if (!editingTemplate) return null;
-    
-    return (
-      <Box sx={{ p: 3 }}>
-        <Box display="flex" alignItems="center" mb={3}>
-          <IconButton 
-            onClick={handleBackToTemplates}
-            sx={{ mr: 2, color: bravoColors.primaryFlat }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-            Template Editor: {editingTemplate.title}
-          </Typography>
-        </Box>
-        
-        <DraggableGrid />
-      </Box>
-    );
-  };
-
   // Render Template Library Tab
   const renderTemplateLibrary = () => (
-    <Box sx={{ p: 3 }}>
+    <Box>
       <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600, mb: 4 }}>
         Template Library
       </Typography>
@@ -741,7 +572,13 @@ const TemplateBuilder: React.FC = () => {
           gap: 3
         }}
       >
-        {filteredLibraryTemplates.map((template) => (
+        {libraryTemplates
+          .filter(template => {
+            const specialtyMatch = !libraryFilters.specialty || template.specialty === libraryFilters.specialty;
+            const noteTypeMatch = !libraryFilters.noteType || template.noteType === libraryFilters.noteType;
+            return specialtyMatch && noteTypeMatch;
+          })
+          .map((template) => (
           <Card
             key={template.id}
             sx={{
@@ -755,7 +592,7 @@ const TemplateBuilder: React.FC = () => {
             }}
           >
             <CardContent sx={{ p: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: bravoColors.text.primary }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: bravoColors.text?.primary || '#000' }}>
                 {template.name}
               </Typography>
               
@@ -790,11 +627,25 @@ const TemplateBuilder: React.FC = () => {
                     color: bravoColors.secondary,
                     '&:hover': {
                       borderColor: bravoColors.primaryFlat,
-                      backgroundColor: bravoColors.background.light
+                      backgroundColor: bravoColors.background?.light || '#f0f0f0'
                     }
                   }}
                 >
                   Preview
+                </Button>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => handleImportToMyTemplates()}
+                  sx={{
+                    backgroundColor: bravoColors.primaryFlat,
+                    color: 'white',
+                    '&:hover': {
+                      backgroundColor: bravoColors.secondary
+                    }
+                  }}
+                >
+                  Import
                 </Button>
               </Box>
             </CardContent>
@@ -807,7 +658,26 @@ const TemplateBuilder: React.FC = () => {
   // Main render logic for My Templates tab
   const renderMyTemplatesContent = () => {
     if (currentScreen === 'templateEditor' && editingTemplate) {
-      return renderTemplateEditor();
+      return (
+        <Box>
+          <Box display="flex" alignItems="center" mb={3}>
+            <IconButton 
+              onClick={handleBackToTemplates}
+              sx={{ mr: 2, color: bravoColors.primaryFlat }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Template Editor: {editingTemplate.title}
+            </Typography>
+          </Box>
+          
+          <TemplateEditor 
+            initialItems={sectionList}
+            onSave={handleSaveTemplate}
+          />
+        </Box>
+      );
     }
 
     if (currentScreen === 'templateView') {
@@ -821,323 +691,114 @@ const TemplateBuilder: React.FC = () => {
     return renderConsultTypes();
   };
 
-  // Computed values
-  const filteredLibraryTemplates = libraryTemplates.filter(template => {
-    const specialtyMatch = !libraryFilters.specialty || template.specialty === libraryFilters.specialty;
-    const noteTypeMatch = !libraryFilters.noteType || template.noteType === libraryFilters.noteType;
-    return specialtyMatch && noteTypeMatch;
-  });
-
-  // Missing handler functions
-  const handleLibraryTemplatePreview = (template: LibraryTemplate) => {
-    setPreviewTemplate(template);
-    setOpenPreview(true);
-  };
-
-  const handleImportToMyTemplates = () => {
-    if (previewTemplate) {
-      setOpenPreview(false);
-      setOpenImportConfirm(true);
-    }
-  };
-
-  const handleConfirmImport = () => {
-    if (previewTemplate && selectedImportType) {
-      console.log("Importing template to:", selectedImportType, previewTemplate);
-      // Here you would typically add the template to the selected consult type
-      setOpenImportConfirm(false);
-      setSelectedImportType('');
-      setPreviewTemplate(null);
-    }
-  };
-
   return (
-    <>
-      <Box sx={{ p: 3 }}>
-        {/* Tab Navigation */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-          <Tabs 
-            value={currentTab} 
-            onChange={(event, newValue) => setCurrentTab(newValue)}
-            sx={{
-              '& .MuiTab-root': {
-                textTransform: 'none',
-                fontWeight: 600,
-                fontSize: '1rem',
-                color: bravoColors.text.secondary,
-                '&.Mui-selected': {
-                  color: bravoColors.primaryFlat,
-                }
-              },
-              '& .MuiTabs-indicator': {
-                backgroundColor: bravoColors.primaryFlat,
-                height: 3,
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      {/* Tab Navigation */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Tabs 
+          value={currentTab} 
+          onChange={(event, newValue) => setCurrentTab(newValue)}
+          sx={{
+            '& .MuiTab-root': {
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '1rem',
+              color: bravoColors.text?.secondary || '#666',
+              '&.Mui-selected': {
+                color: bravoColors.primaryFlat,
               }
-            }}
-          >
-            <Tab label="My Templates" />
-            <Tab label="Template Library" />
-          </Tabs>
-        </Box>
-
-        {/* Tab Content */}
-        {currentTab === 0 && renderMyTemplatesContent()}
-        {currentTab === 1 && renderTemplateLibrary()}
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: bravoColors.primaryFlat,
+              height: 3,
+            }
+          }}
+        >
+          <Tab label="My Templates" />
+          <Tab label="Template Library" />
+        </Tabs>
       </Box>
 
-      {/* Add Type Dialog */}
-      <Dialog
-        open={openAddType}
-        onClose={() => setOpenAddType(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: { 
-            borderRadius: 3,
-            p: 2
-          }
-        }}
-      >
-        <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Add New Consult Type
-            </Typography>
-            <IconButton onClick={() => setOpenAddType(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </DialogTitle>
+      {/* Tab Content */}
+      {currentTab === 0 && renderMyTemplatesContent()}
+      {currentTab === 1 && renderTemplateLibrary()}
+
+      {/* Template Creation Dialog */}
+      <TemplateCreationDialog
+        open={openCreateTemplate}
+        onClose={() => setOpenCreateTemplate(false)}
+        onCreateTemplate={handleCreateTemplateFromDialog}
+      />
+
+      {/* Add Consult Type Dialog */}
+      <Dialog open={openAddType} onClose={() => setOpenAddType(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Add New Consult Type</DialogTitle>
         <DialogContent>
           <TextField
-            fullWidth
+            autoFocus
+            margin="dense"
             label="Consult Type Name"
+            fullWidth
+            variant="outlined"
             value={newTypeName}
             onChange={(e) => setNewTypeName(e.target.value)}
-            variant="outlined"
-            size="small"
-            sx={{ mt: 2 }}
-            placeholder="Enter consult type name"
           />
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button 
-            onClick={() => setOpenAddType(false)}
-            variant="outlined"
-            sx={{
-              borderColor: bravoColors.secondary,
-              color: bravoColors.secondary,
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                borderColor: bravoColors.primaryFlat,
-                backgroundColor: bravoColors.background.light,
-              }
-            }}
-          >
-            CANCEL
-          </Button>
-          <Button 
-            onClick={handleAddType}
-            variant="contained"
-            disabled={!newTypeName.trim()}
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat,
-              },
-              '&:disabled': {
-                backgroundColor: '#ccc',
-                color: '#666'
-              }
-            }}
-          >
-            ADD
-          </Button>
+        <DialogActions>
+          <Button onClick={() => setOpenAddType(false)}>Cancel</Button>
+          <Button onClick={handleAddType} variant="contained">Add</Button>
         </DialogActions>
       </Dialog>
 
       {/* Template Preview Dialog */}
-      <Dialog
-        open={openPreview}
-        onClose={() => setOpenPreview(false)}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{
-          sx: { 
-            borderRadius: 3,
-            p: 2,
-            maxHeight: '90vh'
-          }
-        }}
-      >
+      <Dialog open={openPreview} onClose={() => setOpenPreview(false)} maxWidth="md" fullWidth>
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Preview Options
-            </Typography>
-            <IconButton onClick={() => setOpenPreview(false)}>
-              <CloseIcon />
-            </IconButton>
+            <Typography variant="h6">{previewTemplate?.name}</Typography>
+            <Box>
+              <Tabs value={previewType === 'template' ? 0 : 1} onChange={(e, v) => setPreviewType(v === 0 ? 'template' : 'sample')}>
+                <Tab label="Template" />
+                <Tab label="Sample Note" />
+              </Tabs>
+            </Box>
           </Box>
         </DialogTitle>
-        <DialogContent sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
-          {previewTemplate && (
-            <Box>
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                  {previewTemplate.name}
-                </Typography>
-                <Box display="flex" gap={1} mb={3}>
-                  <Chip 
-                    label={`Specialty: ${previewTemplate.specialty}`} 
-                    size="small" 
-                    sx={{ 
-                      backgroundColor: bravoColors.primaryFlat, 
-                      color: 'white',
-                      fontSize: '0.75rem'
-                    }} 
-                  />
-                  <Chip 
-                    label={`Note Type: ${previewTemplate.noteType}`} 
-                    size="small" 
-                    sx={{ 
-                      backgroundColor: bravoColors.secondary, 
-                      color: 'white',
-                      fontSize: '0.75rem'
-                    }} 
-                  />
-                </Box>
-              </Box>
-
-              {/* Preview Type Selection */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                  Select Preview Type:
-                </Typography>
-                <RadioGroup
-                  value={previewType}
-                  onChange={(e) => setPreviewType(e.target.value as 'template' | 'sample')}
-                  row
-                >
-                  <FormControlLabel 
-                    value="template" 
-                    control={<Radio />} 
-                    label={
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <PreviewIcon sx={{ fontSize: 20 }} />
-                        Template Preview
-                      </Box>
-                    }
-                  />
-                  <FormControlLabel 
-                    value="sample" 
-                    control={<Radio />} 
-                    label={
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <NoteIcon sx={{ fontSize: 20 }} />
-                        Sample Note Preview
-                      </Box>
-                    }
-                  />
-                </RadioGroup>
-              </Box>
-              
-              <Box sx={{ p: 3, border: '2px dashed #ccc', borderRadius: 2, backgroundColor: '#f9f9f9' }}>
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                  {previewType === 'template' ? 'Template Content' : 'Sample Note Example'}
-                </Typography>
-                <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: bravoColors.text.primary, lineHeight: 1.6 }}>
-                  {previewType === 'template' ? previewTemplate.content : previewTemplate.sampleNote}
-                </Typography>
-              </Box>
-            </Box>
-          )}
+        <DialogContent>
+          <Box sx={{ 
+            p: 3, 
+            border: '1px solid #e0e0e0', 
+            borderRadius: 1, 
+            backgroundColor: '#f8f9fa',
+            minHeight: 300
+          }}>
+            <Typography variant="body2" sx={{ whiteSpace: 'pre-line', fontFamily: 'monospace' }}>
+              {previewType === 'template' 
+                ? previewTemplate?.content || 'No template content available'
+                : 'Sample clinical note would appear here based on the template structure...'}
+            </Typography>
+          </Box>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button 
-            onClick={() => setOpenPreview(false)}
-            variant="outlined"
-            sx={{
-              borderColor: bravoColors.secondary,
-              color: bravoColors.secondary,
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                borderColor: bravoColors.primaryFlat,
-                backgroundColor: bravoColors.background.light,
-              }
-            }}
-          >
-            CANCEL
-          </Button>
-          <Button 
-            onClick={handleImportToMyTemplates}
-            variant="contained"
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat,
-              }
-            }}
-          >
-            ADD TO LIBRARY
+        <DialogActions>
+          <Button onClick={() => setOpenPreview(false)}>Close</Button>
+          <Button onClick={handleImportToMyTemplates} variant="contained">
+            Import to My Templates
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Import Confirmation Dialog */}
-      <Dialog
-        open={openImportConfirm}
-        onClose={() => setOpenImportConfirm(false)}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          sx: { 
-            borderRadius: 3,
-            p: 2
-          }
-        }}
-      >
-        <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Import Template
-            </Typography>
-            <IconButton onClick={() => setOpenImportConfirm(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-        </DialogTitle>
+      <Dialog open={openImportConfirm} onClose={() => setOpenImportConfirm(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Import Template</DialogTitle>
         <DialogContent>
-          <Typography variant="body1" sx={{ mb: 3 }}>
-            Select which consult type you want to add this template to:
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Where would you like to import "{previewTemplate?.name}"?
           </Typography>
-          
           <FormControl fullWidth>
             <InputLabel>Select Consult Type</InputLabel>
             <Select
               value={selectedImportType}
-              label="Select Consult Type"
               onChange={(e) => setSelectedImportType(e.target.value)}
+              label="Select Consult Type"
             >
               {consultTypes.map((type) => (
                 <MenuItem key={type.id} value={type.name}>
@@ -1147,52 +808,14 @@ const TemplateBuilder: React.FC = () => {
             </Select>
           </FormControl>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button 
-            onClick={() => setOpenImportConfirm(false)}
-            variant="outlined"
-            sx={{
-              borderColor: bravoColors.secondary,
-              color: bravoColors.secondary,
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                borderColor: bravoColors.primaryFlat,
-                backgroundColor: bravoColors.background.light,
-              }
-            }}
-          >
-            CANCEL
-          </Button>
-          <Button 
-            onClick={handleConfirmImport}
-            variant="contained"
-            disabled={!selectedImportType}
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat,
-              },
-              '&:disabled': {
-                backgroundColor: '#ccc',
-                color: '#666'
-              }
-            }}
-          >
-            IMPORT
+        <DialogActions>
+          <Button onClick={() => setOpenImportConfirm(false)}>Cancel</Button>
+          <Button onClick={handleConfirmImport} variant="contained" disabled={!selectedImportType}>
+            Import
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 };
 
