@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -14,7 +15,7 @@ import {
   Container,
   Tooltip,
   Paper,
-  Grid,
+  Grid2 as Grid,
   Chip,
   Button,
   FormControl,
@@ -121,7 +122,7 @@ const Profile: React.FC = () => {
         </Typography>
         
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle2" color="text.secondary">
                 Email
@@ -132,7 +133,7 @@ const Profile: React.FC = () => {
             </Box>
           </Grid>
           
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle2" color="text.secondary">
                 Phone Number
@@ -143,7 +144,7 @@ const Profile: React.FC = () => {
             </Box>
           </Grid>
           
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle2" color="text.secondary">
                 First Name
@@ -154,7 +155,7 @@ const Profile: React.FC = () => {
             </Box>
           </Grid>
           
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle2" color="text.secondary">
                 Last Name
@@ -165,7 +166,7 @@ const Profile: React.FC = () => {
             </Box>
           </Grid>
           
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle2" color="text.secondary">
                 Specialty
@@ -176,7 +177,7 @@ const Profile: React.FC = () => {
             </Box>
           </Grid>
           
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <Box sx={{ mb: 2 }}>
               <Typography variant="subtitle2" color="text.secondary">
                 EHR Mode
@@ -190,7 +191,7 @@ const Profile: React.FC = () => {
           </Grid>
           
           {mockUserData.ehrMode && (
-            <Grid item xs={12} sm={6}>
+            <Grid xs={12} sm={6}>
               <Box sx={{ mb: 2 }}>
                 <Typography variant="subtitle2" color="text.secondary">
                   EHR Name
@@ -202,7 +203,7 @@ const Profile: React.FC = () => {
             </Grid>
           )}
           
-          <Grid item xs={12} sm={6}>
+          <Grid xs={12} sm={6}>
             <FormControl fullWidth size="small">
               <InputLabel>Notes Retention Duration</InputLabel>
               <Select

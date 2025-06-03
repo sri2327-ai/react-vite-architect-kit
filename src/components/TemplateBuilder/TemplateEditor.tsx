@@ -18,7 +18,7 @@ import {
   Tooltip,
   Chip,
   Stack,
-  Grid,
+  Grid2 as Grid,
   List,
   ListItem,
   ListItemText,
@@ -29,7 +29,7 @@ import {
   AlertTitle,
   Snackbar
 } from '@mui/material';
-import { Delete, Plus, Edit, GripVertical } from 'lucide-react';
+import { Edit, DragHandleDots2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useTheme } from '@mui/material/styles';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -604,7 +604,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
                         disablePadding
                         secondaryAction={
                           <Box {...provided.dragHandleProps}>
-                            <GripVertical color={theme.palette.action.active} />
+                            <DragHandleDots2 color={theme.palette.action.active} />
                           </Box>
                         }
                         sx={{
@@ -652,45 +652,53 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
         </Button>
       </Box>
 
-      {/* Predefined Sections Dialog */}
-      <Dialog
-        open={showPredefinedSections}
-        onClose={() => setShowPredefinedSections(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>Add Predefined Section</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2}>
-            {PREDEFINED_SECTIONS.map((section) => (
-              <Grid item xs={12} md={4} key={section.id}>
-                <Card
-                  sx={{
-                    cursor: 'pointer',
-                    '&:hover': { bgcolor: 'action.hover' }
-                  }}
-                  onClick={() => handleAddPredefinedSection(section)}
-                >
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {section.name}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      {section.description}
-                    </Typography>
-                    <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
-                      {section.elements.length} elements
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowPredefinedSections(false)}>Cancel</Button>
-        </DialogActions>
-      </Dialog>
+      {/* Predefined Sections */}
+      {showPredefinedSections && (
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Add Predefined Sections
+            </Typography>
+            <Grid container spacing={2}>
+              {PREDEFINED_SECTIONS.map((section) => (
+                <Grid key={section.id} xs={12} md={6}>
+                  <Card 
+                    sx={{ 
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: theme.shadows[4]
+                      }
+                    }}
+                    onClick={() => handleAddPredefinedSection(section)}
+                  >
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom>
+                        {section.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {section.description}
+                      </Typography>
+                      <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                        {section.elements.length} elements
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+              <Button 
+                variant="outlined" 
+                onClick={() => setShowPredefinedSections(false)}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Element Edit Dialog */}
       <Dialog
