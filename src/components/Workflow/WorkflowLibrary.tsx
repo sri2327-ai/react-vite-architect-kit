@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -24,7 +23,7 @@ import {
   StepLabel,
   StepContent,
   LinearProgress,
-  Grid2 as Grid,
+  Grid,
   Paper,
   Switch,
   FormControlLabel,
