@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -14,7 +13,7 @@ import {
   IconButton,
   Link,
   Tooltip,
-  Grid2 as Grid,
+  Grid,
   Alert,
   Card,
   CardContent
@@ -22,7 +21,7 @@ import {
 import {
   Receipt as ReceiptIcon,
   Download as DownloadIcon,
-  ExternalLink as ExternalLinkIcon,
+  OpenInNew as OpenInNewIcon,
   Payment as PaymentIcon,
   Schedule as ScheduleIcon,
   CheckCircle as CheckCircleIcon,
@@ -318,7 +317,7 @@ const Billing: React.FC = () => {
                           rel="noopener noreferrer"
                           color="primary"
                         >
-                          <ExternalLinkIcon fontSize="small" />
+                          <OpenInNewIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Download PDF">
