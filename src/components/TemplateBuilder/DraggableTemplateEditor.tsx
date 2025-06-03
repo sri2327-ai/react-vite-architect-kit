@@ -33,7 +33,13 @@ import {
   Help as HelpIcon,
   AutoFixHigh as AutoFixHighIcon,
   Close as CloseIcon,
-  Psychology as PsychologyIcon
+  Psychology as PsychologyIcon,
+  ViewHeadline as ViewHeadlineIcon,
+  FormatListBulleted as FormatListBulletedIcon,
+  Title as TitleIcon,
+  Assignment as AssignmentIcon,
+  TextSnippet as TextSnippetIcon,
+  Checklist as ChecklistIcon
 } from '@mui/icons-material';
 import AddSectionOverlay from './AddSectionOverlay';
 import SectionConfigDialog from './SectionConfigDialog';
@@ -100,15 +106,28 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   };
 
   const getTypeIcon = (type: string) => {
+    const iconProps = { fontSize: 'small' as const, sx: { color: getTypeColor(type) } };
     switch (type) {
-      case 'paragraph': return '📝';
-      case 'bulleted-list': return '• ';
-      case 'section-header': return '📋';
-      case 'exam-list': return '🔍';
-      case 'checklist': return '✅';
-      case 'static-text': return '📄';
-      default: return '📋';
+      case 'paragraph': return <ViewHeadlineIcon {...iconProps} />;
+      case 'bulleted-list': return <FormatListBulletedIcon {...iconProps} />;
+      case 'section-header': return <TitleIcon {...iconProps} />;
+      case 'exam-list': return <AssignmentIcon {...iconProps} />;
+      case 'checklist': return <ChecklistIcon {...iconProps} />;
+      case 'static-text': return <TextSnippetIcon {...iconProps} />;
+      default: return <TextSnippetIcon {...iconProps} />;
     }
+  };
+
+  const getTypeLabel = (type: string) => {
+    const labels = {
+      'paragraph': 'Paragraph',
+      'bulleted-list': 'Bulleted List',
+      'section-header': 'Section Header',
+      'exam-list': 'Exam List',
+      'checklist': 'Checklist',
+      'static-text': 'Static Text'
+    };
+    return labels[type as keyof typeof labels] || type.replace('-', ' ').toUpperCase();
   };
 
   const handleAddSection = (section: any) => {
@@ -222,272 +241,256 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
           mb: 3,
           position: 'relative',
           borderRadius: 3,
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
           transition: 'all 0.3s ease',
-          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+          overflow: 'visible',
           '&:hover': {
-            boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
-            transform: 'translateY(-2px)'
+            boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+            transform: 'translateY(-2px)',
+            '& .drag-handle': {
+              opacity: 1
+            }
           }
         }}
       >
-        <CardContent sx={{ p: 3 }}>
+        {/* Drag Handle */}
+        <Box 
+          className="drag-handle"
+          sx={{
+            position: 'absolute',
+            left: -12,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            zIndex: 2,
+            opacity: 0,
+            transition: 'opacity 0.2s ease'
+          }}
+        >
+          <Tooltip title="Drag to reorder">
+            <IconButton 
+              sx={{ 
+                backgroundColor: theme.palette.background.paper,
+                border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                cursor: 'grab',
+                color: theme.palette.primary.main,
+                width: 32,
+                height: 32,
+                '&:hover': { 
+                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                  borderColor: theme.palette.primary.main
+                },
+                '&:active': { cursor: 'grabbing' },
+                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+              }}
+            >
+              <DragIndicatorIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <CardContent sx={{ p: 0 }}>
           {/* Header Section */}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-            <Tooltip title="Drag to reorder">
-              <IconButton 
-                sx={{ 
-                  cursor: 'grab',
-                  color: theme.palette.text.secondary,
-                  '&:active': { cursor: 'grabbing' }
-                }}
-              >
-                <DragIndicatorIcon />
-              </IconButton>
-            </Tooltip>
-            
-            <Box sx={{ flex: 1 }}>
-              <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+          <Box sx={{ 
+            p: 3, 
+            pb: 2,
+            background: `linear-gradient(135deg, ${alpha(getTypeColor(item.type), 0.03)} 0%, ${alpha(getTypeColor(item.type), 0.08)} 100%)`
+          }}>
+            <Stack direction="row" alignItems="flex-start" spacing={2}>
+              <Box sx={{ flex: 1 }}>
+                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                  {getTypeIcon(item.type)}
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 700,
+                      color: theme.palette.text.primary,
+                      fontSize: '1.1rem'
+                    }}
+                  >
+                    {item.name}
+                  </Typography>
+                  <Chip
+                    label={getTypeLabel(item.type)}
+                    size="small"
+                    sx={{
+                      backgroundColor: alpha(getTypeColor(item.type), 0.15),
+                      color: getTypeColor(item.type),
+                      fontWeight: 600,
+                      fontSize: '0.75rem',
+                      height: 24
+                    }}
+                  />
+                </Stack>
+                
                 <Typography 
-                  variant="h6" 
+                  variant="body2" 
                   sx={{ 
-                    fontWeight: 600,
-                    color: theme.palette.text.primary,
-                    fontSize: '1.1rem'
+                    color: theme.palette.text.secondary,
+                    lineHeight: 1.6,
+                    fontStyle: 'italic'
                   }}
                 >
-                  {getTypeIcon(item.type)} {item.name}
+                  {item.description || 'A.I. will write a descriptive block of text following the guidelines below.'}
                 </Typography>
-                <Chip
-                  label={item.type.replace('-', ' ').toUpperCase()}
-                  size="small"
-                  sx={{
-                    backgroundColor: alpha(getTypeColor(item.type), 0.1),
-                    color: getTypeColor(item.type),
-                    fontWeight: 600,
-                    fontSize: '0.75rem'
-                  }}
-                />
+              </Box>
+
+              {/* Quick Actions */}
+              <Stack direction="row" spacing={1}>
+                <Tooltip title="Move Up">
+                  <IconButton
+                    size="small"
+                    onClick={() => handleMoveUp(item.id)}
+                    disabled={index === 0}
+                    sx={{ 
+                      backgroundColor: alpha(theme.palette.action.active, 0.08),
+                      '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.12) },
+                      '&:disabled': { opacity: 0.3 }
+                    }}
+                  >
+                    <KeyboardArrowUpIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title="Move Down">
+                  <IconButton
+                    size="small"
+                    onClick={() => handleMoveDown(item.id)}
+                    disabled={index === items.length - 1}
+                    sx={{ 
+                      backgroundColor: alpha(theme.palette.action.active, 0.08),
+                      '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.12) },
+                      '&:disabled': { opacity: 0.3 }
+                    }}
+                  >
+                    <KeyboardArrowDownIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title="Duplicate">
+                  <IconButton
+                    size="small"
+                    onClick={() => handleCopyItem(item.id)}
+                    sx={{ 
+                      backgroundColor: alpha(theme.palette.info.main, 0.08),
+                      color: theme.palette.info.main,
+                      '&:hover': { backgroundColor: alpha(theme.palette.info.main, 0.15) }
+                    }}
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+
+                <Tooltip title="Delete">
+                  <IconButton
+                    size="small"
+                    onClick={() => handleDeleteItem(item.id)}
+                    sx={{ 
+                      backgroundColor: alpha(theme.palette.error.main, 0.08),
+                      color: theme.palette.error.main,
+                      '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.15) }
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
               </Stack>
-              
+            </Stack>
+          </Box>
+
+          <Divider />
+
+          {/* Content Preview */}
+          <Box sx={{ p: 3, pt: 2 }}>
+            <Paper 
+              sx={{ 
+                p: 2.5, 
+                backgroundColor: alpha(theme.palette.background.default, 0.5),
+                border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                borderRadius: 2
+              }}
+            >
               <Typography 
                 variant="body2" 
                 sx={{ 
                   color: theme.palette.text.secondary,
                   lineHeight: 1.6,
-                  mb: 2
+                  mb: item.items && item.items.length > 0 ? 2 : 0
                 }}
               >
-                {item.description}
+                {item.content}
               </Typography>
-
-              {/* Content Preview */}
-              <Paper 
-                sx={{ 
-                  p: 2, 
-                  backgroundColor: alpha(theme.palette.primary.main, 0.02),
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-                  borderRadius: 2
-                }}
-              >
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    fontStyle: 'italic',
-                    color: theme.palette.text.secondary
-                  }}
-                >
-                  {item.content}
-                </Typography>
-                
-                {item.items && item.items.length > 0 && (
-                  <Box sx={{ mt: 1.5 }}>
-                    {item.items.map((subItem, idx) => (
-                      <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 0.5 }}>
-                        <Box 
-                          sx={{ 
-                            width: 4, 
-                            height: 4, 
-                            borderRadius: '50%', 
-                            backgroundColor: theme.palette.primary.main,
-                            mt: 1,
-                            flexShrink: 0
-                          }} 
-                        />
-                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                          {subItem.name && `${subItem.name}: `}{subItem.content}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-              </Paper>
-            </Box>
-
-            {/* Action Buttons */}
-            <Stack direction="column" spacing={1}>
-              <Tooltip title="Get AI Help">
-                <IconButton
-                  size="small"
-                  onClick={() => handleHelp(item.id)}
-                  sx={{ 
-                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
-                    '&:hover': { 
-                      backgroundColor: alpha(theme.palette.primary.main, 0.2),
-                      transform: 'scale(1.05)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <HelpIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Edit AI Instructions">
-                <IconButton
-                  size="small"
-                  onClick={() => handleAiEdit(item.id)}
-                  sx={{ 
-                    backgroundColor: alpha(theme.palette.secondary.main, 0.1),
-                    color: theme.palette.secondary.main,
-                    '&:hover': { 
-                      backgroundColor: alpha(theme.palette.secondary.main, 0.2),
-                      transform: 'scale(1.05)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <AutoFixHighIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Duplicate Section">
-                <IconButton
-                  size="small"
-                  onClick={() => handleCopyItem(item.id)}
-                  sx={{ 
-                    backgroundColor: alpha(theme.palette.info.main, 0.1),
-                    color: theme.palette.info.main,
-                    '&:hover': { 
-                      backgroundColor: alpha(theme.palette.info.main, 0.2),
-                      transform: 'scale(1.05)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <ContentCopyIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Divider sx={{ my: 1 }} />
-
-              <Tooltip title="Move Up">
-                <IconButton
-                  size="small"
-                  onClick={() => handleMoveUp(item.id)}
-                  disabled={index === 0}
-                  sx={{ 
-                    backgroundColor: alpha(theme.palette.grey[600], 0.1),
-                    color: theme.palette.grey[600],
-                    '&:hover': { 
-                      backgroundColor: alpha(theme.palette.grey[600], 0.2),
-                      transform: 'scale(1.05)'
-                    },
-                    '&:disabled': {
-                      backgroundColor: 'transparent',
-                      color: theme.palette.grey[300]
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <KeyboardArrowUpIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Move Down">
-                <IconButton
-                  size="small"
-                  onClick={() => handleMoveDown(item.id)}
-                  disabled={index === items.length - 1}
-                  sx={{ 
-                    backgroundColor: alpha(theme.palette.grey[600], 0.1),
-                    color: theme.palette.grey[600],
-                    '&:hover': { 
-                      backgroundColor: alpha(theme.palette.grey[600], 0.2),
-                      transform: 'scale(1.05)'
-                    },
-                    '&:disabled': {
-                      backgroundColor: 'transparent',
-                      color: theme.palette.grey[300]
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <KeyboardArrowDownIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-
-              <Divider sx={{ my: 1 }} />
-
-              <Tooltip title="Delete Section">
-                <IconButton
-                  size="small"
-                  onClick={() => handleDeleteItem(item.id)}
-                  sx={{ 
-                    backgroundColor: alpha(theme.palette.error.main, 0.1),
-                    color: theme.palette.error.main,
-                    '&:hover': { 
-                      backgroundColor: alpha(theme.palette.error.main, 0.2),
-                      transform: 'scale(1.05)'
-                    },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <DeleteIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Stack>
+              
+              {item.items && item.items.length > 0 && (
+                <Box>
+                  {item.items.map((subItem, idx) => (
+                    <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1 }}>
+                      <Box 
+                        sx={{ 
+                          width: 6, 
+                          height: 6, 
+                          borderRadius: '50%', 
+                          backgroundColor: getTypeColor(item.type),
+                          mt: 1,
+                          flexShrink: 0
+                        }} 
+                      />
+                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                        {subItem.name && <strong>{subItem.name}: </strong>}{subItem.content}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </Paper>
           </Box>
 
-          {/* Action Bar */}
-          <Box sx={{ display: 'flex', gap: 2, mt: 2, pt: 2, borderTop: `1px solid ${alpha(theme.palette.divider, 0.1)}` }}>
-            <Button
-              variant="contained"
-              startIcon={<AutoFixHighIcon />}
-              onClick={() => handleAiEdit(item.id)}
-              sx={{
-                borderRadius: 2,
-                textTransform: 'none',
-                fontWeight: 600,
-                px: 3,
-                boxShadow: 'none',
-                '&:hover': {
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                }
-              }}
-            >
-              Edit AI Instructions
-            </Button>
+          <Divider />
 
-            <Button
-              variant="outlined"
-              startIcon={<HelpIcon />}
-              onClick={() => handleHelp(item.id)}
-              sx={{
-                borderRadius: 2,
-                textTransform: 'none',
-                fontWeight: 600,
-                px: 3,
-                borderWidth: 2,
-                '&:hover': {
+          {/* Action Buttons */}
+          <Box sx={{ p: 3, pt: 2 }}>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="contained"
+                startIcon={<AutoFixHighIcon />}
+                onClick={() => handleAiEdit(item.id)}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 3,
+                  flex: 1,
+                  backgroundColor: getTypeColor(item.type),
+                  '&:hover': {
+                    backgroundColor: alpha(getTypeColor(item.type), 0.8)
+                  }
+                }}
+              >
+                Edit Instructions
+              </Button>
+
+              <Button
+                variant="outlined"
+                startIcon={<HelpIcon />}
+                onClick={() => handleHelp(item.id)}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  px: 3,
                   borderWidth: 2,
-                  backgroundColor: alpha(theme.palette.primary.main, 0.04)
-                }
-              }}
-            >
-              Get Help
-            </Button>
+                  borderColor: getTypeColor(item.type),
+                  color: getTypeColor(item.type),
+                  '&:hover': {
+                    borderWidth: 2,
+                    backgroundColor: alpha(getTypeColor(item.type), 0.04),
+                    borderColor: getTypeColor(item.type)
+                  }
+                }}
+              >
+                Get Help
+              </Button>
+            </Stack>
           </Box>
         </CardContent>
       </Card>
@@ -526,7 +529,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
                 maxWidth: 600
               }}
             >
-              Build your AI-powered template by adding and configuring sections. Each section will be intelligently generated based on your instructions.
+              Build your AI-powered template by adding and configuring sections. Drag sections to reorder them and customize each one with specific instructions.
             </Typography>
           </Box>
           
@@ -556,7 +559,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       </Paper>
 
       {/* Template Sections */}
-      <Box>
+      <Box sx={{ position: 'relative', pl: 2 }}>
         {items.map((item, index) => renderSectionBlock(item, index))}
       </Box>
 
