@@ -15,7 +15,7 @@ import {
   Container,
   Tooltip,
   Paper,
-  Grid2 as Grid,
+  Grid,
   Chip,
   Button,
   FormControl,

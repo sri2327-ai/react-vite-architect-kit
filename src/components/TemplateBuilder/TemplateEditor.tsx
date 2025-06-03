@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -18,7 +19,7 @@ import {
   Tooltip,
   Chip,
   Stack,
-  Grid2 as Grid,
+  Grid,
   List,
   ListItem,
   ListItemText,
@@ -29,7 +30,7 @@ import {
   AlertTitle,
   Snackbar
 } from '@mui/material';
-import { Edit, DragHandleDots2 } from 'lucide-react';
+import { Edit, GripVertical, Plus, Trash2 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { useTheme } from '@mui/material/styles';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -604,7 +605,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
                         disablePadding
                         secondaryAction={
                           <Box {...provided.dragHandleProps}>
-                            <DragHandleDots2 color={theme.palette.action.active} />
+                            <GripVertical color={theme.palette.action.active} />
                           </Box>
                         }
                         sx={{
@@ -630,7 +631,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
                                 <Edit size={16} />
                               </IconButton>
                               <IconButton onClick={() => handleRemoveElement(element.id)} color="error">
-                                <Delete size={16} />
+                                <Trash2 size={16} />
                               </IconButton>
                             </Box>
                           </Box>
@@ -661,7 +662,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
             </Typography>
             <Grid container spacing={2}>
               {PREDEFINED_SECTIONS.map((section) => (
-                <Grid key={section.id} xs={12} md={6}>
+                <Grid item key={section.id} xs={12} md={6}>
                   <Card 
                     sx={{ 
                       cursor: 'pointer',
