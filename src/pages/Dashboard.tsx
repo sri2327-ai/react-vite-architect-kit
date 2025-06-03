@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -14,7 +15,6 @@ import {
   Container,
   Tooltip,
   Paper,
-  Grid,
   Chip,
   Button,
   FormControl,
@@ -120,89 +120,75 @@ const Profile: React.FC = () => {
           User Information
         </Typography>
         
-        <Grid container spacing={3}>
-          <Grid xs={12} sm={6}>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Email
-              </Typography>
-              <Typography variant="body1">
-                {mockUserData.email}
-              </Typography>
-            </Box>
-          </Grid>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Email
+            </Typography>
+            <Typography variant="body1">
+              {mockUserData.email}
+            </Typography>
+          </Box>
           
-          <Grid xs={12} sm={6}>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Phone Number
-              </Typography>
-              <Typography variant="body1">
-                {mockUserData.phoneNumber}
-              </Typography>
-            </Box>
-          </Grid>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Phone Number
+            </Typography>
+            <Typography variant="body1">
+              {mockUserData.phoneNumber}
+            </Typography>
+          </Box>
           
-          <Grid xs={12} sm={6}>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                First Name
-              </Typography>
-              <Typography variant="body1">
-                {mockUserData.firstName}
-              </Typography>
-            </Box>
-          </Grid>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary">
+              First Name
+            </Typography>
+            <Typography variant="body1">
+              {mockUserData.firstName}
+            </Typography>
+          </Box>
           
-          <Grid xs={12} sm={6}>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Last Name
-              </Typography>
-              <Typography variant="body1">
-                {mockUserData.lastName}
-              </Typography>
-            </Box>
-          </Grid>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Last Name
+            </Typography>
+            <Typography variant="body1">
+              {mockUserData.lastName}
+            </Typography>
+          </Box>
           
-          <Grid xs={12} sm={6}>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Specialty
-              </Typography>
-              <Typography variant="body1">
-                {mockUserData.specialty}
-              </Typography>
-            </Box>
-          </Grid>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary">
+              Specialty
+            </Typography>
+            <Typography variant="body1">
+              {mockUserData.specialty}
+            </Typography>
+          </Box>
           
-          <Grid xs={12} sm={6}>
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                EHR Mode
-              </Typography>
-              <Chip 
-                label={mockUserData.ehrMode ? 'EHR Mode' : 'No EHR Mode'} 
-                color={mockUserData.ehrMode ? 'primary' : 'default'}
-                size="small"
-              />
-            </Box>
-          </Grid>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" color="text.secondary">
+              EHR Mode
+            </Typography>
+            <Chip 
+              label={mockUserData.ehrMode ? 'EHR Mode' : 'No EHR Mode'} 
+              color={mockUserData.ehrMode ? 'primary' : 'default'}
+              size="small"
+            />
+          </Box>
           
           {mockUserData.ehrMode && (
-            <Grid xs={12} sm={6}>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  EHR Name
-                </Typography>
-                <Typography variant="body1">
-                  {mockUserData.ehrName}
-                </Typography>
-              </Box>
-            </Grid>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" color="text.secondary">
+                EHR Name
+              </Typography>
+              <Typography variant="body1">
+                {mockUserData.ehrName}
+              </Typography>
+            </Box>
           )}
           
-          <Grid xs={12} sm={6}>
+          <Box sx={{ mb: 2 }}>
             <FormControl fullWidth size="small">
               <InputLabel>Notes Retention Duration</InputLabel>
               <Select
@@ -218,8 +204,8 @@ const Profile: React.FC = () => {
                 <MenuItem value="permanent">Permanent</MenuItem>
               </Select>
             </FormControl>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Paper>
       
       <Paper sx={{ p: 3 }}>

@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -20,7 +18,6 @@ import {
   Tooltip,
   Chip,
   Stack,
-  Grid,
   List,
   ListItem,
   ListItemText,
@@ -661,35 +658,34 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
             <Typography variant="h6" gutterBottom>
               Add Predefined Sections
             </Typography>
-            <Grid container spacing={2}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 2 }}>
               {PREDEFINED_SECTIONS.map((section) => (
-                <Grid key={section.id} xs={12} md={6}>
-                  <Card 
-                    sx={{ 
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: theme.shadows[4]
-                      }
-                    }}
-                    onClick={() => handleAddPredefinedSection(section)}
-                  >
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        {section.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {section.description}
-                      </Typography>
-                      <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
-                        {section.elements.length} elements
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                <Card 
+                  key={section.id}
+                  sx={{ 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: theme.shadows[4]
+                    }
+                  }}
+                  onClick={() => handleAddPredefinedSection(section)}
+                >
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {section.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {section.description}
+                    </Typography>
+                    <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                      {section.elements.length} elements
+                    </Typography>
+                  </CardContent>
+                </Card>
               ))}
-            </Grid>
+            </Box>
             <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
               <Button 
                 variant="outlined" 
@@ -772,4 +768,3 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
 };
 
 export default TemplateEditor;
-
