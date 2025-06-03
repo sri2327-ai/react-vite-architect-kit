@@ -29,7 +29,9 @@ import {
   LocationOn as LocationIcon,
   Description as NoteIcon,
   Assignment as ChartIcon,
-  LocalHospital as VisitIcon
+  LocalHospital as VisitIcon,
+  Edit as EditIcon,
+  MapIcon
 } from '@mui/icons-material';
 
 interface WorkflowTemplate {
@@ -38,7 +40,6 @@ interface WorkflowTemplate {
   description: string;
   ehrSystem: string;
   category: string;
-  visitType: string;
   blocks: WorkflowBlock[];
 }
 
@@ -48,33 +49,18 @@ interface WorkflowBlock {
   name: string;
   description: string;
   icon: React.ReactNode;
-  templateMapping?: string;
-  config: any;
   isEditable?: boolean;
-  mappingOptions?: string[];
+  isNoteField?: boolean;
+  config: any;
 }
 
 const WorkflowLibrary: React.FC = () => {
   const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowTemplate | null>(null);
   const [viewDialog, setViewDialog] = useState(false);
-  const [selectedVisitType, setSelectedVisitType] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
   // Mock user EHR - this would come from user profile
   const userEHR = 'Practice Fusion';
-
-  // Available visit types for clinicians
-  const visitTypes = [
-    'Annual Physical',
-    'Follow-up Visit',
-    'Acute Care',
-    'Preventive Care',
-    'Specialist Consultation',
-    'Urgent Care',
-    'Telemedicine',
-    'Pediatric Visit',
-    'Geriatric Assessment'
-  ];
 
   const categories = [
     'Patient Encounter',
@@ -92,7 +78,8 @@ const WorkflowLibrary: React.FC = () => {
       description: 'Navigate to patient schedule interface',
       icon: <ScheduleIcon />,
       config: { automated: true },
-      isEditable: false
+      isEditable: false,
+      isNoteField: false
     },
     {
       id: 'provider-filter',
@@ -101,7 +88,8 @@ const WorkflowLibrary: React.FC = () => {
       description: 'Select your name from provider list',
       icon: <PersonIcon />,
       config: { dynamic: true, userInput: 'provider_name' },
-      isEditable: true
+      isEditable: true,
+      isNoteField: false
     },
     {
       id: 'date-filter',
@@ -110,7 +98,8 @@ const WorkflowLibrary: React.FC = () => {
       description: 'Choose appointment date',
       icon: <TodayIcon />,
       config: { automated: true, value: 'current_date' },
-      isEditable: true
+      isEditable: true,
+      isNoteField: false
     },
     {
       id: 'patient-select',
@@ -119,109 +108,101 @@ const WorkflowLibrary: React.FC = () => {
       description: 'Click on patient from schedule',
       icon: <PersonIcon />,
       config: { userAction: true },
-      isEditable: false
+      isEditable: false,
+      isNoteField: false
     },
     {
       id: 'chief-complaint',
       type: 'action',
       name: 'Chief Complaint',
-      description: 'Document primary reason for visit',
+      description: 'Document primary reason for visit - will map to your EHR field',
       icon: <NoteIcon />,
-      templateMapping: 'chief_complaint_block',
       config: { templateField: true, required: true },
       isEditable: true,
-      mappingOptions: ['Chief Complaint', 'Primary Concern', 'Reason for Visit', 'Main Issue']
+      isNoteField: true
     },
     {
       id: 'subjective',
       type: 'action',
       name: 'History & Review',
-      description: 'Document patient history and symptoms',
+      description: 'Document patient history and symptoms - will map to your EHR field',
       icon: <NoteIcon />,
-      templateMapping: 'subjective_block',
       config: { templateField: true, multiline: true },
       isEditable: true,
-      mappingOptions: ['History of Present Illness', 'Review of Systems', 'Past Medical History', 'Social History']
+      isNoteField: true
     },
     {
       id: 'objective',
       type: 'action',
       name: 'Physical Exam',
-      description: 'Record examination findings',
+      description: 'Record examination findings - will map to your EHR field',
       icon: <NoteIcon />,
-      templateMapping: 'objective_block',
       config: { templateField: true, multiline: true },
       isEditable: true,
-      mappingOptions: ['Physical Examination', 'Vital Signs', 'Clinical Findings', 'Objective Data']
+      isNoteField: true
     },
     {
       id: 'assessment',
       type: 'action',
       name: 'Clinical Assessment',
-      description: 'Document clinical impression',
+      description: 'Document clinical impression - will map to your EHR field',
       icon: <NoteIcon />,
-      templateMapping: 'assessment_block',
       config: { templateField: true, multiline: true },
       isEditable: true,
-      mappingOptions: ['Assessment', 'Clinical Impression', 'Diagnosis', 'Problem List']
+      isNoteField: true
     },
     {
       id: 'plan',
       type: 'action',
       name: 'Treatment Plan',
-      description: 'Outline treatment approach',
+      description: 'Outline treatment approach - will map to your EHR field',
       icon: <NoteIcon />,
-      templateMapping: 'plan_block',
       config: { templateField: true, multiline: true },
       isEditable: true,
-      mappingOptions: ['Plan', 'Treatment Plan', 'Management', 'Next Steps']
+      isNoteField: true
     }
   ];
 
+  // Predefined EHR workflows (not visit-type specific)
   const workflowTemplates: WorkflowTemplate[] = [
     {
-      id: 'pf-annual-physical',
-      name: 'Annual Physical Exam Workflow',
-      description: 'Comprehensive annual physical examination with preventive care screening',
+      id: 'pf-complete-encounter',
+      name: 'Complete Patient Encounter',
+      description: 'Full patient encounter workflow with comprehensive documentation',
       ehrSystem: 'Practice Fusion',
       category: 'Patient Encounter',
-      visitType: 'Annual Physical',
       blocks: workflowBlocks
     },
     {
-      id: 'pf-followup-visit',
-      name: 'Follow-up Visit Workflow',
-      description: 'Streamlined follow-up visit for ongoing conditions',
+      id: 'pf-quick-visit',
+      name: 'Quick Visit Documentation',
+      description: 'Streamlined workflow for brief encounters',
       ehrSystem: 'Practice Fusion',
       category: 'Patient Encounter',
-      visitType: 'Follow-up Visit',
       blocks: workflowBlocks.slice(0, 7)
     },
     {
-      id: 'pf-acute-care',
-      name: 'Acute Care Visit Workflow',
-      description: 'Efficient workflow for urgent medical concerns',
-      ehrSystem: 'Practice Fusion',
-      category: 'Patient Encounter',
-      visitType: 'Acute Care',
-      blocks: workflowBlocks.slice(0, 8)
-    },
-    {
-      id: 'pf-prescription',
-      name: 'Prescription Management Workflow',
-      description: 'Dedicated workflow for medication management',
+      id: 'pf-prescription-only',
+      name: 'Prescription Focused Visit',
+      description: 'Workflow optimized for medication management visits',
       ehrSystem: 'Practice Fusion',
       category: 'Prescription',
-      visitType: 'Follow-up Visit',
       blocks: workflowBlocks.slice(0, 6)
+    },
+    {
+      id: 'pf-follow-up',
+      name: 'Follow-up Visit Workflow',
+      description: 'Efficient workflow for follow-up appointments',
+      ehrSystem: 'Practice Fusion',
+      category: 'Patient Encounter',
+      blocks: workflowBlocks.slice(0, 8)
     }
   ];
 
   const filteredWorkflows = workflowTemplates.filter(wf => {
     const ehrMatch = wf.ehrSystem === userEHR;
-    const visitMatch = selectedVisitType === 'all' || wf.visitType === selectedVisitType;
     const categoryMatch = selectedCategory === 'all' || wf.category === selectedCategory;
-    return ehrMatch && visitMatch && categoryMatch;
+    return ehrMatch && categoryMatch;
   });
 
   const handleViewWorkflow = (workflow: WorkflowTemplate) => {
@@ -232,7 +213,7 @@ const WorkflowLibrary: React.FC = () => {
   const handleImportWorkflow = (workflow: WorkflowTemplate) => {
     console.log('Importing workflow:', workflow.name);
     setViewDialog(false);
-    // Navigate to My Workflows
+    // This will take user to configuration where they map to visit types and EHR fields
   };
 
   const getBlockTypeColor = (type: string) => {
@@ -248,32 +229,13 @@ const WorkflowLibrary: React.FC = () => {
     <Box sx={{ p: 3 }}>
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
-          <strong>EHR System:</strong> {userEHR} - Showing workflows optimized for your practice
+          <strong>EHR System:</strong> {userEHR} - These are predefined workflows that you can customize for your visit types
         </Typography>
       </Alert>
 
-      {/* Filters */}
-      <Box sx={{ 
-        display: 'grid', 
-        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
-        gap: 2, 
-        mb: 3 
-      }}>
-        <FormControl size="small">
-          <InputLabel>Visit Type</InputLabel>
-          <Select
-            value={selectedVisitType}
-            label="Visit Type"
-            onChange={(e) => setSelectedVisitType(e.target.value)}
-          >
-            <MenuItem value="all">All Visit Types</MenuItem>
-            {visitTypes.map((type) => (
-              <MenuItem key={type} value={type}>{type}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        
-        <FormControl size="small">
+      {/* Category Filter */}
+      <Box sx={{ mb: 3 }}>
+        <FormControl size="small" sx={{ minWidth: 200 }}>
           <InputLabel>Category</InputLabel>
           <Select
             value={selectedCategory}
@@ -308,8 +270,9 @@ const WorkflowLibrary: React.FC = () => {
                   {workflow.description}
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <Chip label={workflow.visitType} size="small" color="primary" />
                   <Chip label={workflow.category} size="small" color="secondary" />
+                  <Chip label={`${workflow.blocks.filter(b => b.isEditable).length} Editable Steps`} size="small" color="primary" />
+                  <Chip label={`${workflow.blocks.filter(b => b.isNoteField).length} Note Fields`} size="small" color="warning" />
                 </Box>
               </Box>
               
@@ -317,7 +280,7 @@ const WorkflowLibrary: React.FC = () => {
                 Workflow Steps: {workflow.blocks.length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Includes automated navigation, documentation, and template mapping
+                After importing, you'll map this to your visit types and configure EHR field mappings
               </Typography>
             </CardContent>
             
@@ -338,7 +301,7 @@ const WorkflowLibrary: React.FC = () => {
                 size="small"
                 sx={{ flex: 1 }}
               >
-                Add to My Workflows
+                Import & Configure
               </Button>
             </Box>
           </Card>
@@ -352,7 +315,7 @@ const WorkflowLibrary: React.FC = () => {
             No workflows found for selected filters
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Try adjusting your visit type or category filters
+            Try adjusting your category filter
           </Typography>
         </Box>
       )}
@@ -371,14 +334,16 @@ const WorkflowLibrary: React.FC = () => {
           </Typography>
           
           <Box sx={{ display: 'flex', gap: 1, mb: 3 }}>
-            <Chip label={`Visit Type: ${selectedWorkflow?.visitType}`} color="primary" />
             <Chip label={`Category: ${selectedWorkflow?.category}`} color="secondary" />
+            <Chip label={`EHR: ${selectedWorkflow?.ehrSystem}`} color="primary" />
           </Box>
           
           <Alert severity="info" sx={{ mb: 3 }}>
             <Typography variant="body2">
-              <strong>Template Integration:</strong> This workflow will map to your template fields. 
-              You can customize field mappings after importing.
+              <strong>Configuration Required:</strong> After importing, you'll need to:
+              <br />• Map this workflow to your specific visit types
+              <br />• Configure which EHR fields each note block should populate
+              <br />• Customize editable steps for your practice patterns
             </Typography>
           </Alert>
 
@@ -401,26 +366,34 @@ const WorkflowLibrary: React.FC = () => {
                     <Typography variant="subtitle2">
                       {index + 1}. {block.name}
                     </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                    <Box sx={{ display: 'flex', gap: 1, mt: 0.5, flexWrap: 'wrap' }}>
                       <Chip 
                         label={block.type} 
                         size="small" 
                         color={getBlockTypeColor(block.type)}
                       />
                       {block.isEditable && (
-                        <Chip label="Editable" size="small" color="success" />
+                        <Chip 
+                          label="Editable" 
+                          size="small" 
+                          color="success"
+                          icon={<EditIcon />}
+                        />
+                      )}
+                      {block.isNoteField && (
+                        <Chip 
+                          label="Note Field" 
+                          size="small" 
+                          color="warning"
+                          icon={<MapIcon />}
+                        />
                       )}
                     </Box>
                   </Box>
                 </Box>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <Typography variant="body2" color="text.secondary">
                   {block.description}
                 </Typography>
-                {block.templateMapping && (
-                  <Typography variant="caption" color="primary">
-                    Maps to: {block.templateMapping}
-                  </Typography>
-                )}
               </Card>
             ))}
           </Box>
@@ -429,8 +402,8 @@ const WorkflowLibrary: React.FC = () => {
           
           <Alert severity="success">
             <Typography variant="body2">
-              <strong>Clinician-Friendly Design:</strong> After importing, you can customize each step, 
-              map fields to your templates, and adjust the workflow to match your practice patterns.
+              <strong>Next Steps:</strong> Import this workflow to start customizing it for your practice. 
+              You'll be able to map it to multiple visit types and configure all EHR field mappings.
             </Typography>
           </Alert>
         </DialogContent>
@@ -443,7 +416,7 @@ const WorkflowLibrary: React.FC = () => {
             startIcon={<ImportIcon />}
             onClick={() => handleImportWorkflow(selectedWorkflow!)}
           >
-            Import Workflow
+            Import & Configure
           </Button>
         </DialogActions>
       </Dialog>
