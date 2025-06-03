@@ -11,6 +11,10 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
+  TextField,
+  Dialog,
+  DialogContent,
+  IconButton,
 } from '@mui/material';
 import { 
   CheckCircle, 
@@ -18,7 +22,9 @@ import {
   Shield, 
   Cloud,
   Headphones,
-  BarChart3 
+  BarChart3,
+  Close,
+  Tag
 } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
@@ -26,6 +32,12 @@ import { SignupData } from '../SignupFlow';
 interface PaymentProps {
   onBack: () => void;
   data: Partial<SignupData>;
+}
+
+interface PricingData {
+  noEhrPrice: number;
+  ehrPrice: number;
+  promoDiscount?: number;
 }
 
 const features = [
@@ -37,14 +49,67 @@ const features = [
 
 export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
   const [loading, setLoading] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState('');
+
+  // Mock pricing data - will be fetched from API
+  const [pricing] = useState<PricingData>({
+    noEhrPrice: 79,
+    ehrPrice: 99,
+    promoDiscount: 0
+  });
+
+  const currentPrice = data.ehrMode ? pricing.ehrPrice : pricing.noEhrPrice;
+  const finalPrice = promoApplied ? currentPrice - (pricing.promoDiscount || 0) : currentPrice;
+
+  const handlePromoCode = () => {
+    // Mock promo code validation - will be API call
+    if (promoCode.toLowerCase() === 'welcome10') {
+      setPromoApplied(true);
+      pricing.promoDiscount = 10;
+    }
+  };
 
   const handlePayment = async () => {
     setLoading(true);
-    setTimeout(() => {
+    
+    try {
+      // Mock API call to generate payment URL - replace with actual API
+      const mockPaymentUrl = 'https://zohosecurepay.com/books/s10aiinc/securepay?CInvoiceID=2-cab38e1b3e20ae6086682ef94096c3e79c3170a50e8a1445eae7a317be3fe45a83a8fc305b6392e6c032b46515559313bfd7df8d54ea98406754244081b9ca6aab2e67f7acee8330';
+      
+      setPaymentUrl(mockPaymentUrl);
+      setShowPaymentModal(true);
+    } catch (error) {
+      console.error('Error generating payment URL:', error);
+    } finally {
       setLoading(false);
-      window.location.href = '/dashboard';
-    }, 2000);
+    }
   };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentModal(false);
+    // Redirect to dashboard on successful payment
+    window.location.href = '/dashboard';
+  };
+
+  const handlePaymentModalClose = () => {
+    setShowPaymentModal(false);
+    setLoading(false);
+  };
+
+  // Listen for payment completion messages from iframe
+  React.useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === 'payment_success' || event.data.type === 'payment_success') {
+        handlePaymentSuccess();
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   return (
     <Box sx={{ 
@@ -111,17 +176,52 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           }}>
             <Box sx={{ textAlign: 'center', mb: 1 }}>
               <Typography variant="h3" fontWeight={700} color="primary.main" sx={{ fontSize: { xs: '1.6rem', sm: '2rem' } }}>
-                $99
+                ${finalPrice}
               </Typography>
+              {promoApplied && (
+                <Typography variant="body2" sx={{ textDecoration: 'line-through', color: 'text.secondary', fontSize: '0.9rem' }}>
+                  ${currentPrice}
+                </Typography>
+              )}
               <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                 per month
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.75rem' }}>
-                Professional Plan - Everything you need
+                {data.ehrMode ? 'Professional Plan with EHR' : 'Professional Plan'} - Everything you need
               </Typography>
             </Box>
 
             <Divider sx={{ my: 1 }} />
+
+            {/* Promo Code Section */}
+            <Box sx={{ mb: 1 }}>
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
+                <TextField
+                  size="small"
+                  label="Promo Code"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  disabled={promoApplied}
+                  sx={{ flex: 1 }}
+                  InputProps={{
+                    startAdornment: <Tag size={16} style={{ marginRight: 8, color: '#666' }} />
+                  }}
+                />
+                <SecondaryButton
+                  size="small"
+                  onClick={handlePromoCode}
+                  disabled={!promoCode || promoApplied}
+                  sx={{ py: 1 }}
+                >
+                  Apply
+                </SecondaryButton>
+              </Box>
+              {promoApplied && (
+                <Typography variant="body2" color="success.main" sx={{ mt: 0.5, fontSize: '0.75rem' }}>
+                  ✓ Promo code applied! You saved ${pricing.promoDiscount}
+                </Typography>
+              )}
+            </Box>
 
             <List sx={{ py: 0, flex: 1 }}>
               {features.map((feature, index) => (
@@ -210,9 +310,57 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
             fontSize: { xs: '0.85rem', sm: '0.95rem' }
           }}
         >
-          {loading ? 'Processing Payment...' : 'Complete Setup - $99/month'}
+          {loading ? 'Processing Payment...' : `Complete Setup - $${finalPrice}/month`}
         </PrimaryButton>
       </Box>
+
+      {/* Payment Modal with Iframe */}
+      <Dialog
+        open={showPaymentModal}
+        onClose={handlePaymentModalClose}
+        maxWidth="md"
+        fullWidth
+        sx={{
+          '& .MuiDialog-paper': {
+            height: '80vh',
+            maxHeight: '600px'
+          }
+        }}
+      >
+        <DialogContent sx={{ p: 0, position: 'relative' }}>
+          <IconButton
+            onClick={handlePaymentModalClose}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              zIndex: 1,
+              backgroundColor: 'background.paper',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <Close />
+          </IconButton>
+          {paymentUrl && (
+            <iframe
+              src={paymentUrl}
+              width="100%"
+              height="100%"
+              style={{ border: 'none' }}
+              title="Zoho SecurePay"
+              onLoad={() => {
+                // Send payment completion simulation after 5 seconds for demo
+                setTimeout(() => {
+                  // This would normally come from the payment gateway
+                  // window.postMessage('payment_success', '*');
+                }, 30000);
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };
