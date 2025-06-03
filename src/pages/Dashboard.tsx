@@ -23,6 +23,7 @@ import {
   History,
   Menu as MenuIcon,
 } from 'lucide-react';
+import { bravoColors } from '@/theme/colors';
 
 const drawerWidth = 280;
 
@@ -126,7 +127,12 @@ export const Dashboard: React.FC = () => {
   const ActiveComponent = activeComponent;
 
   const drawer = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ 
+      height: '100%', 
+      display: 'flex', 
+      flexDirection: 'column',
+      background: bravoColors.background.gradient,
+    }}>
       {/* Logo/Brand */}
       <Box
         sx={{
@@ -208,6 +214,7 @@ export const Dashboard: React.FC = () => {
             width: '100%',
             zIndex: theme.zIndex.drawer + 1,
             display: { md: 'none' },
+            background: bravoColors.background.gradient,
           }}
         >
           <Toolbar>
@@ -248,6 +255,7 @@ export const Dashboard: React.FC = () => {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
+              background: bravoColors.background.gradient,
             },
           }}
         >
@@ -264,6 +272,7 @@ export const Dashboard: React.FC = () => {
               width: drawerWidth,
               position: 'relative',
               height: '100vh',
+              background: bravoColors.background.gradient,
             },
           }}
           open
