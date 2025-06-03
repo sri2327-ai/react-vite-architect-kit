@@ -1,6 +1,6 @@
 
 export const bravoColors = {
-  primary: '#143151',
+  primary: 'linear-gradient(90deg, #143151, #387E89)',
   primaryFlat: '#143151',
   primaryDark: '#0d1f31',
   secondary: '#387E89',
