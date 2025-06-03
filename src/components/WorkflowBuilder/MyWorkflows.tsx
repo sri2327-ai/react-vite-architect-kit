@@ -53,7 +53,8 @@ import {
   Person as PersonIcon,
   LocationOn as LocationIcon,
   Note as NoteIcon,
-  History as HistoryIcon
+  History as HistoryIcon,
+  ListCheck as ListCheckIcon
 } from '@mui/icons-material';
 import { templateBuilderService } from '../../services/templateBuilderService';
 
@@ -71,6 +72,8 @@ interface ScheduleConfig {
   providerName: string;
   location: string;
   importPreviousNote: boolean;
+  importPreviousNoteFor: 'all' | 'selected';
+  selectedVisitTypes: string[];
 }
 
 interface VisitTypeMapping {
@@ -123,7 +126,9 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             scheduleConfig: {
               providerName: 'Dr. Smith',
               location: 'Main Clinic',
-              importPreviousNote: false
+              importPreviousNote: false,
+              importPreviousNoteFor: 'all',
+              selectedVisitTypes: []
             },
             noteType: 'Progress Note',
             isConfigured: true
@@ -134,7 +139,9 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             scheduleConfig: {
               providerName: '',
               location: '',
-              importPreviousNote: false
+              importPreviousNote: false,
+              importPreviousNoteFor: 'all',
+              selectedVisitTypes: []
             },
             noteType: '',
             isConfigured: false
@@ -313,7 +320,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
     });
   };
 
-  const handleScheduleConfigChange = (visitType: string, field: keyof ScheduleConfig, value: string | boolean) => {
+  const handleScheduleConfigChange = (visitType: string, field: keyof ScheduleConfig, value: string | boolean | string[]) => {
     if (!selectedWorkflow) return;
     
     setSelectedWorkflow(prev => {
@@ -332,6 +339,25 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               }
             : mapping
         )
+      };
+    });
+  };
+
+  const handleGlobalScheduleConfigChange = (field: keyof ScheduleConfig, value: string | boolean | string[]) => {
+    if (!selectedWorkflow) return;
+    
+    setSelectedWorkflow(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        visitTypeMappings: prev.visitTypeMappings.map(mapping => ({
+          ...mapping,
+          scheduleConfig: {
+            ...mapping.scheduleConfig,
+            [field]: value
+          }
+        }))
       };
     });
   };
@@ -724,24 +750,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   size="small"
                   label="Provider Name"
                   value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.providerName || ''}
-                  onChange={(e) => {
-                    // Update all visit types with the same provider name
-                    if (selectedWorkflow) {
-                      setSelectedWorkflow(prev => {
-                        if (!prev) return null;
-                        return {
-                          ...prev,
-                          visitTypeMappings: prev.visitTypeMappings.map(mapping => ({
-                            ...mapping,
-                            scheduleConfig: {
-                              ...mapping.scheduleConfig,
-                              providerName: e.target.value
-                            }
-                          }))
-                        };
-                      });
-                    }
-                  }}
+                  onChange={(e) => handleGlobalScheduleConfigChange('providerName', e.target.value)}
                   placeholder="e.g., Dr. Smith"
                   InputProps={{
                     startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
@@ -754,24 +763,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   size="small"
                   label="Location"
                   value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.location || ''}
-                  onChange={(e) => {
-                    // Update all visit types with the same location
-                    if (selectedWorkflow) {
-                      setSelectedWorkflow(prev => {
-                        if (!prev) return null;
-                        return {
-                          ...prev,
-                          visitTypeMappings: prev.visitTypeMappings.map(mapping => ({
-                            ...mapping,
-                            scheduleConfig: {
-                              ...mapping.scheduleConfig,
-                              location: e.target.value
-                            }
-                          }))
-                        };
-                      });
-                    }
-                  }}
+                  onChange={(e) => handleGlobalScheduleConfigChange('location', e.target.value)}
                   placeholder="e.g., Main Clinic"
                   InputProps={{
                     startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
@@ -786,38 +778,62 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 control={
                   <Checkbox
                     checked={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote || false}
-                    onChange={(e) => {
-                      // Update all visit types with the same setting
-                      if (selectedWorkflow) {
-                        setSelectedWorkflow(prev => {
-                          if (!prev) return null;
-                          return {
-                            ...prev,
-                            visitTypeMappings: prev.visitTypeMappings.map(mapping => ({
-                              ...mapping,
-                              scheduleConfig: {
-                                ...mapping.scheduleConfig,
-                                importPreviousNote: e.target.checked
-                              }
-                            }))
-                          };
-                        });
-                      }
-                    }}
+                    onChange={(e) => handleGlobalScheduleConfigChange('importPreviousNote', e.target.checked)}
                   />
                 }
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <HistoryIcon color="primary" />
+                    <ListCheckIcon color="primary" />
                     <Typography variant="body2">
                       Import previous visit note as checklist
                     </Typography>
                   </Box>
                 }
               />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block' }}>
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block', mb: 2 }}>
                 Automatically import the last visit note to reference during the current encounter
               </Typography>
+              
+              {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote && (
+                <Box sx={{ ml: 4, mt: 2 }}>
+                  <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                    <InputLabel>Import Note For</InputLabel>
+                    <Select
+                      value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor || 'all'}
+                      label="Import Note For"
+                      onChange={(e) => handleGlobalScheduleConfigChange('importPreviousNoteFor', e.target.value)}
+                    >
+                      <MenuItem value="all">All visit types</MenuItem>
+                      <MenuItem value="selected">Selected visit types only</MenuItem>
+                    </Select>
+                  </FormControl>
+                  
+                  {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor === 'selected' && (
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Select Visit Types</InputLabel>
+                      <Select
+                        multiple
+                        value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.selectedVisitTypes || []}
+                        label="Select Visit Types"
+                        onChange={(e) => handleGlobalScheduleConfigChange('selectedVisitTypes', e.target.value as string[])}
+                        renderValue={(selected) => (
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                            {(selected as string[]).map((value) => (
+                              <Chip key={value} label={value} size="small" />
+                            ))}
+                          </Box>
+                        )}
+                      >
+                        {selectedWorkflow?.availableVisitTypes.map((visitType) => (
+                          <MenuItem key={visitType} value={visitType}>
+                            {visitType}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                </Box>
+              )}
             </Box>
           </Box>
 
