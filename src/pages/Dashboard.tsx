@@ -243,9 +243,16 @@ export const Dashboard: React.FC = () => {
               color: 'white',
               display: 'flex',
               justifyContent: 'center',
+              borderRadius: 2,
+              minHeight: 40,
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)'
-              }
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                transform: 'none'
+              },
+              '&:active': {
+                transform: 'none'
+              },
+              transition: 'background-color 0.2s ease'
             }}
           >
             {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
@@ -257,54 +264,26 @@ export const Dashboard: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
-      {/* Mobile App Bar - Transparent with better styling */}
+      {/* Mobile Menu Button - Floating */}
       {isMobile && (
-        <AppBar
-          position="fixed"
-          elevation={0}
+        <IconButton
+          onClick={handleDrawerToggle}
           sx={{
-            background: 'rgba(255, 255, 255, 0.95)',
+            position: 'fixed',
+            top: 16,
+            left: 16,
+            zIndex: theme.zIndex.drawer + 2,
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
             backdropFilter: 'blur(10px)',
-            borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
-            zIndex: theme.zIndex.drawer + 1
+            color: bravoColors.primaryFlat,
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.95)'
+            },
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
           }}
         >
-          <Toolbar sx={{ justifyContent: 'space-between', px: 2 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <IconButton
-                onClick={handleDrawerToggle}
-                edge="start"
-                sx={{ 
-                  color: bravoColors.primaryFlat,
-                  '&:hover': {
-                    backgroundColor: 'rgba(20, 49, 81, 0.08)'
-                  }
-                }}
-              >
-                {isDrawerOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
-              </IconButton>
-              <Box
-                component="img"
-                src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
-                alt="S10.AI Logo"
-                sx={{
-                  height: 28,
-                  objectFit: 'contain'
-                }}
-              />
-            </Box>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                color: bravoColors.primaryFlat,
-                fontWeight: 600,
-                fontSize: '1rem'
-              }}
-            >
-              Dashboard
-            </Typography>
-          </Toolbar>
-        </AppBar>
+          {isDrawerOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
+        </IconButton>
       )}
 
       {/* Sidebar Navigation */}
@@ -357,7 +336,6 @@ export const Dashboard: React.FC = () => {
           p: 3,
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: 0 },
-          mt: { xs: 9, md: 0 },
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen
