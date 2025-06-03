@@ -156,7 +156,7 @@ export const SignupFlow: React.FC = () => {
 
   return (
     <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2 } }}>
-      <Box sx={{ py: { xs: 1, sm: 2 } }}>
+      <Box sx={{ py: { xs: 0.5, sm: 1 } }}>
         <Paper
           elevation={0}
           sx={{
@@ -170,7 +170,7 @@ export const SignupFlow: React.FC = () => {
           {/* Progress indicator for mobile */}
           <Box sx={{ 
             display: { xs: 'block', md: 'none' }, 
-            mb: 2,
+            mb: 1.5,
             textAlign: 'center'
           }}>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -200,7 +200,7 @@ export const SignupFlow: React.FC = () => {
           <Stepper 
             activeStep={activeStep} 
             sx={{ 
-              mb: 3,
+              mb: 2,
               display: { xs: 'none', md: 'flex' },
               '& .MuiStepLabel-label': {
                 fontSize: '0.875rem',
@@ -248,7 +248,7 @@ export const SignupFlow: React.FC = () => {
             sx={{
               display: { xs: 'block', md: 'none' },
               textAlign: 'center',
-              mb: 2,
+              mb: 1.5,
               fontWeight: 600,
               color: 'primary.main'
             }}
