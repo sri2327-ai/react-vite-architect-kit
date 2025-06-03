@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -25,6 +24,10 @@ import {
 } from 'lucide-react';
 import { bravoColors } from '@/theme/colors';
 import TemplateBuilder from '@/components/TemplateBuilder/TemplateBuilder';
+import Profile from '@/components/Profile/Profile';
+import Billing from '@/components/Billing/Billing';
+import MyWorkflows from '@/components/Workflow/MyWorkflows';
+import WorkflowLibrary from '@/components/Workflow/WorkflowLibrary';
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -36,39 +39,77 @@ interface MenuItem {
   component: React.ComponentType;
 }
 
-// Placeholder components
-const WorkflowBuilder: React.FC = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography variant="h4" gutterBottom>
-      Workflow Builder
-    </Typography>
-    <Typography variant="body1" color="text.secondary">
-      Design and configure your workflows here.
-    </Typography>
-  </Box>
-);
+// Enhanced Workflow Builder component with tabs
+const WorkflowBuilder: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'my-workflows' | 'workflow-library'>('my-workflows');
+  
+  // Mock user EHR data - this would come from user profile
+  const userEHR = 'Practice Fusion'; // This should come from user's profile
 
-const Profile: React.FC = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography variant="h4" gutterBottom>
-      Profile
-    </Typography>
-    <Typography variant="body1" color="text.secondary">
-      View and edit your user details here.
-    </Typography>
-  </Box>
-);
+  const MyWorkflowsTab = () => <MyWorkflows />;
+  const WorkflowLibraryTab = () => <WorkflowLibrary />;
 
-const BillingHistory: React.FC = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography variant="h4" gutterBottom>
-      Billing History
-    </Typography>
-    <Typography variant="body1" color="text.secondary">
-      View your billing history and invoices here.
-    </Typography>
-  </Box>
-);
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Workflow Builder
+      </Typography>
+      
+      {/* Tab Navigation */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+        <Box sx={{ display: 'flex', gap: 0 }}>
+          <Box
+            onClick={() => setActiveTab('my-workflows')}
+            sx={{
+              px: 3,
+              py: 2,
+              cursor: 'pointer',
+              borderBottom: activeTab === 'my-workflows' ? 2 : 0,
+              borderColor: 'primary.main',
+              backgroundColor: activeTab === 'my-workflows' ? 'action.selected' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <Typography 
+              variant="button" 
+              fontWeight={activeTab === 'my-workflows' ? 600 : 400}
+              color={activeTab === 'my-workflows' ? 'primary.main' : 'text.primary'}
+            >
+              My Workflows
+            </Typography>
+          </Box>
+          <Box
+            onClick={() => setActiveTab('workflow-library')}
+            sx={{
+              px: 3,
+              py: 2,
+              cursor: 'pointer',
+              borderBottom: activeTab === 'workflow-library' ? 2 : 0,
+              borderColor: 'primary.main',
+              backgroundColor: activeTab === 'workflow-library' ? 'action.selected' : 'transparent',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
+          >
+            <Typography 
+              variant="button" 
+              fontWeight={activeTab === 'workflow-library' ? 600 : 400}
+              color={activeTab === 'workflow-library' ? 'primary.main' : 'text.primary'}
+            >
+              Workflow Library
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+      
+      {/* Tab Content */}
+      {activeTab === 'my-workflows' ? <MyWorkflowsTab /> : <WorkflowLibraryTab />}
+    </Box>
+  );
+};
 
 const menuItems: MenuItem[] = [
   {
@@ -93,7 +134,7 @@ const menuItems: MenuItem[] = [
     id: 'billing-history',
     label: 'Billing History',
     icon: <History size={20} />,
-    component: BillingHistory
+    component: Billing
   }
 ];
 
