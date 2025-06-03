@@ -80,8 +80,14 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
         </Typography>
       </Box>
 
-      {/* Content with controlled height */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      {/* Content area with proper spacing */}
+      <Box sx={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: 0,
+        gap: 1.5 
+      }}>
         <Card
           sx={{
             flex: 1,
@@ -90,7 +96,8 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             backgroundColor: 'background.paper',
             display: 'flex',
             flexDirection: 'column',
-            minHeight: 0
+            minHeight: 0,
+            overflow: 'hidden'
           }}
         >
           <CardContent sx={{ 
@@ -98,21 +105,22 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             flex: 1, 
             display: 'flex', 
             flexDirection: 'column',
-            minHeight: 0
+            minHeight: 0,
+            overflow: 'auto'
           }}>
             <Box component="form" onSubmit={handleSubmit} sx={{ 
-              flex: 1, 
               display: 'flex', 
               flexDirection: 'column',
-              overflow: 'auto'
+              gap: 1.5,
+              height: '100%'
             }}>
+              {/* Phone Number Field */}
               <TextField
                 fullWidth
                 label="Phone Number"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
                 required
-                sx={{ mb: 1.5 }}
                 size="small"
                 placeholder="+1 (555) 123-4567"
                 InputProps={{
@@ -124,6 +132,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 }}
               />
 
+              {/* Medical Specialty Field */}
               <TextField
                 fullWidth
                 select
@@ -131,7 +140,6 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 value={formData.specialty}
                 onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
                 required
-                sx={{ mb: 1.5 }}
                 size="small"
                 InputProps={{
                   startAdornment: (
@@ -148,6 +156,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 ))}
               </TextField>
 
+              {/* Documentation Mode */}
               <FormControl component="fieldset" sx={{ flex: 1, minHeight: 0 }}>
                 <FormLabel
                   component="legend"
@@ -163,11 +172,15 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 <RadioGroup
                   value={formData.ehrMode}
                   onChange={(e) => setFormData(prev => ({ ...prev, ehrMode: e.target.value === 'true' }))}
-                  sx={{ flex: 1 }}
+                  sx={{ 
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 1
+                  }}
                 >
+                  {/* EHR Integration Mode */}
                   <Card
                     sx={{
-                      mb: 1,
                       cursor: 'pointer',
                       border: formData.ehrMode ? '2px solid #387E89' : '1px solid #E0E7FF',
                       borderRadius: 2,
@@ -212,6 +225,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                     </CardContent>
                   </Card>
 
+                  {/* No EHR Mode */}
                   <Card
                     sx={{
                       cursor: 'pointer',
@@ -268,9 +282,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
           gap: 1.5,
-          flexShrink: 0,
-          pt: 1.5,
-          mt: 'auto'
+          flexShrink: 0
         }}>
           <SecondaryButton
             onClick={onBack}
