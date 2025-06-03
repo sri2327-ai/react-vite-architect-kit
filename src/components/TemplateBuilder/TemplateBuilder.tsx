@@ -1382,6 +1382,36 @@ const TemplateBuilder: React.FC = () => {
     return renderConsultTypes();
   };
 
+  // Computed values
+  const filteredLibraryTemplates = libraryTemplates.filter(template => {
+    const specialtyMatch = !libraryFilters.specialty || template.specialty === libraryFilters.specialty;
+    const noteTypeMatch = !libraryFilters.noteType || template.noteType === libraryFilters.noteType;
+    return specialtyMatch && noteTypeMatch;
+  });
+
+  // Missing handler functions
+  const handleLibraryTemplatePreview = (template: LibraryTemplate) => {
+    setPreviewTemplate(template);
+    setOpenPreview(true);
+  };
+
+  const handleImportToMyTemplates = () => {
+    if (previewTemplate) {
+      setOpenPreview(false);
+      setOpenImportConfirm(true);
+    }
+  };
+
+  const handleConfirmImport = () => {
+    if (previewTemplate && selectedImportType) {
+      console.log("Importing template to:", selectedImportType, previewTemplate);
+      // Here you would typically add the template to the selected consult type
+      setOpenImportConfirm(false);
+      setSelectedImportType('');
+      setPreviewTemplate(null);
+    }
+  };
+
   return (
     <>
       <Box sx={{ p: 3 }}>
