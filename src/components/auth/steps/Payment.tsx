@@ -16,6 +16,8 @@ import {
   DialogContent,
   IconButton,
   Grid,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import { 
   CheckCircle, 
@@ -54,6 +56,9 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
   const [promoApplied, setPromoApplied] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState('');
+  
+  const theme = useTheme();
+  const isFullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Mock pricing data - will be fetched from API
   const [pricing] = useState<PricingData>({
@@ -358,7 +363,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         onClose={handlePaymentModalClose}
         maxWidth="lg"
         fullWidth
-        fullScreen={{ xs: true, sm: false }}
+        fullScreen={isFullScreen}
         sx={{
           '& .MuiDialog-paper': {
             height: { xs: '100vh', sm: '80vh' },
