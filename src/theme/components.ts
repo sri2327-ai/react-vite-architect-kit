@@ -16,6 +16,8 @@ export const components: Components<Omit<Theme, 'components'>> = {
         padding: '12px 24px',
         fontSize: '0.95rem',
         boxShadow: 'none',
+        fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
+        color: '#000000',
         '&:hover': {
           boxShadow: 'none',
         },
@@ -33,6 +35,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
         '& .MuiOutlinedInput-root': {
           borderRadius: 12,
           backgroundColor: bravoColors.background.white,
+          fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
           '& fieldset': {
             borderColor: '#E5E7EB',
             borderWidth: 1.5,
@@ -41,13 +44,18 @@ export const components: Components<Omit<Theme, 'components'>> = {
             borderColor: bravoColors.secondary,
           },
           '&.Mui-focused fieldset': {
-            borderColor: bravoColors.primary,
+            borderColor: bravoColors.primaryFlat,
             borderWidth: 2,
           },
         },
         '& .MuiInputLabel-root': {
           fontWeight: 500,
-          color: bravoColors.text.light,
+          color: '#000000',
+          fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
+        },
+        '& .MuiInputBase-input': {
+          color: '#000000',
+          fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
         },
       },
     },
@@ -74,6 +82,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
     styleOverrides: {
       root: {
         borderRadius: 12,
+        fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
       },
     },
   },
@@ -81,6 +90,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
     styleOverrides: {
       root: {
         borderRadius: 12,
+        fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
       },
     },
   },
@@ -92,7 +102,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
       root: {
         color: bravoColors.icons.primary,
         '&.Mui-checked': {
-          color: bravoColors.primary,
+          color: bravoColors.primaryFlat,
         },
       },
     },
@@ -102,7 +112,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
       root: {
         color: bravoColors.icons.primary,
         '&.Mui-checked': {
-          color: bravoColors.primary,
+          color: bravoColors.primaryFlat,
         },
       },
     },
@@ -118,12 +128,18 @@ export const components: Components<Omit<Theme, 'components'>> = {
       size: 'small',
       fullWidth: true,
     },
+    styleOverrides: {
+      root: {
+        fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
+      },
+    },
   },
   MuiAlert: {
     styleOverrides: {
       root: {
         borderRadius: 12,
         fontWeight: 500,
+        fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
       },
     },
   },
@@ -133,12 +149,20 @@ export const components: Components<Omit<Theme, 'components'>> = {
         '& .MuiStepIcon-root': {
           color: '#E5E7EB',
           '&.Mui-active': {
-            color: bravoColors.primary,
+            color: bravoColors.primaryFlat,
           },
           '&.Mui-completed': {
             color: bravoColors.secondary,
           },
         },
+      },
+    },
+  },
+  MuiTypography: {
+    styleOverrides: {
+      root: {
+        fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
+        color: '#000000',
       },
     },
   },

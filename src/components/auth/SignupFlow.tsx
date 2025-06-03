@@ -5,7 +5,6 @@ import { AccountCreation } from './steps/AccountCreation';
 import { UserInformation } from './steps/UserInformation';
 import { EHRSelection } from './steps/EHRSelection';
 import { BookMeeting } from './steps/BookMeeting';
-import { NotesRetention } from './steps/NotesRetention';
 import { Payment } from './steps/Payment';
 import { CheckCircle } from '@mui/icons-material';
 
@@ -34,28 +33,16 @@ export interface SignupData {
   meetingTime: string;
   meetingNotes: string;
   
-  // Notes Retention
-  retentionDuration: string;
-  
   // Payment
   paymentCompleted: boolean;
 }
-
-const allSteps = [
-  'Account Creation',
-  'User Information',
-  'EHR Selection',
-  'Meeting (if needed)',
-  'Notes Retention',
-  'Payment'
-];
 
 const CustomStepIcon = ({ active, completed, icon }: any) => {
   if (completed) {
     return (
       <CheckCircle 
         sx={{ 
-          color: '#2E8B57', // Sea green color - more elegant and sophisticated
+          color: '#2E8B57',
           fontSize: { xs: 18, sm: 22 }
         }} 
       />
@@ -87,7 +74,6 @@ export const SignupFlow: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [signupData, setSignupData] = useState<Partial<SignupData>>({});
 
-  // Filter steps based on signup data
   const getVisibleSteps = () => {
     const steps = ['Account Creation', 'User Information'];
     
@@ -98,7 +84,7 @@ export const SignupFlow: React.FC = () => {
       }
     }
     
-    steps.push('Notes Retention', 'Payment');
+    steps.push('Payment');
     return steps;
   };
 
@@ -108,14 +94,11 @@ export const SignupFlow: React.FC = () => {
     const updatedData = { ...signupData, ...stepData };
     setSignupData(updatedData);
     
-    // Skip meeting step if not needed or EHR mode is disabled
     if (activeStep === 2 && (!updatedData.ehrMode || !updatedData.needsMeeting)) {
-      // Skip to Notes Retention
-      const nextStepIndex = visibleSteps.indexOf('Notes Retention');
+      const nextStepIndex = visibleSteps.indexOf('Payment');
       setActiveStep(nextStepIndex);
     } else if (activeStep === 1 && !updatedData.ehrMode) {
-      // Skip to Notes Retention if EHR mode is disabled
-      const nextStepIndex = visibleSteps.indexOf('Notes Retention');
+      const nextStepIndex = visibleSteps.indexOf('Payment');
       setActiveStep(nextStepIndex);
     } else {
       setActiveStep((prev) => prev + 1);
@@ -123,11 +106,10 @@ export const SignupFlow: React.FC = () => {
   };
 
   const handleBack = () => {
-    // Handle back navigation, accounting for skipped steps
-    if (activeStep === visibleSteps.indexOf('Notes Retention') && !signupData.ehrMode) {
-      setActiveStep(1); // Go back to User Information
-    } else if (activeStep === visibleSteps.indexOf('Notes Retention') && !signupData.needsMeeting) {
-      setActiveStep(2); // Go back to EHR Selection
+    if (activeStep === visibleSteps.indexOf('Payment') && !signupData.ehrMode) {
+      setActiveStep(1);
+    } else if (activeStep === visibleSteps.indexOf('Payment') && !signupData.needsMeeting) {
+      setActiveStep(2);
     } else {
       setActiveStep((prev) => prev - 1);
     }
@@ -145,8 +127,6 @@ export const SignupFlow: React.FC = () => {
         return <EHRSelection onNext={handleNext} onBack={handleBack} data={signupData} />;
       case 'Meeting':
         return <BookMeeting onNext={handleNext} onBack={handleBack} data={signupData} />;
-      case 'Notes Retention':
-        return <NotesRetention onNext={handleNext} onBack={handleBack} data={signupData} />;
       case 'Payment':
         return <Payment onBack={handleBack} data={signupData} />;
       default:
@@ -179,7 +159,6 @@ export const SignupFlow: React.FC = () => {
             overflow: 'hidden'
           }}
         >
-          {/* Progress indicator for mobile */}
           <Box sx={{ 
             display: { xs: 'block', md: 'none' }, 
             mb: { xs: 1, sm: 1.5 },
@@ -209,7 +188,6 @@ export const SignupFlow: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Desktop stepper */}
           <Stepper 
             activeStep={activeStep} 
             sx={{ 
@@ -256,7 +234,6 @@ export const SignupFlow: React.FC = () => {
             ))}
           </Stepper>
 
-          {/* Current step name for mobile */}
           <Typography
             variant="h6"
             sx={{
@@ -272,7 +249,6 @@ export const SignupFlow: React.FC = () => {
             {visibleSteps[activeStep]}
           </Typography>
 
-          {/* Step content with controlled height */}
           <Box 
             sx={{ 
               flex: 1,
