@@ -6,7 +6,10 @@ import {
   Tabs,
   Tab,
   Paper,
-  Alert
+  Alert,
+  useTheme,
+  useMediaQuery,
+  Container
 } from '@mui/material';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
@@ -30,7 +33,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box>
+        <Box sx={{ pt: { xs: 2, md: 3 } }}>
           {children}
         </Box>
       )}
@@ -41,6 +44,8 @@ function TabPanel(props: TabPanelProps) {
 const WorkflowBuilder: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
   const [importedWorkflows, setImportedWorkflows] = useState<any[]>([]);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -77,26 +82,67 @@ const WorkflowBuilder: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, height: '100%' }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 1 }}>
-        Workflow Builder
-      </Typography>
-      
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <Typography variant="body2">
-          <strong>Agentic EHR Automation:</strong> Configure and manage your EHR workflows, 
-          map them to your visit types (from Template Builder), set up schedule preferences, 
-          then execute with your EHR credentials for seamless automation.
+    <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 }, px: { xs: 1, md: 3 } }}>
+      <Box sx={{ mb: { xs: 2, md: 3 } }}>
+        <Typography 
+          variant={isMobile ? "h5" : "h4"} 
+          gutterBottom 
+          sx={{ 
+            fontWeight: 600, 
+            mb: 1,
+            textAlign: { xs: 'center', md: 'left' }
+          }}
+        >
+          EHR Workflow Builder
         </Typography>
-      </Alert>
+        
+        <Alert 
+          severity="info" 
+          sx={{ 
+            mb: { xs: 2, md: 3 },
+            '& .MuiAlert-message': {
+              fontSize: { xs: '0.875rem', md: '1rem' }
+            }
+          }}
+        >
+          <Typography variant="body2" sx={{ lineHeight: 1.5 }}>
+            <strong>Streamline Your EHR Tasks:</strong> Build automated workflows for your daily clinical activities. 
+            Connect your templates, configure settings, and let AI handle repetitive EHR tasks while you focus on patient care.
+          </Typography>
+        </Alert>
+      </Box>
 
-      <Paper sx={{ width: '100%' }}>
+      <Paper 
+        elevation={2}
+        sx={{ 
+          width: '100%',
+          borderRadius: { xs: 2, md: 3 },
+          overflow: 'hidden'
+        }}
+      >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={handleTabChange} aria-label="workflow builder tabs">
+          <Tabs 
+            value={tabValue} 
+            onChange={handleTabChange} 
+            aria-label="workflow builder tabs"
+            variant={isMobile ? "fullWidth" : "standard"}
+            sx={{
+              '& .MuiTab-root': {
+                fontSize: { xs: '0.875rem', md: '1rem' },
+                fontWeight: 600,
+                textTransform: 'none',
+                minHeight: { xs: 48, md: 56 }
+              }
+            }}
+          >
             <Tab 
-              label={`My Workflows ${importedWorkflows.length > 0 ? `(${importedWorkflows.length})` : ''}`} 
+              label={`My Workflows${importedWorkflows.length > 0 ? ` (${importedWorkflows.length})` : ''}`}
+              sx={{ flex: 1 }}
             />
-            <Tab label="Workflow Library" />
+            <Tab 
+              label="Workflow Library" 
+              sx={{ flex: 1 }}
+            />
           </Tabs>
         </Box>
         
@@ -108,7 +154,7 @@ const WorkflowBuilder: React.FC = () => {
           <WorkflowLibrary onImportWorkflow={handleImportWorkflow} />
         </TabPanel>
       </Paper>
-    </Box>
+    </Container>
   );
 };
 

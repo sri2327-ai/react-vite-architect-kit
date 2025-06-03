@@ -17,8 +17,12 @@ import {
   DialogContent,
   DialogActions,
   useTheme,
+  useMediaQuery,
   Link,
-  IconButton
+  Container,
+  Grid,
+  Card,
+  CardContent
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -32,7 +36,9 @@ import {
   Extension as ExtensionIcon,
   Login as LoginIcon,
   PhoneAndroid as MobileIcon,
-  OpenInNew as OpenInNewIcon
+  OpenInNew as OpenInNewIcon,
+  Security as SecurityIcon,
+  CloudUpload as CloudIcon
 } from '@mui/icons-material';
 
 interface UserProfile {
@@ -48,6 +54,7 @@ interface UserProfile {
 
 const Profile: React.FC = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   
@@ -81,16 +88,13 @@ const Profile: React.FC = () => {
   };
 
   const handleCancelSubscription = () => {
-    // Handle subscription cancellation logic here
     console.log('Canceling subscription...');
     setShowCancelDialog(false);
   };
 
   const handleLogout = () => {
-    // Handle logout logic here
     console.log('Logging out...');
     setShowLogoutDialog(false);
-    // Redirect to login or home page
     window.location.href = '/login';
   };
 
@@ -105,29 +109,38 @@ const Profile: React.FC = () => {
     value: string | boolean; 
     chip?: boolean;
   }) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', py: 1.5 }}>
+    <Box sx={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      py: { xs: 1, md: 1.5 },
+      borderBottom: '1px solid',
+      borderColor: 'divider',
+      '&:last-child': {
+        borderBottom: 'none'
+      }
+    }}>
       <Box sx={{ 
         display: 'flex', 
         alignItems: 'center', 
-        width: 40, 
+        width: { xs: 32, md: 40 }, 
         mr: 2,
         color: 'primary.main'
       }}>
         {icon}
       </Box>
       <Box sx={{ flex: 1 }}>
-        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem', fontWeight: 500 }}>
           {label}
         </Typography>
         {chip && typeof value === 'boolean' ? (
           <Chip 
-            label={value ? 'EHR Mode' : 'No EHR Mode'}
+            label={value ? 'EHR Connected' : 'No EHR Connection'}
             color={value ? 'success' : 'default'}
             size="small"
-            sx={{ mt: 0.5 }}
+            sx={{ mt: 0.5, fontSize: '0.75rem' }}
           />
         ) : (
-          <Typography variant="body1" sx={{ fontWeight: 500, mt: 0.5 }}>
+          <Typography variant="body2" sx={{ fontWeight: 500, mt: 0.5 }}>
             {String(value)}
           </Typography>
         )}
@@ -135,88 +148,160 @@ const Profile: React.FC = () => {
     </Box>
   );
 
+  const QuickLinkCard = ({ 
+    href, 
+    icon, 
+    title, 
+    description 
+  }: { 
+    href: string; 
+    icon: React.ReactNode; 
+    title: string; 
+    description: string;
+  }) => (
+    <Card 
+      component={Link}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      sx={{ 
+        textDecoration: 'none',
+        transition: 'all 0.2s ease-in-out',
+        cursor: 'pointer',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: 4
+        }
+      }}
+    >
+      <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ color: 'primary.main' }}>
+            {icon}
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 0.5 }}>
+              {title}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {description}
+            </Typography>
+          </Box>
+          <OpenInNewIcon fontSize="small" color="action" />
+        </Box>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-        Profile
+    <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 }, px: { xs: 1, md: 3 } }}>
+      <Typography 
+        variant={isMobile ? "h5" : "h4"} 
+        gutterBottom 
+        sx={{ 
+          fontWeight: 600, 
+          mb: { xs: 2, md: 3 },
+          textAlign: { xs: 'center', md: 'left' }
+        }}
+      >
+        My Profile
       </Typography>
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 3 }}>
-        <Box>
-          <Paper sx={{ p: 3, mb: 3 }}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
+        <Grid item xs={12} lg={8}>
+          {/* Personal Information */}
+          <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 2, md: 3 }, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ 
               display: 'flex', 
               alignItems: 'center', 
               gap: 1, 
-              mb: 3 
+              mb: { xs: 2, md: 3 },
+              fontSize: { xs: '1.1rem', md: '1.25rem' }
             }}>
               <PersonIcon color="primary" />
               Personal Information
             </Typography>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 2 }}>
-              <ProfileField
-                icon={<EmailIcon />}
-                label="Email Address"
-                value={userProfile.email}
-              />
-              <ProfileField
-                icon={<PhoneIcon />}
-                label="Phone Number"
-                value={userProfile.phoneNumber}
-              />
-              <ProfileField
-                icon={<PersonIcon />}
-                label="First Name"
-                value={userProfile.firstName}
-              />
-              <ProfileField
-                icon={<PersonIcon />}
-                label="Last Name"
-                value={userProfile.lastName}
-              />
-              <ProfileField
-                icon={<BusinessIcon />}
-                label="Specialty"
-                value={userProfile.specialty}
-              />
-              <ProfileField
-                icon={<SettingsIcon />}
-                label="EHR Integration"
-                value={userProfile.ehrMode}
-                chip
-              />
-              {userProfile.ehrMode && userProfile.ehrName && (
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
                 <ProfileField
-                  icon={<StorageIcon />}
-                  label="EHR System"
-                  value={userProfile.ehrName}
+                  icon={<EmailIcon />}
+                  label="Email Address"
+                  value={userProfile.email}
                 />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <ProfileField
+                  icon={<PhoneIcon />}
+                  label="Phone Number"
+                  value={userProfile.phoneNumber}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <ProfileField
+                  icon={<PersonIcon />}
+                  label="First Name"
+                  value={userProfile.firstName}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <ProfileField
+                  icon={<PersonIcon />}
+                  label="Last Name"
+                  value={userProfile.lastName}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <ProfileField
+                  icon={<BusinessIcon />}
+                  label="Medical Specialty"
+                  value={userProfile.specialty}
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <ProfileField
+                  icon={<SettingsIcon />}
+                  label="EHR Integration Status"
+                  value={userProfile.ehrMode}
+                  chip
+                />
+              </Grid>
+              {userProfile.ehrMode && userProfile.ehrName && (
+                <Grid item xs={12}>
+                  <ProfileField
+                    icon={<StorageIcon />}
+                    label="Connected EHR System"
+                    value={userProfile.ehrName}
+                  />
+                </Grid>
               )}
-            </Box>
+            </Grid>
           </Paper>
 
-          <Paper sx={{ p: 3 }}>
+          {/* Data Management */}
+          <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ 
               display: 'flex', 
               alignItems: 'center', 
               gap: 1, 
-              mb: 3 
+              mb: { xs: 2, md: 3 },
+              fontSize: { xs: '1.1rem', md: '1.25rem' }
             }}>
-              <StorageIcon color="primary" />
-              Data Retention Settings
+              <CloudIcon color="primary" />
+              Data Management & Security
             </Typography>
 
-            <Alert severity="info" sx={{ mb: 3 }}>
-              Configure how long your notes and templates are stored in the system.
+            <Alert severity="info" sx={{ mb: 3, fontSize: { xs: '0.875rem', md: '1rem' } }}>
+              Configure how long your clinical notes and templates are securely stored in our HIPAA-compliant system.
             </Alert>
 
             <FormControl fullWidth sx={{ mb: 3 }}>
-              <InputLabel>Notes Retention Duration</InputLabel>
+              <InputLabel>Clinical Notes Retention Period</InputLabel>
               <Select
                 value={userProfile.notesRetentionDuration}
-                label="Notes Retention Duration"
+                label="Clinical Notes Retention Period"
                 onChange={(e) => handleRetentionChange(Number(e.target.value))}
+                size={isMobile ? "small" : "medium"}
               >
                 {retentionOptions.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -226,124 +311,58 @@ const Profile: React.FC = () => {
               </Select>
             </FormControl>
 
-            <Typography variant="body2" color="text.secondary">
-              Current setting: Your notes will be retained for{' '}
-              <strong>
-                {userProfile.notesRetentionDuration === -1 
-                  ? 'permanently' 
-                  : `${userProfile.notesRetentionDuration} months`}
-              </strong>
-            </Typography>
+            <Box sx={{ p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <strong>Current Setting:</strong> Your clinical notes and templates will be retained for{' '}
+                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>
+                  {userProfile.notesRetentionDuration === -1 
+                    ? 'permanently' 
+                    : `${userProfile.notesRetentionDuration} months`}
+                </span>
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                All data is encrypted and stored in HIPAA-compliant infrastructure with 99.9% uptime guarantee.
+              </Typography>
+            </Box>
           </Paper>
-        </Box>
+        </Grid>
 
-        <Box>
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              Quick Links
+        <Grid item xs={12} lg={4}>
+          {/* Quick Access */}
+          <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 2, md: 3 }, borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem', md: '1.25rem' } }}>
+              Quick Access
             </Typography>
-            
-            <Divider sx={{ my: 2 }} />
             
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              <Link
+              <QuickLinkCard
                 href="https://chrome.google.com/webstore/detail/s10ai-crush-extension"
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 1, 
-                  textDecoration: 'none',
-                  p: 2,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  '&:hover': {
-                    backgroundColor: 'action.hover'
-                  }
-                }}
-              >
-                <ExtensionIcon color="primary" />
-                <Box>
-                  <Typography variant="body2" fontWeight={600}>
-                    S10.AI CRUSH EXTENSION
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Chrome extension for enhanced productivity
-                  </Typography>
-                </Box>
-                <OpenInNewIcon fontSize="small" sx={{ ml: 'auto' }} />
-              </Link>
-
-              <Link
+                icon={<ExtensionIcon />}
+                title="Chrome Extension"
+                description="Install S10.AI browser extension"
+              />
+              
+              <QuickLinkCard
                 href="https://app.s10.ai/login"
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 1, 
-                  textDecoration: 'none',
-                  p: 2,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  '&:hover': {
-                    backgroundColor: 'action.hover'
-                  }
-                }}
-              >
-                <LoginIcon color="primary" />
-                <Box>
-                  <Typography variant="body2" fontWeight={600}>
-                    Product Login URL
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Access the main application
-                  </Typography>
-                </Box>
-                <OpenInNewIcon fontSize="small" sx={{ ml: 'auto' }} />
-              </Link>
-
-              <Link
+                icon={<LoginIcon />}
+                title="Main Application"
+                description="Access full S10.AI platform"
+              />
+              
+              <QuickLinkCard
                 href="https://play.google.com/store/apps/details?id=com.s10ai.mobile"
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 1, 
-                  textDecoration: 'none',
-                  p: 2,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: 1,
-                  '&:hover': {
-                    backgroundColor: 'action.hover'
-                  }
-                }}
-              >
-                <MobileIcon color="primary" />
-                <Box>
-                  <Typography variant="body2" fontWeight={600}>
-                    Mobile App
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Download S10.AI mobile application
-                  </Typography>
-                </Box>
-                <OpenInNewIcon fontSize="small" sx={{ ml: 'auto' }} />
-              </Link>
+                icon={<MobileIcon />}
+                title="Mobile App"
+                description="Download for iOS/Android"
+              />
             </Box>
           </Paper>
 
-          <Paper sx={{ p: 3, mb: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          {/* Account Actions */}
+          <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 2, md: 3 }, borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem', md: '1.25rem' } }}>
               Account Actions
             </Typography>
-            
-            <Divider sx={{ my: 2 }} />
             
             <Button
               variant="outlined"
@@ -351,21 +370,23 @@ const Profile: React.FC = () => {
               fullWidth
               startIcon={<LogoutIcon />}
               onClick={() => setShowLogoutDialog(true)}
-              sx={{ mb: 2 }}
+              sx={{ 
+                py: { xs: 1, md: 1.5 },
+                fontSize: { xs: '0.875rem', md: '1rem' }
+              }}
             >
               Logout
             </Button>
           </Paper>
 
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom color="error">
-              Danger Zone
+          {/* Subscription Management */}
+          <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2, border: '1px solid', borderColor: 'error.light' }}>
+            <Typography variant="h6" gutterBottom color="error" sx={{ fontSize: { xs: '1.1rem', md: '1.25rem' } }}>
+              Subscription Management
             </Typography>
             
-            <Divider sx={{ my: 2 }} />
-            
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Cancel your subscription and lose access to premium features.
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.5 }}>
+              Need to pause your subscription? Your data will be safely preserved.
             </Typography>
             
             <Button
@@ -375,6 +396,8 @@ const Profile: React.FC = () => {
               startIcon={<CancelIcon />}
               onClick={() => setShowCancelDialog(true)}
               sx={{
+                py: { xs: 1, md: 1.5 },
+                fontSize: { xs: '0.875rem', md: '1rem' },
                 borderColor: 'error.main',
                 '&:hover': {
                   backgroundColor: 'error.main',
@@ -382,22 +405,22 @@ const Profile: React.FC = () => {
                 }
               }}
             >
-              Cancel Subscription
+              Manage Subscription
             </Button>
             
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-              You can reactivate your subscription at any time.
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+              You can reactivate anytime without data loss.
             </Typography>
           </Paper>
-        </Box>
-      </Box>
+        </Grid>
+      </Grid>
 
       {/* Logout Dialog */}
-      <Dialog open={showLogoutDialog} onClose={() => setShowLogoutDialog(false)}>
-        <DialogTitle>Logout</DialogTitle>
+      <Dialog open={showLogoutDialog} onClose={() => setShowLogoutDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Confirm Logout</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
-            Are you sure you want to logout? You will need to sign in again to access your account.
+            Are you sure you want to logout? You'll need to sign in again to access your clinical workflows and templates.
           </Typography>
         </DialogContent>
         <DialogActions>
@@ -411,35 +434,37 @@ const Profile: React.FC = () => {
       </Dialog>
 
       {/* Cancel Subscription Dialog */}
-      <Dialog open={showCancelDialog} onClose={() => setShowCancelDialog(false)}>
-        <DialogTitle>Cancel Subscription</DialogTitle>
+      <Dialog open={showCancelDialog} onClose={() => setShowCancelDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Manage Subscription</DialogTitle>
         <DialogContent>
           <Typography variant="body1" sx={{ mb: 2 }}>
-            Are you sure you want to cancel your subscription?
+            Are you sure you want to pause your subscription?
           </Typography>
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            Canceling your subscription will:
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+              What happens when you pause:
+            </Typography>
+            <Box component="ul" sx={{ pl: 2, m: 0 }}>
+              <li>Your clinical data remains secure and accessible</li>
+              <li>Billing stops immediately</li>
+              <li>Premium features become unavailable</li>
+              <li>You can reactivate anytime</li>
+            </Box>
           </Alert>
-          <Box component="ul" sx={{ pl: 3, mb: 2 }}>
-            <li>Remove access to premium features</li>
-            <li>Stop automatic billing</li>
-            <li>Preserve your data according to retention settings</li>
-            <li>Allow reactivation at any time</li>
-          </Box>
           <Typography variant="body2" color="text.secondary">
             Your subscription will remain active until the end of your current billing period.
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowCancelDialog(false)}>
-            Keep Subscription
+            Keep Active
           </Button>
           <Button onClick={handleCancelSubscription} color="error" variant="contained">
-            Cancel Subscription
+            Pause Subscription
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 
