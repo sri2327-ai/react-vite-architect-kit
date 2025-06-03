@@ -15,7 +15,6 @@ import {
   IconButton,
   Link,
   Tooltip,
-  Grid,
   Alert,
   Card,
   CardContent
@@ -152,83 +151,75 @@ const Billing: React.FC = () => {
         Billing History
       </Typography>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <PaymentIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" fontWeight={600}>
-                  Total Paid
-                </Typography>
-              </Box>
-              <Typography variant="h4" color="success.main" fontWeight={700}>
-                $199.98
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 3, mb: 4 }}>
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <PaymentIcon color="primary" sx={{ mr: 1 }} />
+              <Typography variant="h6" fontWeight={600}>
+                Total Paid
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                2 invoices paid
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Box>
+            <Typography variant="h4" color="success.main" fontWeight={700}>
+              $199.98
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              2 invoices paid
+            </Typography>
+          </CardContent>
+        </Card>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <ScheduleIcon color="warning" sx={{ mr: 1 }} />
-                <Typography variant="h6" fontWeight={600}>
-                  Pending
-                </Typography>
-              </Box>
-              <Typography variant="h4" color="warning.main" fontWeight={700}>
-                $99.99
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <ScheduleIcon color="warning" sx={{ mr: 1 }} />
+              <Typography variant="h6" fontWeight={600}>
+                Pending
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                1 invoice pending
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Box>
+            <Typography variant="h4" color="warning.main" fontWeight={700}>
+              $99.99
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              1 invoice pending
+            </Typography>
+          </CardContent>
+        </Card>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <WarningIcon color="error" sx={{ mr: 1 }} />
-                <Typography variant="h6" fontWeight={600}>
-                  Overdue
-                </Typography>
-              </Box>
-              <Typography variant="h4" color="error.main" fontWeight={700}>
-                $99.99
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <WarningIcon color="error" sx={{ mr: 1 }} />
+              <Typography variant="h6" fontWeight={600}>
+                Overdue
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                1 invoice overdue
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+            </Box>
+            <Typography variant="h4" color="error.main" fontWeight={700}>
+              $99.99
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              1 invoice overdue
+            </Typography>
+          </CardContent>
+        </Card>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <ReceiptIcon color="primary" sx={{ mr: 1 }} />
-                <Typography variant="h6" fontWeight={600}>
-                  Total Invoices
-                </Typography>
-              </Box>
-              <Typography variant="h4" color="primary.main" fontWeight={700}>
-                {invoices.length}
+        <Card>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+              <ReceiptIcon color="primary" sx={{ mr: 1 }} />
+              <Typography variant="h6" fontWeight={600}>
+                Total Invoices
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                All time
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+            </Box>
+            <Typography variant="h4" color="primary.main" fontWeight={700}>
+              {invoices.length}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              All time
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
 
       <Paper sx={{ mt: 4 }}>
         <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>

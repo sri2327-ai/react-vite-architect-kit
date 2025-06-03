@@ -4,7 +4,6 @@ import {
   Box,
   Paper,
   Typography,
-  Grid,
   Divider,
   Button,
   FormControl,
@@ -142,8 +141,8 @@ const Profile: React.FC = () => {
         Profile
       </Typography>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' }, gap: 3 }}>
+        <Box>
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" gutterBottom sx={{ 
               display: 'flex', 
@@ -155,60 +154,46 @@ const Profile: React.FC = () => {
               Personal Information
             </Typography>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <ProfileField
-                  icon={<EmailIcon />}
-                  label="Email Address"
-                  value={userProfile.email}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <ProfileField
-                  icon={<PhoneIcon />}
-                  label="Phone Number"
-                  value={userProfile.phoneNumber}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <ProfileField
-                  icon={<PersonIcon />}
-                  label="First Name"
-                  value={userProfile.firstName}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <ProfileField
-                  icon={<PersonIcon />}
-                  label="Last Name"
-                  value={userProfile.lastName}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <ProfileField
-                  icon={<BusinessIcon />}
-                  label="Specialty"
-                  value={userProfile.specialty}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <ProfileField
-                  icon={<SettingsIcon />}
-                  label="EHR Integration"
-                  value={userProfile.ehrMode}
-                  chip
-                />
-              </Grid>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 2 }}>
+              <ProfileField
+                icon={<EmailIcon />}
+                label="Email Address"
+                value={userProfile.email}
+              />
+              <ProfileField
+                icon={<PhoneIcon />}
+                label="Phone Number"
+                value={userProfile.phoneNumber}
+              />
+              <ProfileField
+                icon={<PersonIcon />}
+                label="First Name"
+                value={userProfile.firstName}
+              />
+              <ProfileField
+                icon={<PersonIcon />}
+                label="Last Name"
+                value={userProfile.lastName}
+              />
+              <ProfileField
+                icon={<BusinessIcon />}
+                label="Specialty"
+                value={userProfile.specialty}
+              />
+              <ProfileField
+                icon={<SettingsIcon />}
+                label="EHR Integration"
+                value={userProfile.ehrMode}
+                chip
+              />
               {userProfile.ehrMode && userProfile.ehrName && (
-                <Grid item xs={12} sm={6}>
-                  <ProfileField
-                    icon={<StorageIcon />}
-                    label="EHR System"
-                    value={userProfile.ehrName}
-                  />
-                </Grid>
+                <ProfileField
+                  icon={<StorageIcon />}
+                  label="EHR System"
+                  value={userProfile.ehrName}
+                />
               )}
-            </Grid>
+            </Box>
           </Paper>
 
           <Paper sx={{ p: 3 }}>
@@ -250,9 +235,9 @@ const Profile: React.FC = () => {
               </strong>
             </Typography>
           </Paper>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} md={4}>
+        <Box>
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" gutterBottom>
               Quick Links
@@ -404,8 +389,8 @@ const Profile: React.FC = () => {
               You can reactivate your subscription at any time.
             </Typography>
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Logout Dialog */}
       <Dialog open={showLogoutDialog} onClose={() => setShowLogoutDialog(false)}>
