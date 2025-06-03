@@ -82,6 +82,9 @@ const TemplateBuilder: React.FC = () => {
   const [templateType, setTemplateType] = useState("none");
   const [templateMethod, setTemplateMethod] = useState({});
   const [sectionList, setSectionList] = useState([]);
+  const [showTemplatePreview, setShowTemplatePreview] = useState(false);
+  const [openAddSection, setOpenAddSection] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState([]);
 
   // Form controls
   const { control, handleSubmit, formState: { errors }, trigger, getValues } = useForm();
@@ -132,6 +135,40 @@ const TemplateBuilder: React.FC = () => {
       "is_editing_template": false,
       "paste_template": "",
       "description": "List known allergies or lack thereof, to medications or other substances."
+    }
+  ];
+
+  const templatePreview = [
+    {
+      "content": "Provide a comprehensive narrative of the patient's current condition. Include details about the onset, duration, and characteristics of the present illness. Note any associated symptoms, and incorporate relevant background information such as lifestyle factors and family medical history. Be sure to structure the narrative in a chronological manner, emphasizing the progression of the condition over time.",
+      "id": "cb1129e5-81e7-6dbd-d9f8-91d8a502d0b1",
+      "name": "History of Present Illness",
+      "type": "paragraph"
+    },
+    {
+      "content": "List any known allergies the patient has, including reactions to medications, foods, or other substances. If there are no known allergies, indicate this as well.",
+      "id": "dccbe5e5-6645-e3e2-b2b7-1fd45baf1477",
+      "items": [
+        {
+          "content": "Create a bullet for each known allergy, specifying the substance and the type of reaction."
+        },
+        {
+          "content": "Include a bullet to indicate if there are no known allergies."
+        }
+      ],
+      "name": "Allergies",
+      "type": "bulleted_list"
+    },
+    {
+      "content": "Create a detailed plan of management for each diagnosis the patient has. For each diagnosis, include any tests to be ordered, follow-ups required, and treatments initiated or considered.",
+      "id": "fce99b6b-1a72-9cc5-9cc9-bfe6fed4f355",
+      "items": [
+        {
+          "content": "For each diagnosis, include specifics such as additional tests to be scheduled, frequency of follow-up appointments, and any treatments that have been initiated or are under consideration, including their dosage and duration where applicable."
+        }
+      ],
+      "name": "Plan",
+      "type": "bulleted_list"
     }
   ];
 
@@ -279,6 +316,143 @@ const TemplateBuilder: React.FC = () => {
       setSectionList(sectionData);
     }
   };
+
+  const options = ['ALL', 'EHR', 'No EHR'];
+
+  // Template Library render
+  const renderTemplateLibrary = () => (
+    <Box sx={{ p: 3 }}>
+      <Box display="flex" alignItems="center" justifyContent="center">
+        <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600, my: 2 }}>
+          Template Library
+        </Typography>
+      </Box>
+
+      <Box mb={2} display="flex" alignItems="center" justifyContent="center" gap={2}>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Specialty</InputLabel>
+          <Select
+            label="Specialty"
+            sx={{ 
+              color: bravoColors.text.primary, 
+              backgroundColor: 'white'
+            }}
+          >
+            <MenuItem value="all">ALL</MenuItem>
+            <MenuItem value="gp">General Practitioner</MenuItem>
+            <MenuItem value="psych">Psychologist</MenuItem>
+            <MenuItem value="family">Family Medicine Specialist</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Note Type</InputLabel>
+          <Select
+            label="Note Type"
+            sx={{ 
+              color: bravoColors.text.primary, 
+              backgroundColor: 'white'
+            }}
+          >
+            <MenuItem value="all">ALL</MenuItem>
+            <MenuItem value="ehr">EHR</MenuItem>
+            <MenuItem value="no-ehr">No EHR</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: 3,
+          alignItems: "stretch",
+          p: 1,
+          maxHeight: "65vh",
+          overflowY: "auto",
+        }}
+      >
+        {data.map((item) => (
+          <Card
+            key={item.id}
+            onClick={() => setShowTemplatePreview(true)}
+            sx={{
+              width: 250,
+              borderRadius: 3,
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+              transition: "all 0.2s ease-in-out",
+              cursor: "pointer",
+              "&:hover": {
+                boxShadow: `0 4px 14px ${bravoColors.secondary}33`,
+                border: `1px solid ${bravoColors.secondary}`,
+              },
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              p: 2,
+              backgroundColor: "#fff",
+            }}
+          >
+            <CardContent
+              sx={{
+                textAlign: "center",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 1,
+                width: "100%",
+                p: 0,
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: bravoColors.text.primary,
+                  lineHeight: 1.4,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  width: "100%",
+                }}
+              >
+                {item.title}
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0.5,
+                  mt: 1,
+                }}
+              >
+                <Chip
+                  label={`Specialty: ${item.specality}`}
+                  size="small"
+                  sx={{ 
+                    fontSize: 11, 
+                    backgroundColor: bravoColors.secondary,
+                    color: 'white'
+                  }}
+                />
+                <Chip
+                  label={`Note Type: ${item.type}`}
+                  size="small"
+                  sx={{ 
+                    fontSize: 11, 
+                    backgroundColor: bravoColors.secondary,
+                    color: 'white'
+                  }}
+                />
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Box>
+    </Box>
+  );
 
   // Main render based on screen state
   const renderContent = () => {
@@ -462,6 +636,10 @@ const TemplateBuilder: React.FC = () => {
       );
     }
 
+    if (templateScreen === "templateListPage") {
+      return renderTemplateLibrary();
+    }
+
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
@@ -472,14 +650,23 @@ const TemplateBuilder: React.FC = () => {
           <Typography variant="body1" color="text.secondary">
             Create and manage your document templates
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenCreateTemplate(true)}
-            sx={{ borderRadius: 2 }}
-          >
-            Create Template
-          </Button>
+          <Box display="flex" gap={2}>
+            <Button
+              variant="outlined"
+              onClick={() => setTemplateScreen("templateListPage")}
+              sx={{ borderRadius: 2 }}
+            >
+              Template Library
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenCreateTemplate(true)}
+              sx={{ borderRadius: 2 }}
+            >
+              Create Template
+            </Button>
+          </Box>
         </Box>
 
         <Card sx={{ borderRadius: 2 }}>
@@ -525,7 +712,7 @@ const TemplateBuilder: React.FC = () => {
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
               {createTemplateItems.map((item) => (
-                <Grid item xs={12} sm={6} md={4} key={item.type}>
+                <Grid xs={12} sm={6} md={4} key={item.type}>
                   <Card
                     elevation={2}
                     sx={{
@@ -564,7 +751,7 @@ const TemplateBuilder: React.FC = () => {
                   Template Details
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                  <Grid xs={12} sm={6}>
                     <Controller
                       name="template_name"
                       control={control}
@@ -575,13 +762,13 @@ const TemplateBuilder: React.FC = () => {
                           fullWidth
                           label="Template Name"
                           error={!!errors.template_name}
-                          helperText={errors.template_name?.message}
+                          helperText={errors.template_name?.message as string}
                           size="small"
                         />
                       )}
                     />
                   </Grid>
-                  <Grid item xs={12} sm={6}>
+                  <Grid xs={12} sm={6}>
                     <FormControl fullWidth size="small">
                       <InputLabel>Consultation Type</InputLabel>
                       <Select
@@ -595,7 +782,7 @@ const TemplateBuilder: React.FC = () => {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12}>
+                  <Grid xs={12}>
                     <Controller
                       name="description"
                       control={control}
@@ -628,6 +815,130 @@ const TemplateBuilder: React.FC = () => {
               disabled={Object.keys(templateMethod).length === 0}
             >
               Create Template
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Template Preview Dialog */}
+        <Dialog
+          open={showTemplatePreview}
+          onClose={() => setShowTemplatePreview(false)}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{
+            sx: { borderRadius: 2 }
+          }}
+        >
+          <DialogTitle>
+            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Template Preview
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <Box p={2} sx={{ border: '2px dashed #808080', borderRadius: 2 }}>
+              <Typography sx={{ fontSize: 18, color: "black", fontWeight: 600, mb: 2 }}>
+                Template Preview
+              </Typography>
+              <Divider sx={{ mb: 2 }} />
+              {templatePreview.map((item, idx) => (
+                <Box key={idx} p={2}>
+                  <Typography sx={{ fontSize: 18, color: "black", fontWeight: 700 }}>
+                    {item.name}
+                  </Typography>
+                  <Typography sx={{ fontSize: 16, color: "black", mb: 1 }}>
+                    {item.content}
+                  </Typography>
+                  {item.items && item.items.length > 0 && item.items.map((data, index) => (
+                    <Stack key={index} direction="row" alignItems="flex-start">
+                      <CircleIcon sx={{ fontSize: 8, color: 'black', mt: 1 }} />
+                      <Typography sx={{ fontSize: 16, color: 'black', pl: 1 }}>
+                        {data.content}
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Box>
+              ))}
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 3 }}>
+            <Button 
+              onClick={() => setShowTemplatePreview(false)}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => {
+                setShowTemplatePreview(false);
+                setOpenAddSection(true);
+              }}
+              variant="contained"
+            >
+              Add to Library
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Add Section Dialog */}
+        <Dialog
+          open={openAddSection}
+          onClose={() => setOpenAddSection(false)}
+          maxWidth="sm"
+          fullWidth
+          PaperProps={{
+            sx: { borderRadius: 2 }
+          }}
+        >
+          <DialogTitle>
+            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Add Template to
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <Box p={2}>
+              <Autocomplete
+                multiple
+                options={options}
+                value={selectedOptions}
+                onChange={(event, newValue) => setSelectedOptions(newValue)}
+                sx={{ width: '100%' }}
+                renderTags={(value, getTagProps) =>
+                  value.map((option, index) => (
+                    <Chip
+                      key={option}
+                      label={option}
+                      {...getTagProps({ index })}
+                      sx={{
+                        backgroundColor: bravoColors.primaryFlat,
+                        color: 'white',
+                        fontWeight: 500,
+                      }}
+                    />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    label="Select"
+                    placeholder="Search or select"
+                  />
+                )}
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 3 }}>
+            <Button 
+              onClick={() => setOpenAddSection(false)}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => setOpenAddSection(false)}
+              variant="contained"
+            >
+              Import All
             </Button>
           </DialogActions>
         </Dialog>

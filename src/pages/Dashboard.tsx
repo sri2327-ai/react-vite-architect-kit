@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -36,17 +37,6 @@ interface MenuItem {
 }
 
 // Placeholder components
-const TemplateBuilder: React.FC = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography variant="h4" gutterBottom>
-      Template Builder
-    </Typography>
-    <Typography variant="body1" color="text.secondary">
-      Create and manage your templates here.
-    </Typography>
-  </Box>
-);
-
 const WorkflowBuilder: React.FC = () => (
   <Box sx={{ p: 3 }}>
     <Typography variant="h4" gutterBottom>
