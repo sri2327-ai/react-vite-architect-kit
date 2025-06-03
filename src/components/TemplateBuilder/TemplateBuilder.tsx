@@ -67,10 +67,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
 import TemplateCreationDialog from './TemplateCreationDialog';
-import TemplateLibraryCard from './TemplateLibraryCard';
-import TemplateLibraryFilters from './TemplateLibraryFilters';
-import TemplatePreviewDialog from './TemplatePreviewDialog';
-import TemplateImportDialog from './TemplateImportDialog';
 import { templateService } from '@/services/templateService';
 import { templateBuilderService } from '@/services/templateBuilderService';
 
@@ -109,9 +105,6 @@ interface LibraryTemplate {
   name: string;
   specialty: string;
   noteType: string;
-  estimatedTime?: string;
-  complexity?: string;
-  usageCount?: number;
   content?: string;
 }
 
@@ -142,9 +135,7 @@ const TemplateBuilder: React.FC = () => {
   // Library and filter states
   const [libraryFilters, setLibraryFilters] = useState({
     specialty: '',
-    noteType: '',
-    complexity: '',
-    searchTerm: ''
+    noteType: ''
   });
   const [newTypeName, setNewTypeName] = useState('');
   const [previewTemplate, setPreviewTemplate] = useState<LibraryTemplate | null>(null);
@@ -181,79 +172,50 @@ const TemplateBuilder: React.FC = () => {
     }
   ]);
 
-  // Enhanced library templates with clinical metadata
-  const enhancedLibraryTemplates: LibraryTemplate[] = [
+  // Enhanced library templates using templateService
+  const libraryTemplates: LibraryTemplate[] = [
     {
       id: 1,
-      name: "Comprehensive Cardiology Consultation",
-      specialty: "Cardiology",
+      name: "Cardiology Consultation",
+      specialty: "cardiologist",
       noteType: "Consultation Note",
-      estimatedTime: "8-12 minutes",
-      complexity: "Moderate",
-      usageCount: 1247,
       content: templateService.generateTemplateContent('Consultation Note', {
-        reason: 'Cardiovascular evaluation and risk assessment',
-        examination: 'Comprehensive cardiovascular examination including ECG review',
-        impression: 'Detailed cardiac assessment with risk stratification',
-        recommendations: 'Evidence-based cardiology treatment recommendations'
+        reason: 'Cardiac evaluation',
+        examination: 'Cardiovascular system examination',
+        impression: 'Cardiac assessment findings',
+        recommendations: 'Cardiology-specific recommendations'
       })
     },
     {
       id: 2,
-      name: "Mental Health Assessment - Initial",
-      specialty: "Mental Health",
+      name: "Psychology Assessment",
+      specialty: "psychologist",
       noteType: "SOAP Note",
-      estimatedTime: "15-20 minutes",
-      complexity: "Complex",
-      usageCount: 892,
       content: templateService.generateTemplateContent('SOAP Note', {
-        chief_complaint: 'Mental health concerns and psychological symptoms',
-        history_of_present_illness: 'Detailed psychiatric history and timeline',
-        physical_examination: 'Mental status examination and risk assessment',
-        assessment: 'Psychological assessment and diagnostic considerations',
-        plan: 'Comprehensive treatment plan with follow-up strategy'
+        chief_complaint: 'Mental health concerns',
+        history_of_present_illness: 'Psychological history',
+        physical_examination: 'Mental status examination',
+        assessment: 'Psychological assessment',
+        plan: 'Treatment plan and recommendations'
       })
     },
     {
       id: 3,
-      name: "Primary Care Annual Physical",
-      specialty: "Primary Care",
-      noteType: "SOAP Note",
-      estimatedTime: "12-15 minutes",
-      complexity: "Simple",
-      usageCount: 2156,
-      content: templateService.generateTemplateContent('SOAP Note', {
-        chief_complaint: 'Annual wellness visit and health maintenance',
-        physical_examination: 'Complete physical examination by systems',
-        assessment: 'Health status assessment and risk factors',
-        plan: 'Preventive care recommendations and health maintenance'
-      })
-    },
-    {
-      id: 4,
-      name: "Emergency Department Evaluation",
-      specialty: "Emergency Medicine",
-      noteType: "SOAP Note",
-      estimatedTime: "6-10 minutes",
-      complexity: "Moderate",
-      usageCount: 1653,
-      content: templateService.generateTemplateContent('SOAP Note')
-    },
-    {
-      id: 5,
-      name: "Dermatology Lesion Assessment",
+      name: "Dermatology Exam",
       specialty: "Dermatology",
       noteType: "SOAP Note",
-      estimatedTime: "8-12 minutes",
-      complexity: "Simple",
-      usageCount: 743,
-      content: templateService.generateTemplateContent('SOAP Note')
+      content: templateService.generateTemplateContent('SOAP Note', {
+        chief_complaint: 'Skin concerns',
+        physical_examination: 'Dermatological examination',
+        assessment: 'Dermatologic diagnosis',
+        plan: 'Treatment recommendations'
+      })
     }
   ];
 
   // Initialize template service with library templates
   useEffect(() => {
-    const initTemplates = enhancedLibraryTemplates.map(template => ({
+    const initTemplates = libraryTemplates.map(template => ({
       title: template.noteType,
       sections: templateService.getEhrFieldMappings(template.noteType)?.ehrFields.map(field => ({
         name: field,
@@ -374,22 +336,6 @@ const TemplateBuilder: React.FC = () => {
       setPreviewTemplate(null);
     }
   };
-
-  // Enhanced filter logic
-  const filteredLibraryTemplates = enhancedLibraryTemplates.filter(template => {
-    const specialtyMatch = !libraryFilters.specialty || template.specialty === libraryFilters.specialty;
-    const noteTypeMatch = !libraryFilters.noteType || template.noteType === libraryFilters.noteType;
-    const complexityMatch = !libraryFilters.complexity || template.complexity === libraryFilters.complexity;
-    const searchMatch = !libraryFilters.searchTerm || 
-      template.name.toLowerCase().includes(libraryFilters.searchTerm.toLowerCase()) ||
-      template.specialty.toLowerCase().includes(libraryFilters.searchTerm.toLowerCase()) ||
-      template.noteType.toLowerCase().includes(libraryFilters.searchTerm.toLowerCase());
-    
-    return specialtyMatch && noteTypeMatch && complexityMatch && searchMatch;
-  });
-
-  const availableSpecialties = [...new Set(enhancedLibraryTemplates.map(t => t.specialty))];
-  const availableNoteTypes = [...new Set(enhancedLibraryTemplates.map(t => t.noteType))];
 
   // Render Consult Types Screen
   const renderConsultTypes = () => (
@@ -631,104 +577,171 @@ const TemplateBuilder: React.FC = () => {
     </Box>
   );
 
-  // Render Enhanced Template Library Tab
+  // Render Template Library Tab
   const renderTemplateLibrary = () => (
     <Box>
-      {/* Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600, mb: 2 }}>
-          Clinical Template Library
+      <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600, mb: 4 }}>
+        Template Library
+      </Typography>
+      
+      {/* Template Service Info */}
+      <Card sx={{ mb: 3, p: 2, backgroundColor: bravoColors.background?.light || '#f8f9fa' }}>
+        <Typography variant="h6" gutterBottom>
+          Available Template Types
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-          Professionally designed templates created by practicing clinicians. Each template is optimized 
-          for efficiency and comprehensive documentation across various medical specialties.
+        <Box display="flex" gap={1} flexWrap="wrap">
+          {templateService.getTemplateTypes().map((type) => (
+            <Chip 
+              key={type}
+              label={type}
+              variant="outlined"
+              size="small"
+              sx={{ 
+                borderColor: bravoColors.primaryFlat,
+                color: bravoColors.primaryFlat
+              }}
+            />
+          ))}
+        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Total workflow steps available: {templateService.getAllWorkflowSteps().length}
         </Typography>
+      </Card>
+      
+      <Box display="flex" gap={2} mb={3}>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Specialty</InputLabel>
+          <Select
+            value={libraryFilters.specialty}
+            label="Specialty"
+            onChange={(e) => setLibraryFilters(prev => ({ ...prev, specialty: e.target.value }))}
+          >
+            <MenuItem value="">All</MenuItem>
+            <MenuItem value="cardiologist">Cardiologist</MenuItem>
+            <MenuItem value="psychologist">Psychologist</MenuItem>
+            <MenuItem value="Dermatology">Dermatology</MenuItem>
+          </Select>
+        </FormControl>
         
-        {/* Stats */}
-        <Stack direction="row" spacing={3} sx={{ mb: 3 }}>
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
-              {enhancedLibraryTemplates.length}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Templates Available
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.secondary }}>
-              {availableSpecialties.length}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Medical Specialties
-            </Typography>
-          </Box>
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.tertiary }}>
-              {enhancedLibraryTemplates.reduce((sum, t) => sum + (t.usageCount || 0), 0).toLocaleString()}+
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Clinical Uses
-            </Typography>
-          </Box>
-        </Stack>
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Template Type</InputLabel>
+          <Select
+            value={libraryFilters.noteType}
+            label="Template Type"
+            onChange={(e) => setLibraryFilters(prev => ({ ...prev, noteType: e.target.value }))}
+          >
+            <MenuItem value="">All</MenuItem>
+            {templateService.getTemplateTypes().map((type) => (
+              <MenuItem key={type} value={type}>{type}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Box>
 
-      {/* Filters */}
-      <TemplateLibraryFilters
-        filters={libraryFilters}
-        onFiltersChange={setLibraryFilters}
-        availableSpecialties={availableSpecialties}
-        availableNoteTypes={availableNoteTypes}
-      />
-
-      {/* Results Count */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          Showing {filteredLibraryTemplates.length} of {enhancedLibraryTemplates.length} templates
-          {libraryFilters.searchTerm && ` for "${libraryFilters.searchTerm}"`}
-        </Typography>
-      </Box>
-
-      {/* Template Grid */}
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-          gap: 3,
-          mb: 4
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          gap: 3
         }}
       >
-        {filteredLibraryTemplates.map((template) => (
-          <TemplateLibraryCard
-            key={template.id}
-            template={template}
-            onPreview={handleLibraryTemplatePreview}
-            onImport={() => {
-              setPreviewTemplate(template);
-              setOpenImportConfirm(true);
-            }}
-          />
-        ))}
-      </Box>
+        {libraryTemplates
+          .filter(template => {
+            const specialtyMatch = !libraryFilters.specialty || template.specialty === libraryFilters.specialty;
+            const noteTypeMatch = !libraryFilters.noteType || template.noteType === libraryFilters.noteType;
+            return specialtyMatch && noteTypeMatch;
+          })
+          .map((template) => {
+            const mapping = templateService.getEhrFieldMappings(template.noteType || '');
+            return (
+              <Card
+                key={template.id}
+                sx={{
+                  borderRadius: 2,
+                  border: '1px solid #e0e0e0',
+                  overflow: 'hidden',
+                  '&:hover': {
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                    borderColor: bravoColors.secondary
+                  }
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: bravoColors.text?.primary || '#000' }}>
+                    {template.name}
+                  </Typography>
+                  
+                  <Box display="flex" gap={1} mb={2} flexWrap="wrap">
+                    <Chip 
+                      label={`Specialty: ${template.specialty}`} 
+                      size="small" 
+                      sx={{ 
+                        backgroundColor: bravoColors.primaryFlat, 
+                        color: 'white',
+                        fontSize: '0.75rem'
+                      }} 
+                    />
+                    <Chip 
+                      label={`Type: ${template.noteType}`} 
+                      size="small" 
+                      sx={{ 
+                        backgroundColor: bravoColors.secondary, 
+                        color: 'white',
+                        fontSize: '0.75rem'
+                      }} 
+                    />
+                  </Box>
 
-      {/* No Results */}
-      {filteredLibraryTemplates.length === 0 && (
-        <Paper sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
-          <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-            No templates found
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Try adjusting your filters or search terms to find the perfect template for your practice.
-          </Typography>
-          <Button
-            variant="outlined"
-            onClick={() => setLibraryFilters({ specialty: '', noteType: '', complexity: '', searchTerm: '' })}
-            sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 600 }}
-          >
-            Clear All Filters
-          </Button>
-        </Paper>
-      )}
+                  {mapping && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        EHR Fields: {mapping.ehrFields.length}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Workflow Steps: {mapping.workflowSteps.length}
+                      </Typography>
+                    </Box>
+                  )}
+                  
+                  <Box display="flex" gap={1} mt={3}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleLibraryTemplatePreview(template)}
+                      sx={{
+                        borderColor: bravoColors.secondary,
+                        color: bravoColors.secondary,
+                        '&:hover': {
+                          borderColor: bravoColors.primaryFlat,
+                          backgroundColor: bravoColors.background?.light || '#f0f0f0'
+                        }
+                      }}
+                    >
+                      Preview
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => {
+                        setPreviewTemplate(template);
+                        setOpenImportConfirm(true);
+                      }}
+                      sx={{
+                        backgroundColor: bravoColors.primaryFlat,
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: bravoColors.secondary
+                        }
+                      }}
+                    >
+                      Import
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            );
+          })}
+      </Box>
     </Box>
   );
 
@@ -827,22 +840,85 @@ const TemplateBuilder: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Enhanced Template Preview Dialog */}
-      <TemplatePreviewDialog
-        open={openPreview}
-        template={previewTemplate}
-        onClose={() => setOpenPreview(false)}
-        onImport={handleImportToMyTemplates}
-      />
+      {/* Template Preview Dialog */}
+      <Dialog open={openPreview} onClose={() => setOpenPreview(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h6">{previewTemplate?.name}</Typography>
+            <Box>
+              <Tabs value={previewType === 'template' ? 0 : 1} onChange={(e, v) => setPreviewType(v === 0 ? 'template' : 'sample')}>
+                <Tab label="Template" />
+                <Tab label="Sample Note" />
+              </Tabs>
+            </Box>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ 
+            p: 3, 
+            border: '1px solid #e0e0e0', 
+            borderRadius: 1, 
+            backgroundColor: '#f8f9fa',
+            minHeight: 300
+          }}>
+            <Typography variant="body2" sx={{ whiteSpace: 'pre-line', fontFamily: 'monospace' }}>
+              {previewType === 'template' 
+                ? previewTemplate?.content || 'No template content available'
+                : 'Sample clinical note would appear here based on the template structure...'}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenPreview(false)}>Close</Button>
+          <Button onClick={handleImportToMyTemplates} variant="contained">
+            Import to My Templates
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-      {/* Enhanced Import Dialog */}
-      <TemplateImportDialog
-        open={openImportConfirm}
-        template={previewTemplate}
-        consultTypes={consultTypes}
-        onClose={() => setOpenImportConfirm(false)}
-        onImport={handleConfirmImport}
-      />
+      {/* Enhanced Import Confirmation Dialog */}
+      <Dialog open={openImportConfirm} onClose={() => setOpenImportConfirm(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>Import Template</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Where would you like to import "{previewTemplate?.name}"?
+          </Typography>
+          
+          {previewTemplate?.noteType && (
+            <Box sx={{ mb: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Template Type: {previewTemplate.noteType}
+              </Typography>
+              {templateService.getEhrFieldMappings(previewTemplate.noteType) && (
+                <Typography variant="body2" color="text.secondary">
+                  Will include: {templateService.getEhrFieldMappings(previewTemplate.noteType)?.ehrFields.join(', ')}
+                </Typography>
+              )}
+            </Box>
+          )}
+          
+          <FormControl fullWidth>
+            <InputLabel>Select Consult Type</InputLabel>
+            <Select
+              value={selectedImportType}
+              onChange={(e) => setSelectedImportType(e.target.value)}
+              label="Select Consult Type"
+            >
+              {consultTypes.map((type) => (
+                <MenuItem key={type.id} value={type.name}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenImportConfirm(false)}>Cancel</Button>
+          <Button onClick={handleConfirmImport} variant="contained" disabled={!selectedImportType}>
+            Import
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
