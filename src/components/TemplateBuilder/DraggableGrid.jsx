@@ -20,19 +20,22 @@ import {
   IconButton,
   Stack,
   Button,
-  TextField
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Drawer
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import CircleIcon from '@mui/icons-material/Circle';
-import CustomDialog from "../../reuseable-components/DialogCustom/DialogCustom";
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import CustomDrawer from "../../reuseable-components/CustomDrawer";
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline';
 import TitleIcon from '@mui/icons-material/Title';
 import AssignmentIcon from '@mui/icons-material/Assignment';
@@ -40,7 +43,12 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import { ArrowBack } from "@mui/icons-material";
-import { useAddsectionClick } from "../../store";
+
+// Simple store hook - replace with actual store import when available
+const useAddsectionClick = () => {
+  const [addsectiontemp, setaddsection] = useState(false);
+  return { addsectiontemp, setaddsection };
+};
 
 // 🔹 FieldCard - Reorderable Card
 function FieldCard({ id, item }) {
@@ -268,174 +276,173 @@ function FieldCard({ id, item }) {
   </Box>
 </Box>
 
-       <CustomDialog
-                            isOpen={openHelpMe}
-                            onClose={() => { setHelpMe(false);  }}
-                            title={'Modify AI-Generated Section'}
-                            actions={
-                               
-                            <>
-                          <Button onClick={() => {setHelpMe(false) }} variant="contained"  color="primary">
-                                    Cancel
-                                </Button>
-                                <Button onClick={() => {setHelpMe(false) }} type="submit" variant="contained" color="primary" >
-                                   Modify
-                                </Button>
-                             
-                                
-                            </>}
-                        >
-                        <Stack flexDirection={"column"} justifyContent={"center"} gap={1}>
-                        {
-                          
-                            helpmeItems &&
-                            helpmeItems.map((item) => (
-                                <Card
-                                key={item.type}
-                                elevation={5}
-                                sx={{
-                                    bgcolor: "white",
-                                    borderRadius: 2,
-                                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                                    cursor: "pointer",
-                                    transition: "all 0.3s ease-in-out",
-                                    "&:hover": {
-                                        transform: "scale(1.02)",
-                                        boxShadow: "0px 8px 16px rgba(0,0,0,0.2)",
-                                    },
-                                    border: selectedHelpMe.title == item.title && "2px solid #408DA9",
-                                }}
-                                onClick={() => { setselectedHelpMe(item);  }}
-                            >
-                                        <Box display="flex" alignItems={"center"}  justifyContent={"flex-start"} flexDirection={"row"} p={1}>
-                                            <Box pl={1}>
-                                            {item.icon}
-                                            </Box>
-                                            <Box display="flex"   flexDirection={"column"} ml={1} mb={1}>
-                                            <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>{item.title}</Typography>
-                                            <Typography sx={{ color: "#808080", fontSize: 14, fontWeight: 400 }}>{item.Description}</Typography>
-                                            </Box>
-                                        </Box>
-                            </Card>
-                            ))
-                        }
-                           
-                         {
-                           selectedHelpMe.type &&  selectedHelpMe.type != 1 &&
-                            <Box>
-                                <Typography
-            variant="h6"
-            sx={{ color: "#343434", fontSize: 14, fontWeight: 600, pt:1 }}
-          > {selectedHelpMe.type == 2 ? "How many paragraphs do you prefer?" :  selectedHelpMe.type == 3 ? "Please give an example of how you'd like this to be formatted:" : "What do you want changed?" }   </Typography>
-                          
-                               <TextField fullWidth  variant="outlined" multiline rows={2} margin="normal" autoFocus  
-                           onChange={(event) => {
-                             }} />
-                             </Box>
-                         } 
-                          
-                        </Stack>
-                        </CustomDialog>
-                        <CustomDrawer
-        open={openDrawer}
-        onClose={() => setOpenDrawer(false)}
-        actionButton={ selectedFeildObj.type ? true : false}
-        actions={
-          <>
-          <Button onClick={() => { setselectedFeildObj({}) }} variant="contained" sx={{
-              borderRadius: "5px", padding: "5px 10px",
-              color: "#F4FCFF",
-              fontSize: "0.9rem",
-              fontWeight: 600,
-            }} startIcon={(<><ArrowBack/></>)}  color="primary" >
-              Back
-            </Button>
-            <Button onClick={() => { }} variant="contained" sx={{
-              borderRadius: "5px", padding: "5px 10px",
-              color: "#F4FCFF",
-              fontSize: "0.9rem",
-              fontWeight: 600,
-            }} color="primary">
-              Update
-            </Button>
-          </>
-        }
-        title="Add section"
-      >
-          <Box p={4}>
-        {
-          selectedFeildObj.type == "paragraph"  ?
-          (
-            <>
-      <Box p={2}>
-                                <Typography
-            variant="h6"
-            sx={{ color: "#343434", fontSize: 16, fontWeight: 600, pt:1 }}
-          > Title</Typography>
-                          
-                               <TextField fullWidth  variant="outlined" margin="normal"    value={selectedFeildObj.name} 
-                           onChange={(event) => {
-                             setselectedFeildObj(prev => ({
-                              ...prev,
-                              name: event.target.value
-                            }));
-                             }} />
-                             </Box>
-                             <Box p={2}>
-                                <Typography
-            variant="h6"
-            sx={{ color: "#343434", fontSize: 16, fontWeight: 600, pt:1 }}
-          > What do you want the A.I. to generate in this section?</Typography>
-                          
-                               <TextField fullWidth  variant="outlined" multiline rows={6} margin="normal"  value={selectedFeildObj.content} 
-                           onChange={(event) => {
-                             setselectedFeildObj(prev => ({
-                              ...prev,
-                              content: event.target.value
-                            }));
-                             }} />
-                             </Box>
-            </>
-          ) : 
-        <Stack flexDirection={"column"} justifyContent={"center"} gap={1} >
-          <Stack flexDirection={"row"} sx={{ border: '1px dashed #408DA9', p: 2, borderRadius: 10 }}>
-            <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>Can't find the section you need?</Typography>
-            <Typography sx={{ color: "#808080", fontSize: 18, fontWeight: 400, cursor: "pointer", color: "primary.main", pl: 1 }} onClick={() => console.log("Clicked!")}>Click here to Create your own!</Typography>
-          </Stack>
-          <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>Custom Block</Typography>
-          {
-            customBlocks &&
-            customBlocks.map((item) => (
-              <Card
-                key={item.type}
-                sx={{
-                  bgcolor: "white",
-                  borderRadius: 2,
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                  cursor: "pointer",
-                  "&:hover": {
-                    border: "2px solid #408DA9",
-                  },
+       <Dialog
+         open={openHelpMe}
+         onClose={() => { setHelpMe(false); }}
+         maxWidth="md"
+         fullWidth
+       >
+         <DialogTitle>Modify AI-Generated Section</DialogTitle>
+         <DialogContent>
+           <Stack flexDirection={"column"} justifyContent={"center"} gap={1}>
+             {helpmeItems &&
+               helpmeItems.map((item) => (
+                 <Card
+                   key={item.type}
+                   elevation={5}
+                   sx={{
+                     bgcolor: "white",
+                     borderRadius: 2,
+                     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                     cursor: "pointer",
+                     transition: "all 0.3s ease-in-out",
+                     "&:hover": {
+                       transform: "scale(1.02)",
+                       boxShadow: "0px 8px 16px rgba(0,0,0,0.2)",
+                     },
+                     border: selectedHelpMe.title == item.title && "2px solid #408DA9",
+                   }}
+                   onClick={() => { setselectedHelpMe(item); }}
+                 >
+                   <Box display="flex" alignItems={"center"} justifyContent={"flex-start"} flexDirection={"row"} p={1}>
+                     <Box pl={1}>
+                       {item.icon}
+                     </Box>
+                     <Box display="flex" flexDirection={"column"} ml={1} mb={1}>
+                       <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>{item.title}</Typography>
+                       <Typography sx={{ color: "#808080", fontSize: 14, fontWeight: 400 }}>{item.Description}</Typography>
+                     </Box>
+                   </Box>
+                 </Card>
+               ))
+             }
 
-                }}
-                onClick={() => { setSelectedCustomBlock(item); onclickAddsectionCustomBlock(item) }}
-              >
-                <Box display="flex" alignItems={"center"} justifyContent={"flex-start"} flexDirection={"row"} p={1}>
-                  <Box pl={1}>
-                    {item.icon}
-                  </Box>
-                  <Box display="flex" flexDirection={"column"} ml={1} mb={1}>
-                    <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>{item.title}</Typography>
-                    <Typography sx={{ color: "#808080", fontSize: 14, fontWeight: 400 }}>{item.des}</Typography>
-                  </Box>
-                </Box>
-              </Card>
-            ))
-          }
-        </Stack>
-        }
+             {selectedHelpMe.type && selectedHelpMe.type != 1 &&
+               <Box>
+                 <Typography
+                   variant="h6"
+                   sx={{ color: "#343434", fontSize: 14, fontWeight: 600, pt: 1 }}
+                 > {selectedHelpMe.type == 2 ? "How many paragraphs do you prefer?" : selectedHelpMe.type == 3 ? "Please give an example of how you'd like this to be formatted:" : "What do you want changed?"}</Typography>
+
+                 <TextField fullWidth variant="outlined" multiline rows={2} margin="normal" autoFocus
+                   onChange={(event) => {
+                   }} />
+               </Box>
+             }
+           </Stack>
+         </DialogContent>
+         <DialogActions>
+           <Button onClick={() => { setHelpMe(false) }} variant="contained" color="primary">
+             Cancel
+           </Button>
+           <Button onClick={() => { setHelpMe(false) }} type="submit" variant="contained" color="primary" >
+             Modify
+           </Button>
+         </DialogActions>
+       </Dialog>
+
+       <Drawer
+         anchor="right"
+         open={openDrawer}
+         onClose={() => setOpenDrawer(false)}
+         sx={{ '& .MuiDrawer-paper': { width: 400 } }}
+       >
+         <Box sx={{ p: 2 }}>
+           <Typography variant="h6" gutterBottom>
+             Add section
+           </Typography>
+           
+           <Box mt={2}>
+             {selectedFeildObj.type == "paragraph" ? (
+               <>
+                 <Box p={2}>
+                   <Typography
+                     variant="h6"
+                     sx={{ color: "#343434", fontSize: 16, fontWeight: 600, pt: 1 }}
+                   > Title</Typography>
+
+                   <TextField fullWidth variant="outlined" margin="normal" value={selectedFeildObj.name}
+                     onChange={(event) => {
+                       setselectedFeildObj(prev => ({
+                         ...prev,
+                         name: event.target.value
+                       }));
+                     }} />
+                 </Box>
+                 <Box p={2}>
+                   <Typography
+                     variant="h6"
+                     sx={{ color: "#343434", fontSize: 16, fontWeight: 600, pt: 1 }}
+                   > What do you want the A.I. to generate in this section?</Typography>
+
+                   <TextField fullWidth variant="outlined" multiline rows={6} margin="normal" value={selectedFeildObj.content}
+                     onChange={(event) => {
+                       setselectedFeildObj(prev => ({
+                         ...prev,
+                         content: event.target.value
+                       }));
+                     }} />
+                 </Box>
+               </>
+             ) :
+               <Stack flexDirection={"column"} justifyContent={"center"} gap={1} >
+                 <Stack flexDirection={"row"} sx={{ border: '1px dashed #408DA9', p: 2, borderRadius: 10 }}>
+                   <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>Can't find the section you need?</Typography>
+                   <Typography sx={{ fontSize: 18, fontWeight: 400, cursor: "pointer", color: "primary.main", pl: 1 }} onClick={() => console.log("Clicked!")}>Click here to Create your own!</Typography>
+                 </Stack>
+                 <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>Custom Block</Typography>
+                 {
+                   customBlocks &&
+                   customBlocks.map((item) => (
+                     <Card
+                       key={item.type}
+                       sx={{
+                         bgcolor: "white",
+                         borderRadius: 2,
+                         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                         cursor: "pointer",
+                         "&:hover": {
+                           border: "2px solid #408DA9",
+                         },
+                       }}
+                       onClick={() => { setSelectedCustomBlock(item); onclickAddsectionCustomBlock(item) }}
+                     >
+                       <Box display="flex" alignItems={"center"} justifyContent={"flex-start"} flexDirection={"row"} p={1}>
+                         <Box pl={1}>
+                           {item.icon}
+                         </Box>
+                         <Box display="flex" flexDirection={"column"} ml={1} mb={1}>
+                           <Typography sx={{ color: "#343434", fontSize: 18, fontWeight: 600 }}>{item.title}</Typography>
+                           <Typography sx={{ color: "#808080", fontSize: 14, fontWeight: 400 }}>{item.des}</Typography>
+                         </Box>
+                       </Box>
+                     </Card>
+                   ))
+                 }
+               </Stack>
+             }
+           </Box>
+
+           <Box mt={2} display="flex" gap={2}>
+             <Button onClick={() => { setselectedFeildObj({}) }} variant="contained" sx={{
+               borderRadius: "5px", padding: "5px 10px",
+               color: "#F4FCFF",
+               fontSize: "0.9rem",
+               fontWeight: 600,
+             }} startIcon={(<ArrowBack />)} color="primary" >
+               Back
+             </Button>
+             <Button onClick={() => { }} variant="contained" sx={{
+               borderRadius: "5px", padding: "5px 10px",
+               color: "#F4FCFF",
+               fontSize: "0.9rem",
+               fontWeight: 600,
+             }} color="primary">
+               Update
+             </Button>
+           </Box>
          </Box>
-      </CustomDrawer>
+       </Drawer>
     </>
   );
 }
