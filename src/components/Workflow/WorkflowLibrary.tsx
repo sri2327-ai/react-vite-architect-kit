@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -224,53 +223,55 @@ const WorkflowLibrary: React.FC = () => {
         </Typography>
       </Alert>
 
-      <Grid container spacing={3}>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+        gap: 3 
+      }}>
         {filteredWorkflows.map((workflow) => (
-          <Grid item xs={12} md={6} lg={4} key={workflow.id}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Box sx={{ mb: 2 }}>
-                  <Typography variant="h6" gutterBottom>
-                    {workflow.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {workflow.description}
-                  </Typography>
-                  <Chip label={workflow.category} size="small" color="primary" />
-                </Box>
-                
-                <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                  Workflow Blocks: {workflow.blocks.length}
+          <Card key={workflow.id} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                  {workflow.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Includes automated scheduling, patient selection, and SOAP note generation
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  {workflow.description}
                 </Typography>
-              </CardContent>
-              
-              <Box sx={{ p: 2, pt: 0, display: 'flex', gap: 1 }}>
-                <Button
-                  variant="outlined"
-                  startIcon={<ViewIcon />}
-                  onClick={() => handleViewWorkflow(workflow)}
-                  size="small"
-                  sx={{ flex: 1 }}
-                >
-                  View Details
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={<ImportIcon />}
-                  onClick={() => handleImportWorkflow(workflow)}
-                  size="small"
-                  sx={{ flex: 1 }}
-                >
-                  Import
-                </Button>
+                <Chip label={workflow.category} size="small" color="primary" />
               </Box>
-            </Card>
-          </Grid>
+              
+              <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                Workflow Blocks: {workflow.blocks.length}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Includes automated scheduling, patient selection, and SOAP note generation
+              </Typography>
+            </CardContent>
+            
+            <Box sx={{ p: 2, pt: 0, display: 'flex', gap: 1 }}>
+              <Button
+                variant="outlined"
+                startIcon={<ViewIcon />}
+                onClick={() => handleViewWorkflow(workflow)}
+                size="small"
+                sx={{ flex: 1 }}
+              >
+                View Details
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<ImportIcon />}
+                onClick={() => handleImportWorkflow(workflow)}
+                size="small"
+                sx={{ flex: 1 }}
+              >
+                Import
+              </Button>
+            </Box>
+          </Card>
         ))}
-      </Grid>
+      </Box>
 
       {/* Workflow Details Dialog */}
       <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="md" fullWidth>
@@ -290,38 +291,40 @@ const WorkflowLibrary: React.FC = () => {
             Workflow Blocks ({selectedWorkflow?.blocks.length})
           </Typography>
           
-          <Grid container spacing={2}>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+            gap: 2 
+          }}>
             {selectedWorkflow?.blocks.map((block, index) => (
-              <Grid item xs={12} md={6} key={block.id}>
-                <Card variant="outlined" sx={{ p: 2 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Box sx={{ mr: 2, color: 'primary.main' }}>
-                      {block.icon}
-                    </Box>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="subtitle2">
-                        {index + 1}. {block.name}
-                      </Typography>
-                      <Chip 
-                        label={block.type} 
-                        size="small" 
-                        color={getBlockTypeColor(block.type)}
-                        sx={{ mt: 0.5 }}
-                      />
-                    </Box>
+              <Card key={block.id} variant="outlined" sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Box sx={{ mr: 2, color: 'primary.main' }}>
+                    {block.icon}
                   </Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    {block.description}
-                  </Typography>
-                  {block.templateMapping && (
-                    <Typography variant="caption" color="primary">
-                      Maps to: {block.templateMapping}
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="subtitle2">
+                      {index + 1}. {block.name}
                     </Typography>
-                  )}
-                </Card>
-              </Grid>
+                    <Chip 
+                      label={block.type} 
+                      size="small" 
+                      color={getBlockTypeColor(block.type)}
+                      sx={{ mt: 0.5 }}
+                    />
+                  </Box>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  {block.description}
+                </Typography>
+                {block.templateMapping && (
+                  <Typography variant="caption" color="primary">
+                    Maps to: {block.templateMapping}
+                  </Typography>
+                )}
+              </Card>
             ))}
-          </Grid>
+          </Box>
           
           <Divider sx={{ my: 3 }} />
           

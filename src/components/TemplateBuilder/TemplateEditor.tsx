@@ -73,6 +73,13 @@ interface Template {
   updatedAt: string;
 }
 
+interface TemplateEditorProps {
+  templateName?: string;
+  initialSections?: TemplateSection[];
+  onSave?: (sections: TemplateSection[]) => void;
+  onBack?: () => void;
+}
+
 const FIELD_TYPES = [
   { value: 'TEXT', label: 'Text Input' },
   { value: 'NUMBER', label: 'Number Input' },
@@ -412,36 +419,41 @@ const FieldEditor: React.FC<FieldEditorProps> = ({ field, onSave, onCancel }) =>
   );
 };
 
-export const TemplateEditor: React.FC = () => {
+export const TemplateEditor: React.FC<TemplateEditorProps> = ({ 
+  templateName = 'Medical Exam Template',
+  initialSections = [
+    {
+      id: 'section-1',
+      title: 'Patient Information',
+      description: 'Basic patient details',
+      visible: true,
+      fields: [
+        {
+          id: 'field-1',
+          type: 'TEXT',
+          label: 'Patient Name',
+          placeholder: 'Enter patient full name',
+          required: true,
+          visible: true
+        },
+        {
+          id: 'field-2',
+          type: 'DATE',
+          label: 'Date of Birth',
+          required: true,
+          visible: true
+        }
+      ]
+    }
+  ],
+  onSave,
+  onBack
+}) => {
   const [template, setTemplate] = useState<Template>({
     id: '1',
-    name: 'Medical Exam Template',
+    name: templateName,
     description: 'Comprehensive medical examination form',
-    sections: [
-      {
-        id: 'section-1',
-        title: 'Patient Information',
-        description: 'Basic patient details',
-        visible: true,
-        fields: [
-          {
-            id: 'field-1',
-            type: 'TEXT',
-            label: 'Patient Name',
-            placeholder: 'Enter patient full name',
-            required: true,
-            visible: true
-          },
-          {
-            id: 'field-2',
-            type: 'DATE',
-            label: 'Date of Birth',
-            required: true,
-            visible: true
-          }
-        ]
-      }
-    ],
+    sections: initialSections,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   });

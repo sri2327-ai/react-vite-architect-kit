@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -171,62 +170,64 @@ const MyWorkflows: React.FC = () => {
           </Button>
         </Box>
       ) : (
-        <Grid container spacing={3}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+          gap: 3 
+        }}>
           {workflows.map((workflow) => (
-            <Grid item xs={12} md={6} lg={4} key={workflow.id}>
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography variant="h6" gutterBottom>
-                        {workflow.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        {workflow.description}
-                      </Typography>
-                    </Box>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => setAnchorEl(e.currentTarget)}
-                    >
-                      <MoreIcon />
-                    </IconButton>
+            <Card key={workflow.id} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <CardContent sx={{ flexGrow: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" gutterBottom>
+                      {workflow.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      {workflow.description}
+                    </Typography>
                   </Box>
-                  
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                    <Chip
-                      label={workflow.status.toUpperCase()}
-                      color={getStatusColor(workflow.status)}
-                      size="small"
-                      icon={getStatusIcon(workflow.status)}
-                    />
-                    {workflow.lastRun && (
-                      <Typography variant="caption" color="text.secondary">
-                        Last run: {workflow.lastRun}
-                      </Typography>
-                    )}
-                  </Box>
-                </CardContent>
-                
-                <Box sx={{ p: 2, pt: 0 }}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    startIcon={<PlayIcon />}
-                    onClick={() => handleExecuteWorkflow(workflow)}
-                    disabled={workflow.status === 'error'}
-                    sx={{ mb: 1 }}
+                  <IconButton
+                    size="small"
+                    onClick={(e) => setAnchorEl(e.currentTarget)}
                   >
-                    Execute Workflow
-                  </Button>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
-                    Click to run this workflow with your EHR
-                  </Typography>
+                    <MoreIcon />
+                  </IconButton>
                 </Box>
-              </Card>
-            </Grid>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                  <Chip
+                    label={workflow.status.toUpperCase()}
+                    color={getStatusColor(workflow.status)}
+                    size="small"
+                    icon={getStatusIcon(workflow.status)}
+                  />
+                  {workflow.lastRun && (
+                    <Typography variant="caption" color="text.secondary">
+                      Last run: {workflow.lastRun}
+                    </Typography>
+                  )}
+                </Box>
+              </CardContent>
+              
+              <Box sx={{ p: 2, pt: 0 }}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  startIcon={<PlayIcon />}
+                  onClick={() => handleExecuteWorkflow(workflow)}
+                  disabled={workflow.status === 'error'}
+                  sx={{ mb: 1 }}
+                >
+                  Execute Workflow
+                </Button>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
+                  Click to run this workflow with your EHR
+                </Typography>
+              </Box>
+            </Card>
           ))}
-        </Grid>
+        </Box>
       )}
 
       {/* Workflow Execution Dialog */}
