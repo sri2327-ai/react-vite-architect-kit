@@ -3,7 +3,7 @@ import {
   Box,
   Card,
   CardContent,
-  Grid2 as Grid,
+  Grid,
   TextField,
   Dialog,
   Chip,
@@ -51,6 +51,7 @@ import {
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
+import DragDropList from './DragDropList';
 
 interface TemplateData {
   id: number;
@@ -421,7 +422,6 @@ const TemplateBuilder: React.FC = () => {
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
-                  width: "100%",
                 }}
               >
                 {item.title}

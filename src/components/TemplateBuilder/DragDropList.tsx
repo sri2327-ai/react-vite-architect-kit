@@ -13,7 +13,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
-  Grid2 as Grid,
+  Grid,
   Card,
   CardContent,
   Typography,
@@ -164,7 +164,7 @@ function FieldCard({ id, item }: { id: string; item: FieldItem }) {
 
   return (
     <>
-      <Grid xs={12} ref={setNodeRef} {...attributes}>
+      <Grid item xs={12} ref={setNodeRef} {...attributes}>
         <Box
           sx={{
             bgcolor: "white",
