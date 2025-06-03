@@ -34,7 +34,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid
+  Grid2 as Grid
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -665,7 +665,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       Schedule Configuration
                     </Typography>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={6}>
+                      <Grid xs={12} md={6}>
                         <TextField
                           fullWidth
                           size="small"
@@ -678,7 +678,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                           }}
                         />
                       </Grid>
-                      <Grid item xs={12} md={6}>
+                      <Grid xs={12} md={6}>
                         <TextField
                           fullWidth
                           size="small"
