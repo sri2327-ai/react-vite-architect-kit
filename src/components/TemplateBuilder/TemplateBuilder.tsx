@@ -4,7 +4,7 @@ import {
   Box,
   Card,
   CardContent,
-  Grid,
+  Grid2 as Grid,
   TextField,
   Dialog,
   Chip,
@@ -29,7 +29,7 @@ import {
   Select,
   MenuItem
 } from '@mui/material';
-import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
+import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
@@ -52,6 +52,14 @@ import {
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
+
+interface TemplateData {
+  id: number;
+  title: string;
+  specality: string;
+  type: string;
+  fields: any[];
+}
 
 const NoDataOverlay = () => (
   <Box
@@ -80,17 +88,17 @@ const TemplateBuilder: React.FC = () => {
   const [selectedConsType, setSelectedConsType] = useState("");
   const [showTemplate, setShowTemplate] = useState(false);
   const [templateType, setTemplateType] = useState("none");
-  const [templateMethod, setTemplateMethod] = useState({});
-  const [sectionList, setSectionList] = useState([]);
+  const [templateMethod, setTemplateMethod] = useState<any>({});
+  const [sectionList, setSectionList] = useState<any[]>([]);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
   const [openAddSection, setOpenAddSection] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
   // Form controls
   const { control, handleSubmit, formState: { errors }, trigger, getValues } = useForm();
 
   // Sample data
-  const data = [
+  const data: TemplateData[] = [
     { id: 1, title: "CLINICAL INTERVIEW1", specality: "cardiologist", type: "SOAP", fields: [] },
     { id: 2, title: "CLINICAL INTERVIEW2", specality: "psychology", type: "SOAP", fields: [] },
     { id: 3, title: "CLINICAL INTERVIEW3", specality: "cardiologist", type: "DPD", fields: [] },
@@ -205,7 +213,7 @@ const TemplateBuilder: React.FC = () => {
     },
   ];
 
-  const columns = [
+  const columns: GridColDef<TemplateData>[] = [
     { field: "id", headerName: "S.NO", width: 80 },
     {
       field: 'title',
@@ -250,7 +258,7 @@ const TemplateBuilder: React.FC = () => {
     },
     {
       field: 'actions',
-      type: 'actions',
+      type: 'actions' as const,
       headerName: 'Actions',
       width: 150,
       getActions: (params) => [
@@ -277,18 +285,18 @@ const TemplateBuilder: React.FC = () => {
   ];
 
   // Event handlers
-  const handleEdit = (row: any) => {
+  const handleEdit = (row: TemplateData) => {
     console.log('Edit template:', row);
     setOpenModifyTemplate(true);
     setShowTemplate(true);
     setSectionList(sectionData);
   };
 
-  const handleView = (row: any) => {
+  const handleView = (row: TemplateData) => {
     console.log('View template:', row);
   };
 
-  const handleDelete = (row: any) => {
+  const handleDelete = (row: TemplateData) => {
     console.log('Delete template:', row);
   };
 
@@ -673,9 +681,13 @@ const TemplateBuilder: React.FC = () => {
           <DataGrid
             rows={data}
             columns={columns}
-            pageSize={10}
-            rowsPerPageOptions={[10, 25, 50]}
-            disableSelectionOnClick
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10 },
+              },
+            }}
+            pageSizeOptions={[10, 25, 50]}
+            disableRowSelectionOnClick
             autoHeight
             slots={{
               noRowsOverlay: NoDataOverlay,
@@ -712,7 +724,7 @@ const TemplateBuilder: React.FC = () => {
           <DialogContent>
             <Grid container spacing={3} sx={{ mt: 1 }}>
               {createTemplateItems.map((item) => (
-                <Grid xs={12} sm={6} md={4} key={item.type}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={item.type}>
                   <Card
                     elevation={2}
                     sx={{
@@ -751,7 +763,7 @@ const TemplateBuilder: React.FC = () => {
                   Template Details
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <Controller
                       name="template_name"
                       control={control}
@@ -768,7 +780,7 @@ const TemplateBuilder: React.FC = () => {
                       )}
                     />
                   </Grid>
-                  <Grid xs={12} sm={6}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
                     <FormControl fullWidth size="small">
                       <InputLabel>Consultation Type</InputLabel>
                       <Select
@@ -782,7 +794,7 @@ const TemplateBuilder: React.FC = () => {
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid xs={12}>
+                  <Grid size={{ xs: 12 }}>
                     <Controller
                       name="description"
                       control={control}
