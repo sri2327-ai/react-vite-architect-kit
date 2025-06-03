@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -6,69 +6,36 @@ import {
   TextField,
   Dialog,
   Chip,
-  Tooltip,
-  List,
-  ListItem,
-  ListItemText,
+  Typography,
   DialogActions,
   Button,
-  Modal,
-  Typography,
-  Stack,
   DialogTitle,
   DialogContent,
-  Divider,
-  Autocomplete,
-  useTheme,
-  useMediaQuery,
-  IconButton,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Tabs,
   Tab,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  LinearProgress
+  IconButton,
+  Alert,
+  Stack,
+  useTheme,
+  useMediaQuery,
+  Pagination,
+  Skeleton
 } from '@mui/material';
-import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
   Edit as EditIcon,
-  Delete as DeleteIcon,
-  Save as SaveIcon,
   Add as AddIcon,
-  Close as CloseIcon,
-  Assignment as AssignmentIcon,
-  ReceiptLong as ReceiptLongIcon,
-  Visibility as VisibilityIcon,
-  DoDisturb as DoDisturbIcon,
   ArrowBack as ArrowBackIcon,
-  AutoFixHigh as AutoFixHighIcon,
-  EditNote as EditNoteIcon,
-  ContentCopy as ContentCopyIcon,
-  CopyAll as CopyAllIcon,
-  LibraryBooks as LibraryBooksIcon,
-  Description as DescriptionIcon,
-  FormatListBulleted as FormatListBulletedIcon,
-  Circle as CircleIcon,
-  Preview as PreviewIcon,
-  Note as NoteIcon,
-  NavigateNext as NavigateNextIcon,
-  NavigateBefore as NavigateBeforeIcon,
-  Check as CheckIcon
+  Search as SearchIcon,
+  TrendingUp as TrendingUpIcon,
+  Assignment as AssignmentIcon,
+  Schedule as ScheduleIcon
 } from '@mui/icons-material';
-import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
-import TemplateCreationDialog from './TemplateCreationDialog';
+import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
+import TemplateCard from './TemplateCard';
+import TemplateFilters from './TemplateFilters';
 import { templateService } from '@/services/templateService';
-import { templateBuilderService } from '@/services/templateBuilderService';
 
 interface TemplateItem {
   id: string;
@@ -92,30 +59,27 @@ interface TemplateData {
   type: string;
   fields: any[];
   content?: string;
+  lastUsed?: string;
+  usageCount?: number;
+  isFavorite?: boolean;
+  createdBy?: string;
+  tags?: string[];
 }
 
 interface ConsultType {
   id: number;
   name: string;
   isNew?: boolean;
-}
-
-interface LibraryTemplate {
-  id: number;
-  name: string;
-  specialty: string;
-  noteType: string;
-  content?: string;
+  templateCount?: number;
+  description?: string;
 }
 
 const TemplateBuilder: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
-  // Tab state
+  // Tab and navigation state
   const [currentTab, setCurrentTab] = useState(0);
-  
-  // Navigation state
   const [currentScreen, setCurrentScreen] = useState<'consultTypes' | 'templates' | 'templateEditor' | 'templateView'>('consultTypes');
   const [selectedConsultType, setSelectedConsultType] = useState<ConsultType | null>(null);
   const [viewingTemplate, setViewingTemplate] = useState<TemplateData | null>(null);
@@ -123,119 +87,120 @@ const TemplateBuilder: React.FC = () => {
   
   // Modal states
   const [openCreateTemplate, setOpenCreateTemplate] = useState(false);
-  const [openModifyTemplate, setOpenModifyTemplate] = useState(false);
   const [openAddType, setOpenAddType] = useState(false);
-  const [showTemplate, setShowTemplate] = useState(false);
-  const [templateMethod, setTemplateMethod] = useState<any>({});
   const [sectionList, setSectionList] = useState<TemplateItem[]>([]);
-  const [showTemplatePreview, setShowTemplatePreview] = useState(false);
-  const [openAddSection, setOpenAddSection] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-
-  // Library and filter states
-  const [libraryFilters, setLibraryFilters] = useState({
-    specialty: '',
-    noteType: ''
-  });
   const [newTypeName, setNewTypeName] = useState('');
-  const [previewTemplate, setPreviewTemplate] = useState<LibraryTemplate | null>(null);
-  const [openPreview, setOpenPreview] = useState(false);
-  const [previewType, setPreviewType] = useState<'template' | 'sample'>('template');
-  const [openImportConfirm, setOpenImportConfirm] = useState(false);
-  const [selectedImportType, setSelectedImportType] = useState<string>('');
 
-  // Form controls
-  const { control, handleSubmit, formState: { errors }, trigger, getValues } = useForm();
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSpecialty, setSelectedSpecialty] = useState('All Specialties');
+  const [selectedType, setSelectedType] = useState('All Types');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState('recent');
+  const [viewMode, setViewMode] = useState<'all' | 'favorites' | 'recent'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Sample data with template service integration
+  const templatesPerPage = 12;
+
+  // Enhanced sample data with better clinical context
   const [consultTypes, setConsultTypes] = useState<ConsultType[]>([
-    { id: 1, name: "SOAP NOTE", isNew: true },
-    { id: 2, name: "SOAP NOTE VIRTUAL", isNew: true },
+    { 
+      id: 1, 
+      name: "SOAP NOTE", 
+      isNew: false,
+      templateCount: 12,
+      description: "Subjective, Objective, Assessment, Plan documentation"
+    },
+    { 
+      id: 2, 
+      name: "CONSULTATION NOTE", 
+      isNew: true,
+      templateCount: 8,
+      description: "Specialist consultation documentation"
+    },
+    { 
+      id: 3, 
+      name: "PROCEDURE NOTE", 
+      isNew: false,
+      templateCount: 15,
+      description: "Medical procedure documentation"
+    },
+    { 
+      id: 4, 
+      name: "H&P", 
+      isNew: false,
+      templateCount: 6,
+      description: "History and Physical examination"
+    }
   ]);
 
   const [templates, setTemplates] = useState<TemplateData[]>([
     {
       id: 1,
-      title: "General Consultation",
-      specialty: "General Medicine",
-      type: "Standard",
+      title: "Cardiology Consultation",
+      specialty: "Cardiology",
+      type: "Consultation",
       fields: [],
-      content: templateService.generateTemplateContent('SOAP Note')
+      content: templateService.generateTemplateContent('Consultation Note'),
+      lastUsed: "2 days ago",
+      usageCount: 45,
+      isFavorite: true,
+      createdBy: "Dr. Smith",
+      tags: ["Cardiac", "Consultation", "New Patient"]
     },
     {
       id: 2,
-      title: "Follow-up Visit",
+      title: "General Medicine SOAP",
       specialty: "General Medicine",
-      type: "Follow-up",
+      type: "SOAP",
       fields: [],
-      content: templateService.generateTemplateContent('Progress Note')
-    }
-  ]);
-
-  // Enhanced library templates using templateService
-  const libraryTemplates: LibraryTemplate[] = [
-    {
-      id: 1,
-      name: "Cardiology Consultation",
-      specialty: "cardiologist",
-      noteType: "Consultation Note",
-      content: templateService.generateTemplateContent('Consultation Note', {
-        reason: 'Cardiac evaluation',
-        examination: 'Cardiovascular system examination',
-        impression: 'Cardiac assessment findings',
-        recommendations: 'Cardiology-specific recommendations'
-      })
-    },
-    {
-      id: 2,
-      name: "Psychology Assessment",
-      specialty: "psychologist",
-      noteType: "SOAP Note",
-      content: templateService.generateTemplateContent('SOAP Note', {
-        chief_complaint: 'Mental health concerns',
-        history_of_present_illness: 'Psychological history',
-        physical_examination: 'Mental status examination',
-        assessment: 'Psychological assessment',
-        plan: 'Treatment plan and recommendations'
-      })
+      content: templateService.generateTemplateContent('SOAP Note'),
+      lastUsed: "1 day ago",
+      usageCount: 89,
+      isFavorite: false,
+      createdBy: "Dr. Johnson",
+      tags: ["Primary Care", "Routine", "Follow-up"]
     },
     {
       id: 3,
-      name: "Dermatology Exam",
+      title: "Dermatology Exam",
       specialty: "Dermatology",
-      noteType: "SOAP Note",
-      content: templateService.generateTemplateContent('SOAP Note', {
-        chief_complaint: 'Skin concerns',
-        physical_examination: 'Dermatological examination',
-        assessment: 'Dermatologic diagnosis',
-        plan: 'Treatment recommendations'
-      })
+      type: "SOAP",
+      fields: [],
+      content: templateService.generateTemplateContent('SOAP Note'),
+      lastUsed: "5 days ago",
+      usageCount: 23,
+      isFavorite: true,
+      createdBy: "Dr. Davis",
+      tags: ["Dermatology", "Skin", "Annual Exam"]
+    },
+    {
+      id: 4,
+      title: "Emergency Department Note",
+      specialty: "Emergency Medicine",
+      type: "SOAP",
+      fields: [],
+      content: templateService.generateTemplateContent('SOAP Note'),
+      lastUsed: "3 hours ago",
+      usageCount: 156,
+      isFavorite: false,
+      createdBy: "Dr. Wilson",
+      tags: ["Emergency", "Urgent Care", "Triage"]
     }
-  ];
-
-  // Initialize template service with library templates
-  useEffect(() => {
-    const initTemplates = libraryTemplates.map(template => ({
-      title: template.noteType,
-      sections: templateService.getEhrFieldMappings(template.noteType)?.ehrFields.map(field => ({
-        name: field,
-        type: 'text'
-      })) || []
-    }));
-    templateService.registerLibraryTemplates(initTemplates);
-  }, []);
+  ]);
 
   // Event handlers
   const handleConsultTypeSelect = (consultType: ConsultType) => {
     setSelectedConsultType(consultType);
     setCurrentScreen('templates');
+    setCurrentPage(1); // Reset pagination
   };
 
   const handleTemplateEdit = (template: TemplateData) => {
     setEditingTemplate(template);
     setCurrentScreen('templateEditor');
     
-    // Convert template content to sections for the editor
     const defaultSections: TemplateItem[] = [
       {
         id: 'section-1',
@@ -255,54 +220,55 @@ const TemplateBuilder: React.FC = () => {
   const handleBackToConsultTypes = () => {
     setCurrentScreen('consultTypes');
     setSelectedConsultType(null);
+    setCurrentPage(1);
   };
 
   const handleBackToTemplates = () => {
     setCurrentScreen('templates');
-    setOpenModifyTemplate(false);
-    setShowTemplate(false);
     setViewingTemplate(null);
     setEditingTemplate(null);
   };
 
   const handleCreateTemplateFromDialog = (templateData: any) => {
-    // Enhanced template creation with template service
-    let content = templateData.content;
+    setIsLoading(true);
     
-    // If template type is specified, generate structured content
-    if (templateData.templateType) {
-      content = templateService.generateTemplateContent(templateData.templateType, templateData.customFields);
-    }
-    
-    const newTemplate: TemplateData = {
-      id: templates.length + 1,
-      title: templateData.name,
-      specialty: selectedConsultType?.name || 'General',
-      type: templateData.templateType || 'Custom',
-      fields: templateData.ehrFields || [],
-      content: content || 'New template content'
-    };
-    
-    setTemplates(prev => [...prev, newTemplate]);
-    
-    // Register the new template type if it's custom
-    if (templateData.templateType && !templateService.getEhrFieldMappings(templateData.templateType)) {
-      templateService.addCustomTemplateMapping(
-        templateData.templateType,
-        templateData.ehrFields || ['Content'],
-        templateData.workflowSteps
-      );
-    }
-    
-    console.log('Created new template with template service integration:', templateData);
+    // Simulate creation delay
+    setTimeout(() => {
+      let content = templateData.content;
+      
+      if (templateData.templateType) {
+        content = templateService.generateTemplateContent(templateData.templateType, templateData.customFields);
+      }
+      
+      const newTemplate: TemplateData = {
+        id: templates.length + 1,
+        title: templateData.name,
+        specialty: templateData.specialty || selectedConsultType?.name || 'General',
+        type: templateData.templateType || 'Custom',
+        fields: templateData.ehrFields || [],
+        content: content || 'New template content',
+        lastUsed: 'Just created',
+        usageCount: 0,
+        isFavorite: false,
+        createdBy: 'Current User',
+        tags: templateData.tags || []
+      };
+      
+      setTemplates(prev => [...prev, newTemplate]);
+      setIsLoading(false);
+      
+      console.log('Created new template:', templateData);
+    }, 1500);
   };
 
   const handleAddType = () => {
     if (newTypeName.trim()) {
       const newType: ConsultType = {
         id: consultTypes.length + 1,
-        name: newTypeName.trim(),
-        isNew: true
+        name: newTypeName.trim().toUpperCase(),
+        isNew: true,
+        templateCount: 0,
+        description: `Custom ${newTypeName.trim()} documentation type`
       };
       setConsultTypes([...consultTypes, newType]);
       setNewTypeName('');
@@ -316,34 +282,95 @@ const TemplateBuilder: React.FC = () => {
     handleBackToTemplates();
   };
 
-  const handleLibraryTemplatePreview = (template: LibraryTemplate) => {
-    setPreviewTemplate(template);
-    setOpenPreview(true);
+  const handleToggleFavorite = (template: TemplateData) => {
+    setTemplates(prev => 
+      prev.map(t => 
+        t.id === template.id 
+          ? { ...t, isFavorite: !t.isFavorite }
+          : t
+      )
+    );
   };
 
-  const handleImportToMyTemplates = () => {
-    if (previewTemplate) {
-      setOpenPreview(false);
-      setOpenImportConfirm(true);
+  const handleCopyTemplate = (template: TemplateData) => {
+    const copiedTemplate: TemplateData = {
+      ...template,
+      id: templates.length + 1,
+      title: `${template.title} (Copy)`,
+      lastUsed: 'Just created',
+      usageCount: 0,
+      isFavorite: false
+    };
+    setTemplates(prev => [...prev, copiedTemplate]);
+  };
+
+  // Filter and search logic
+  const filteredTemplates = templates.filter(template => {
+    const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         template.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesSpecialty = selectedSpecialty === 'All Specialties' || template.specialty === selectedSpecialty;
+    const matchesType = selectedType === 'All Types' || template.type === selectedType;
+    const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => template.tags?.includes(tag));
+    const matchesViewMode = viewMode === 'all' || 
+                           (viewMode === 'favorites' && template.isFavorite) ||
+                           (viewMode === 'recent' && template.lastUsed?.includes('day') || template.lastUsed?.includes('hour'));
+
+    return matchesSearch && matchesSpecialty && matchesType && matchesTags && matchesViewMode;
+  });
+
+  // Sorting logic
+  const sortedTemplates = [...filteredTemplates].sort((a, b) => {
+    switch (sortBy) {
+      case 'alphabetical':
+        return a.title.localeCompare(b.title);
+      case 'usage':
+        return (b.usageCount || 0) - (a.usageCount || 0);
+      case 'specialty':
+        return a.specialty.localeCompare(b.specialty);
+      case 'recent':
+      default:
+        // Simple recent sorting (in real app, would use actual dates)
+        return (b.usageCount || 0) - (a.usageCount || 0);
     }
+  });
+
+  // Pagination
+  const totalPages = Math.ceil(sortedTemplates.length / templatesPerPage);
+  const paginatedTemplates = sortedTemplates.slice(
+    (currentPage - 1) * templatesPerPage,
+    currentPage * templatesPerPage
+  );
+
+  const hasActiveFilters = searchTerm || 
+                          selectedSpecialty !== 'All Specialties' || 
+                          selectedType !== 'All Types' || 
+                          selectedTags.length > 0 ||
+                          viewMode !== 'all';
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setSelectedSpecialty('All Specialties');
+    setSelectedType('All Types');
+    setSelectedTags([]);
+    setViewMode('all');
+    setSortBy('recent');
+    setCurrentPage(1);
   };
 
-  const handleConfirmImport = () => {
-    if (previewTemplate && selectedImportType) {
-      console.log("Importing template to:", selectedImportType, previewTemplate);
-      setOpenImportConfirm(false);
-      setSelectedImportType('');
-      setPreviewTemplate(null);
-    }
-  };
-
-  // Render Consult Types Screen
+  // Render Consult Types Screen with enhanced design
   const renderConsultTypes = () => (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
-        <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-          Consult Type List
-        </Typography>
+        <Box>
+          <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 700, mb: 1 }}>
+            Template Categories
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Choose a documentation type to view and manage your templates
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -351,48 +378,66 @@ const TemplateBuilder: React.FC = () => {
           sx={{
             backgroundColor: bravoColors.secondary,
             color: 'white',
-            borderRadius: 2,
-            px: 3,
+            borderRadius: 3,
+            px: 4,
             py: 1.5,
             fontSize: '0.9rem',
             fontWeight: 600,
+            textTransform: 'none',
+            boxShadow: '0 4px 12px rgba(56, 126, 137, 0.3)',
             '&:hover': {
               backgroundColor: bravoColors.primaryFlat,
+              transform: 'translateY(-2px)',
+              boxShadow: '0 6px 20px rgba(56, 126, 137, 0.4)'
             }
           }}
         >
-          ADD TYPE
+          Add Category
         </Button>
       </Box>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
+        gap: 3 
+      }}>
         {consultTypes.map((consultType) => (
           <Card
             key={consultType.id}
             sx={{
-              borderRadius: 2,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              borderRadius: 4,
+              border: '1px solid',
+              borderColor: 'divider',
               cursor: 'pointer',
-              transition: 'all 0.2s ease-in-out',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              position: 'relative',
+              overflow: 'hidden',
               '&:hover': {
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-                transform: 'translateY(-2px)',
+                borderColor: bravoColors.primaryFlat,
+                boxShadow: '0 8px 25px rgba(20, 49, 81, 0.15)',
+                transform: 'translateY(-4px)',
               },
             }}
             onClick={() => handleConsultTypeSelect(consultType)}
           >
-            <CardContent sx={{ py: 3 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Typography
-                  variant="h5"
-                  sx={{
-                    color: bravoColors.primaryFlat,
-                    fontWeight: 600,
-                    fontSize: '1.2rem'
-                  }}
-                >
-                  {consultType.name}
-                </Typography>
+            <CardContent sx={{ p: 4 }}>
+              <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={2}>
+                <Box>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: bravoColors.primaryFlat,
+                      fontWeight: 700,
+                      fontSize: '1.3rem',
+                      mb: 1
+                    }}
+                  >
+                    {consultType.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {consultType.description}
+                  </Typography>
+                </Box>
                 {consultType.isNew && (
                   <Chip
                     label="New"
@@ -406,6 +451,19 @@ const TemplateBuilder: React.FC = () => {
                   />
                 )}
               </Box>
+              
+              <Box display="flex" alignItems="center" gap={2}>
+                <Chip
+                  icon={<AssignmentIcon />}
+                  label={`${consultType.templateCount} templates`}
+                  size="small"
+                  variant="outlined"
+                  sx={{
+                    borderColor: bravoColors.secondary,
+                    color: bravoColors.secondary
+                  }}
+                />
+              </Box>
             </CardContent>
           </Card>
         ))}
@@ -413,115 +471,221 @@ const TemplateBuilder: React.FC = () => {
     </Box>
   );
 
-  // Render Templates Screen
+  // Render Templates Screen with enhanced filters and cards
   const renderTemplates = () => (
     <Box>
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
-        <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-          {selectedConsultType?.name}
-        </Typography>
-        <Box display="flex" gap={2}>
-          <Button
-            variant="contained"
-            startIcon={<ArrowBackIcon />}
-            onClick={handleBackToConsultTypes}
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat,
-              }
-            }}
-          >
-            BACK
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenCreateTemplate(true)}
-            sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontSize: '0.9rem',
-              fontWeight: 600,
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat,
-              }
-            }}
-          >
-            ADD TEMPLATE
-          </Button>
+      <Box display="flex" alignItems="center" justifyContent="between" mb={4}>
+        <Box sx={{ flex: 1 }}>
+          <Box display="flex" alignItems="center" gap={2} mb={2}>
+            <IconButton 
+              onClick={handleBackToConsultTypes}
+              sx={{ 
+                backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+                '&:hover': { backgroundColor: alpha(bravoColors.primaryFlat, 0.2) }
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 700 }}>
+              {selectedConsultType?.name} Templates
+            </Typography>
+          </Box>
+          <Typography variant="body1" color="text.secondary">
+            Manage your {selectedConsultType?.name.toLowerCase()} documentation templates
+          </Typography>
         </Box>
+        
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => setOpenCreateTemplate(true)}
+          sx={{
+            backgroundColor: bravoColors.secondary,
+            color: 'white',
+            borderRadius: 3,
+            px: 4,
+            py: 1.5,
+            fontSize: '0.9rem',
+            fontWeight: 600,
+            textTransform: 'none',
+            boxShadow: '0 4px 12px rgba(56, 126, 137, 0.3)',
+            '&:hover': {
+              backgroundColor: bravoColors.primaryFlat,
+              transform: 'translateY(-2px)',
+              boxShadow: '0 6px 20px rgba(56, 126, 137, 0.4)'
+            }
+          }}
+        >
+          Create Template
+        </Button>
       </Box>
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {templates.map((template) => (
-          <Card
-            key={template.id}
-            sx={{
-              borderRadius: 2,
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.15)',
-              },
-            }}
-          >
-            <CardContent sx={{ py: 3 }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: bravoColors.primaryFlat,
-                      fontWeight: 500,
-                      fontSize: '1.1rem',
-                      mb: 1
-                    }}
-                  >
-                    {template.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Specialty: {template.specialty} • Type: {template.type}
-                  </Typography>
-                </Box>
-                <Box display="flex" gap={1}>
-                  <IconButton
-                    onClick={() => handleTemplateView(template)}
-                    sx={{
-                      color: bravoColors.secondary,
-                      '&:hover': {
-                        backgroundColor: bravoColors.highlight?.hover || '#f0f0f0',
-                      }
-                    }}
-                  >
-                    <VisibilityIcon />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleTemplateEdit(template)}
-                    sx={{
-                      color: bravoColors.primaryFlat,
-                      '&:hover': {
-                        backgroundColor: bravoColors.highlight?.hover || '#f0f0f0',
-                      }
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                </Box>
+      {/* Template Statistics */}
+      <Box sx={{ mb: 4 }}>
+        <Stack direction="row" spacing={3}>
+          <Card sx={{ p: 2, borderRadius: 2, minWidth: 140 }}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <AssignmentIcon sx={{ color: bravoColors.primaryFlat }} />
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {sortedTemplates.length}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Total Templates
+                </Typography>
               </Box>
-            </CardContent>
+            </Box>
           </Card>
-        ))}
+          
+          <Card sx={{ p: 2, borderRadius: 2, minWidth: 140 }}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <TrendingUpIcon sx={{ color: bravoColors.secondary }} />
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {sortedTemplates.filter(t => t.isFavorite).length}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Favorites
+                </Typography>
+              </Box>
+            </Box>
+          </Card>
+
+          <Card sx={{ p: 2, borderRadius: 2, minWidth: 140 }}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <ScheduleIcon sx={{ color: bravoColors.tertiary }} />
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {sortedTemplates.filter(t => t.lastUsed?.includes('day') || t.lastUsed?.includes('hour')).length}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Recently Used
+                </Typography>
+              </Box>
+            </Box>
+          </Card>
+        </Stack>
       </Box>
+
+      {/* Filters */}
+      <TemplateFilters
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        selectedSpecialty={selectedSpecialty}
+        onSpecialtyChange={setSelectedSpecialty}
+        selectedType={selectedType}
+        onTypeChange={setSelectedType}
+        selectedTags={selectedTags}
+        onTagsChange={setSelectedTags}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        onClearFilters={handleClearFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
+
+      {/* Results Summary */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="body2" color="text.secondary">
+          Showing {paginatedTemplates.length} of {filteredTemplates.length} templates
+          {hasActiveFilters && ' (filtered)'}
+        </Typography>
+      </Box>
+
+      {/* Template Grid */}
+      {isLoading ? (
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+          gap: 3 
+        }}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Card key={index} sx={{ borderRadius: 3 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Skeleton variant="text" height={32} sx={{ mb: 1 }} />
+                <Skeleton variant="text" height={20} sx={{ mb: 2 }} />
+                <Skeleton variant="rectangular" height={80} sx={{ mb: 2 }} />
+                <Box display="flex" gap={1}>
+                  <Skeleton variant="rectangular" width={80} height={32} />
+                  <Skeleton variant="rectangular" width={80} height={32} />
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+      ) : paginatedTemplates.length > 0 ? (
+        <>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
+            gap: 3,
+            mb: 4
+          }}>
+            {paginatedTemplates.map((template) => (
+              <TemplateCard
+                key={template.id}
+                template={template}
+                onView={handleTemplateView}
+                onEdit={handleTemplateEdit}
+                onCopy={handleCopyTemplate}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            ))}
+          </Box>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Box display="flex" justifyContent="center" mt={4}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={(_, page) => setCurrentPage(page)}
+                size="large"
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    borderRadius: 2,
+                    fontWeight: 600
+                  },
+                  '& .Mui-selected': {
+                    backgroundColor: bravoColors.primaryFlat,
+                    color: 'white'
+                  }
+                }}
+              />
+            </Box>
+          )}
+        </>
+      ) : (
+        <Card sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
+          <Typography variant="h6" gutterBottom color="text.secondary">
+            No templates found
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            {hasActiveFilters 
+              ? 'Try adjusting your filters or search terms'
+              : 'Create your first template to get started'
+            }
+          </Typography>
+          {hasActiveFilters ? (
+            <Button 
+              variant="outlined" 
+              onClick={handleClearFilters}
+              sx={{ borderRadius: 2 }}
+            >
+              Clear Filters
+            </Button>
+          ) : (
+            <Button 
+              variant="contained" 
+              onClick={() => setOpenCreateTemplate(true)}
+              sx={{ borderRadius: 2 }}
+            >
+              Create Template
+            </Button>
+          )}
+        </Card>
+      )}
     </Box>
   );
 
@@ -577,174 +741,6 @@ const TemplateBuilder: React.FC = () => {
     </Box>
   );
 
-  // Render Template Library Tab
-  const renderTemplateLibrary = () => (
-    <Box>
-      <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600, mb: 4 }}>
-        Template Library
-      </Typography>
-      
-      {/* Template Service Info */}
-      <Card sx={{ mb: 3, p: 2, backgroundColor: bravoColors.background?.light || '#f8f9fa' }}>
-        <Typography variant="h6" gutterBottom>
-          Available Template Types
-        </Typography>
-        <Box display="flex" gap={1} flexWrap="wrap">
-          {templateService.getTemplateTypes().map((type) => (
-            <Chip 
-              key={type}
-              label={type}
-              variant="outlined"
-              size="small"
-              sx={{ 
-                borderColor: bravoColors.primaryFlat,
-                color: bravoColors.primaryFlat
-              }}
-            />
-          ))}
-        </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Total workflow steps available: {templateService.getAllWorkflowSteps().length}
-        </Typography>
-      </Card>
-      
-      <Box display="flex" gap={2} mb={3}>
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Specialty</InputLabel>
-          <Select
-            value={libraryFilters.specialty}
-            label="Specialty"
-            onChange={(e) => setLibraryFilters(prev => ({ ...prev, specialty: e.target.value }))}
-          >
-            <MenuItem value="">All</MenuItem>
-            <MenuItem value="cardiologist">Cardiologist</MenuItem>
-            <MenuItem value="psychologist">Psychologist</MenuItem>
-            <MenuItem value="Dermatology">Dermatology</MenuItem>
-          </Select>
-        </FormControl>
-        
-        <FormControl size="small" sx={{ minWidth: 120 }}>
-          <InputLabel>Template Type</InputLabel>
-          <Select
-            value={libraryFilters.noteType}
-            label="Template Type"
-            onChange={(e) => setLibraryFilters(prev => ({ ...prev, noteType: e.target.value }))}
-          >
-            <MenuItem value="">All</MenuItem>
-            {templateService.getTemplateTypes().map((type) => (
-              <MenuItem key={type} value={type}>{type}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: 3
-        }}
-      >
-        {libraryTemplates
-          .filter(template => {
-            const specialtyMatch = !libraryFilters.specialty || template.specialty === libraryFilters.specialty;
-            const noteTypeMatch = !libraryFilters.noteType || template.noteType === libraryFilters.noteType;
-            return specialtyMatch && noteTypeMatch;
-          })
-          .map((template) => {
-            const mapping = templateService.getEhrFieldMappings(template.noteType || '');
-            return (
-              <Card
-                key={template.id}
-                sx={{
-                  borderRadius: 2,
-                  border: '1px solid #e0e0e0',
-                  overflow: 'hidden',
-                  '&:hover': {
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    borderColor: bravoColors.secondary
-                  }
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: bravoColors.text?.primary || '#000' }}>
-                    {template.name}
-                  </Typography>
-                  
-                  <Box display="flex" gap={1} mb={2} flexWrap="wrap">
-                    <Chip 
-                      label={`Specialty: ${template.specialty}`} 
-                      size="small" 
-                      sx={{ 
-                        backgroundColor: bravoColors.primaryFlat, 
-                        color: 'white',
-                        fontSize: '0.75rem'
-                      }} 
-                    />
-                    <Chip 
-                      label={`Type: ${template.noteType}`} 
-                      size="small" 
-                      sx={{ 
-                        backgroundColor: bravoColors.secondary, 
-                        color: 'white',
-                        fontSize: '0.75rem'
-                      }} 
-                    />
-                  </Box>
-
-                  {mapping && (
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        EHR Fields: {mapping.ehrFields.length}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Workflow Steps: {mapping.workflowSteps.length}
-                      </Typography>
-                    </Box>
-                  )}
-                  
-                  <Box display="flex" gap={1} mt={3}>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => handleLibraryTemplatePreview(template)}
-                      sx={{
-                        borderColor: bravoColors.secondary,
-                        color: bravoColors.secondary,
-                        '&:hover': {
-                          borderColor: bravoColors.primaryFlat,
-                          backgroundColor: bravoColors.background?.light || '#f0f0f0'
-                        }
-                      }}
-                    >
-                      Preview
-                    </Button>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={() => {
-                        setPreviewTemplate(template);
-                        setOpenImportConfirm(true);
-                      }}
-                      sx={{
-                        backgroundColor: bravoColors.primaryFlat,
-                        color: 'white',
-                        '&:hover': {
-                          backgroundColor: bravoColors.secondary
-                        }
-                      }}
-                    >
-                      Import
-                    </Button>
-                  </Box>
-                </CardContent>
-              </Card>
-            );
-          })}
-      </Box>
-    </Box>
-  );
-
   // Main render logic for My Templates tab
   const renderMyTemplatesContent = () => {
     if (currentScreen === 'templateEditor' && editingTemplate) {
@@ -782,9 +778,9 @@ const TemplateBuilder: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
+    <Box sx={{ p: { xs: 2, md: 4 } }}>
       {/* Tab Navigation */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
         <Tabs 
           value={currentTab} 
           onChange={(event, newValue) => setCurrentTab(newValue)}
@@ -792,8 +788,10 @@ const TemplateBuilder: React.FC = () => {
             '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 600,
-              fontSize: '1rem',
+              fontSize: '1.1rem',
               color: bravoColors.text?.secondary || '#666',
+              px: 4,
+              py: 2,
               '&.Mui-selected': {
                 color: bravoColors.primaryFlat,
               }
@@ -801,6 +799,7 @@ const TemplateBuilder: React.FC = () => {
             '& .MuiTabs-indicator': {
               backgroundColor: bravoColors.primaryFlat,
               height: 3,
+              borderRadius: 2
             }
           }}
         >
@@ -811,10 +810,14 @@ const TemplateBuilder: React.FC = () => {
 
       {/* Tab Content */}
       {currentTab === 0 && renderMyTemplatesContent()}
-      {currentTab === 1 && renderTemplateLibrary()}
+      {currentTab === 1 && (
+        <Alert severity="info" sx={{ textAlign: 'center' }}>
+          Template Library functionality will be implemented here
+        </Alert>
+      )}
 
-      {/* Template Creation Dialog */}
-      <TemplateCreationDialog
+      {/* Enhanced Template Creation Dialog */}
+      <ImprovedTemplateCreationDialog
         open={openCreateTemplate}
         onClose={() => setOpenCreateTemplate(false)}
         onCreateTemplate={handleCreateTemplateFromDialog}
@@ -822,101 +825,22 @@ const TemplateBuilder: React.FC = () => {
 
       {/* Add Consult Type Dialog */}
       <Dialog open={openAddType} onClose={() => setOpenAddType(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Consult Type</DialogTitle>
+        <DialogTitle>Add New Template Category</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Consult Type Name"
+            label="Category Name"
             fullWidth
             variant="outlined"
             value={newTypeName}
             onChange={(e) => setNewTypeName(e.target.value)}
+            placeholder="e.g., Progress Note, Discharge Summary"
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenAddType(false)}>Cancel</Button>
-          <Button onClick={handleAddType} variant="contained">Add</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Template Preview Dialog */}
-      <Dialog open={openPreview} onClose={() => setOpenPreview(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h6">{previewTemplate?.name}</Typography>
-            <Box>
-              <Tabs value={previewType === 'template' ? 0 : 1} onChange={(e, v) => setPreviewType(v === 0 ? 'template' : 'sample')}>
-                <Tab label="Template" />
-                <Tab label="Sample Note" />
-              </Tabs>
-            </Box>
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ 
-            p: 3, 
-            border: '1px solid #e0e0e0', 
-            borderRadius: 1, 
-            backgroundColor: '#f8f9fa',
-            minHeight: 300
-          }}>
-            <Typography variant="body2" sx={{ whiteSpace: 'pre-line', fontFamily: 'monospace' }}>
-              {previewType === 'template' 
-                ? previewTemplate?.content || 'No template content available'
-                : 'Sample clinical note would appear here based on the template structure...'}
-            </Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenPreview(false)}>Close</Button>
-          <Button onClick={handleImportToMyTemplates} variant="contained">
-            Import to My Templates
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Enhanced Import Confirmation Dialog */}
-      <Dialog open={openImportConfirm} onClose={() => setOpenImportConfirm(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Import Template</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Where would you like to import "{previewTemplate?.name}"?
-          </Typography>
-          
-          {previewTemplate?.noteType && (
-            <Box sx={{ mb: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Template Type: {previewTemplate.noteType}
-              </Typography>
-              {templateService.getEhrFieldMappings(previewTemplate.noteType) && (
-                <Typography variant="body2" color="text.secondary">
-                  Will include: {templateService.getEhrFieldMappings(previewTemplate.noteType)?.ehrFields.join(', ')}
-                </Typography>
-              )}
-            </Box>
-          )}
-          
-          <FormControl fullWidth>
-            <InputLabel>Select Consult Type</InputLabel>
-            <Select
-              value={selectedImportType}
-              onChange={(e) => setSelectedImportType(e.target.value)}
-              label="Select Consult Type"
-            >
-              {consultTypes.map((type) => (
-                <MenuItem key={type.id} value={type.name}>
-                  {type.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenImportConfirm(false)}>Cancel</Button>
-          <Button onClick={handleConfirmImport} variant="contained" disabled={!selectedImportType}>
-            Import
-          </Button>
+          <Button onClick={handleAddType} variant="contained">Add Category</Button>
         </DialogActions>
       </Dialog>
     </Box>
