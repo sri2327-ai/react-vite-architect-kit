@@ -18,7 +18,17 @@ import {
   MenuItem,
   Chip,
   Stack,
-  Divider
+  Divider,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Collapse,
+  Paper,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -27,7 +37,20 @@ import {
   DragIndicator as DragIndicatorIcon,
   Save as SaveIcon,
   Close as CloseIcon,
-  ArrowBack as ArrowBackIcon
+  ArrowBack as ArrowBackIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
+  Psychology as PsychologyIcon,
+  LocalHospital as MedicalIcon,
+  LocalPharmacy as PharmacyIcon,
+  Warning as WarningIcon,
+  School as SchoolIcon,
+  Assignment as AssignmentIcon,
+  CheckCircle as CheckCircleIcon,
+  TextFields as TextFieldsIcon,
+  Title as TitleIcon,
+  List as ListIcon,
+  Help as HelpIcon
 } from '@mui/icons-material';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -39,8 +62,14 @@ interface TemplateSection {
   id: string;
   title: string;
   content: string;
-  type: 'text' | 'list' | 'checkbox' | 'dropdown';
+  type: 'text' | 'list' | 'checkbox' | 'dropdown' | 'exam_list' | 'paragraph' | 'section_header';
   options?: string[];
+  subsections?: Array<{
+    id: string;
+    title: string;
+    instruction?: string;
+  }>;
+  aiInstruction?: string;
 }
 
 interface TemplateEditorProps {
@@ -50,11 +79,140 @@ interface TemplateEditorProps {
   onBack: () => void;
 }
 
+const PREDEFINED_SECTIONS = [
+  {
+    id: 'past-psychiatric',
+    title: 'Past Psychiatric History',
+    description: "Patient's history of psychiatric conditions and treatments",
+    icon: <PsychologyIcon />,
+    type: 'paragraph' as const,
+    content: "Document the patient's history of psychiatric conditions and treatments"
+  },
+  {
+    id: 'medical-history',
+    title: 'Medical History',
+    description: "Patient's history of medical conditions",
+    icon: <MedicalIcon />,
+    type: 'paragraph' as const,
+    content: "Patient's history of medical conditions"
+  },
+  {
+    id: 'surgical-history',
+    title: 'Surgical History',
+    description: "Patient's history of surgical procedures",
+    icon: <MedicalIcon />,
+    type: 'paragraph' as const,
+    content: "Patient's history of surgical procedures"
+  },
+  {
+    id: 'current-medications',
+    title: 'Current Medications',
+    description: "List of patient's current medications",
+    icon: <PharmacyIcon />,
+    type: 'list' as const,
+    content: "List of patient's current medications"
+  },
+  {
+    id: 'allergies',
+    title: 'Allergies',
+    description: "Patient's allergies to medications, foods, or other substances",
+    icon: <WarningIcon />,
+    type: 'list' as const,
+    content: "Patient's allergies to medications, foods, or other substances"
+  },
+  {
+    id: 'substance-use',
+    title: 'Substance Use History',
+    description: "Patient's history of substance use",
+    icon: <WarningIcon />,
+    type: 'paragraph' as const,
+    content: "Patient's history of substance use"
+  },
+  {
+    id: 'treatment-history',
+    title: 'Treatment History',
+    description: "Patient's history of substance use treatment",
+    icon: <MedicalIcon />,
+    type: 'paragraph' as const,
+    content: "Patient's history of substance use treatment"
+  },
+  {
+    id: 'family-history',
+    title: 'Family History',
+    description: "Patient's family psychiatric history",
+    icon: <PsychologyIcon />,
+    type: 'paragraph' as const,
+    content: "Patient's family psychiatric history"
+  },
+  {
+    id: 'plan',
+    title: 'Plan',
+    description: 'Comprehensive treatment plan with interventions',
+    icon: <AssignmentIcon />,
+    type: 'paragraph' as const,
+    content: 'Comprehensive treatment plan with interventions'
+  },
+  {
+    id: 'developmental-history',
+    title: 'Developmental History',
+    description: "Patient's developmental history and milestones",
+    icon: <SchoolIcon />,
+    type: 'paragraph' as const,
+    content: "Patient's developmental history and milestones"
+  },
+  {
+    id: 'academic-history',
+    title: 'Academic History',
+    description: "Patient's academic performance and school history",
+    icon: <SchoolIcon />,
+    type: 'paragraph' as const,
+    content: "Patient's academic performance and school history"
+  },
+  {
+    id: 'todo-next-steps',
+    title: 'To-do and Next Steps',
+    description: 'Action items for provider and patient before next visit',
+    icon: <CheckCircleIcon />,
+    type: 'list' as const,
+    content: 'Action items for provider and patient before next visit'
+  }
+];
+
+const CUSTOM_SECTION_TYPES = [
+  {
+    id: 'paragraph',
+    title: 'Paragraph',
+    description: 'Add a paragraph for general note-taking or documentation.',
+    icon: <TextFieldsIcon />
+  },
+  {
+    id: 'section_header',
+    title: 'Section Header',
+    description: 'Insert a section header to organize and separate content.',
+    icon: <TitleIcon />
+  },
+  {
+    id: 'exam_list',
+    title: 'Exam List',
+    description: 'Use this for structured lists of exam observations or findings.',
+    icon: <ListIcon />
+  },
+  {
+    id: 'list',
+    title: 'Bullet List',
+    description: 'Create a bullet list for multiple items.',
+    icon: <ListIcon />
+  }
+];
+
 const SortableSection: React.FC<{
   section: TemplateSection;
   onEdit: (section: TemplateSection) => void;
   onDelete: (id: string) => void;
-}> = ({ section, onEdit, onDelete }) => {
+  onEditAI: (section: TemplateSection) => void;
+}> = ({ section, onEdit, onDelete, onEditAI }) => {
+  const [expanded, setExpanded] = useState(false);
+  
   const {
     attributes,
     listeners,
@@ -78,10 +236,7 @@ const SortableSection: React.FC<{
         mb: 2,
         border: '1px solid #e0e0e0',
         borderRadius: 2,
-        cursor: 'pointer',
-        '&:hover': {
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-        }
+        overflow: 'visible'
       }}
     >
       <CardContent sx={{ p: 3 }}>
@@ -102,18 +257,9 @@ const SortableSection: React.FC<{
           <Box flex={1}>
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
               <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.text.primary }}>
-                {section.title}
+                {section.title} - {section.type.replace('_', ' ')}
               </Typography>
               <Box display="flex" gap={1}>
-                <Chip 
-                  label={section.type.toUpperCase()} 
-                  size="small"
-                  sx={{ 
-                    backgroundColor: bravoColors.primaryFlat,
-                    color: 'white',
-                    fontSize: '0.75rem'
-                  }}
-                />
                 <IconButton size="small" onClick={() => onEdit(section)}>
                   <EditIcon sx={{ fontSize: 20 }} />
                 </IconButton>
@@ -123,12 +269,27 @@ const SortableSection: React.FC<{
               </Box>
             </Box>
             
-            <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mb: 1 }}>
+            <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mb: 2 }}>
               {section.content}
             </Typography>
+
+            {section.type === 'exam_list' && section.subsections && (
+              <Box mb={2}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  Exam Sections:
+                </Typography>
+                {section.subsections.map((subsection, index) => (
+                  <Box key={subsection.id} display="flex" alignItems="center" mb={0.5}>
+                    <Typography variant="body2" sx={{ color: bravoColors.text.primary }}>
+                      • {subsection.title}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
             
             {section.options && section.options.length > 0 && (
-              <Box display="flex" flexWrap="wrap" gap={0.5} mt={1}>
+              <Box display="flex" flexWrap="wrap" gap={0.5} mb={2}>
                 {section.options.map((option, index) => (
                   <Chip
                     key={index}
@@ -140,6 +301,39 @@ const SortableSection: React.FC<{
                 ))}
               </Box>
             )}
+
+            <Box display="flex" gap={1}>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<EditIcon />}
+                onClick={() => onEditAI(section)}
+                sx={{
+                  backgroundColor: bravoColors.secondary,
+                  color: 'white',
+                  fontSize: '0.75rem',
+                  textTransform: 'uppercase',
+                  '&:hover': {
+                    backgroundColor: bravoColors.primaryFlat
+                  }
+                }}
+              >
+                Edit Instruction for A.I
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<HelpIcon />}
+                sx={{
+                  borderColor: bravoColors.secondary,
+                  color: bravoColors.secondary,
+                  fontSize: '0.75rem',
+                  textTransform: 'uppercase'
+                }}
+              >
+                Help Me
+              </Button>
+            </Box>
           </Box>
         </Box>
       </CardContent>
@@ -155,12 +349,29 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
 }) => {
   const [sections, setSections] = useState<TemplateSection[]>(initialSections);
   const [openAddSection, setOpenAddSection] = useState(false);
+  const [openCustomSection, setOpenCustomSection] = useState(false);
+  const [openExamListEditor, setOpenExamListEditor] = useState(false);
+  const [openAIInstructionEditor, setOpenAIInstructionEditor] = useState(false);
   const [editingSection, setEditingSection] = useState<TemplateSection | null>(null);
-  const [sectionForm, setSectionForm] = useState({
+  const [selectedPredefinedSection, setSelectedPredefinedSection] = useState<any>(null);
+  const [customSectionForm, setCustomSectionForm] = useState({
     title: '',
-    content: '',
-    type: 'text' as 'text' | 'list' | 'checkbox' | 'dropdown',
-    options: ['']
+    description: '',
+    type: 'paragraph' as const
+  });
+  const [examListForm, setExamListForm] = useState({
+    title: '',
+    subsections: [
+      { id: '1', title: 'Past Psychiatric Diagnoses' },
+      { id: '2', title: 'Psychiatric Hospitalizations' },
+      { id: '3', title: 'Suicide Attempts' },
+      { id: '4', title: 'Self-Injurious Behavior' },
+      { id: '5', title: 'Psychiatric Medication Trials' },
+      { id: '6', title: 'Previous mental health treatment' }
+    ]
+  });
+  const [aiInstructionForm, setAIInstructionForm] = useState({
+    instruction: ''
   });
 
   const sensors = useSensors(
@@ -183,125 +394,164 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     }
   };
 
-  const handleAddSection = () => {
-    setEditingSection(null);
-    setSectionForm({
+  const handleAddPredefinedSection = (predefinedSection: any) => {
+    const newSection: TemplateSection = {
+      id: `section-${Date.now()}`,
+      title: predefinedSection.title,
+      content: predefinedSection.content,
+      type: predefinedSection.type,
+      options: predefinedSection.type === 'list' ? [''] : undefined
+    };
+
+    setSections(prev => [...prev, newSection]);
+    setOpenAddSection(false);
+  };
+
+  const handleCreateCustomSection = () => {
+    setOpenAddSection(false);
+    setOpenCustomSection(true);
+  };
+
+  const handleSaveCustomSection = () => {
+    if (customSectionForm.type === 'exam_list') {
+      setOpenCustomSection(false);
+      setOpenExamListEditor(true);
+      setExamListForm(prev => ({ ...prev, title: customSectionForm.title }));
+    } else {
+      const newSection: TemplateSection = {
+        id: `section-${Date.now()}`,
+        title: customSectionForm.title,
+        content: customSectionForm.description,
+        type: customSectionForm.type
+      };
+
+      setSections(prev => [...prev, newSection]);
+      setOpenCustomSection(false);
+      setCustomSectionForm({ title: '', description: '', type: 'paragraph' });
+    }
+  };
+
+  const handleSaveExamList = () => {
+    const newSection: TemplateSection = {
+      id: `section-${Date.now()}`,
+      title: examListForm.title,
+      content: 'A.I. will craft an examination list in a structured format, as instructed.',
+      type: 'exam_list',
+      subsections: examListForm.subsections
+    };
+
+    setSections(prev => [...prev, newSection]);
+    setOpenExamListEditor(false);
+    setExamListForm({
       title: '',
-      content: '',
-      type: 'text',
-      options: ['']
+      subsections: [
+        { id: '1', title: 'Past Psychiatric Diagnoses' },
+        { id: '2', title: 'Psychiatric Hospitalizations' },
+        { id: '3', title: 'Suicide Attempts' },
+        { id: '4', title: 'Self-Injurious Behavior' },
+        { id: '5', title: 'Psychiatric Medication Trials' },
+        { id: '6', title: 'Previous mental health treatment' }
+      ]
     });
-    setOpenAddSection(true);
   };
 
   const handleEditSection = (section: TemplateSection) => {
-    setEditingSection(section);
-    setSectionForm({
-      title: section.title,
-      content: section.content,
-      type: section.type,
-      options: section.options || ['']
-    });
-    setOpenAddSection(true);
+    // Handle different edit modes based on section type
+    console.log('Edit section:', section);
   };
 
   const handleDeleteSection = (id: string) => {
     setSections(prev => prev.filter(section => section.id !== id));
   };
 
-  const handleSaveSection = () => {
-    const newSection: TemplateSection = {
-      id: editingSection?.id || `section-${Date.now()}`,
-      title: sectionForm.title,
-      content: sectionForm.content,
-      type: sectionForm.type,
-      options: sectionForm.type !== 'text' ? sectionForm.options.filter(opt => opt.trim()) : undefined
-    };
+  const handleEditAI = (section: TemplateSection) => {
+    setEditingSection(section);
+    setAIInstructionForm({ instruction: section.aiInstruction || '' });
+    setOpenAIInstructionEditor(true);
+  };
 
+  const handleSaveAIInstruction = () => {
     if (editingSection) {
       setSections(prev => prev.map(section => 
-        section.id === editingSection.id ? newSection : section
+        section.id === editingSection.id 
+          ? { ...section, aiInstruction: aiInstructionForm.instruction }
+          : section
       ));
-    } else {
-      setSections(prev => [...prev, newSection]);
     }
-
-    setOpenAddSection(false);
+    setOpenAIInstructionEditor(false);
+    setEditingSection(null);
   };
 
-  const handleOptionChange = (index: number, value: string) => {
-    setSectionForm(prev => ({
+  const handleAddSubsection = () => {
+    setExamListForm(prev => ({
       ...prev,
-      options: prev.options.map((opt, i) => i === index ? value : opt)
+      subsections: [...prev.subsections, { id: Date.now().toString(), title: '' }]
     }));
   };
 
-  const handleAddOption = () => {
-    setSectionForm(prev => ({
+  const handleRemoveSubsection = (id: string) => {
+    setExamListForm(prev => ({
       ...prev,
-      options: [...prev.options, '']
+      subsections: prev.subsections.filter(sub => sub.id !== id)
     }));
   };
 
-  const handleRemoveOption = (index: number) => {
-    setSectionForm(prev => ({
+  const handleSubsectionChange = (id: string, title: string) => {
+    setExamListForm(prev => ({
       ...prev,
-      options: prev.options.filter((_, i) => i !== index)
+      subsections: prev.subsections.map(sub => 
+        sub.id === id ? { ...sub, title } : sub
+      )
     }));
   };
 
   return (
     <Box>
       {/* Header */}
-      <Box display="flex" alignItems="center" justifyContent="between" mb={4}>
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
         <Box display="flex" alignItems="center">
           <IconButton onClick={onBack} sx={{ mr: 2, color: bravoColors.primaryFlat }}>
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-            Editing: {templateName}
+            {templateName}
           </Typography>
         </Box>
         
         <Box display="flex" gap={2}>
           <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={handleAddSection}
-            sx={{
-              borderColor: bravoColors.secondary,
-              color: bravoColors.secondary,
-              borderRadius: 2,
-              '&:hover': {
-                borderColor: bravoColors.primaryFlat,
-                backgroundColor: bravoColors.background?.light
-              }
-            }}
-          >
-            ADD SECTION
-          </Button>
-          <Button
             variant="contained"
-            startIcon={<SaveIcon />}
-            onClick={() => onSave(sections)}
+            startIcon={<AddIcon />}
+            onClick={() => setOpenAddSection(true)}
             sx={{
               backgroundColor: bravoColors.secondary,
               color: 'white',
               borderRadius: 2,
+              textTransform: 'uppercase',
               '&:hover': {
                 backgroundColor: bravoColors.primaryFlat
               }
             }}
           >
-            SAVE TEMPLATE
+            Add Section
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => onSave(sections)}
+            sx={{
+              backgroundColor: bravoColors.primaryFlat,
+              color: 'white',
+              borderRadius: 2,
+              textTransform: 'uppercase'
+            }}
+          >
+            Save
           </Button>
         </Box>
       </Box>
 
-      {/* Instructions */}
-      <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mb: 4 }}>
-        Drag and drop sections to reorder them. Click the edit icon to modify a section or the delete icon to remove it.
-      </Typography>
+      {/* Progress Bar */}
+      <Box sx={{ backgroundColor: bravoColors.secondary, height: 4, borderRadius: 2, mb: 4 }} />
 
       {/* Sections List */}
       <DndContext
@@ -316,6 +566,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
               section={section}
               onEdit={handleEditSection}
               onDelete={handleDeleteSection}
+              onEditAI={handleEditAI}
             />
           ))}
         </SortableContext>
@@ -340,7 +591,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
           <Button
             variant="contained"
             startIcon={<AddIcon />}
-            onClick={handleAddSection}
+            onClick={() => setOpenAddSection(true)}
             sx={{
               backgroundColor: bravoColors.primaryFlat,
               color: 'white',
@@ -352,10 +603,88 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
         </Box>
       )}
 
-      {/* Add/Edit Section Dialog */}
+      {/* Add Section Dialog */}
       <Dialog
         open={openAddSection}
         onClose={() => setOpenAddSection(false)}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3, p: 2, height: '80vh' }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Add section
+            </Typography>
+            <IconButton onClick={() => setOpenAddSection(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Paper
+            sx={{
+              p: 3,
+              mb: 3,
+              border: '2px dashed #ccc',
+              borderRadius: 2,
+              textAlign: 'center',
+              cursor: 'pointer',
+              '&:hover': { borderColor: bravoColors.secondary }
+            }}
+            onClick={handleCreateCustomSection}
+          >
+            <Typography variant="body1" sx={{ color: bravoColors.text.secondary }}>
+              Can't find the section you need?{' '}
+              <Typography component="span" sx={{ color: bravoColors.secondary, fontWeight: 600 }}>
+                Click here to Create your own!
+              </Typography>
+            </Typography>
+          </Paper>
+
+          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+            Predefined Sections
+          </Typography>
+
+          <Grid container spacing={2}>
+            {PREDEFINED_SECTIONS.map((section) => (
+              <Grid item xs={12} md={4} key={section.id}>
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      transform: 'translateY(-2px)'
+                    }
+                  }}
+                  onClick={() => handleAddPredefinedSection(section)}
+                >
+                  <CardContent sx={{ p: 2 }}>
+                    <Box display="flex" alignItems="center" mb={1}>
+                      {section.icon}
+                      <Typography variant="subtitle1" sx={{ ml: 1, fontWeight: 600 }}>
+                        {section.title}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                      {section.description}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+      </Dialog>
+
+      {/* Custom Section Dialog */}
+      <Dialog
+        open={openCustomSection}
+        onClose={() => setOpenCustomSection(false)}
         maxWidth="md"
         fullWidth
         PaperProps={{
@@ -365,114 +694,262 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              {editingSection ? 'Edit Section' : 'Add New Section'}
+              Create Custom Section
             </Typography>
-            <IconButton onClick={() => setOpenAddSection(false)}>
+            <IconButton onClick={() => setOpenCustomSection(false)}>
               <CloseIcon />
             </IconButton>
           </Box>
         </DialogTitle>
         
         <DialogContent>
-          <Stack spacing={3} sx={{ mt: 2 }}>
-            <TextField
-              fullWidth
-              label="Section Title *"
-              value={sectionForm.title}
-              onChange={(e) => setSectionForm(prev => ({ ...prev, title: e.target.value }))}
-              variant="outlined"
-              size="small"
-            />
-            
-            <FormControl fullWidth size="small">
-              <InputLabel>Section Type</InputLabel>
-              <Select
-                value={sectionForm.type}
-                label="Section Type"
-                onChange={(e) => setSectionForm(prev => ({ 
-                  ...prev, 
-                  type: e.target.value as any,
-                  options: e.target.value === 'text' ? [] : ['']
-                }))}
+          <Paper sx={{ p: 3, mb: 3, backgroundColor: '#f8f9fa', border: '1px solid #e9ecef' }}>
+            <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+              Explain the type of content you want to generate.
+            </Typography>
+            <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+              Example: A comprehensive mental status exam with sections for appearance, behavior, mood, affect, and thought process
+            </Typography>
+          </Paper>
+
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            placeholder="Describe what you want"
+            value={customSectionForm.description}
+            onChange={(e) => setCustomSectionForm(prev => ({ ...prev, description: e.target.value }))}
+            variant="outlined"
+            sx={{ mb: 3 }}
+          />
+
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+            Define From Scratch
+          </Typography>
+
+          <Stack spacing={2}>
+            {CUSTOM_SECTION_TYPES.map((type) => (
+              <Paper
+                key={type.id}
+                sx={{
+                  p: 2,
+                  cursor: 'pointer',
+                  border: customSectionForm.type === type.id ? `2px solid ${bravoColors.secondary}` : '1px solid #e0e0e0',
+                  '&:hover': { borderColor: bravoColors.secondary }
+                }}
+                onClick={() => setCustomSectionForm(prev => ({ ...prev, type: type.id as any }))}
               >
-                <MenuItem value="text">Text Field</MenuItem>
-                <MenuItem value="list">Bullet List</MenuItem>
-                <MenuItem value="checkbox">Checkbox List</MenuItem>
-                <MenuItem value="dropdown">Dropdown Menu</MenuItem>
-              </Select>
-            </FormControl>
-            
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label="Section Content/Description"
-              value={sectionForm.content}
-              onChange={(e) => setSectionForm(prev => ({ ...prev, content: e.target.value }))}
-              variant="outlined"
-              size="small"
-              placeholder="Enter the content or instructions for this section..."
-            />
-            
-            {sectionForm.type !== 'text' && (
-              <Box>
-                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                  Options (for {sectionForm.type})
-                </Typography>
-                {sectionForm.options.map((option, index) => (
-                  <Box key={index} display="flex" gap={1} mb={1}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder={`Option ${index + 1}`}
-                      value={option}
-                      onChange={(e) => handleOptionChange(index, e.target.value)}
-                    />
-                    {sectionForm.options.length > 1 && (
-                      <IconButton onClick={() => handleRemoveOption(index)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    )}
+                <Box display="flex" alignItems="center">
+                  {type.icon}
+                  <Box ml={2}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                      {type.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                      {type.description}
+                    </Typography>
                   </Box>
-                ))}
-                <Button
-                  variant="outlined"
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddOption}
-                  sx={{ mt: 1 }}
-                >
-                  Add Option
-                </Button>
-              </Box>
-            )}
+                </Box>
+              </Paper>
+            ))}
           </Stack>
         </DialogContent>
         
         <DialogActions sx={{ p: 3 }}>
           <Button
-            onClick={() => setOpenAddSection(false)}
+            onClick={() => setOpenCustomSection(false)}
             variant="outlined"
+            sx={{ borderColor: bravoColors.secondary, color: bravoColors.secondary }}
+          >
+            BACK
+          </Button>
+          <Button
+            onClick={handleSaveCustomSection}
+            variant="contained"
+            disabled={!customSectionForm.description.trim()}
             sx={{
-              borderColor: bravoColors.secondary,
-              color: bravoColors.secondary
+              backgroundColor: bravoColors.secondary,
+              color: 'white',
+              '&:hover': { backgroundColor: bravoColors.primaryFlat }
             }}
+          >
+            GENERATE
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Exam List Editor Dialog */}
+      <Dialog
+        open={openExamListEditor}
+        onClose={() => setOpenExamListEditor(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3, p: 2 }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Add section Exam List
+            </Typography>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Typography variant="h6" sx={{ color: bravoColors.text.secondary }}>
+                How this works
+              </Typography>
+              <IconButton onClick={() => setOpenExamListEditor(false)}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Box display="flex" gap={4}>
+            <Box flex={1}>
+              <TextField
+                fullWidth
+                label="Title"
+                value={examListForm.title}
+                onChange={(e) => setExamListForm(prev => ({ ...prev, title: e.target.value }))}
+                variant="outlined"
+                size="small"
+                sx={{ mb: 3 }}
+              />
+
+              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+                What exam sections would you like A.I. to report on?
+              </Typography>
+
+              <Stack spacing={1}>
+                {examListForm.subsections.map((subsection, index) => (
+                  <Box key={subsection.id} display="flex" alignItems="center" gap={1}>
+                    <DeleteIcon sx={{ color: 'red', cursor: 'pointer' }} onClick={() => handleRemoveSubsection(subsection.id)} />
+                    <TextField
+                      fullWidth
+                      size="small"
+                      value={subsection.title}
+                      onChange={(e) => handleSubsectionChange(subsection.id, e.target.value)}
+                      variant="outlined"
+                    />
+                    <ExpandMoreIcon />
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+
+            <Box flex={1} sx={{ pl: 2, borderLeft: '1px solid #e0e0e0' }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                How this works
+              </Typography>
+              
+              <Box mb={3}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Review each subsection
+                </Typography>
+                <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                  An exam-list is a structured output, with each subsection as it's own instruction for A.I. You can add, remove, or edit sections.
+                </Typography>
+              </Box>
+
+              <Box mb={3}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Tell A.I what to focus on
+                </Typography>
+                <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                  For each section, you can tell A.I what to write for that subsection.
+                </Typography>
+              </Box>
+
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Decide Normal Limits Behavior
+                </Typography>
+                <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                  You can specify certain default "within normal limits" text, and decide when you want A.I to fall back to that text.
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3 }}>
+          <Button
+            onClick={() => setOpenExamListEditor(false)}
+            variant="outlined"
+            sx={{ borderColor: bravoColors.secondary, color: bravoColors.secondary }}
+          >
+            BACK
+          </Button>
+          <Button
+            onClick={handleSaveExamList}
+            variant="contained"
+            disabled={!examListForm.title.trim()}
+            sx={{
+              backgroundColor: bravoColors.secondary,
+              color: 'white',
+              '&:hover': { backgroundColor: bravoColors.primaryFlat }
+            }}
+          >
+            UPDATE
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* AI Instruction Editor Dialog */}
+      <Dialog
+        open={openAIInstructionEditor}
+        onClose={() => setOpenAIInstructionEditor(false)}
+        maxWidth="md"
+        fullWidth
+        PaperProps={{
+          sx: { borderRadius: 3, p: 2 }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Edit AI Instructions
+            </Typography>
+            <IconButton onClick={() => setOpenAIInstructionEditor(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Provide specific instructions for how AI should handle this section:
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={6}
+            placeholder="Enter detailed instructions for AI..."
+            value={aiInstructionForm.instruction}
+            onChange={(e) => setAIInstructionForm(prev => ({ ...prev, instruction: e.target.value }))}
+            variant="outlined"
+          />
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3 }}>
+          <Button
+            onClick={() => setOpenAIInstructionEditor(false)}
+            variant="outlined"
+            sx={{ borderColor: bravoColors.secondary, color: bravoColors.secondary }}
           >
             CANCEL
           </Button>
           <Button
-            onClick={handleSaveSection}
+            onClick={handleSaveAIInstruction}
             variant="contained"
-            disabled={!sectionForm.title.trim() || !sectionForm.content.trim()}
             sx={{
               backgroundColor: bravoColors.secondary,
               color: 'white',
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat
-              }
+              '&:hover': { backgroundColor: bravoColors.primaryFlat }
             }}
           >
-            {editingSection ? 'UPDATE' : 'ADD'} SECTION
+            SAVE INSTRUCTIONS
           </Button>
         </DialogActions>
       </Dialog>
