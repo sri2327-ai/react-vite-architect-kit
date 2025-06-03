@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -233,7 +234,8 @@ const WorkflowLibrary: React.FC = () => {
         <DialogContent>
           {selectedWorkflow && (
             <DynamicWorkflowBuilder
-              workflow={selectedWorkflow}
+              name={selectedWorkflow.name}
+              description={selectedWorkflow.description}
               onSave={handleSaveWorkflow}
               onCancel={handleCancelWorkflow}
             />
