@@ -13,21 +13,7 @@ import {
   useTheme, 
   useMediaQuery, 
   Container,
-  Tooltip,
-  Paper,
-  Chip,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Link
+  Tooltip
 } from '@mui/material';
 import { 
   LayoutTemplate, 
@@ -50,263 +36,6 @@ interface MenuItem {
   component: React.ComponentType;
 }
 
-// Mock user data - in real app this would come from your authentication system
-const mockUserData = {
-  email: 'john.doe@example.com',
-  phoneNumber: '+1 (555) 123-4567',
-  firstName: 'John',
-  lastName: 'Doe',
-  specialty: 'Cardiology',
-  ehrMode: true,
-  ehrName: 'Epic Systems',
-  notesRetentionDuration: '7 years'
-};
-
-// Mock invoice data
-const mockInvoices = [
-  {
-    id: '1',
-    date: '2024-01-15',
-    invoiceNumber: 'INV-2024-001',
-    zohoLink: 'https://zoho.com/invoice/INV-2024-001',
-    status: 'Paid',
-    dueDate: '2024-01-30',
-    amount: '$299.00'
-  },
-  {
-    id: '2',
-    date: '2023-12-15',
-    invoiceNumber: 'INV-2023-012',
-    zohoLink: 'https://zoho.com/invoice/INV-2023-012',
-    status: 'Paid',
-    dueDate: '2023-12-30',
-    amount: '$299.00'
-  },
-  {
-    id: '3',
-    date: '2023-11-15',
-    invoiceNumber: 'INV-2023-011',
-    zohoLink: 'https://zoho.com/invoice/INV-2023-011',
-    status: 'Overdue',
-    dueDate: '2023-11-30',
-    amount: '$299.00'
-  }
-];
-
-// Updated Profile component
-const Profile: React.FC = () => {
-  const [notesRetention, setNotesRetention] = useState(mockUserData.notesRetentionDuration);
-
-  const handleNotesRetentionChange = (event: any) => {
-    setNotesRetention(event.target.value);
-    // In real app, this would update the user's settings
-    console.log('Notes retention updated to:', event.target.value);
-  };
-
-  const handleCancelSubscription = () => {
-    // In real app, this would handle subscription cancellation
-    console.log('Cancel subscription clicked');
-    alert('Subscription cancellation functionality would be implemented here');
-  };
-
-  return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Profile
-      </Typography>
-      
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          User Information
-        </Typography>
-        
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" color="text.secondary">
-              Email
-            </Typography>
-            <Typography variant="body1">
-              {mockUserData.email}
-            </Typography>
-          </Box>
-          
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" color="text.secondary">
-              Phone Number
-            </Typography>
-            <Typography variant="body1">
-              {mockUserData.phoneNumber}
-            </Typography>
-          </Box>
-          
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" color="text.secondary">
-              First Name
-            </Typography>
-            <Typography variant="body1">
-              {mockUserData.firstName}
-            </Typography>
-          </Box>
-          
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" color="text.secondary">
-              Last Name
-            </Typography>
-            <Typography variant="body1">
-              {mockUserData.lastName}
-            </Typography>
-          </Box>
-          
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" color="text.secondary">
-              Specialty
-            </Typography>
-            <Typography variant="body1">
-              {mockUserData.specialty}
-            </Typography>
-          </Box>
-          
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle2" color="text.secondary">
-              EHR Mode
-            </Typography>
-            <Chip 
-              label={mockUserData.ehrMode ? 'EHR Mode' : 'No EHR Mode'} 
-              color={mockUserData.ehrMode ? 'primary' : 'default'}
-              size="small"
-            />
-          </Box>
-          
-          {mockUserData.ehrMode && (
-            <Box sx={{ mb: 2 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                EHR Name
-              </Typography>
-              <Typography variant="body1">
-                {mockUserData.ehrName}
-              </Typography>
-            </Box>
-          )}
-          
-          <Box sx={{ mb: 2 }}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Notes Retention Duration</InputLabel>
-              <Select
-                value={notesRetention}
-                label="Notes Retention Duration"
-                onChange={handleNotesRetentionChange}
-              >
-                <MenuItem value="1 year">1 Year</MenuItem>
-                <MenuItem value="3 years">3 Years</MenuItem>
-                <MenuItem value="5 years">5 Years</MenuItem>
-                <MenuItem value="7 years">7 Years</MenuItem>
-                <MenuItem value="10 years">10 Years</MenuItem>
-                <MenuItem value="permanent">Permanent</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-        </Box>
-      </Paper>
-      
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Subscription
-        </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="body1">
-            Current Plan: Professional
-          </Typography>
-          <Button 
-            variant="outlined" 
-            color="error" 
-            onClick={handleCancelSubscription}
-          >
-            Cancel Subscription
-          </Button>
-        </Box>
-      </Paper>
-    </Box>
-  );
-};
-
-// Updated BillingHistory component
-const BillingHistory: React.FC = () => {
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'paid':
-        return 'success';
-      case 'overdue':
-        return 'error';
-      case 'pending':
-        return 'warning';
-      default:
-        return 'default';
-    }
-  };
-
-  return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Billing History
-      </Typography>
-      
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Invoice History
-        </Typography>
-        
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Invoice</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Due Date</TableCell>
-                <TableCell align="right">Amount</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {mockInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell>
-                    {new Date(invoice.date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell>
-                    <Link 
-                      href={invoice.zohoLink} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      sx={{ textDecoration: 'none' }}
-                    >
-                      {invoice.invoiceNumber}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={invoice.status} 
-                      color={getStatusColor(invoice.status) as any}
-                      size="small"
-                    />
-                  </TableCell>
-                  <TableCell>
-                    {new Date(invoice.dueDate).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Typography variant="body2" fontWeight="medium">
-                      {invoice.amount}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-    </Box>
-  );
-};
-
 // Placeholder components
 const WorkflowBuilder: React.FC = () => (
   <Box sx={{ p: 3 }}>
@@ -315,6 +44,28 @@ const WorkflowBuilder: React.FC = () => (
     </Typography>
     <Typography variant="body1" color="text.secondary">
       Design and configure your workflows here.
+    </Typography>
+  </Box>
+);
+
+const Profile: React.FC = () => (
+  <Box sx={{ p: 3 }}>
+    <Typography variant="h4" gutterBottom>
+      Profile
+    </Typography>
+    <Typography variant="body1" color="text.secondary">
+      View and edit your user details here.
+    </Typography>
+  </Box>
+);
+
+const BillingHistory: React.FC = () => (
+  <Box sx={{ p: 3 }}>
+    <Typography variant="h4" gutterBottom>
+      Billing History
+    </Typography>
+    <Typography variant="body1" color="text.secondary">
+      View your billing history and invoices here.
     </Typography>
   </Box>
 );
