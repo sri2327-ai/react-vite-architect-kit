@@ -20,7 +20,7 @@ import {
   useMediaQuery,
   Link,
   Container,
-  Grid2 as Grid,
+  Grid,
   Card,
   CardContent
 } from '@mui/material';
@@ -208,7 +208,7 @@ const Profile: React.FC = () => {
       </Typography>
 
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        <Grid xs={12} lg={8}>
+        <Grid item xs={12} lg={8}>
           {/* Personal Information */}
           <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 2, md: 3 }, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ 
@@ -223,42 +223,42 @@ const Profile: React.FC = () => {
             </Typography>
 
             <Grid container spacing={2}>
-              <Grid xs={12} md={6}>
+              <Grid item xs={12} md={6}>
                 <ProfileField
                   icon={<EmailIcon />}
                   label="Email Address"
                   value={userProfile.email}
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid item xs={12} md={6}>
                 <ProfileField
                   icon={<PhoneIcon />}
                   label="Phone Number"
                   value={userProfile.phoneNumber}
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid item xs={12} md={6}>
                 <ProfileField
                   icon={<PersonIcon />}
                   label="First Name"
                   value={userProfile.firstName}
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid item xs={12} md={6}>
                 <ProfileField
                   icon={<PersonIcon />}
                   label="Last Name"
                   value={userProfile.lastName}
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid item xs={12} md={6}>
                 <ProfileField
                   icon={<BusinessIcon />}
                   label="Medical Specialty"
                   value={userProfile.specialty}
                 />
               </Grid>
-              <Grid xs={12} md={6}>
+              <Grid item xs={12} md={6}>
                 <ProfileField
                   icon={<SettingsIcon />}
                   label="EHR Integration Status"
@@ -267,7 +267,7 @@ const Profile: React.FC = () => {
                 />
               </Grid>
               {userProfile.ehrMode && userProfile.ehrName && (
-                <Grid xs={12}>
+                <Grid item xs={12}>
                   <ProfileField
                     icon={<StorageIcon />}
                     label="Connected EHR System"
@@ -327,7 +327,7 @@ const Profile: React.FC = () => {
           </Paper>
         </Grid>
 
-        <Grid xs={12} lg={4}>
+        <Grid item xs={12} lg={4}>
           {/* Quick Access */}
           <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 2, md: 3 }, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem', md: '1.25rem' } }}>
