@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -20,7 +21,11 @@ import {
   useMediaQuery,
   Pagination,
   Skeleton,
-  alpha
+  alpha,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -34,8 +39,6 @@ import {
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
 import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
-import TemplateCard from './TemplateCard';
-import TemplateFilters from './TemplateFilters';
 import { templateService } from '@/services/templateService';
 
 interface TemplateItem {
@@ -67,7 +70,7 @@ interface TemplateData {
   tags?: string[];
 }
 
-interface ConsultType {
+interface VisitType {
   id: number;
   name: string;
   isNew?: boolean;
@@ -81,8 +84,8 @@ const TemplateBuilder: React.FC = () => {
   
   // Tab and navigation state
   const [currentTab, setCurrentTab] = useState(0);
-  const [currentScreen, setCurrentScreen] = useState<'consultTypes' | 'templates' | 'templateEditor' | 'templateView'>('consultTypes');
-  const [selectedConsultType, setSelectedConsultType] = useState<ConsultType | null>(null);
+  const [currentScreen, setCurrentScreen] = useState<'visitTypes' | 'templates' | 'templateEditor' | 'templateView'>('visitTypes');
+  const [selectedVisitType, setSelectedVisitType] = useState<VisitType | null>(null);
   const [viewingTemplate, setViewingTemplate] = useState<TemplateData | null>(null);
   const [editingTemplate, setEditingTemplate] = useState<TemplateData | null>(null);
   
@@ -94,18 +97,13 @@ const TemplateBuilder: React.FC = () => {
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSpecialty, setSelectedSpecialty] = useState('All Specialties');
-  const [selectedType, setSelectedType] = useState('All Types');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState('recent');
-  const [viewMode, setViewMode] = useState<'all' | 'favorites' | 'recent'>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
   const templatesPerPage = 12;
 
   // Enhanced sample data with better clinical context
-  const [consultTypes, setConsultTypes] = useState<ConsultType[]>([
+  const [visitTypes, setVisitTypes] = useState<VisitType[]>([
     { 
       id: 1, 
       name: "SOAP NOTE", 
@@ -192,8 +190,8 @@ const TemplateBuilder: React.FC = () => {
   ]);
 
   // Event handlers
-  const handleConsultTypeSelect = (consultType: ConsultType) => {
-    setSelectedConsultType(consultType);
+  const handleVisitTypeSelect = (visitType: VisitType) => {
+    setSelectedVisitType(visitType);
     setCurrentScreen('templates');
     setCurrentPage(1); // Reset pagination
   };
@@ -218,9 +216,9 @@ const TemplateBuilder: React.FC = () => {
     setCurrentScreen('templateView');
   };
 
-  const handleBackToConsultTypes = () => {
-    setCurrentScreen('consultTypes');
-    setSelectedConsultType(null);
+  const handleBackToVisitTypes = () => {
+    setCurrentScreen('visitTypes');
+    setSelectedVisitType(null);
     setCurrentPage(1);
   };
 
@@ -244,7 +242,7 @@ const TemplateBuilder: React.FC = () => {
       const newTemplate: TemplateData = {
         id: templates.length + 1,
         title: templateData.name,
-        specialty: templateData.specialty || selectedConsultType?.name || 'General',
+        specialty: templateData.specialty || selectedVisitType?.name || 'General',
         type: templateData.templateType || 'Custom',
         fields: templateData.ehrFields || [],
         content: content || 'New template content',
@@ -264,14 +262,14 @@ const TemplateBuilder: React.FC = () => {
 
   const handleAddType = () => {
     if (newTypeName.trim()) {
-      const newType: ConsultType = {
-        id: consultTypes.length + 1,
+      const newType: VisitType = {
+        id: visitTypes.length + 1,
         name: newTypeName.trim().toUpperCase(),
         isNew: true,
         templateCount: 0,
         description: `Custom ${newTypeName.trim()} documentation type`
       };
-      setConsultTypes([...consultTypes, newType]);
+      setVisitTypes([...visitTypes, newType]);
       setNewTypeName('');
       setOpenAddType(false);
     }
@@ -283,93 +281,30 @@ const TemplateBuilder: React.FC = () => {
     handleBackToTemplates();
   };
 
-  const handleToggleFavorite = (template: TemplateData) => {
-    setTemplates(prev => 
-      prev.map(t => 
-        t.id === template.id 
-          ? { ...t, isFavorite: !t.isFavorite }
-          : t
-      )
-    );
-  };
-
-  const handleCopyTemplate = (template: TemplateData) => {
-    const copiedTemplate: TemplateData = {
-      ...template,
-      id: templates.length + 1,
-      title: `${template.title} (Copy)`,
-      lastUsed: 'Just created',
-      usageCount: 0,
-      isFavorite: false
-    };
-    setTemplates(prev => [...prev, copiedTemplate]);
-  };
-
   // Filter and search logic
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         template.specialty.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         template.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesSpecialty = selectedSpecialty === 'All Specialties' || template.specialty === selectedSpecialty;
-    const matchesType = selectedType === 'All Types' || template.type === selectedType;
-    const matchesTags = selectedTags.length === 0 || selectedTags.some(tag => template.tags?.includes(tag));
-    const matchesViewMode = viewMode === 'all' || 
-                           (viewMode === 'favorites' && template.isFavorite) ||
-                           (viewMode === 'recent' && template.lastUsed?.includes('day') || template.lastUsed?.includes('hour'));
-
-    return matchesSearch && matchesSpecialty && matchesType && matchesTags && matchesViewMode;
-  });
-
-  // Sorting logic
-  const sortedTemplates = [...filteredTemplates].sort((a, b) => {
-    switch (sortBy) {
-      case 'alphabetical':
-        return a.title.localeCompare(b.title);
-      case 'usage':
-        return (b.usageCount || 0) - (a.usageCount || 0);
-      case 'specialty':
-        return a.specialty.localeCompare(b.specialty);
-      case 'recent':
-      default:
-        // Simple recent sorting (in real app, would use actual dates)
-        return (b.usageCount || 0) - (a.usageCount || 0);
-    }
+                         template.specialty.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
 
   // Pagination
-  const totalPages = Math.ceil(sortedTemplates.length / templatesPerPage);
-  const paginatedTemplates = sortedTemplates.slice(
+  const totalPages = Math.ceil(filteredTemplates.length / templatesPerPage);
+  const paginatedTemplates = filteredTemplates.slice(
     (currentPage - 1) * templatesPerPage,
     currentPage * templatesPerPage
   );
 
-  const hasActiveFilters = searchTerm || 
-                          selectedSpecialty !== 'All Specialties' || 
-                          selectedType !== 'All Types' || 
-                          selectedTags.length > 0 ||
-                          viewMode !== 'all';
-
-  const handleClearFilters = () => {
-    setSearchTerm('');
-    setSelectedSpecialty('All Specialties');
-    setSelectedType('All Types');
-    setSelectedTags([]);
-    setViewMode('all');
-    setSortBy('recent');
-    setCurrentPage(1);
-  };
-
-  // Render Consult Types Screen with enhanced design
-  const renderConsultTypes = () => (
+  // Render Visit Types Screen with enhanced design
+  const renderVisitTypes = () => (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
         <Box>
           <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 700, mb: 1 }}>
-            Template Categories
+            Visit Types
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Choose a documentation type to view and manage your templates
+            Choose a visit type to view and manage your templates
           </Typography>
         </Box>
         <Button
@@ -393,7 +328,7 @@ const TemplateBuilder: React.FC = () => {
             }
           }}
         >
-          Add Category
+          Add Visit Type
         </Button>
       </Box>
 
@@ -402,9 +337,9 @@ const TemplateBuilder: React.FC = () => {
         gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
         gap: 3 
       }}>
-        {consultTypes.map((consultType) => (
+        {visitTypes.map((visitType) => (
           <Card
-            key={consultType.id}
+            key={visitType.id}
             sx={{
               borderRadius: 4,
               border: '1px solid',
@@ -419,7 +354,7 @@ const TemplateBuilder: React.FC = () => {
                 transform: 'translateY(-4px)',
               },
             }}
-            onClick={() => handleConsultTypeSelect(consultType)}
+            onClick={() => handleVisitTypeSelect(visitType)}
           >
             <CardContent sx={{ p: 4 }}>
               <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={2}>
@@ -433,13 +368,13 @@ const TemplateBuilder: React.FC = () => {
                       mb: 1
                     }}
                   >
-                    {consultType.name}
+                    {visitType.name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {consultType.description}
+                    {visitType.description}
                   </Typography>
                 </Box>
-                {consultType.isNew && (
+                {visitType.isNew && (
                   <Chip
                     label="New"
                     size="small"
@@ -456,7 +391,7 @@ const TemplateBuilder: React.FC = () => {
               <Box display="flex" alignItems="center" gap={2}>
                 <Chip
                   icon={<AssignmentIcon />}
-                  label={`${consultType.templateCount} templates`}
+                  label={`${visitType.templateCount} templates`}
                   size="small"
                   variant="outlined"
                   sx={{
@@ -472,14 +407,14 @@ const TemplateBuilder: React.FC = () => {
     </Box>
   );
 
-  // Render Templates Screen with enhanced filters and cards
+  // Render Templates Screen with simplified design
   const renderTemplates = () => (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
         <Box sx={{ flex: 1 }}>
           <Box display="flex" alignItems="center" gap={2} mb={2}>
             <IconButton 
-              onClick={handleBackToConsultTypes}
+              onClick={handleBackToVisitTypes}
               sx={{ 
                 backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
                 '&:hover': { backgroundColor: alpha(bravoColors.primaryFlat, 0.2) }
@@ -488,11 +423,11 @@ const TemplateBuilder: React.FC = () => {
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 700 }}>
-              {selectedConsultType?.name} Templates
+              {selectedVisitType?.name} Templates
             </Typography>
           </Box>
           <Typography variant="body1" color="text.secondary">
-            Manage your {selectedConsultType?.name.toLowerCase()} documentation templates
+            Manage your {selectedVisitType?.name.toLowerCase()} documentation templates
           </Typography>
         </Box>
         
@@ -521,170 +456,119 @@ const TemplateBuilder: React.FC = () => {
         </Button>
       </Box>
 
-      {/* Template Statistics */}
-      <Box sx={{ mb: 4 }}>
-        <Stack direction="row" spacing={3}>
-          <Card sx={{ p: 2, borderRadius: 2, minWidth: 140 }}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <AssignmentIcon sx={{ color: bravoColors.primaryFlat }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {sortedTemplates.length}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Total Templates
-                </Typography>
-              </Box>
-            </Box>
-          </Card>
-          
-          <Card sx={{ p: 2, borderRadius: 2, minWidth: 140 }}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <TrendingUpIcon sx={{ color: bravoColors.secondary }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {sortedTemplates.filter(t => t.isFavorite).length}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Favorites
-                </Typography>
-              </Box>
-            </Box>
-          </Card>
-
-          <Card sx={{ p: 2, borderRadius: 2, minWidth: 140 }}>
-            <Box display="flex" alignItems="center" gap={1}>
-              <ScheduleIcon sx={{ color: bravoColors.tertiary }} />
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {sortedTemplates.filter(t => t.lastUsed?.includes('day') || t.lastUsed?.includes('hour')).length}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Recently Used
-                </Typography>
-              </Box>
-            </Box>
-          </Card>
-        </Stack>
-      </Box>
-
-      {/* Filters */}
-      <TemplateFilters
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        selectedSpecialty={selectedSpecialty}
-        onSpecialtyChange={setSelectedSpecialty}
-        selectedType={selectedType}
-        onTypeChange={setSelectedType}
-        selectedTags={selectedTags}
-        onTagsChange={setSelectedTags}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onClearFilters={handleClearFilters}
-        hasActiveFilters={hasActiveFilters}
+      {/* Search Bar Only */}
+      <TextField
+        fullWidth
+        placeholder="Search templates by name..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        InputProps={{
+          startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />,
+        }}
+        sx={{
+          mb: 3,
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 2,
+            backgroundColor: 'background.default',
+            '&:hover': {
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: bravoColors.primaryFlat
+              }
+            }
+          }
+        }}
       />
 
-      {/* Results Summary */}
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="body2" color="text.secondary">
-          Showing {paginatedTemplates.length} of {filteredTemplates.length} templates
-          {hasActiveFilters && ' (filtered)'}
-        </Typography>
-      </Box>
-
-      {/* Template Grid */}
+      {/* Simple Template List */}
       {isLoading ? (
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-          gap: 3 
-        }}>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Card key={index} sx={{ borderRadius: 3 }}>
+        <Box>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} sx={{ mb: 2, borderRadius: 2 }}>
               <CardContent sx={{ p: 3 }}>
-                <Skeleton variant="text" height={32} sx={{ mb: 1 }} />
-                <Skeleton variant="text" height={20} sx={{ mb: 2 }} />
-                <Skeleton variant="rectangular" height={80} sx={{ mb: 2 }} />
-                <Box display="flex" gap={1}>
-                  <Skeleton variant="rectangular" width={80} height={32} />
-                  <Skeleton variant="rectangular" width={80} height={32} />
-                </Box>
+                <Skeleton variant="text" height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" height={20} width="60%" />
               </CardContent>
             </Card>
           ))}
         </Box>
       ) : paginatedTemplates.length > 0 ? (
-        <>
-          <Box sx={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-            gap: 3,
-            mb: 4
-          }}>
-            {paginatedTemplates.map((template) => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                onView={handleTemplateView}
-                onEdit={handleTemplateEdit}
-                onCopy={handleCopyTemplate}
-                onToggleFavorite={handleToggleFavorite}
-              />
-            ))}
-          </Box>
-
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Box display="flex" justifyContent="center" mt={4}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(_, page) => setCurrentPage(page)}
-                size="large"
-                sx={{
-                  '& .MuiPaginationItem-root': {
-                    borderRadius: 2,
-                    fontWeight: 600
-                  },
-                  '& .Mui-selected': {
-                    backgroundColor: bravoColors.primaryFlat,
-                    color: 'white'
-                  }
-                }}
-              />
-            </Box>
-          )}
-        </>
+        <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+          {paginatedTemplates.map((template, index) => (
+            <React.Fragment key={template.id}>
+              <ListItem disablePadding>
+                <ListItemButton 
+                  onClick={() => handleTemplateView(template)}
+                  sx={{
+                    py: 2,
+                    px: 3,
+                    '&:hover': {
+                      backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
+                    }
+                  }}
+                >
+                  <Box display="flex" alignItems="center" gap={2} sx={{ flex: 1 }}>
+                    <Typography variant="h3" sx={{ fontSize: '1.5rem' }}>
+                      🩺
+                    </Typography>
+                    <Box sx={{ flex: 1 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 600,
+                          color: bravoColors.primaryFlat,
+                          fontSize: '1.1rem'
+                        }}
+                      >
+                        {template.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {template.specialty}
+                      </Typography>
+                    </Box>
+                    <IconButton 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTemplateEdit(template);
+                      }}
+                      sx={{
+                        backgroundColor: bravoColors.primaryFlat,
+                        color: 'white',
+                        '&:hover': {
+                          backgroundColor: bravoColors.primaryDark
+                        }
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Box>
+                </ListItemButton>
+              </ListItem>
+              {index < paginatedTemplates.length - 1 && (
+                <Box sx={{ px: 3 }}>
+                  <Box sx={{ borderBottom: '1px solid', borderColor: 'divider' }} />
+                </Box>
+              )}
+            </React.Fragment>
+          ))}
+        </List>
       ) : (
         <Card sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
           <Typography variant="h6" gutterBottom color="text.secondary">
             No templates found
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {hasActiveFilters 
-              ? 'Try adjusting your filters or search terms'
+            {searchTerm 
+              ? 'Try adjusting your search terms'
               : 'Create your first template to get started'
             }
           </Typography>
-          {hasActiveFilters ? (
-            <Button 
-              variant="outlined" 
-              onClick={handleClearFilters}
-              sx={{ borderRadius: 2 }}
-            >
-              Clear Filters
-            </Button>
-          ) : (
-            <Button 
-              variant="contained" 
-              onClick={() => setOpenCreateTemplate(true)}
-              sx={{ borderRadius: 2 }}
-            >
-              Create Template
-            </Button>
-          )}
+          <Button 
+            variant="contained" 
+            onClick={() => setOpenCreateTemplate(true)}
+            sx={{ borderRadius: 2 }}
+          >
+            Create Template
+          </Button>
         </Card>
       )}
     </Box>
@@ -775,7 +659,7 @@ const TemplateBuilder: React.FC = () => {
       return renderTemplates();
     }
 
-    return renderConsultTypes();
+    return renderVisitTypes();
   };
 
   return (
@@ -824,14 +708,14 @@ const TemplateBuilder: React.FC = () => {
         onCreateTemplate={handleCreateTemplateFromDialog}
       />
 
-      {/* Add Consult Type Dialog */}
+      {/* Add Visit Type Dialog */}
       <Dialog open={openAddType} onClose={() => setOpenAddType(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Template Category</DialogTitle>
+        <DialogTitle>Add New Visit Type</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Category Name"
+            label="Visit Type Name"
             fullWidth
             variant="outlined"
             value={newTypeName}
@@ -841,7 +725,7 @@ const TemplateBuilder: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenAddType(false)}>Cancel</Button>
-          <Button onClick={handleAddType} variant="contained">Add Category</Button>
+          <Button onClick={handleAddType} variant="contained">Add Visit Type</Button>
         </DialogActions>
       </Dialog>
     </Box>
