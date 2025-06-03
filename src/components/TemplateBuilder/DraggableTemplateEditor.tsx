@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -12,7 +13,6 @@ import {
   DialogActions,
   TextField,
   MenuItem,
-  Chip,
   Alert
 } from '@mui/material';
 import {
@@ -28,6 +28,8 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import AddSectionOverlay from './AddSectionOverlay';
+import SectionConfigDialog from './SectionConfigDialog';
+import SectionPlacementDialog from './SectionPlacementDialog';
 
 interface TemplateItem {
   id: string;
@@ -59,11 +61,14 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [addSectionOpen, setAddSectionOpen] = useState(false);
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
   const [aiEditDialogOpen, setAiEditDialogOpen] = useState(false);
+  const [sectionConfigOpen, setSectionConfigOpen] = useState(false);
+  const [placementDialogOpen, setPlacementDialogOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [helpOption, setHelpOption] = useState('');
   const [aiInstructions, setAiInstructions] = useState('');
   const [aiTitle, setAiTitle] = useState('');
   const [aiDescription, setAiDescription] = useState('');
+  const [pendingSection, setPendingSection] = useState<any>(null);
 
   const helpOptions = [
     { value: 'change-to-list', label: 'Change to List' },
@@ -74,14 +79,45 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   ];
 
   const handleAddSection = (section: any) => {
-    const newItem: TemplateItem = {
-      id: Date.now().toString(),
-      name: section.name,
-      type: 'paragraph',
-      content: section.description,
-      description: 'A.I. will write a descriptive block of text following the guidelines below.'
-    };
-    setItems([...items, newItem]);
+    // Check if it's a custom block that needs configuration
+    if (['paragraph', 'section-header', 'bulleted-list', 'exam-list', 'checklist', 'static-text'].includes(section.id)) {
+      setPendingSection(section);
+      setSectionConfigOpen(true);
+    } else {
+      // Add section directly
+      const newItem: TemplateItem = {
+        id: Date.now().toString(),
+        name: section.name,
+        type: 'paragraph',
+        content: section.description,
+        description: 'A.I. will write a descriptive block of text following the guidelines below.'
+      };
+      setItems([...items, newItem]);
+    }
+  };
+
+  const handleSectionConfigContinue = () => {
+    setSectionConfigOpen(false);
+    setPlacementDialogOpen(true);
+  };
+
+  const handlePlaceSection = (position: number) => {
+    if (pendingSection) {
+      const newItem: TemplateItem = {
+        id: Date.now().toString(),
+        name: pendingSection.name,
+        type: pendingSection.id,
+        content: pendingSection.description,
+        description: 'A.I. will write a descriptive block of text following the guidelines below.'
+      };
+      
+      const newItems = [...items];
+      newItems.splice(position, 0, newItem);
+      setItems(newItems);
+      
+      setPendingSection(null);
+      setPlacementDialogOpen(false);
+    }
   };
 
   const handleDeleteItem = (id: string) => {
@@ -257,6 +293,21 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         open={addSectionOpen}
         onClose={() => setAddSectionOpen(false)}
         onAddSection={handleAddSection}
+      />
+
+      <SectionConfigDialog
+        open={sectionConfigOpen}
+        onClose={() => setSectionConfigOpen(false)}
+        onContinue={handleSectionConfigContinue}
+        sectionType={pendingSection?.id || ''}
+        sectionName={pendingSection?.name || ''}
+      />
+
+      <SectionPlacementDialog
+        open={placementDialogOpen}
+        onClose={() => setPlacementDialogOpen(false)}
+        onPlaceSection={handlePlaceSection}
+        existingSections={items.map(item => ({ id: item.id, name: item.name }))}
       />
 
       {/* Help Dialog */}

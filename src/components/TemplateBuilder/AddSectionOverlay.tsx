@@ -24,14 +24,14 @@ import {
   MedicalServices as MedicalServicesIcon,
   Medication as MedicationIcon,
   Warning as WarningIcon,
-  Smoking as SmokingIcon,
-  Family as FamilyIcon,
+  SmokingRooms as SmokingRoomsIcon,
+  People as PeopleIcon,
   ChildCare as ChildCareIcon,
   School as SchoolIcon,
   Restaurant as RestaurantIcon,
   Group as GroupIcon,
   Bedtime as BedtimeIcon,
-  FemaleIcon,
+  Female as FemaleIcon,
   CheckCircle as CheckCircleIcon,
   Assignment as AssignmentIcon,
   Science as ScienceIcon,
@@ -72,9 +72,9 @@ const sectionTemplates: SectionTemplate[] = [
   { id: 'surgical-history', name: 'Surgical History', description: "Patient's history of surgical procedures", icon: <MedicalServicesIcon />, category: 'Subjective', emoji: '🔪' },
   { id: 'current-medications', name: 'Current Medications', description: "List of patient's current medications", icon: <MedicationIcon />, category: 'Subjective', emoji: '💊' },
   { id: 'allergies', name: 'Allergies', description: "Patient's allergies to medications, foods, or other substances", icon: <WarningIcon />, category: 'Subjective', emoji: '⚠️' },
-  { id: 'substance-use', name: 'Substance Use History', description: "Patient's history of substance use", icon: <SmokingIcon />, category: 'Subjective', emoji: '🚬' },
+  { id: 'substance-use', name: 'Substance Use History', description: "Patient's history of substance use", icon: <SmokingRoomsIcon />, category: 'Subjective', emoji: '🚬' },
   { id: 'treatment-history', name: 'Treatment History', description: "Patient's history of substance use treatment", icon: <LocalHospitalIcon />, category: 'Subjective', emoji: '🏥' },
-  { id: 'family-history', name: 'Family History', description: "Patient's family psychiatric history", icon: <FamilyIcon />, category: 'Subjective', emoji: '👪' },
+  { id: 'family-history', name: 'Family History', description: "Patient's family psychiatric history", icon: <PeopleIcon />, category: 'Subjective', emoji: '👪' },
   { id: 'developmental-history', name: 'Developmental History', description: "Patient's developmental history and milestones", icon: <ChildCareIcon />, category: 'Subjective', emoji: '👶' },
   { id: 'academic-history', name: 'Academic History', description: "Patient's academic performance and school history", icon: <SchoolIcon />, category: 'Subjective', emoji: '🏫' },
   { id: 'nutrition-weight', name: 'Nutrition and Weight History', description: "Patient's diet, nutrition patterns and weight history", icon: <RestaurantIcon />, category: 'Subjective', emoji: '🍎' },
@@ -258,7 +258,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
               
               <Grid container spacing={2}>
                 {categorySections.map((section) => (
-                  <Grid item xs={12} sm={6} md={4} key={section.id}>
+                  <Grid xs={12} sm={6} md={4} key={section.id}>
                     <Card 
                       sx={{ 
                         height: '100%',
