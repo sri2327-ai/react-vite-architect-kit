@@ -56,7 +56,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { isMobile } from 'react-device-detect';
 import { v4 as uuidv4 } from 'uuid';
 import { debounce } from 'lodash';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 // Custom styles
 const SectionPaper = styled(Paper)(({ theme }) => ({
