@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -15,7 +14,15 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction
+  ListItemSecondaryAction,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Checkbox,
+  Paper,
+  Stack
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -44,6 +51,12 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   const [description, setDescription] = useState('');
   const [examItems, setExamItems] = useState([{ title: '', description: '', normalText: '' }]);
   const [checklistItems, setChecklistItems] = useState([{ buttonName: '', text: '' }]);
+  
+  // Within Normal Limits Settings
+  const [notDiscussedBehavior, setNotDiscussedBehavior] = useState('blank');
+  const [normalLimitsBehavior, setNormalLimitsBehavior] = useState('summarize');
+  const [highlightAbnormal, setHighlightAbnormal] = useState(true);
+  const [hideEmpty, setHideEmpty] = useState(false);
 
   const handleAddExamItem = () => {
     setExamItems([...examItems, { title: '', description: '', normalText: '' }]);
@@ -313,16 +326,106 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               variant="outlined"
               startIcon={<AddIcon />}
               onClick={handleAddExamItem}
-              sx={{ mb: 2 }}
+              sx={{ mb: 3 }}
             >
               Add another item
             </Button>
             
-            <Divider sx={{ my: 2 }} />
+            <Divider sx={{ my: 3 }} />
             
-            <Typography variant="subtitle2" gutterBottom>
-              Within Normal Limits Settings
-            </Typography>
+            <Paper sx={{ p: 3, backgroundColor: '#f8f9fa', border: '1px solid #e9ecef' }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, color: '#495057' }}>
+                Within Normal Limits Settings
+              </Typography>
+              
+              <Stack spacing={3}>
+                {/* When an item is not discussed */}
+                <Box>
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend" sx={{ fontWeight: 600, mb: 1 }}>
+                      When an item is not discussed in the session:
+                    </FormLabel>
+                    <RadioGroup
+                      value={notDiscussedBehavior}
+                      onChange={(e) => setNotDiscussedBehavior(e.target.value)}
+                    >
+                      <FormControlLabel 
+                        value="blank" 
+                        control={<Radio size="small" />} 
+                        label="Leave it blank" 
+                      />
+                      <FormControlLabel 
+                        value="default" 
+                        control={<Radio size="small" />} 
+                        label='Default to "Within Normal Limits"' 
+                      />
+                      <FormControlLabel 
+                        value="alert" 
+                        control={<Radio size="small" />} 
+                        label="Alert provider to discuss this item" 
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Box>
+
+                <Divider />
+
+                {/* When findings are within normal limits */}
+                <Box>
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend" sx={{ fontWeight: 600, mb: 1 }}>
+                      When findings are within normal limits:
+                    </FormLabel>
+                    <RadioGroup
+                      value={normalLimitsBehavior}
+                      onChange={(e) => setNormalLimitsBehavior(e.target.value)}
+                    >
+                      <FormControlLabel 
+                        value="summarize" 
+                        control={<Radio size="small" />} 
+                        label="Summarize the discussion" 
+                      />
+                      <FormControlLabel 
+                        value="specified" 
+                        control={<Radio size="small" />} 
+                        label='Use specified "Within Normal Limits" text' 
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Box>
+
+                <Divider />
+
+                {/* Additional options */}
+                <Box>
+                  <FormLabel component="legend" sx={{ fontWeight: 600, mb: 2, display: 'block' }}>
+                    Additional Options:
+                  </FormLabel>
+                  <Stack spacing={1}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={highlightAbnormal}
+                          onChange={(e) => setHighlightAbnormal(e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label="Highlight findings that are not within normal limits"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={hideEmpty}
+                          onChange={(e) => setHideEmpty(e.target.checked)}
+                          size="small"
+                        />
+                      }
+                      label="Hide items that are empty"
+                    />
+                  </Stack>
+                </Box>
+              </Stack>
+            </Paper>
           </Box>
         );
 
