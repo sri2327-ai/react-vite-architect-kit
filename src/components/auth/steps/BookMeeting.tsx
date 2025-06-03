@@ -75,7 +75,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
       overflow: 'hidden'
     }}>
       {/* Header */}
-      <Box sx={{ textAlign: 'center', mb: { xs: 1, sm: 1.5 }, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
         <Typography
           variant="h4"
           sx={{
@@ -84,8 +84,8 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 0.5,
-            fontSize: { xs: '1.3rem', sm: '1.6rem' }
+            mb: 1,
+            fontSize: { xs: '1.4rem', sm: '1.6rem' }
           }}
         >
           Schedule Integration Call
@@ -94,8 +94,9 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
           variant="body1"
           color="text.secondary"
           sx={{ 
-            fontSize: { xs: '0.75rem', sm: '0.85rem' },
-            mb: 0.5
+            fontSize: { xs: '0.85rem', sm: '0.95rem' },
+            mb: 1,
+            lineHeight: 1.5
           }}
         >
           Set up a session to integrate your EHR system
@@ -106,13 +107,13 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
           alignItems: 'center', 
           gap: 0.5,
           backgroundColor: '#E8F5E8',
-          px: 1,
-          py: 0.25,
-          borderRadius: 1,
+          px: 1.5,
+          py: 0.5,
+          borderRadius: 1.5,
           border: '1px solid #C8E6C9'
         }}>
-          <Clock size={12} color="#2E7D32" />
-          <Typography variant="body2" sx={{ color: '#2E7D32', fontWeight: 600, fontSize: '0.7rem' }}>
+          <Clock size={14} color="#2E7D32" />
+          <Typography variant="body2" sx={{ color: '#2E7D32', fontWeight: 600, fontSize: '0.75rem' }}>
             30-45 minutes • Free consultation
           </Typography>
         </Box>
@@ -120,40 +121,40 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
 
       {/* Content with controlled height */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        {/* Features grid - compressed */}
-        <Grid container spacing={1} sx={{ mb: 1, flexShrink: 0 }}>
+        {/* Features grid */}
+        <Grid container spacing={1.5} sx={{ mb: 2, flexShrink: 0 }}>
           {meetingFeatures.map((feature, index) => (
             <Grid key={index} size={{ xs: 12, sm: 4 }}>
               <Card
                 sx={{
                   background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
                   border: '1px solid #E8F4F8',
-                  borderRadius: 1.5,
-                  height: { xs: 60, sm: 70 },
+                  borderRadius: 2,
+                  height: { xs: 70, sm: 80 },
                   display: 'flex',
                   alignItems: 'center'
                 }}
               >
                 <CardContent sx={{ 
-                  p: 1, 
+                  p: 1.5, 
                   textAlign: 'center', 
                   width: '100%',
                   display: 'flex', 
                   flexDirection: 'column', 
                   justifyContent: 'center',
                   alignItems: 'center',
-                  '&:last-child': { pb: 1 }
+                  '&:last-child': { pb: 1.5 }
                 }}>
                   <Box
                     sx={{
-                      width: 24,
-                      height: 24,
-                      borderRadius: '6px',
+                      width: 28,
+                      height: 28,
+                      borderRadius: '8px',
                       background: 'linear-gradient(135deg, #143151, #387E89)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      mb: 0.25,
+                      mb: 0.5,
                       color: 'white'
                     }}
                   >
@@ -162,14 +163,14 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                   <Typography variant="h6" sx={{ 
                     fontWeight: 700, 
                     mb: 0.25, 
-                    fontSize: '0.7rem',
-                    lineHeight: 1.1
+                    fontSize: '0.75rem',
+                    lineHeight: 1.2
                   }}>
                     {feature.title}
                   </Typography>
                   <Typography variant="body2" color="text.secondary" sx={{ 
-                    fontSize: '0.65rem',
-                    lineHeight: 1.1
+                    fontSize: '0.7rem',
+                    lineHeight: 1.2
                   }}>
                     {feature.description}
                   </Typography>
@@ -182,11 +183,11 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
         <Alert
           severity="info"
           sx={{ 
-            mb: 1.5, 
+            mb: 2.5, 
             borderRadius: 2,
             flexShrink: 0,
             '& .MuiAlert-message': {
-              fontSize: '0.75rem'
+              fontSize: '0.8rem'
             }
           }}
           icon={<Calendar size={16} />}
@@ -202,7 +203,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
             flexDirection: 'column',
             overflow: 'auto'
           }}>
-            <Grid container spacing={1.5} sx={{ mb: 1.5 }}>
+            <Grid container spacing={2} sx={{ mb: 2.5 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <TextField
                   fullWidth
@@ -214,9 +215,16 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                   size="small"
                   InputLabelProps={{
                     shrink: true,
+                    sx: { fontSize: '0.9rem' }
                   }}
                   inputProps={{
                     min: getMinDate(),
+                    sx: { fontSize: '0.85rem' }
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      fontSize: '0.85rem'
+                    }
                   }}
                 />
               </Grid>
@@ -230,6 +238,14 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                   onChange={(e) => setSelectedTime(e.target.value)}
                   required
                   size="small"
+                  InputLabelProps={{
+                    sx: { fontSize: '0.9rem' }
+                  }}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      fontSize: '0.85rem'
+                    }
+                  }}
                 >
                   {timeSlots.map((slot) => (
                     <MenuItem 
@@ -239,7 +255,8 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                       sx={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        fontSize: '0.85rem'
                       }}
                     >
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -250,13 +267,13 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
                         <Chip label="Available" size="small" sx={{ 
                           backgroundColor: '#E8F5E8', 
                           color: '#2E7D32',
-                          fontSize: '0.6rem'
+                          fontSize: '0.65rem'
                         }} />
                       ) : (
                         <Chip label="Booked" size="small" sx={{ 
                           backgroundColor: '#FFEBEE', 
                           color: '#C62828',
-                          fontSize: '0.6rem'
+                          fontSize: '0.65rem'
                         }} />
                       )}
                     </MenuItem>
@@ -273,7 +290,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
           flexDirection: { xs: 'column', sm: 'row' },
           gap: 1.5,
           flexShrink: 0,
-          pt: 1.5,
+          pt: 2,
           mt: 'auto'
         }}>
           <SecondaryButton
@@ -281,7 +298,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
             sx={{ 
               flex: 1,
               order: { xs: 2, sm: 1 },
-              py: { xs: 1.2, sm: 1.5 },
+              py: { xs: 1.3, sm: 1.5 },
               borderRadius: 2,
               fontSize: { xs: '0.85rem', sm: '0.9rem' }
             }}
@@ -295,7 +312,7 @@ export const BookMeeting: React.FC<BookMeetingProps> = ({ onNext, onBack, data }
               flex: 2, 
               fontWeight: 700,
               order: { xs: 1, sm: 2 },
-              py: { xs: 1.2, sm: 1.5 },
+              py: { xs: 1.3, sm: 1.5 },
               borderRadius: 2,
               fontSize: { xs: '0.85rem', sm: '0.9rem' }
             }}
