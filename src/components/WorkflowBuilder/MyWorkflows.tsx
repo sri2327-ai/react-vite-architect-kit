@@ -7,7 +7,6 @@ import {
   CardContent,
   Button,
   Chip,
-  Grid,
   IconButton,
   Menu,
   MenuItem,
@@ -22,7 +21,20 @@ import {
   LinearProgress,
   Stepper,
   Step,
-  StepLabel
+  StepLabel,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -32,40 +44,100 @@ import {
   Delete as DeleteIcon,
   CheckCircle as CheckIcon,
   Error as ErrorIcon,
-  Warning as WarningIcon
+  Warning as WarningIcon,
+  Settings as SettingsIcon,
+  Map as MapIcon,
+  Assignment as AssignmentIcon,
+  ExpandMore as ExpandMoreIcon,
+  AccountTree as WorkflowIcon
 } from '@mui/icons-material';
-
-interface ImportedWorkflow {
-  id: string;
-  name: string;
-  description: string;
-  status: 'draft' | 'active' | 'error';
-  lastRun?: string;
-  blocks: WorkflowBlock[];
-}
 
 interface WorkflowBlock {
   id: string;
   type: string;
   name: string;
-  config: any;
-  position: { x: number; y: number };
+  description: string;
+  ehrField?: string;
+  isEditable: boolean;
+  config?: any;
+}
+
+interface VisitTypeMapping {
+  visitType: string;
+  templateFields: { [blockId: string]: string };
+  isConfigured: boolean;
+}
+
+interface ImportedWorkflow {
+  id: string;
+  name: string;
+  description: string;
+  ehrSystem: string;
+  status: 'draft' | 'configured' | 'active' | 'error';
+  lastRun?: string;
+  blocks: WorkflowBlock[];
+  visitTypeMappings: VisitTypeMapping[];
+  availableVisitTypes: string[];
 }
 
 const MyWorkflows: React.FC = () => {
   const [workflows, setWorkflows] = useState<ImportedWorkflow[]>([
     {
       id: '1',
-      name: 'Practice Fusion - Patient Visit Workflow',
+      name: 'Epic - Standard Patient Visit',
       description: 'Complete patient encounter workflow with automated note generation',
-      status: 'active',
+      ehrSystem: 'Epic',
+      status: 'configured',
       lastRun: '2024-01-15 14:30',
-      blocks: []
+      availableVisitTypes: ['Office Visit', 'Follow-up', 'Annual Physical'],
+      visitTypeMappings: [
+        {
+          visitType: 'Office Visit',
+          templateFields: {
+            'chief-complaint': 'Chief Complaint',
+            'subjective-note': 'History of Present Illness',
+            'objective-note': 'Physical Examination'
+          },
+          isConfigured: true
+        },
+        {
+          visitType: 'Follow-up',
+          templateFields: {},
+          isConfigured: false
+        }
+      ],
+      blocks: [
+        {
+          id: 'schedule-filter',
+          type: 'schedule',
+          name: 'Schedule Menu',
+          description: 'Access provider schedule with filters',
+          isEditable: true
+        },
+        {
+          id: 'chief-complaint',
+          type: 'note_entry',
+          name: 'Chief Complaint Entry',
+          description: 'Enter patient chief complaint',
+          ehrField: 'chief_complaint',
+          isEditable: true
+        },
+        {
+          id: 'subjective-note',
+          type: 'note_entry',
+          name: 'Subjective Note',
+          description: 'Enter HPI, ROS, and subjective findings',
+          ehrField: 'subjective',
+          isEditable: true
+        }
+      ]
     }
   ]);
   
   const [executeDialog, setExecuteDialog] = useState(false);
+  const [configureDialog, setConfigureDialog] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState<ImportedWorkflow | null>(null);
+  const [selectedVisitType, setSelectedVisitType] = useState('');
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [otpCode, setOtpCode] = useState('');
@@ -73,8 +145,22 @@ const MyWorkflows: React.FC = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  // Mock template fields - in real app, these would come from template builder
+  const availableTemplateFields = [
+    'Chief Complaint',
+    'History of Present Illness', 
+    'Review of Systems',
+    'Physical Examination',
+    'Assessment',
+    'Plan',
+    'Subjective Note',
+    'Objective Note',
+    'Diagnosis'
+  ];
+
   const executionSteps = [
-    'EHR Authentication',
+    'Visit Type Selection',
+    'EHR Authentication', 
     'MFA Verification',
     'Workflow Execution',
     'Complete'
@@ -87,20 +173,31 @@ const MyWorkflows: React.FC = () => {
     setCredentials({ username: '', password: '' });
     setOtpCode('');
     setMfaEnabled(false);
+    setSelectedVisitType('');
+  };
+
+  const handleConfigureWorkflow = (workflow: ImportedWorkflow) => {
+    setSelectedWorkflow(workflow);
+    setConfigureDialog(true);
+  };
+
+  const handleVisitTypeSelection = () => {
+    if (!selectedVisitType) return;
+    setExecutionStep(1);
   };
 
   const handleStartExecution = async () => {
     if (!credentials.username || !credentials.password) return;
     
     setIsExecuting(true);
-    setExecutionStep(1);
+    setExecutionStep(2);
     
     // Simulate authentication
     setTimeout(() => {
       if (mfaEnabled) {
-        setExecutionStep(1); // Wait for OTP
+        setExecutionStep(2); // Wait for OTP
       } else {
-        setExecutionStep(2);
+        setExecutionStep(3);
         startWorkflowExecution();
       }
       setIsExecuting(false);
@@ -112,14 +209,14 @@ const MyWorkflows: React.FC = () => {
     
     setIsExecuting(true);
     setTimeout(() => {
-      setExecutionStep(2);
+      setExecutionStep(3);
       startWorkflowExecution();
     }, 1000);
   };
 
   const startWorkflowExecution = () => {
     setTimeout(() => {
-      setExecutionStep(3);
+      setExecutionStep(4);
       setIsExecuting(false);
       // Update workflow status
       if (selectedWorkflow) {
@@ -135,99 +232,158 @@ const MyWorkflows: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'success';
+      case 'configured': return 'info';
       case 'error': return 'error';
-      default: return 'default';
+      default: return 'warning';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active': return <CheckIcon />;
+      case 'configured': return <SettingsIcon />;
       case 'error': return <ErrorIcon />;
       default: return <WarningIcon />;
     }
+  };
+
+  const getConfigurationStatus = (workflow: ImportedWorkflow) => {
+    const configuredMappings = workflow.visitTypeMappings.filter(m => m.isConfigured).length;
+    const totalMappings = workflow.visitTypeMappings.length;
+    return `${configuredMappings}/${totalMappings} visit types configured`;
   };
 
   return (
     <Box sx={{ p: 3 }}>
       {workflows.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
-          <ImportIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+          <WorkflowIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h5" gutterBottom color="text.secondary">
             No Workflows Yet
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Import workflows from the Workflow Library to get started
+            Import workflows from the Workflow Library to get started with EHR automation
           </Typography>
+          <Alert severity="info" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
+            <Typography variant="body2">
+              <strong>Next Steps:</strong> Go to Workflow Library → Browse predefined EHR workflows → 
+              Import to My Workflows → Configure visit type mappings → Execute with your EHR
+            </Typography>
+          </Alert>
           <Button
             variant="contained"
             startIcon={<ImportIcon />}
-            onClick={() => {
-              // This would switch to workflow library tab
-              console.log('Navigate to workflow library');
-            }}
+            onClick={() => console.log('Navigate to workflow library')}
+            size="large"
           >
             Go to Workflow Library
           </Button>
         </Box>
       ) : (
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-          gap: 3 
-        }}>
-          {workflows.map((workflow) => (
-            <Card key={workflow.id} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" gutterBottom>
-                      {workflow.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {workflow.description}
-                    </Typography>
+        <Box>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h5" gutterBottom>
+              My Workflows
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Configure and execute your imported EHR automation workflows
+            </Typography>
+          </Box>
+
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', 
+            gap: 3 
+          }}>
+            {workflows.map((workflow) => (
+              <Card key={workflow.id} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="h6" gutterBottom>
+                        {workflow.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        {workflow.description}
+                      </Typography>
+                    </Box>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => setAnchorEl(e.currentTarget)}
+                    >
+                      <MoreIcon />
+                    </IconButton>
                   </Box>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => setAnchorEl(e.currentTarget)}
-                  >
-                    <MoreIcon />
-                  </IconButton>
-                </Box>
-                
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                  <Chip
-                    label={workflow.status.toUpperCase()}
-                    color={getStatusColor(workflow.status)}
-                    size="small"
-                    icon={getStatusIcon(workflow.status)}
-                  />
+                  
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                    <Chip
+                      label={workflow.status.toUpperCase()}
+                      color={getStatusColor(workflow.status)}
+                      size="small"
+                      icon={getStatusIcon(workflow.status)}
+                    />
+                    <Chip 
+                      label={workflow.ehrSystem} 
+                      size="small" 
+                      color="primary" 
+                      variant="outlined"
+                    />
+                    <Chip 
+                      label={`${workflow.blocks.length} blocks`} 
+                      size="small" 
+                      variant="outlined"
+                    />
+                  </Box>
+
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    <strong>Configuration:</strong> {getConfigurationStatus(workflow)}
+                  </Typography>
+
                   {workflow.lastRun && (
                     <Typography variant="caption" color="text.secondary">
                       Last run: {workflow.lastRun}
                     </Typography>
                   )}
+                </CardContent>
+                
+                <Box sx={{ p: 2, pt: 0 }}>
+                  <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<MapIcon />}
+                      onClick={() => handleConfigureWorkflow(workflow)}
+                      sx={{ flex: 1 }}
+                    >
+                      Configure
+                    </Button>
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<PlayIcon />}
+                      onClick={() => handleExecuteWorkflow(workflow)}
+                      disabled={workflow.status === 'error' || workflow.status === 'draft'}
+                      sx={{ flex: 1 }}
+                    >
+                      Execute
+                    </Button>
+                  </Box>
+                  
+                  {workflow.status === 'draft' && (
+                    <Alert severity="warning" sx={{ fontSize: '0.75rem' }}>
+                      Configure visit type mappings to enable execution
+                    </Alert>
+                  )}
+                  
+                  {workflow.status === 'configured' && (
+                    <Typography variant="caption" color="success.main" sx={{ display: 'block', textAlign: 'center' }}>
+                      ✓ Ready to execute with your EHR credentials
+                    </Typography>
+                  )}
                 </Box>
-              </CardContent>
-              
-              <Box sx={{ p: 2, pt: 0 }}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  startIcon={<PlayIcon />}
-                  onClick={() => handleExecuteWorkflow(workflow)}
-                  disabled={workflow.status === 'error'}
-                  sx={{ mb: 1 }}
-                >
-                  Execute Workflow
-                </Button>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
-                  Click to run this workflow with your EHR
-                </Typography>
-              </Box>
-            </Card>
-          ))}
+              </Card>
+            ))}
+          </Box>
         </Box>
       )}
 
@@ -252,11 +408,33 @@ const MyWorkflows: React.FC = () => {
           {executionStep === 0 && (
             <Box>
               <Alert severity="info" sx={{ mb: 3 }}>
-                Enter your EHR credentials to authenticate and execute the workflow
+                Select the visit type for this workflow execution
+              </Alert>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+                <InputLabel>Visit Type</InputLabel>
+                <Select
+                  value={selectedVisitType}
+                  label="Visit Type"
+                  onChange={(e) => setSelectedVisitType(e.target.value)}
+                >
+                  {selectedWorkflow?.availableVisitTypes.map((visitType) => (
+                    <MenuItem key={visitType} value={visitType}>
+                      {visitType}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+          )}
+
+          {executionStep === 1 && (
+            <Box>
+              <Alert severity="info" sx={{ mb: 3 }}>
+                Enter your {selectedWorkflow?.ehrSystem} credentials to authenticate and execute the workflow
               </Alert>
               <TextField
                 fullWidth
-                label="EHR Username"
+                label={`${selectedWorkflow?.ehrSystem} Username`}
                 value={credentials.username}
                 onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
                 sx={{ mb: 2 }}
@@ -264,7 +442,7 @@ const MyWorkflows: React.FC = () => {
               />
               <TextField
                 fullWidth
-                label="EHR Password"
+                label={`${selectedWorkflow?.ehrSystem} Password`}
                 type="password"
                 value={credentials.password}
                 onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
@@ -278,12 +456,12 @@ const MyWorkflows: React.FC = () => {
                     onChange={(e) => setMfaEnabled(e.target.checked)}
                   />
                 }
-                label="My EHR has Multi-Factor Authentication (MFA)"
+                label={`My ${selectedWorkflow?.ehrSystem} has Multi-Factor Authentication (MFA)`}
               />
             </Box>
           )}
 
-          {executionStep === 1 && mfaEnabled && (
+          {executionStep === 2 && mfaEnabled && (
             <Box>
               <Alert severity="warning" sx={{ mb: 3 }}>
                 MFA detected. Please check your device for the OTP code and enter it below.
@@ -300,28 +478,39 @@ const MyWorkflows: React.FC = () => {
             </Box>
           )}
 
-          {executionStep === 2 && (
+          {executionStep === 3 && (
             <Box>
               <Alert severity="success" sx={{ mb: 2 }}>
-                Authentication successful! Executing workflow...
+                Authentication successful! Executing workflow for {selectedVisitType}...
               </Alert>
               <Typography variant="body2" color="text.secondary">
-                The workflow is now running in your EHR system. You can monitor progress in the workflow dashboard.
+                The workflow is now automating your {selectedWorkflow?.ehrSystem} system. 
+                You can monitor progress in the workflow dashboard.
               </Typography>
             </Box>
           )}
 
-          {executionStep === 3 && (
+          {executionStep === 4 && (
             <Alert severity="success">
-              Workflow executed successfully! Your EHR is now automated according to the configured workflow.
+              Workflow executed successfully! Your {selectedWorkflow?.ehrSystem} encounter has been 
+              automated according to the {selectedVisitType} configuration.
             </Alert>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setExecuteDialog(false)}>
-            {executionStep === 3 ? 'Close' : 'Cancel'}
+            {executionStep === 4 ? 'Close' : 'Cancel'}
           </Button>
           {executionStep === 0 && (
+            <Button
+              variant="contained"
+              onClick={handleVisitTypeSelection}
+              disabled={!selectedVisitType}
+            >
+              Continue
+            </Button>
+          )}
+          {executionStep === 1 && (
             <Button
               variant="contained"
               onClick={handleStartExecution}
@@ -330,7 +519,7 @@ const MyWorkflows: React.FC = () => {
               Authenticate & Start
             </Button>
           )}
-          {executionStep === 1 && mfaEnabled && (
+          {executionStep === 2 && mfaEnabled && (
             <Button
               variant="contained"
               onClick={handleMfaVerification}
@@ -339,6 +528,74 @@ const MyWorkflows: React.FC = () => {
               Verify OTP
             </Button>
           )}
+        </DialogActions>
+      </Dialog>
+
+      {/* Configuration Dialog */}
+      <Dialog open={configureDialog} onClose={() => setConfigureDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          Configure Workflow: {selectedWorkflow?.name}
+        </DialogTitle>
+        <DialogContent>
+          <Alert severity="info" sx={{ mb: 3 }}>
+            Map your workflow blocks to template fields for each visit type. This ensures the 
+            automation populates the correct fields in your templates.
+          </Alert>
+          
+          {selectedWorkflow?.visitTypeMappings.map((mapping) => (
+            <Accordion key={mapping.visitType} sx={{ mb: 2 }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                  <Typography variant="h6">{mapping.visitType}</Typography>
+                  <Chip 
+                    label={mapping.isConfigured ? 'Configured' : 'Needs Configuration'}
+                    color={mapping.isConfigured ? 'success' : 'warning'}
+                    size="small"
+                  />
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  Map workflow blocks to your template fields for {mapping.visitType}
+                </Typography>
+                
+                {selectedWorkflow.blocks
+                  .filter(block => block.type === 'note_entry')
+                  .map((block) => (
+                    <Box key={block.id} sx={{ mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                        {block.name}
+                      </Typography>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Template Field</InputLabel>
+                        <Select
+                          value={mapping.templateFields[block.id] || ''}
+                          label="Template Field"
+                          onChange={(e) => {
+                            // Handle field mapping update
+                            console.log(`Mapping ${block.id} to ${e.target.value} for ${mapping.visitType}`);
+                          }}
+                        >
+                          {availableTemplateFields.map((field) => (
+                            <MenuItem key={field} value={field}>
+                              {field}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  ))}
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfigureDialog(false)}>
+            Cancel
+          </Button>
+          <Button variant="contained">
+            Save Configuration
+          </Button>
         </DialogActions>
       </Dialog>
 

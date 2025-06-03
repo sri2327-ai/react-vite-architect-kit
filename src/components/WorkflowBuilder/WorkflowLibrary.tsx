@@ -22,15 +22,15 @@ import {
   ListItemText,
   Divider,
   Paper,
-  LinearProgress,
+  Alert,
   Stepper,
   Step,
   StepLabel,
+  StepContent,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Fade,
-  Zoom
+  Badge
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -39,232 +39,472 @@ import {
   PlayArrow as PlayIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
-  Today as TodayIcon,
-  Note as NoteIcon,
-  CheckCircle as CheckCircleIcon,
-  ExpandMore as ExpandMoreIcon,
   Visibility as VisitIcon,
-  Map as MapIcon,
   GetApp as ImportIcon,
   Settings as SettingsIcon,
-  Close as CloseIcon,
-  Save as SaveIcon,
-  ArrowBack as ArrowBackIcon
+  ExpandMore as ExpandMoreIcon,
+  AccountTree as WorkflowIcon,
+  LocalHospital as EHRIcon,
+  Assignment as TaskIcon
 } from '@mui/icons-material';
-import DynamicWorkflowBuilder from './DynamicWorkflowBuilder';
 
-interface WorkflowTemplate {
+interface WorkflowBlock {
+  id: string;
+  type: 'schedule' | 'patient_select' | 'encounter_open' | 'note_entry' | 'diagnosis' | 'save';
+  name: string;
+  description: string;
+  ehrField?: string;
+  isEditable: boolean;
+  config?: any;
+}
+
+interface PredefinedWorkflow {
   id: string;
   name: string;
   description: string;
-  category: string;
   ehrSystem: string;
-  blocks: any[];
+  category: string;
+  blocks: WorkflowBlock[];
+  supportedVisitTypes: string[];
 }
 
-const initialWorkflowTemplates: WorkflowTemplate[] = [
+const predefinedWorkflows: PredefinedWorkflow[] = [
   {
-    id: 'workflow-1',
-    name: 'New Patient Onboarding',
-    description: 'Workflow for onboarding new patients to the clinic.',
-    category: 'Patient Management',
+    id: 'epic-standard-visit',
+    name: 'Epic - Standard Patient Visit',
+    description: 'Complete patient encounter workflow for Epic EHR system',
     ehrSystem: 'Epic',
-    blocks: []
+    category: 'Patient Encounters',
+    supportedVisitTypes: ['Office Visit', 'Follow-up', 'Annual Physical', 'Consultation'],
+    blocks: [
+      {
+        id: 'schedule-filter',
+        type: 'schedule',
+        name: 'Schedule Menu',
+        description: 'Access provider schedule with filters',
+        isEditable: true,
+        config: {
+          filters: ['Provider Name', 'Date', 'Location']
+        }
+      },
+      {
+        id: 'patient-select',
+        type: 'patient_select', 
+        name: 'Patient Selection',
+        description: 'Select patient from schedule',
+        isEditable: false
+      },
+      {
+        id: 'encounter-open',
+        type: 'encounter_open',
+        name: 'Open Encounter Chart',
+        description: 'Open patient encounter for current date',
+        isEditable: false
+      },
+      {
+        id: 'chief-complaint',
+        type: 'note_entry',
+        name: 'Chief Complaint Entry',
+        description: 'Enter patient chief complaint',
+        ehrField: 'chief_complaint',
+        isEditable: true
+      },
+      {
+        id: 'subjective-note',
+        type: 'note_entry',
+        name: 'Subjective Note',
+        description: 'Enter HPI, ROS, and subjective findings',
+        ehrField: 'subjective',
+        isEditable: true
+      },
+      {
+        id: 'objective-note',
+        type: 'note_entry',
+        name: 'Objective Note', 
+        description: 'Enter physical exam and objective findings',
+        ehrField: 'objective',
+        isEditable: true
+      },
+      {
+        id: 'assessment-plan',
+        type: 'note_entry',
+        name: 'Assessment & Plan',
+        description: 'Enter assessment and treatment plan',
+        ehrField: 'assessment_plan',
+        isEditable: true
+      },
+      {
+        id: 'care-plan',
+        type: 'note_entry',
+        name: 'Care Plan',
+        description: 'Enter ongoing care plan',
+        ehrField: 'care_plan',
+        isEditable: true
+      },
+      {
+        id: 'diagnosis-entry',
+        type: 'diagnosis',
+        name: 'Diagnosis Entry',
+        description: 'Enter ICD-10 diagnoses',
+        isEditable: true
+      },
+      {
+        id: 'save-encounter',
+        type: 'save',
+        name: 'Save Encounter',
+        description: 'Save and close encounter',
+        isEditable: false
+      }
+    ]
   },
   {
-    id: 'workflow-2',
-    name: 'Annual Physical Exam',
-    description: 'Workflow for conducting annual physical exams.',
-    category: 'Clinical Operations',
+    id: 'cerner-standard-visit',
+    name: 'Cerner - Standard Patient Visit',
+    description: 'Complete patient encounter workflow for Cerner EHR system',
     ehrSystem: 'Cerner',
-    blocks: []
+    category: 'Patient Encounters',
+    supportedVisitTypes: ['Office Visit', 'Follow-up', 'Consultation'],
+    blocks: [
+      {
+        id: 'schedule-access',
+        type: 'schedule',
+        name: 'Access Schedule',
+        description: 'Navigate to provider schedule',
+        isEditable: true
+      },
+      {
+        id: 'patient-chart',
+        type: 'patient_select',
+        name: 'Open Patient Chart',
+        description: 'Select and open patient chart',
+        isEditable: false
+      },
+      {
+        id: 'note-creation',
+        type: 'encounter_open',
+        name: 'Create Progress Note',
+        description: 'Create new progress note',
+        isEditable: false
+      },
+      {
+        id: 'complaint-entry',
+        type: 'note_entry',
+        name: 'Chief Complaint',
+        description: 'Document chief complaint',
+        ehrField: 'chief_complaint',
+        isEditable: true
+      },
+      {
+        id: 'history-entry',
+        type: 'note_entry',
+        name: 'History & Review',
+        description: 'Document history and review of systems',
+        ehrField: 'history_ros',
+        isEditable: true
+      },
+      {
+        id: 'exam-entry',
+        type: 'note_entry',
+        name: 'Physical Examination',
+        description: 'Document physical exam findings',
+        ehrField: 'physical_exam',
+        isEditable: true
+      },
+      {
+        id: 'impression-plan',
+        type: 'note_entry',
+        name: 'Impression & Plan',
+        description: 'Document clinical impression and plan',
+        ehrField: 'impression_plan',
+        isEditable: true
+      },
+      {
+        id: 'diagnosis-codes',
+        type: 'diagnosis',
+        name: 'Diagnosis Coding',
+        description: 'Add diagnosis codes',
+        isEditable: true
+      }
+    ]
   }
 ];
 
-const WorkflowLibrary: React.FC = () => {
-  const [workflowTemplates, setWorkflowTemplates] = useState<WorkflowTemplate[]>(initialWorkflowTemplates);
-  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowTemplate | null>(null);
-  const [showBuilder, setShowBuilder] = useState(false);
-  const [showImportDialog, setShowImportDialog] = useState(false);
-  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+interface WorkflowLibraryProps {
+  onImportWorkflow?: (workflow: PredefinedWorkflow) => void;
+}
 
-  const handleCreateWorkflow = () => {
-    const newWorkflow: WorkflowTemplate = {
-      id: `workflow-${Date.now()}`,
-      name: 'New Workflow',
-      description: '',
-      category: '',
-      ehrSystem: '',
-      blocks: []
-    };
-    setWorkflowTemplates(prev => [...prev, newWorkflow]);
+const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) => {
+  const [selectedWorkflow, setSelectedWorkflow] = useState<PredefinedWorkflow | null>(null);
+  const [showWorkflowDetails, setShowWorkflowDetails] = useState(false);
+  const [importDialog, setImportDialog] = useState(false);
+  const [selectedVisitTypes, setSelectedVisitTypes] = useState<string[]>([]);
+
+  const getBlockIcon = (type: string) => {
+    switch (type) {
+      case 'schedule': return <ScheduleIcon />;
+      case 'patient_select': return <PersonIcon />;
+      case 'encounter_open': return <VisitIcon />;
+      case 'note_entry': return <EditIcon />;
+      case 'diagnosis': return <TaskIcon />;
+      case 'save': return <PlayIcon />;
+      default: return <WorkflowIcon />;
+    }
   };
 
-  const handleEditWorkflow = (workflow: WorkflowTemplate) => {
+  const getBlockColor = (type: string) => {
+    switch (type) {
+      case 'schedule': return 'primary';
+      case 'patient_select': return 'secondary';
+      case 'encounter_open': return 'info';
+      case 'note_entry': return 'success';
+      case 'diagnosis': return 'warning';
+      case 'save': return 'error';
+      default: return 'default';
+    }
+  };
+
+  const handleViewWorkflow = (workflow: PredefinedWorkflow) => {
     setSelectedWorkflow(workflow);
-    setShowBuilder(true);
+    setShowWorkflowDetails(true);
   };
 
-  const handleDeleteWorkflow = (workflowId: string) => {
-    setWorkflowTemplates(prev => prev.filter(workflow => workflow.id !== workflowId));
+  const handleImportClick = (workflow: PredefinedWorkflow) => {
+    setSelectedWorkflow(workflow);
+    setSelectedVisitTypes([]);
+    setImportDialog(true);
   };
 
-  const handleSaveWorkflow = (updatedWorkflow: any) => {
-    // Convert the workflow to our WorkflowTemplate format
-    const workflowTemplate: WorkflowTemplate = {
-      id: updatedWorkflow.id || selectedWorkflow?.id || `workflow-${Date.now()}`,
-      name: updatedWorkflow.name || 'Untitled Workflow',
-      description: updatedWorkflow.description || '',
-      category: updatedWorkflow.category || 'General',
-      ehrSystem: updatedWorkflow.ehrSystem || 'Generic',
-      blocks: updatedWorkflow.blocks || []
-    };
-
-    setWorkflowTemplates(prev =>
-      prev.map(workflow =>
-        workflow.id === workflowTemplate.id ? workflowTemplate : workflow
-      )
-    );
-    setShowBuilder(false);
-    setSelectedWorkflow(null);
-  };
-
-  const handleCancelWorkflow = () => {
-    setShowBuilder(false);
-    setSelectedWorkflow(null);
-  };
-
-  const handleImportWorkflow = () => {
-    setShowImportDialog(true);
-  };
-
-  const handleCloseImportDialog = () => {
-    setShowImportDialog(false);
-  };
-
-  const handleSettings = () => {
-    setShowSettingsDialog(true);
-  };
-
-  const handleCloseSettingsDialog = () => {
-    setShowSettingsDialog(false);
+  const handleImport = () => {
+    if (selectedWorkflow && onImportWorkflow) {
+      onImportWorkflow(selectedWorkflow);
+      setImportDialog(false);
+      setSelectedWorkflow(null);
+    }
   };
 
   return (
     <Box sx={{ p: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5">
-          Workflow Library
-        </Typography>
         <Box>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreateWorkflow} sx={{ mr: 2 }}>
-            Create Workflow
-          </Button>
-          <Button variant="outlined" startIcon={<ImportIcon />} onClick={handleImportWorkflow}>
-            Import Workflow
-          </Button>
+          <Typography variant="h5" gutterBottom>
+            Workflow Library
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Pre-built EHR workflows ready to import and customize
+          </Typography>
         </Box>
       </Box>
+
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <Typography variant="body2">
+          <strong>How it works:</strong> Browse predefined workflows, view their automation blocks, 
+          then import to "My Workflows" where you can map them to your visit types and customize field mappings.
+        </Typography>
+      </Alert>
       
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-        {workflowTemplates.map((workflow) => (
-          <Box key={workflow.id} sx={{ width: { xs: '100%', sm: '48%', md: '31%' } }}>
-            <Card 
-              sx={{ 
-                height: '100%',
-                cursor: 'pointer',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: 3,
-                },
-                transition: 'all 0.3s ease'
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6" component="div" gutterBottom>
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 3 }}>
+        {predefinedWorkflows.map((workflow) => (
+          <Card 
+            key={workflow.id}
+            sx={{ 
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 4,
+              },
+              transition: 'all 0.3s ease'
+            }}
+          >
+            <CardContent sx={{ flexGrow: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                <EHRIcon color="primary" sx={{ mr: 1 }} />
+                <Typography variant="h6" component="div">
                   {workflow.name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" paragraph>
-                  {workflow.description}
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+              </Box>
+              
+              <Typography variant="body2" color="text.secondary" paragraph>
+                {workflow.description}
+              </Typography>
+              
+              <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                <Chip 
+                  icon={<EHRIcon />} 
+                  label={workflow.ehrSystem} 
+                  size="small" 
+                  color="primary" 
+                />
+                <Chip 
+                  label={workflow.category} 
+                  size="small" 
+                  color="secondary" 
+                />
+                <Badge badgeContent={workflow.blocks.length} color="primary">
                   <Chip 
-                    icon={<ScheduleIcon />} 
-                    label={workflow.ehrSystem} 
+                    icon={<WorkflowIcon />}
+                    label="Automation Blocks" 
                     size="small" 
-                    color="primary" 
+                    variant="outlined"
                   />
+                </Badge>
+              </Box>
+
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                <strong>Supported Visit Types:</strong>
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
+                {workflow.supportedVisitTypes.map((visitType) => (
                   <Chip 
-                    icon={<PersonIcon />} 
-                    label={workflow.category} 
-                    size="small" 
-                    color="secondary" 
+                    key={visitType}
+                    label={visitType}
+                    size="small"
+                    variant="outlined"
                   />
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography variant="caption" color="text.secondary">
-                    {workflow.blocks.length} steps
-                  </Typography>
-                  <Box>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleEditWorkflow(workflow)}
-                      color="primary"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton 
-                      size="small" 
-                      onClick={() => handleDeleteWorkflow(workflow.id)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Box>
+                ))}
+              </Box>
+            </CardContent>
+            
+            <Box sx={{ p: 2, pt: 0 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => handleViewWorkflow(workflow)}
+                  sx={{ flex: 1 }}
+                >
+                  View Blocks
+                </Button>
+                <Button
+                  variant="contained"
+                  size="small"
+                  startIcon={<ImportIcon />}
+                  onClick={() => handleImportClick(workflow)}
+                  sx={{ flex: 1 }}
+                >
+                  Import
+                </Button>
+              </Box>
+            </Box>
+          </Card>
         ))}
       </Box>
 
-      <Dialog open={showBuilder} onClose={handleCancelWorkflow} maxWidth="md" fullWidth>
-        <DialogTitle>{selectedWorkflow ? `Edit Workflow: ${selectedWorkflow.name}` : 'Workflow Builder'}</DialogTitle>
+      {/* Workflow Details Dialog */}
+      <Dialog 
+        open={showWorkflowDetails} 
+        onClose={() => setShowWorkflowDetails(false)} 
+        maxWidth="md" 
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <WorkflowIcon color="primary" />
+            {selectedWorkflow?.name} - Automation Blocks
+          </Box>
+        </DialogTitle>
         <DialogContent>
           {selectedWorkflow && (
-            <DynamicWorkflowBuilder
-              availableTemplates={['SOAP', 'Clinical Interview']}
-              onSave={handleSaveWorkflow}
-              onCancel={handleCancelWorkflow}
-            />
+            <Box>
+              <Alert severity="info" sx={{ mb: 3 }}>
+                This workflow contains {selectedWorkflow.blocks.length} automation blocks that will 
+                execute in sequence when you run the workflow in your EHR.
+              </Alert>
+              
+              <Stepper orientation="vertical">
+                {selectedWorkflow.blocks.map((block, index) => (
+                  <Step key={block.id} active={true}>
+                    <StepLabel>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Chip 
+                          icon={getBlockIcon(block.type)}
+                          label={block.name}
+                          color={getBlockColor(block.type) as any}
+                          size="small"
+                        />
+                        {block.isEditable && (
+                          <Chip label="Editable" size="small" variant="outlined" />
+                        )}
+                        {block.ehrField && (
+                          <Chip 
+                            label={`Maps to: ${block.ehrField}`} 
+                            size="small" 
+                            color="info"
+                            variant="outlined"
+                          />
+                        )}
+                      </Box>
+                    </StepLabel>
+                    <StepContent>
+                      <Typography variant="body2" color="text.secondary">
+                        {block.description}
+                      </Typography>
+                      {block.config && (
+                        <Box sx={{ mt: 1 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            Configuration: {JSON.stringify(block.config)}
+                          </Typography>
+                        </Box>
+                      )}
+                    </StepContent>
+                  </Step>
+                ))}
+              </Stepper>
+            </Box>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelWorkflow}>Cancel</Button>
+          <Button onClick={() => setShowWorkflowDetails(false)}>
+            Close
+          </Button>
+          <Button 
+            variant="contained" 
+            startIcon={<ImportIcon />}
+            onClick={() => {
+              setShowWorkflowDetails(false);
+              if (selectedWorkflow) {
+                handleImportClick(selectedWorkflow);
+              }
+            }}
+          >
+            Import This Workflow
+          </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={showImportDialog} onClose={handleCloseImportDialog}>
+      {/* Import Dialog */}
+      <Dialog open={importDialog} onClose={() => setImportDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Import Workflow</DialogTitle>
         <DialogContent>
-          <Typography>
-            Implement import logic here (e.g., file upload).
+          <Alert severity="success" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>{selectedWorkflow?.name}</strong> will be imported to "My Workflows" where you can:
+            </Typography>
+            <Box component="ul" sx={{ mt: 1, mb: 0 }}>
+              <li>Map it to your specific visit types</li>
+              <li>Customize field mappings to your templates</li>
+              <li>Edit automation blocks as needed</li>
+              <li>Execute the workflow with your EHR credentials</li>
+            </Box>
+          </Alert>
+          
+          <Typography variant="body2" color="text.secondary">
+            After import, you'll be able to configure this workflow for each of your visit types 
+            and map the note fields to your template fields for seamless automation.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseImportDialog}>Close</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={showSettingsDialog} onClose={handleCloseSettingsDialog}>
-        <DialogTitle>Settings</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Implement settings options here.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseSettingsDialog}>Close</Button>
+          <Button onClick={() => setImportDialog(false)}>
+            Cancel
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={handleImport}
+            startIcon={<ImportIcon />}
+          >
+            Import to My Workflows
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

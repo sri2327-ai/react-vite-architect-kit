@@ -5,7 +5,8 @@ import {
   Typography,
   Tabs,
   Tab,
-  Paper
+  Paper,
+  Alert
 } from '@mui/material';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
@@ -38,27 +39,61 @@ function TabPanel(props: TabPanelProps) {
 
 const WorkflowBuilder: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
+  const [importedWorkflows, setImportedWorkflows] = useState<any[]>([]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
 
+  const handleImportWorkflow = (workflow: any) => {
+    // Convert predefined workflow to imported workflow format
+    const importedWorkflow = {
+      id: `imported-${Date.now()}`,
+      name: workflow.name,
+      description: workflow.description,
+      ehrSystem: workflow.ehrSystem,
+      status: 'draft' as const,
+      blocks: workflow.blocks,
+      availableVisitTypes: workflow.supportedVisitTypes,
+      visitTypeMappings: workflow.supportedVisitTypes.map((visitType: string) => ({
+        visitType,
+        templateFields: {},
+        isConfigured: false
+      }))
+    };
+
+    setImportedWorkflows(prev => [...prev, importedWorkflow]);
+    
+    // Switch to My Workflows tab to show the imported workflow
+    setTabValue(1);
+  };
+
   return (
     <Box sx={{ p: 3, height: '100%' }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 1 }}>
         Workflow Builder
       </Typography>
+      
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <Typography variant="body2">
+          <strong>Agentic EHR Automation:</strong> Import pre-built workflows from the library, 
+          configure them for your visit types, map fields to your templates, then execute with 
+          your EHR credentials for seamless automation.
+        </Typography>
+      </Alert>
 
       <Paper sx={{ width: '100%' }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="workflow builder tabs">
             <Tab label="Workflow Library" />
-            <Tab label="My Workflows" />
+            <Tab 
+              label={`My Workflows ${importedWorkflows.length > 0 ? `(${importedWorkflows.length})` : ''}`} 
+            />
           </Tabs>
         </Box>
         
         <TabPanel value={tabValue} index={0}>
-          <WorkflowLibrary />
+          <WorkflowLibrary onImportWorkflow={handleImportWorkflow} />
         </TabPanel>
         
         <TabPanel value={tabValue} index={1}>
