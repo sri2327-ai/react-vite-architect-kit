@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo } from 'react';
 import {
   Box,
@@ -18,7 +19,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid2 as Grid,
+  Grid,
   Card,
   CardContent,
   Dialog,
@@ -244,7 +245,7 @@ const TemplateBuilder: React.FC = () => {
           </Box>
           <Grid container spacing={3}>
             {templates.map(template => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={template.id}>
+              <Grid item xs={12} sm={6} md={4} key={template.id}>
                 <Card sx={{ height: '100%' }}>
                   <CardContent>
                     <Typography variant="h6" component="div">
