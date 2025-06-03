@@ -27,7 +27,10 @@ import {
   Select,
   MenuItem,
   Tabs,
-  Tab
+  Tab,
+  RadioGroup,
+  FormControlLabel,
+  Radio
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
@@ -48,7 +51,9 @@ import {
   LibraryBooks as LibraryBooksIcon,
   Description as DescriptionIcon,
   FormatListBulleted as FormatListBulletedIcon,
-  Circle as CircleIcon
+  Circle as CircleIcon,
+  Preview as PreviewIcon,
+  Note as NoteIcon
 } from '@mui/icons-material';
 import { useForm, Controller } from 'react-hook-form';
 import { bravoColors } from '@/theme/colors';
@@ -74,6 +79,7 @@ interface LibraryTemplate {
   specialty: string;
   noteType: string;
   content: string;
+  sampleNote?: string;
 }
 
 const TemplateBuilder: React.FC = () => {
@@ -110,6 +116,11 @@ const TemplateBuilder: React.FC = () => {
   // Template preview states
   const [previewTemplate, setPreviewTemplate] = useState<LibraryTemplate | null>(null);
   const [openPreview, setOpenPreview] = useState(false);
+  const [previewType, setPreviewType] = useState<'template' | 'sample'>('template');
+  
+  // Import confirmation states
+  const [openImportConfirm, setOpenImportConfirm] = useState(false);
+  const [selectedImportType, setSelectedImportType] = useState<string>('');
 
   // Form controls
   const { control, handleSubmit, formState: { errors }, trigger, getValues } = useForm();
@@ -135,42 +146,48 @@ const TemplateBuilder: React.FC = () => {
       name: "CLINICAL INTERVIEW1",
       specialty: "cardiologist",
       noteType: "SOAP",
-      content: "History of Present Illness\nProvide a comprehensive narrative of the patient's current condition. Include details about the onset, duration, and characteristics of the present illness. Note any associated symptoms, and incorporate relevant background information such as lifestyle factors and family medical history. Be sure to structure the narrative in a chronological manner, emphasizing the progression of the condition over time.\n\nAllergies\nList any known allergies the patient has, including reactions to medications, foods, or other substances. If there are no known allergies, indicate this as well.\n• Create a bullet for each known allergy, specifying the substance and the type of reaction.\n• Include a bullet to indicate if there are no known allergies.\n\nFamily Health History\nSummarize the known family health history, focusing on immediate family members and highlighting relevant hereditary conditions."
+      content: "History of Present Illness\nProvide a comprehensive narrative of the patient's current condition. Include details about the onset, duration, and characteristics of the present illness. Note any associated symptoms, and incorporate relevant background information such as lifestyle factors and family medical history. Be sure to structure the narrative in a chronological manner, emphasizing the progression of the condition over time.\n\nAllergies\nList any known allergies the patient has, including reactions to medications, foods, or other substances. If there are no known allergies, indicate this as well.\n• Create a bullet for each known allergy, specifying the substance and the type of reaction.\n• Include a bullet to indicate if there are no known allergies.\n\nFamily Health History\nSummarize the known family health history, focusing on immediate family members and highlighting relevant hereditary conditions.",
+      sampleNote: "PATIENT: John Doe, 45-year-old male\n\nHISTORY OF PRESENT ILLNESS:\nThe patient presents with a 3-week history of chest pain that began gradually and has progressively worsened. The pain is described as a dull, aching sensation located in the center of the chest, radiating to the left arm. Episodes typically last 15-20 minutes and are triggered by physical exertion such as climbing stairs or walking briskly. The patient reports associated shortness of breath and mild diaphoresis during episodes. He denies any nausea, vomiting, or palpitations.\n\nALLERGIES:\n• Penicillin - rash and hives\n• Shellfish - facial swelling and difficulty breathing\n• No known environmental allergies\n\nFAMILY HEALTH HISTORY:\nFather: Myocardial infarction at age 52, hypertension\nMother: Type 2 diabetes, alive at age 68\nPaternal grandfather: Stroke at age 65\nNo known family history of cancer or genetic disorders"
     },
     {
       id: 2,
       name: "CLINICAL INTERVIEW2",
       specialty: "pyschologist",
       noteType: "SOAP",
-      content: "Psychological assessment content..."
+      content: "Psychological assessment content...",
+      sampleNote: "Sample psychological assessment note..."
     },
     {
       id: 3,
       name: "CLINICAL INTERVIEW3",
       specialty: "cardiologist",
       noteType: "DPD",
-      content: "Cardiology specific content..."
+      content: "Cardiology specific content...",
+      sampleNote: "Sample cardiology note..."
     },
     {
       id: 4,
       name: "Dermatology Intake",
       specialty: "Dermatology",
       noteType: "SOAP",
-      content: "Dermatology intake content..."
+      content: "Dermatology intake content...",
+      sampleNote: "Sample dermatology intake note..."
     },
     {
       id: 5,
       name: "Neurology Followup",
       specialty: "pyschologist",
       noteType: "SOAP",
-      content: "Neurology followup content..."
+      content: "Neurology followup content...",
+      sampleNote: "Sample neurology followup note..."
     },
     {
       id: 6,
       name: "Dermatology Intake1",
       specialty: "cardiologist",
       noteType: "DPD",
-      content: "Another dermatology intake content..."
+      content: "Another dermatology intake content...",
+      sampleNote: "Another sample dermatology note..."
     }
   ];
 
@@ -354,15 +371,27 @@ const TemplateBuilder: React.FC = () => {
 
   const handleLibraryTemplatePreview = (template: LibraryTemplate) => {
     setPreviewTemplate(template);
+    setPreviewType('template');
     setOpenPreview(true);
   };
 
   const handleImportToMyTemplates = () => {
     if (previewTemplate) {
-      console.log('Importing template to my templates:', previewTemplate);
-      // Add logic to import template to user's templates
       setOpenPreview(false);
+      setOpenImportConfirm(true);
+    }
+  };
+
+  const handleConfirmImport = () => {
+    if (previewTemplate && selectedImportType) {
+      console.log('Importing template to my templates:', {
+        template: previewTemplate,
+        consultType: selectedImportType
+      });
+      // Add logic to import template to user's templates
+      setOpenImportConfirm(false);
       setPreviewTemplate(null);
+      setSelectedImportType('');
     }
   };
 
@@ -1030,7 +1059,7 @@ const TemplateBuilder: React.FC = () => {
         <DialogTitle>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-              Template Preview
+              Preview Options
             </Typography>
             <IconButton onClick={() => setOpenPreview(false)}>
               <CloseIcon />
@@ -1044,7 +1073,7 @@ const TemplateBuilder: React.FC = () => {
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                   {previewTemplate.name}
                 </Typography>
-                <Box display="flex" gap={1} mb={2}>
+                <Box display="flex" gap={1} mb={3}>
                   <Chip 
                     label={`Specialty: ${previewTemplate.specialty}`} 
                     size="small" 
@@ -1065,10 +1094,46 @@ const TemplateBuilder: React.FC = () => {
                   />
                 </Box>
               </Box>
+
+              {/* Preview Type Selection */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
+                  Select Preview Type:
+                </Typography>
+                <RadioGroup
+                  value={previewType}
+                  onChange={(e) => setPreviewType(e.target.value as 'template' | 'sample')}
+                  row
+                >
+                  <FormControlLabel 
+                    value="template" 
+                    control={<Radio />} 
+                    label={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <PreviewIcon sx={{ fontSize: 20 }} />
+                        Template Preview
+                      </Box>
+                    }
+                  />
+                  <FormControlLabel 
+                    value="sample" 
+                    control={<Radio />} 
+                    label={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <NoteIcon sx={{ fontSize: 20 }} />
+                        Sample Note Preview
+                      </Box>
+                    }
+                  />
+                </RadioGroup>
+              </Box>
               
               <Box sx={{ p: 3, border: '2px dashed #ccc', borderRadius: 2, backgroundColor: '#f9f9f9' }}>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                  {previewType === 'template' ? 'Template Content' : 'Sample Note Example'}
+                </Typography>
                 <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: bravoColors.text.primary, lineHeight: 1.6 }}>
-                  {previewTemplate.content}
+                  {previewType === 'template' ? previewTemplate.content : previewTemplate.sampleNote}
                 </Typography>
               </Box>
             </Box>
@@ -1111,6 +1176,95 @@ const TemplateBuilder: React.FC = () => {
             }}
           >
             ADD TO LIBRARY
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Import Confirmation Dialog */}
+      <Dialog
+        open={openImportConfirm}
+        onClose={() => setOpenImportConfirm(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            p: 2
+          }
+        }}
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" justifyContent="space-between">
+            <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+              Import Template
+            </Typography>
+            <IconButton onClick={() => setOpenImportConfirm(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 3 }}>
+            Select which consult type you want to add this template to:
+          </Typography>
+          
+          <FormControl fullWidth>
+            <InputLabel>Select Consult Type</InputLabel>
+            <Select
+              value={selectedImportType}
+              label="Select Consult Type"
+              onChange={(e) => setSelectedImportType(e.target.value)}
+            >
+              {consultTypes.map((type) => (
+                <MenuItem key={type.id} value={type.name}>
+                  {type.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1 }}>
+          <Button 
+            onClick={() => setOpenImportConfirm(false)}
+            variant="outlined"
+            sx={{
+              borderColor: bravoColors.secondary,
+              color: bravoColors.secondary,
+              borderRadius: 2,
+              px: 3,
+              py: 1.5,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              '&:hover': {
+                borderColor: bravoColors.primaryFlat,
+                backgroundColor: bravoColors.background.light,
+              }
+            }}
+          >
+            CANCEL
+          </Button>
+          <Button 
+            onClick={handleConfirmImport}
+            variant="contained"
+            disabled={!selectedImportType}
+            sx={{
+              backgroundColor: bravoColors.secondary,
+              color: 'white',
+              borderRadius: 2,
+              px: 3,
+              py: 1.5,
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              '&:hover': {
+                backgroundColor: bravoColors.primaryFlat,
+              },
+              '&:disabled': {
+                backgroundColor: '#ccc',
+                color: '#666'
+              }
+            }}
+          >
+            IMPORT
           </Button>
         </DialogActions>
       </Dialog>
