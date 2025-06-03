@@ -1,5 +1,5 @@
+
 import React, { useState, useCallback, useMemo } from 'react';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 import {
   Box,
   Typography,
@@ -134,7 +134,7 @@ const fieldTypes = [
 ];
 
 const TemplateBuilder: React.FC = () => {
-  const [templates, setTemplates] = useState<Template[]>([]);
+  const [templates, setTemplates] = useState<Template[]>(initialTemplates);
   const [currentTemplate, setCurrentTemplate] = useState<EditorTemplate | null>(null);
   const [editingTemplate, setEditingTemplate] = useState<EditorTemplate | null>(null);
   const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
@@ -239,7 +239,7 @@ const TemplateBuilder: React.FC = () => {
           </Box>
           <Grid container spacing={3}>
             {templates.map(template => (
-              <Grid item xs={12} sm={6} md={4} key={template.id}>
+              <Grid xs={12} sm={6} md={4} key={template.id}>
                 <Card sx={{ height: '100%' }}>
                   <CardContent>
                     <Typography variant="h6" component="div">
@@ -280,21 +280,28 @@ const TemplateBuilder: React.FC = () => {
         </Box>
       ) : (
         <TemplateEditor
-          template={currentTemplate}
-          onSave={(updatedTemplate) => {
-            const templateToSave = convertToTemplate(updatedTemplate);
-            if (editingTemplate) {
-              setTemplates(prev => prev.map(t => 
-                t.id === editingTemplate.id ? templateToSave : t
-              ));
-            } else {
-              setTemplates(prev => [...prev, templateToSave]);
+          templateName={currentTemplate?.name}
+          initialSections={currentTemplate?.sections}
+          onSave={(sections) => {
+            if (currentTemplate) {
+              const updatedTemplate: EditorTemplate = {
+                ...currentTemplate,
+                sections
+              };
+              const templateToSave = convertToTemplate(updatedTemplate);
+              if (editingTemplate) {
+                setTemplates(prev => prev.map(t => 
+                  t.id === editingTemplate.id ? templateToSave : t
+                ));
+              } else {
+                setTemplates(prev => [...prev, templateToSave]);
+              }
             }
             setShowEditor(false);
             setCurrentTemplate(null);
             setEditingTemplate(null);
           }}
-          onCancel={() => {
+          onBack={() => {
             setShowEditor(false);
             setCurrentTemplate(null);
             setEditingTemplate(null);

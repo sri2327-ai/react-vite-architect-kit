@@ -320,7 +320,7 @@ const WorkflowLibrary: React.FC = () => {
             
             <Grid container spacing={2}>
               {visitTypes.map((visitType) => (
-                <Grid item xs={12} sm={6} key={visitType}>
+                <Grid xs={12} sm={6} key={visitType}>
                   <Card 
                     sx={{ 
                       cursor: 'pointer',
@@ -353,7 +353,7 @@ const WorkflowLibrary: React.FC = () => {
                 fullWidth
                 size="small"
                 placeholder="Add custom visit type..."
-                onKeyPress={(e) => {
+                onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
                   if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
                     const newType = (e.target as HTMLInputElement).value.trim();
                     setVisitTypes(prev => [...prev, newType]);
