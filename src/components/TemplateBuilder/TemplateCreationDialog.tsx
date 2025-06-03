@@ -97,13 +97,11 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
   const [aiSummary, setAiSummary] = useState('');
   const [selectedTemplateType, setSelectedTemplateType] = useState('');
 
-  // Get available template types from templateService
   const availableTemplateTypes = templateService.getTemplateTypes();
 
   const handleMethodSelect = (method: CreateTemplateOption) => {
     setSelectedMethod(method);
     
-    // If selecting template library, get library templates
     if (method.id === 5) {
       const libraryTemplates = [
         { title: 'SOAP Note', sections: [{ name: 'Chief Complaint' }, { name: 'History' }, { name: 'Assessment' }, { name: 'Plan' }] },
@@ -117,7 +115,6 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
 
   const handleNext = () => {
     if (currentStep === 1 && selectedMethod?.id === 2) {
-      // AI Generation with template service integration
       setIsProcessing(true);
       setTimeout(() => {
         const mapping = templateService.getEhrFieldMappings(selectedTemplateType || 'SOAP Note');
@@ -232,7 +229,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <Chip 
                 icon={selectedMethod?.icon} 
-                label={<span>{selectedMethod?.title || ''}</span>}
+                label={<Typography component="span">{selectedMethod?.title || ''}</Typography>}
                 color="primary"
                 sx={{ mr: 2 }}
               />
