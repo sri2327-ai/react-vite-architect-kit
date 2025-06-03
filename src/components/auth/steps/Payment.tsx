@@ -23,7 +23,7 @@ import {
   Cloud,
   Headphones,
   BarChart3,
-  Close,
+  X,
   Tag
 } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
@@ -341,7 +341,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
               }
             }}
           >
-            <Close />
+            <X />
           </IconButton>
           {paymentUrl && (
             <iframe
