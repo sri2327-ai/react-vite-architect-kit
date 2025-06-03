@@ -163,7 +163,7 @@ export const Dashboard: React.FC = () => {
               src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
               alt="S10.AI Logo"
               sx={{
-                height: isMobile ? 36 : isTablet ? 40 : 44,
+                height: isMobile ? 48 : isTablet ? 52 : 56,
                 mb: 1.5,
                 objectFit: 'contain',
                 transition: 'height 0.3s ease'
@@ -174,9 +174,10 @@ export const Dashboard: React.FC = () => {
               fontWeight={700} 
               color="white" 
               sx={{ 
-                fontSize: isMobile ? '0.95rem' : '1.1rem',
+                fontSize: isMobile ? '1.05rem' : '1.2rem',
                 textAlign: 'center',
-                letterSpacing: '0.02em'
+                letterSpacing: '0.02em',
+                transition: 'all 0.3s ease'
               }}
             >
               S10.AI Dashboard
@@ -188,8 +189,8 @@ export const Dashboard: React.FC = () => {
             src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
             alt="S10.AI"
             sx={{
-              height: 42,
-              width: 42,
+              height: 48,
+              width: 48,
               objectFit: 'contain',
               transition: 'all 0.3s ease'
             }}
@@ -208,7 +209,7 @@ export const Dashboard: React.FC = () => {
                 sx={{
                   borderRadius: 3,
                   mx: 1,
-                  minHeight: 52,
+                  minHeight: 56,
                   justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
                   px: isCollapsed && !isMobile ? 1.5 : 2.5,
                   transition: 'all 0.2s ease',
@@ -217,7 +218,7 @@ export const Dashboard: React.FC = () => {
                   '&.Mui-selected': {
                     backgroundColor: 'rgba(255, 255, 255, 0.18)',
                     color: 'white',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.22)'
                     },
@@ -250,9 +251,11 @@ export const Dashboard: React.FC = () => {
                   <ListItemText
                     primary={item.label}
                     primaryTypographyProps={{
-                      fontSize: '0.9rem',
+                      fontSize: '0.95rem',
                       fontWeight: activeMenuItem === item.id ? 600 : 500,
                       color: activeMenuItem === item.id ? 'white' : 'rgba(255, 255, 255, 0.9)',
+                    }}
+                    sx={{
                       transition: 'all 0.2s ease'
                     }}
                   />
