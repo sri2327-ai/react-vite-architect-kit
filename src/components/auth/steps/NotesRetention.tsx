@@ -8,12 +8,14 @@ import {
   FormControlLabel,
   Radio,
   Alert,
-  Card,
-  CardContent,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Chip,
-  Grid,
 } from '@mui/material';
-import { Shield, HardDrive, Clock, Infinity, CheckCircle2 } from 'lucide-react';
+import { Info, Clock, CheckCircle2 } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -24,65 +26,48 @@ interface NotesRetentionProps {
 }
 
 const retentionOptions = [
-  { 
-    value: '1year', 
-    label: '1 Year', 
-    description: 'Standard retention',
-    icon: <Clock size={20} />,
+  {
+    value: '30',
+    label: '30 Days',
+    description: 'Basic compliance period',
     recommended: false
   },
-  { 
-    value: '3years', 
-    label: '3 Years', 
-    description: 'Extended retention',
-    icon: <HardDrive size={20} />,
+  {
+    value: '90',
+    label: '90 Days',
+    description: 'Standard practice period',
     recommended: true
   },
-  { 
-    value: '5years', 
-    label: '5 Years', 
-    description: 'Long-term storage',
-    icon: <Shield size={20} />,
+  {
+    value: '365',
+    label: '1 Year',
+    description: 'Extended retention for detailed analysis',
     recommended: false
   },
-  { 
-    value: '7years', 
-    label: '7 Years', 
-    description: 'Maximum compliance',
-    icon: <Shield size={20} />,
+  {
+    value: 'indefinite',
+    label: 'Indefinite',
+    description: 'Keep all notes permanently',
     recommended: false
-  },
-  { 
-    value: 'indefinite', 
-    label: 'Indefinite', 
-    description: 'No automatic deletion',
-    icon: <Infinity size={20} />,
-    recommended: false
-  },
-];
-
-const securityFeatures = [
-  'End-to-end encryption',
-  'HIPAA compliant storage',
-  'Regular security audits',
-  'Backup & disaster recovery'
+  }
 ];
 
 export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, data }) => {
-  const [retentionDuration, setRetentionDuration] = useState(data.retentionDuration || '');
+  const [selectedRetention, setSelectedRetention] = useState(data.retentionDuration || '90');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onNext({ retentionDuration });
+    onNext({ retentionDuration: selectedRetention });
   };
 
   return (
     <Box sx={{ 
-      minHeight: '60vh',
+      height: '75vh',
       display: 'flex', 
-      flexDirection: 'column'
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
-      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
+      <Box sx={{ textAlign: 'center', mb: 2, flexShrink: 0 }}>
         <Typography
           variant="h4"
           sx={{
@@ -92,10 +77,10 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             mb: 1,
-            fontSize: { xs: '1.4rem', sm: '1.8rem' }
+            fontSize: { xs: '1.5rem', sm: '1.8rem' }
           }}
         >
-          Data Retention Policy
+          Notes Retention Period
         </Typography>
         <Typography
           variant="body1"
@@ -105,203 +90,164 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
             mb: 1
           }}
         >
-          Choose how long to securely store your clinical notes
+          Choose how long to keep your session notes
         </Typography>
-        
-        <Box sx={{ 
-          display: 'inline-flex', 
-          alignItems: 'center', 
-          gap: 1,
-          backgroundColor: '#E8F5E8',
-          px: 1.5,
-          py: 0.5,
-          borderRadius: 1,
-          border: '1px solid #C8E6C9'
-        }}>
-          <Shield size={14} color="#2E7D32" />
-          <Typography variant="body2" sx={{ color: '#2E7D32', fontWeight: 600, fontSize: '0.8rem' }}>
-            HIPAA compliant • Bank-level security
-          </Typography>
-        </Box>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Card
-          sx={{
-            background: 'linear-gradient(135deg, #F8FBFF 0%, #F0F8FF 100%)',
-            border: '1px solid #E8F4F8',
-            borderRadius: 2,
-            mb: 1.5,
-            flexShrink: 0
-          }}
-        >
-          <CardContent sx={{ p: 1.5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-              <Box
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '6px',
-                  background: 'linear-gradient(135deg, #143151, #387E89)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}
-              >
-                <Shield size={14} />
-              </Box>
-              <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', fontSize: '0.9rem' }}>
-                Your Data is Protected
-              </Typography>
-            </Box>
-            <Grid container spacing={1}>
-              {securityFeatures.map((feature, index) => (
-                <Grid key={index} size={{ xs: 6, sm: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <CheckCircle2 size={10} color="#2E7D32" />
-                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.7rem' }}>
-                      {feature}
-                    </Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Alert
           severity="info"
+          icon={<Info size={18} />}
           sx={{ 
-            mb: 1.5, 
+            mb: 2, 
             borderRadius: 2,
             flexShrink: 0,
             '& .MuiAlert-message': {
-              fontSize: '0.8rem'
+              fontSize: '0.85rem'
             }
           }}
-          icon={<Shield size={18} />}
         >
-          All notes are encrypted and stored securely. Change this setting anytime.
+          You can always adjust this setting later in your account preferences.
         </Alert>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
-          <FormControl component="fieldset" fullWidth sx={{ height: '100%' }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          <FormControl component="fieldset" fullWidth sx={{ flex: 1, overflow: 'hidden' }}>
             <RadioGroup
-              value={retentionDuration}
-              onChange={(e) => setRetentionDuration(e.target.value)}
-              sx={{ height: '100%' }}
+              value={selectedRetention}
+              onChange={(e) => setSelectedRetention(e.target.value)}
+              sx={{ flex: 1, overflow: 'hidden' }}
             >
-              <Grid container spacing={1.5} sx={{ maxHeight: '35vh', overflow: 'auto' }}>
+              <List 
+                sx={{ 
+                  flex: 1,
+                  overflow: 'auto',
+                  py: 0,
+                  '&::-webkit-scrollbar': {
+                    width: '6px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: '#f1f1f1',
+                    borderRadius: '3px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: '#c1c1c1',
+                    borderRadius: '3px',
+                  },
+                  '&::-webkit-scrollbar-thumb:hover': {
+                    background: '#a8a8a8',
+                  },
+                }}
+              >
                 {retentionOptions.map((option) => (
-                  <Grid key={option.value} size={{ xs: 6, sm: 4, lg: 2.4 }}>
-                    <Card
+                  <ListItem key={option.value} disablePadding sx={{ mb: 1 }}>
+                    <ListItemButton
+                      onClick={() => setSelectedRetention(option.value)}
+                      selected={selectedRetention === option.value}
                       sx={{
-                        cursor: 'pointer',
-                        border: retentionDuration === option.value ? 2 : 1,
-                        borderColor: retentionDuration === option.value ? 'primary.main' : '#E0E7FF',
-                        background: retentionDuration === option.value 
+                        borderRadius: 2,
+                        border: selectedRetention === option.value ? 2 : 1,
+                        borderColor: selectedRetention === option.value ? 'primary.main' : '#E0E7FF',
+                        background: selectedRetention === option.value 
                           ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
                           : 'background.paper',
-                        borderRadius: 2,
-                        position: 'relative',
-                        height: { xs: 100, sm: 110 },
+                        py: 1.5,
                         '&:hover': {
                           borderColor: 'primary.main',
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 8px 24px rgba(20, 49, 81, 0.1)'
+                          background: selectedRetention === option.value 
+                            ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
+                            : 'rgba(20, 49, 81, 0.04)',
                         },
-                        transition: 'all 0.2s ease'
-                      }}
-                      onClick={() => setRetentionDuration(option.value)}
-                    >
-                      {option.recommended && (
-                        <Chip
-                          label="Recommended"
-                          size="small"
-                          sx={{
-                            position: 'absolute',
-                            top: 6,
-                            left: 6,
-                            backgroundColor: '#E8F5E8',
-                            color: '#2E7D32',
-                            fontWeight: 700,
-                            fontSize: '0.6rem',
-                            zIndex: 2
-                          }}
-                        />
-                      )}
-
-                      {retentionDuration === option.value && (
-                        <CheckCircle2 
-                          size={10} 
-                          color="white" 
-                          style={{
-                            position: 'absolute',
-                            top: 4,
-                            right: 4,
-                            backgroundColor: '#2E7D32',
-                            borderRadius: '50%',
-                            zIndex: 2
-                          }}
-                        />
-                      )}
-                      
-                      <CardContent sx={{ 
-                        textAlign: 'center', 
-                        p: 1,
-                        height: '100%',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center'
-                      }}>
-                        <FormControlLabel
-                          value={option.value}
-                          control={<Radio sx={{ display: 'none' }} />}
-                          label={
-                            <Box>
-                              <Box
-                                sx={{
-                                  width: { xs: 32, sm: 36 },
-                                  height: { xs: 32, sm: 36 },
-                                  borderRadius: '8px',
-                                  background: retentionDuration === option.value 
-                                    ? 'linear-gradient(135deg, #143151, #387E89)'
-                                    : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  margin: '0 auto 6px auto',
-                                  color: retentionDuration === option.value ? 'white' : '#666',
-                                  transition: 'all 0.3s ease'
-                                }}
-                              >
-                                {option.icon}
-                              </Box>
-                              <Typography
-                                variant="h6"
-                                fontWeight={retentionDuration === option.value ? 700 : 600}
-                                color={retentionDuration === option.value ? 'primary.main' : 'text.primary'}
-                                sx={{ mb: 0.5, fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
-                              >
-                                {option.label}
-                              </Typography>
-                              <Typography 
-                                variant="body2" 
-                                color="text.secondary"
-                                sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' }, lineHeight: 1.2 }}
-                              >
-                                {option.description}
-                              </Typography>
-                            </Box>
+                        '&.Mui-selected': {
+                          background: 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)',
                           }
-                          sx={{ m: 0, width: '100%' }}
+                        }
+                      }}
+                    >
+                      <ListItemIcon sx={{ minWidth: 40 }}>
+                        <Box
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '8px',
+                            background: selectedRetention === option.value 
+                              ? 'linear-gradient(135deg, #143151, #387E89)'
+                              : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: selectedRetention === option.value ? 'white' : '#666',
+                          }}
+                        >
+                          <Clock size={16} />
+                        </Box>
+                      </ListItemIcon>
+                      
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography
+                              variant="body1"
+                              fontWeight={selectedRetention === option.value ? 700 : 600}
+                              color={selectedRetention === option.value ? 'primary.main' : 'text.primary'}
+                              sx={{ fontSize: '0.95rem' }}
+                            >
+                              {option.label}
+                            </Typography>
+                            {option.recommended && (
+                              <Chip 
+                                label="Recommended" 
+                                size="small" 
+                                color="primary"
+                                sx={{ 
+                                  height: 20, 
+                                  fontSize: '0.7rem',
+                                  fontWeight: 600
+                                }} 
+                              />
+                            )}
+                          </Box>
+                        }
+                        secondary={
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ fontSize: '0.8rem', mt: 0.5 }}
+                          >
+                            {option.description}
+                          </Typography>
+                        }
+                      />
+                      
+                      <FormControlLabel
+                        value={option.value}
+                        control={
+                          <Radio 
+                            checked={selectedRetention === option.value}
+                            sx={{ 
+                              color: selectedRetention === option.value ? 'primary.main' : 'action.active',
+                              '&.Mui-checked': {
+                                color: 'primary.main',
+                              }
+                            }} 
+                          />
+                        }
+                        label=""
+                        sx={{ m: 0, mr: 0 }}
+                      />
+                      
+                      {selectedRetention === option.value && (
+                        <CheckCircle2 
+                          size={16} 
+                          color="#2E7D32"
+                          style={{ marginLeft: 8 }}
                         />
-                      </CardContent>
-                    </Card>
-                  </Grid>
+                      )}
+                    </ListItemButton>
+                  </ListItem>
                 ))}
-              </Grid>
+              </List>
             </RadioGroup>
           </FormControl>
         </Box>
@@ -326,7 +272,6 @@ export const NotesRetention: React.FC<NotesRetentionProps> = ({ onNext, onBack, 
           </SecondaryButton>
           <PrimaryButton
             type="submit"
-            disabled={!retentionDuration}
             onClick={handleSubmit}
             sx={{ 
               flex: 2, 
