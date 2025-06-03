@@ -172,8 +172,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             id: 'encounter-open',
             type: 'encounter_open',
             name: 'Open Encounter Chart',
-            description: 'Open patient encounter for current date',
-            isEditable: false
+            description: 'Open patient encounter for current date and choose note type',
+            isEditable: true
           },
           {
             id: 'chief-complaint',
