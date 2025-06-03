@@ -48,17 +48,23 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
 
   return (
     <Box sx={{ 
-      minHeight: '60vh',
+      height: '100%',
       display: 'flex', 
-      flexDirection: 'column'
+      flexDirection: 'column',
+      overflow: 'hidden'
     }}>
-      <Box sx={{ textAlign: 'center', mb: { xs: 1.5, sm: 2 }, flexShrink: 0 }}>
+      {/* Header - Fixed height */}
+      <Box sx={{ 
+        textAlign: 'center', 
+        mb: { xs: 1, sm: 1.5 }, 
+        flexShrink: 0 
+      }}>
         <Typography
           variant="h4"
           sx={{
             fontWeight: 700,
             color: 'primary.main',
-            mb: 1,
+            mb: 0.5,
             fontSize: { xs: '1.4rem', sm: '1.8rem' }
           }}
         >
@@ -75,38 +81,52 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {/* Scrollable content area */}
+      <Box sx={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column',
+        minHeight: 0,
+        overflow: 'auto'
+      }}>
         <Card
           sx={{
-            mb: 1.5,
+            mb: 1,
             border: 2,
             borderColor: 'primary.main',
             backgroundColor: 'background.paper',
             borderRadius: 2,
             flex: 1,
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            minHeight: 0
           }}
         >
-          <CardContent sx={{ p: { xs: 2, sm: 2.5 }, flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ textAlign: 'center', mb: 1.5 }}>
-              <Typography variant="h3" fontWeight={700} color="primary.main" sx={{ fontSize: { xs: '1.8rem', sm: '2.2rem' } }}>
+          <CardContent sx={{ 
+            p: { xs: 1.5, sm: 2 }, 
+            flex: 1, 
+            display: 'flex', 
+            flexDirection: 'column',
+            minHeight: 0
+          }}>
+            <Box sx={{ textAlign: 'center', mb: 1 }}>
+              <Typography variant="h3" fontWeight={700} color="primary.main" sx={{ fontSize: { xs: '1.6rem', sm: '2rem' } }}>
                 $99
               </Typography>
-              <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '1rem', sm: '1.1rem' } }}>
+              <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
                 per month
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.8rem' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.75rem' }}>
                 Professional Plan - Everything you need
               </Typography>
             </Box>
 
-            <Divider sx={{ my: 1.5 }} />
+            <Divider sx={{ my: 1 }} />
 
             <List sx={{ py: 0, flex: 1 }}>
               {features.map((feature, index) => (
-                <ListItem key={index} sx={{ px: 0, py: 0.5 }}>
-                  <ListItemIcon sx={{ minWidth: 24, color: '#000000' }}>
+                <ListItem key={index} sx={{ px: 0, py: 0.25 }}>
+                  <ListItemIcon sx={{ minWidth: 20, color: '#000000' }}>
                     {feature.icon}
                   </ListItemIcon>
                   <ListItemText
@@ -114,7 +134,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
                     primaryTypographyProps={{
                       variant: 'body2',
                       fontWeight: 500,
-                      fontSize: '0.8rem'
+                      fontSize: '0.75rem'
                     }}
                   />
                 </ListItem>
@@ -126,18 +146,18 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         <Alert
           severity="success"
           sx={{ 
-            mb: 1.5, 
+            mb: 1, 
             borderRadius: 2,
             backgroundColor: '#F0F8FF',
             borderColor: '#D6E8F5',
             flexShrink: 0
           }}
-          icon={<CheckCircle size={18} />}
+          icon={<CheckCircle size={16} />}
         >
-          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.75rem' }}>
+          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem' }}>
             Setup Summary Complete
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.7rem' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25, fontSize: '0.65rem' }}>
             Account: {data.firstName} {data.lastName} • Specialty: {data.specialty}
             {data.ehrMode && ` • EHR: ${data.ehrSystem}`}
             • Retention: {data.retentionDuration?.replace('years', ' Years').replace('year', ' Year')}
@@ -147,18 +167,24 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ textAlign: 'center', mb: 1.5, fontSize: '0.75rem', flexShrink: 0 }}
+          sx={{ 
+            textAlign: 'center', 
+            mb: 1, 
+            fontSize: '0.7rem', 
+            flexShrink: 0 
+          }}
         >
           🔒 Secure payment • Cancel anytime • 30-day money-back guarantee
         </Typography>
       </Box>
 
+      {/* Fixed buttons at bottom */}
       <Box sx={{ 
         display: 'flex', 
         flexDirection: { xs: 'column', sm: 'row' },
-        gap: 2,
+        gap: 1.5,
         flexShrink: 0,
-        pt: 2,
+        pt: 1.5,
         borderTop: '1px solid #F0F8FF'
       }}>
         <SecondaryButton
@@ -166,7 +192,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           sx={{ 
             flex: 1,
             order: { xs: 2, sm: 1 },
-            py: 1.5,
+            py: 1.25,
             borderRadius: 2
           }}
         >
@@ -180,9 +206,9 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
             flex: 2, 
             fontWeight: 600,
             order: { xs: 1, sm: 2 },
-            py: 1.5,
+            py: 1.25,
             borderRadius: 2,
-            fontSize: { xs: '0.9rem', sm: '1rem' }
+            fontSize: { xs: '0.85rem', sm: '0.95rem' }
           }}
         >
           {loading ? 'Processing Payment...' : 'Complete Setup - $99/month'}
