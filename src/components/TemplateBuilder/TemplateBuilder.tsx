@@ -1,369 +1,452 @@
-
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Box,
   Typography,
   Button,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  Chip,
-  IconButton,
-  Paper,
-  Divider,
-  Alert,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Grid,
   Card,
   CardContent,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Switch,
+  FormControlLabel,
+  Divider,
+  Alert,
+  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Switch,
-  Tooltip,
-  Fab,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent
+  Grid,
+  Paper,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Fab
 } from '@mui/material';
 import {
   Add as AddIcon,
   Delete as DeleteIcon,
   DragIndicator as DragIcon,
-  Edit as EditIcon,
   Save as SaveIcon,
   Preview as PreviewIcon,
   ExpandMore as ExpandMoreIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
-  FileCopy as CopyIcon,
-  GetApp as ExportIcon,
-  Publish as PublishIcon
+  Edit as EditIcon
 } from '@mui/icons-material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import DragDropList from './DragDropList';
 import { Template, TemplateSection, TemplateField, EditorTemplate, EditorTemplateSection, EditorTemplateField } from './types';
-import TemplateEditor from './TemplateEditor';
-
-interface FieldOption {
-  id: string;
-  text: string;
-}
-
-const initialTemplates: Template[] = [
-  {
-    id: 'template-1',
-    name: 'Patient Intake Form',
-    description: 'Standard form for new patient information',
-    sections: [
-      {
-        id: 'section-1',
-        title: 'Personal Information',
-        description: 'Enter your basic details',
-        content: 'Please fill out all required fields.',
-        type: 'text',
-        fields: [
-          {
-            id: 'field-1',
-            type: 'TEXT',
-            label: 'First Name',
-            placeholder: 'Enter your first name',
-            required: true,
-            validation: { maxLength: 50 },
-            description: 'Your given name'
-          },
-          {
-            id: 'field-2',
-            type: 'TEXT',
-            label: 'Last Name',
-            placeholder: 'Enter your last name',
-            required: true,
-            validation: { maxLength: 50 },
-            description: 'Your family name'
-          }
-        ]
-      },
-      {
-        id: 'section-2',
-        title: 'Contact Information',
-        description: 'How can we reach you?',
-        content: 'Provide your preferred contact method.',
-        type: 'text',
-        fields: [
-          {
-            id: 'field-3',
-            type: 'NUMBER',
-            label: 'Phone Number',
-            placeholder: 'Enter your phone number',
-            required: true,
-            validation: { minLength: 10, maxLength: 10 },
-            description: 'Mobile or landline'
-          },
-          {
-            id: 'field-4',
-            type: 'TEXT',
-            label: 'Email Address',
-            placeholder: 'Enter your email address',
-            required: true,
-            validation: { pattern: '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$' },
-            description: 'A valid email for communication'
-          }
-        ]
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
-
-const fieldTypes = [
-  { value: 'TEXT', label: 'Text' },
-  { value: 'NUMBER', label: 'Number' },
-  { value: 'DATE', label: 'Date' },
-  { value: 'DROPDOWN', label: 'Dropdown' },
-  { value: 'CHECKBOX', label: 'Checkbox' },
-  { value: 'TEXTAREA', label: 'Textarea' },
-  { value: 'RADIO', label: 'Radio' },
-  { value: 'FILE_UPLOAD', label: 'File Upload' }
-];
 
 const TemplateBuilder: React.FC = () => {
-  const [templates, setTemplates] = useState<Template[]>(initialTemplates);
-  const [currentTemplate, setCurrentTemplate] = useState<EditorTemplate | null>(null);
-  const [editingTemplate, setEditingTemplate] = useState<EditorTemplate | null>(null);
-  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
-  const [showEditor, setShowEditor] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
-  const [exportDialog, setExportDialog] = useState(false);
-  const [publishDialog, setPublishDialog] = useState(false);
+  // State for the template
+  const [template, setTemplate] = useState<EditorTemplate>({
+    id: '',
+    name: '',
+    description: '',
+    sections: [],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  });
 
-  // Helper function to convert Template to EditorTemplate
-  const convertToEditorTemplate = useCallback((template: Template): EditorTemplate => {
+  // State for dialogs (e.g., preview, save)
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+
+  // State for alerts (e.g., success, error)
+  const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  // Handlers for dialogs
+  const handlePreviewOpen = () => setPreviewDialogOpen(true);
+  const handlePreviewClose = () => setPreviewDialogOpen(false);
+  const handleSaveOpen = () => setSaveDialogOpen(true);
+  const handleSaveClose = () => setSaveDialogOpen(false);
+
+  const convertToEditorTemplate = (baseTemplate: Template): EditorTemplate => {
     return {
-      ...template,
-      sections: template.sections.map(section => ({
+      ...baseTemplate,
+      sections: baseTemplate.sections.map((section): EditorTemplateSection => ({
         ...section,
         visible: true,
-        fields: section.fields?.map(field => ({
+        fields: section.fields?.map((field): EditorTemplateField => ({
           ...field,
           visible: true
         })) || []
       }))
     };
-  }, []);
+  };
 
-  // Helper function to convert EditorTemplate to Template
-  const convertToTemplate = useCallback((editorTemplate: EditorTemplate): Template => {
+  const convertFromEditorTemplate = (editorTemplate: EditorTemplate): Template => {
     return {
       ...editorTemplate,
-      sections: editorTemplate.sections.map(section => ({
-        ...section,
-        fields: section.fields?.map(field => {
-          const { visible, ...fieldData } = field;
-          return fieldData;
-        })
+      sections: editorTemplate.sections.map((section): TemplateSection => ({
+        id: section.id,
+        title: section.title,
+        description: section.description,
+        content: section.content,
+        type: section.type,
+        fields: section.fields?.map((field): TemplateField => ({
+          id: field.id,
+          type: field.type,
+          label: field.label,
+          placeholder: field.placeholder,
+          required: field.required,
+          options: field.options,
+          validation: field.validation,
+          description: field.description,
+          defaultValue: field.defaultValue
+        })) || []
       }))
     };
-  }, []);
+  };
 
-  const handleCreateTemplate = () => {
-    const newTemplate: EditorTemplate = {
-      id: `template-${Date.now()}`,
-      name: 'New Template',
+  // Handler to add a new section
+  const handleSectionAdd = () => {
+    const newSection: EditorTemplateSection = {
+      id: `section-${Date.now()}`,
+      title: 'New Section',
       description: '',
-      sections: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      content: '',
+      type: 'text',
+      visible: true,
+      fields: []
     };
-    setCurrentTemplate(newTemplate);
-    setEditingTemplate(null);
-    setShowEditor(true);
+    setTemplate(prev => ({
+      ...prev,
+      sections: [...prev.sections, newSection]
+    }));
   };
 
-  const handleCloneTemplate = (template: Template) => {
-    const clonedTemplate: Template = {
-      ...template,
-      id: `template-${Date.now()}`,
-      name: `${template.name} (Clone)`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+  // Handler to update a section
+  const handleSectionUpdate = (sectionId: string, updates: Partial<EditorTemplateSection>) => {
+    setTemplate(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === sectionId ? { ...section, ...updates } : section
+      )
+    }));
+  };
+
+  // Handler to delete a section
+  const handleSectionDelete = (sectionId: string) => {
+    setTemplate(prev => ({
+      ...prev,
+      sections: prev.sections.filter(section => section.id !== sectionId)
+    }));
+  };
+
+  // Handler to add a new field to a section
+  const handleFieldAdd = (sectionId: string) => {
+    const newField: EditorTemplateField = {
+      id: `field-${Date.now()}`,
+      type: 'TEXT',
+      label: 'New Field',
+      placeholder: '',
+      required: false,
+      visible: true
     };
-    setTemplates(prev => [...prev, clonedTemplate]);
+    
+    handleSectionUpdate(sectionId, {
+      fields: [...(template.sections.find(s => s.id === sectionId)?.fields || []), newField]
+    });
   };
 
-  const handleDeleteTemplate = (templateId: string) => {
-    setTemplates(prev => prev.filter(template => template.id !== templateId));
+  // Handler to update a field in a section
+  const handleFieldUpdate = (sectionId: string, fieldId: string, updates: Partial<EditorTemplateField>) => {
+    const section = template.sections.find(s => s.id === sectionId);
+    if (section) {
+      const updatedFields = section.fields.map(field =>
+        field.id === fieldId ? { ...field, ...updates } : field
+      );
+      handleSectionUpdate(sectionId, { fields: updatedFields });
+    }
   };
 
-  const handlePreviewTemplate = (template: Template) => {
-    setPreviewTemplate(template);
-    setShowPreview(true);
+  // Handler to delete a field from a section
+  const handleFieldDelete = (sectionId: string, fieldId: string) => {
+    const section = template.sections.find(s => s.id === sectionId);
+    if (section) {
+      const updatedFields = section.fields.filter(field => field.id !== fieldId);
+      handleSectionUpdate(sectionId, { fields: updatedFields });
+    }
   };
 
-  const handleExportTemplate = (template: Template) => {
-    // Implement export logic here (e.g., JSON download)
-    console.log('Exporting template:', template);
-    setExportDialog(true);
+  const addSection = () => {
+    const newSection: EditorTemplateSection = {
+      id: `section-${Date.now()}`,
+      title: 'New Section',
+      description: '',
+      content: '',
+      type: 'text',
+      visible: true,
+      fields: []
+    };
+    setTemplate(prev => ({
+      ...prev,
+      sections: [...prev.sections, newSection]
+    }));
   };
 
-  const handlePublishTemplate = (template: Template) => {
-    // Implement publish logic here (e.g., to a template library)
-    console.log('Publishing template:', template);
-    setPublishDialog(true);
+  const updateSection = (sectionId: string, updates: Partial<EditorTemplateSection>) => {
+    setTemplate(prev => ({
+      ...prev,
+      sections: prev.sections.map(section =>
+        section.id === sectionId ? { ...section, ...updates } : section
+      )
+    }));
   };
 
-  const handleEditTemplate = (template: Template) => {
-    const editorTemplate = convertToEditorTemplate(template);
-    setEditingTemplate(editorTemplate);
-    setCurrentTemplate(editorTemplate);
-    setShowEditor(true);
+  const deleteSection = (sectionId: string) => {
+    setTemplate(prev => ({
+      ...prev,
+      sections: prev.sections.filter(section => section.id !== sectionId)
+    }));
   };
+
+  const addField = (sectionId: string) => {
+    const newField: EditorTemplateField = {
+      id: `field-${Date.now()}`,
+      type: 'TEXT',
+      label: 'New Field',
+      placeholder: '',
+      required: false,
+      visible: true
+    };
+    
+    updateSection(sectionId, {
+      fields: [...(template.sections.find(s => s.id === sectionId)?.fields || []), newField]
+    });
+  };
+
+  const updateField = (sectionId: string, fieldId: string, updates: Partial<EditorTemplateField>) => {
+    const section = template.sections.find(s => s.id === sectionId);
+    if (section) {
+      const updatedFields = section.fields.map(field =>
+        field.id === fieldId ? { ...field, ...updates } : field
+      );
+      updateSection(sectionId, { fields: updatedFields });
+    }
+  };
+
+  const deleteField = (sectionId: string, fieldId: string) => {
+    const section = template.sections.find(s => s.id === sectionId);
+    if (section) {
+      const updatedFields = section.fields.filter(field => field.id !== fieldId);
+      updateSection(sectionId, { fields: updatedFields });
+    }
+  };
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      setTemplate(prev => {
+        const oldIndex = prev.sections.findIndex(section => section.id === active.id);
+        const newIndex = prev.sections.findIndex(section => section.id === over.id);
+        return {
+          ...prev,
+          sections: arrayMove(prev.sections, oldIndex, newIndex)
+        };
+      });
+    }
+  };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   return (
     <Box sx={{ p: 3 }}>
-      {!showEditor ? (
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h5">
-              Template Library
-            </Typography>
-            <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreateTemplate}>
-              Create Template
-            </Button>
-          </Box>
-          <Grid container spacing={3}>
-            {templates.map(template => (
-              <Grid xs={12} sm={6} md={4} key={template.id}>
-                <Card sx={{ height: '100%' }}>
-                  <CardContent>
-                    <Typography variant="h6" component="div">
-                      {template.name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {template.description}
-                    </Typography>
-                  </CardContent>
-                  <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Box>
-                      <Tooltip title="Edit">
-                        <IconButton onClick={() => handleEditTemplate(template)}>
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Clone">
-                        <IconButton onClick={() => handleCloneTemplate(template)}>
-                          <CopyIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Preview">
-                        <IconButton onClick={() => handlePreviewTemplate(template)}>
-                          <PreviewIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                    <Tooltip title="Delete">
-                      <IconButton color="error" onClick={() => handleDeleteTemplate(template.id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      ) : (
-        <TemplateEditor
-          templateName={currentTemplate?.name}
-          initialSections={currentTemplate?.sections}
-          onSave={(sections) => {
-            if (currentTemplate) {
-              const updatedTemplate: EditorTemplate = {
-                ...currentTemplate,
-                sections
-              };
-              const templateToSave = convertToTemplate(updatedTemplate);
-              if (editingTemplate) {
-                setTemplates(prev => prev.map(t => 
-                  t.id === editingTemplate.id ? templateToSave : t
-                ));
-              } else {
-                setTemplates(prev => [...prev, templateToSave]);
-              }
-            }
-            setShowEditor(false);
-            setCurrentTemplate(null);
-            setEditingTemplate(null);
-          }}
-          onBack={() => {
-            setShowEditor(false);
-            setCurrentTemplate(null);
-            setEditingTemplate(null);
-          }}
-        />
-      )}
+      <Typography variant="h4" gutterBottom>
+        Template Builder
+      </Typography>
       
-      <Dialog open={showPreview} onClose={() => setShowPreview(false)} maxWidth="md" fullWidth>
-        <DialogTitle>Template Preview</DialogTitle>
-        <DialogContent>
-          {previewTemplate && (
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h5" gutterBottom>{previewTemplate.name}</Typography>
-              <Typography variant="body1" paragraph>{previewTemplate.description}</Typography>
-              {previewTemplate.sections.map(section => (
-                <Box key={section.id} sx={{ mb: 3 }}>
-                  <Typography variant="h6" gutterBottom>{section.title}</Typography>
-                  <Typography variant="body2" paragraph>{section.description}</Typography>
-                  {section.fields?.map(field => (
-                    <Box key={field.id} sx={{ mb: 2 }}>
-                      <Typography variant="subtitle1">{field.label}</Typography>
-                      <TextField
-                        fullWidth
-                        placeholder={field.placeholder}
-                        required={field.required}
-                        disabled
-                      />
-                    </Box>
+      <Paper sx={{ p: 3, mb: 3 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Template Name"
+              value={template.name}
+              onChange={(e) => setTemplate(prev => ({ ...prev, name: e.target.value }))}
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              fullWidth
+              label="Description"
+              value={template.description}
+              onChange={(e) => setTemplate(prev => ({ ...prev, description: e.target.value }))}
+              size="small"
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={template.sections.map(s => s.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {template.sections.map((section) => (
+              <Card key={section.id} variant="outlined">
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <DragIcon sx={{ cursor: 'grab' }} />
+                    <TextField
+                      value={section.title}
+                      onChange={(e) => updateSection(section.id, { title: e.target.value })}
+                      variant="outlined"
+                      size="small"
+                      sx={{ flexGrow: 1 }}
+                    />
+                    <Button
+                      startIcon={<AddIcon />}
+                      onClick={() => addField(section.id)}
+                      size="small"
+                      variant="outlined"
+                    >
+                      Add Field
+                    </Button>
+                    <Button
+                      startIcon={<DeleteIcon />}
+                      onClick={() => deleteSection(section.id)}
+                      size="small"
+                      color="error"
+                    >
+                      Delete
+                    </Button>
+                  </Box>
+                  
+                  <TextField
+                    fullWidth
+                    label="Section Description"
+                    value={section.description}
+                    onChange={(e) => updateSection(section.id, { description: e.target.value })}
+                    size="small"
+                    sx={{ mb: 2 }}
+                  />
+
+                  {section.fields.map((field) => (
+                    <Card key={field.id} variant="outlined" sx={{ mb: 2, p: 2 }}>
+                      <Grid container spacing={2} alignItems="center">
+                        <Grid item xs={12} sm={3}>
+                          <TextField
+                            fullWidth
+                            label="Field Label"
+                            value={field.label}
+                            onChange={(e) => updateField(section.id, field.id, { label: e.target.value })}
+                            size="small"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={3}>
+                          <FormControl fullWidth size="small">
+                            <InputLabel>Field Type</InputLabel>
+                            <Select
+                              value={field.type}
+                              label="Field Type"
+                              onChange={(e) => updateField(section.id, field.id, { type: e.target.value as any })}
+                            >
+                              <MenuItem value="TEXT">Text</MenuItem>
+                              <MenuItem value="NUMBER">Number</MenuItem>
+                              <MenuItem value="DATE">Date</MenuItem>
+                              <MenuItem value="DROPDOWN">Dropdown</MenuItem>
+                              <MenuItem value="CHECKBOX">Checkbox</MenuItem>
+                              <MenuItem value="TEXTAREA">Textarea</MenuItem>
+                              <MenuItem value="RADIO">Radio</MenuItem>
+                              <MenuItem value="FILE_UPLOAD">File Upload</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                        <Grid item xs={12} sm={3}>
+                          <TextField
+                            fullWidth
+                            label="Placeholder"
+                            value={field.placeholder || ''}
+                            onChange={(e) => updateField(section.id, field.id, { placeholder: e.target.value })}
+                            size="small"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={2}>
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={field.required}
+                                onChange={(e) => updateField(section.id, field.id, { required: e.target.checked })}
+                              />
+                            }
+                            label="Required"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={1}>
+                          <Button
+                            startIcon={<DeleteIcon />}
+                            onClick={() => deleteField(section.id, field.id)}
+                            size="small"
+                            color="error"
+                          >
+                            Delete
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    </Card>
                   ))}
-                </Box>
-              ))}
-            </Paper>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowPreview(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
+        </SortableContext>
+      </DndContext>
 
-      <Dialog open={exportDialog} onClose={() => setExportDialog(false)}>
-        <DialogTitle>Export Template</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Implement export logic here (e.g., JSON download).
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setExportDialog(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={publishDialog} onClose={() => setPublishDialog(false)}>
-        <DialogTitle>Publish Template</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Implement publish logic here (e.g., to a template library).
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPublishDialog(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
+      <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+        <Button
+          startIcon={<AddIcon />}
+          onClick={addSection}
+          variant="outlined"
+          size="large"
+        >
+          Add Section
+        </Button>
+        <Button
+          startIcon={<SaveIcon />}
+          onClick={() => console.log('Saving template:', convertFromEditorTemplate(template))}
+          variant="contained"
+          size="large"
+        >
+          Save Template
+        </Button>
+        <Button
+          startIcon={<PreviewIcon />}
+          onClick={() => console.log('Previewing template:', template)}
+          variant="outlined"
+          size="large"
+        >
+          Preview
+        </Button>
+      </Box>
     </Box>
   );
 };
