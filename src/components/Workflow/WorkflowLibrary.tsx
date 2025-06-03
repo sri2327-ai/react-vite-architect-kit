@@ -234,8 +234,11 @@ const WorkflowLibrary: React.FC = () => {
         <DialogContent>
           {selectedWorkflow && (
             <DynamicWorkflowBuilder
-              name={selectedWorkflow.name}
-              description={selectedWorkflow.description}
+              workflow={{
+                name: selectedWorkflow.name,
+                description: selectedWorkflow.description,
+                blocks: selectedWorkflow.blocks
+              }}
               onSave={handleSaveWorkflow}
               onCancel={handleCancelWorkflow}
             />
