@@ -7,10 +7,13 @@ import {
   MenuItem,
   FormControl,
   FormLabel,
-  RadioGroup,
   Card,
   CardContent,
   Alert,
+  Grid,
+  Radio,
+  FormControlLabel,
+  RadioGroup,
 } from '@mui/material';
 import { Phone, Stethoscope, Database, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
@@ -57,19 +60,16 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
       {/* Header */}
       <Box sx={{ 
         textAlign: 'center', 
-        mb: { xs: 1.5, sm: 2 }, 
+        mb: { xs: 2, sm: 3 }, 
         flexShrink: 0 
       }}>
         <Typography
           variant="h4"
           sx={{
-            fontWeight: 800,
-            background: 'linear-gradient(135deg, #143151, #387E89)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            mb: 0.5,
-            fontSize: { xs: '1.3rem', sm: '1.6rem' }
+            fontWeight: 700,
+            color: 'primary.main',
+            mb: 1,
+            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
           }}
         >
           Professional Information
@@ -78,26 +78,28 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           variant="body1"
           color="text.secondary"
           sx={{ 
-            fontSize: { xs: '0.85rem', sm: '0.95rem' }
+            fontSize: { xs: '0.875rem', sm: '1rem' },
+            maxWidth: 600,
+            mx: 'auto'
           }}
         >
           Help us customize your experience
         </Typography>
       </Box>
 
-      {/* Content area with better spacing */}
+      {/* Content area */}
       <Box sx={{ 
         flex: 1, 
         display: 'flex', 
         flexDirection: 'column', 
         minHeight: 0,
-        gap: { xs: 1.5, sm: 2 }
+        overflow: 'auto'
       }}>
         <Card
           sx={{
             flex: 1,
-            borderRadius: 2,
-            border: '1px solid #E8F4F8',
+            border: '1px solid',
+            borderColor: 'divider',
             backgroundColor: 'background.paper',
             display: 'flex',
             flexDirection: 'column',
@@ -106,7 +108,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           }}
         >
           <CardContent sx={{ 
-            p: { xs: 2, sm: 3 }, 
+            p: { xs: 2, sm: 3, md: 4 }, 
             flex: 1, 
             display: 'flex', 
             flexDirection: 'column',
@@ -116,22 +118,23 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             <Box component="form" onSubmit={handleSubmit} sx={{ 
               display: 'flex', 
               flexDirection: 'column',
-              gap: { xs: 2, sm: 2.5 },
+              gap: 3,
               height: '100%'
             }}>
               {/* Phone Number Field */}
               <TextField
                 fullWidth
+                size="small"
+                variant="outlined"
                 label="Phone Number"
                 value={formData.phoneNumber}
                 onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
                 required
-                size="small"
                 placeholder="+1 (555) 123-4567"
                 InputProps={{
                   startAdornment: (
                     <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-                      <Phone size={16} color="#387E89" />
+                      <Phone size={20} color="#387E89" />
                     </Box>
                   ),
                 }}
@@ -140,16 +143,17 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
               {/* Medical Specialty Field */}
               <TextField
                 fullWidth
+                size="small"
+                variant="outlined"
                 select
                 label="Medical Specialty"
                 value={formData.specialty}
                 onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
                 required
-                size="small"
                 InputProps={{
                   startAdornment: (
                     <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-                      <Stethoscope size={16} color="#387E89" />
+                      <Stethoscope size={20} color="#387E89" />
                     </Box>
                   ),
                 }}
@@ -161,15 +165,15 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 ))}
               </TextField>
 
-              {/* Documentation Mode with better spacing */}
+              {/* Documentation Mode */}
               <FormControl component="fieldset" sx={{ flex: 1, minHeight: 0 }}>
                 <FormLabel
                   component="legend"
                   sx={{
                     fontWeight: 600,
                     color: 'text.primary',
-                    fontSize: { xs: '0.9rem', sm: '1rem' },
-                    mb: { xs: 1, sm: 1.5 }
+                    fontSize: { xs: '1rem', sm: '1.125rem' },
+                    mb: 2
                   }}
                 >
                   How do you want to document your sessions?
@@ -181,67 +185,73 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                   sx={{ 
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: { xs: 1.5, sm: 2 }
+                    gap: 2
                   }}
                 >
                   {/* EHR Integration Mode */}
                   <Card
                     sx={{
                       cursor: 'pointer',
-                      border: formData.ehrMode ? '2px solid #387E89' : '1px solid #E0E7FF',
-                      borderRadius: 2,
-                      background: formData.ehrMode 
-                        ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
-                        : 'background.paper',
+                      border: 2,
+                      borderColor: formData.ehrMode ? 'primary.main' : 'grey.300',
+                      backgroundColor: formData.ehrMode ? 'primary.50' : 'background.paper',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        borderColor: '#387E89',
+                        borderColor: 'primary.main',
+                        backgroundColor: 'primary.50'
                       }
                     }}
                     onClick={() => setFormData(prev => ({ ...prev, ehrMode: true }))}
                   >
                     <CardContent sx={{ 
-                      p: { xs: 1.5, sm: 2 }, 
+                      p: { xs: 2, sm: 3 }, 
                       display: 'flex', 
                       alignItems: 'center', 
                       gap: 2,
-                      '&:last-child': { pb: { xs: 1.5, sm: 2 } }
+                      '&:last-child': { pb: { xs: 2, sm: 3 } }
                     }}>
                       <Box
                         sx={{
-                          width: { xs: 32, sm: 36 },
-                          height: { xs: 32, sm: 36 },
-                          borderRadius: '8px',
-                          background: formData.ehrMode 
-                            ? 'linear-gradient(135deg, #143151, #387E89)'
-                            : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
+                          width: { xs: 40, sm: 48 },
+                          height: { xs: 40, sm: 48 },
+                          borderRadius: 2,
+                          backgroundColor: formData.ehrMode ? 'primary.main' : 'grey.200',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: formData.ehrMode ? 'white' : '#666',
+                          color: formData.ehrMode ? 'white' : 'grey.600',
                           flexShrink: 0
                         }}
                       >
-                        <Database size={18} />
+                        <Database size={24} />
                       </Box>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography 
-                          variant="body1" 
+                          variant="h6" 
                           fontWeight={700} 
                           color={formData.ehrMode ? 'primary.main' : 'text.primary'}
-                          sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 0.5 }}
+                          sx={{ 
+                            fontSize: { xs: '1rem', sm: '1.125rem' }, 
+                            mb: 0.5 
+                          }}
                         >
                           EHR Integration
                         </Typography>
                         <Typography 
                           variant="body2" 
                           color="text.secondary"
-                          sx={{ fontSize: { xs: '0.8rem', sm: '0.85rem' } }}
+                          sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
                         >
                           Connect with your existing system
                         </Typography>
                       </Box>
-                      {formData.ehrMode && <CheckCircle2 size={18} color="#2E7D32" />}
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio checked={formData.ehrMode} />}
+                        label=""
+                        sx={{ m: 0 }}
+                      />
+                      {formData.ehrMode && <CheckCircle2 size={24} color="#2E7D32" />}
                     </CardContent>
                   </Card>
 
@@ -249,60 +259,66 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                   <Card
                     sx={{
                       cursor: 'pointer',
-                      border: !formData.ehrMode ? '2px solid #387E89' : '1px solid #E0E7FF',
-                      borderRadius: 2,
-                      background: !formData.ehrMode 
-                        ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
-                        : 'background.paper',
+                      border: 2,
+                      borderColor: !formData.ehrMode ? 'primary.main' : 'grey.300',
+                      backgroundColor: !formData.ehrMode ? 'primary.50' : 'background.paper',
                       transition: 'all 0.2s ease',
                       '&:hover': {
-                        borderColor: '#387E89',
+                        borderColor: 'primary.main',
+                        backgroundColor: 'primary.50'
                       }
                     }}
                     onClick={() => setFormData(prev => ({ ...prev, ehrMode: false }))}
                   >
                     <CardContent sx={{ 
-                      p: { xs: 1.5, sm: 2 }, 
+                      p: { xs: 2, sm: 3 }, 
                       display: 'flex', 
                       alignItems: 'center', 
                       gap: 2,
-                      '&:last-child': { pb: { xs: 1.5, sm: 2 } }
+                      '&:last-child': { pb: { xs: 2, sm: 3 } }
                     }}>
                       <Box
                         sx={{
-                          width: { xs: 32, sm: 36 },
-                          height: { xs: 32, sm: 36 },
-                          borderRadius: '8px',
-                          background: !formData.ehrMode 
-                            ? 'linear-gradient(135deg, #143151, #387E89)'
-                            : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
+                          width: { xs: 40, sm: 48 },
+                          height: { xs: 40, sm: 48 },
+                          borderRadius: 2,
+                          backgroundColor: !formData.ehrMode ? 'primary.main' : 'grey.200',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: !formData.ehrMode ? 'white' : '#666',
+                          color: !formData.ehrMode ? 'white' : 'grey.600',
                           flexShrink: 0
                         }}
                       >
-                        <FileText size={18} />
+                        <FileText size={24} />
                       </Box>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography 
-                          variant="body1" 
+                          variant="h6" 
                           fontWeight={700} 
                           color={!formData.ehrMode ? 'primary.main' : 'text.primary'}
-                          sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 0.5 }}
+                          sx={{ 
+                            fontSize: { xs: '1rem', sm: '1.125rem' }, 
+                            mb: 0.5 
+                          }}
                         >
                           Standalone Notes
                         </Typography>
                         <Typography 
                           variant="body2" 
                           color="text.secondary"
-                          sx={{ fontSize: { xs: '0.8rem', sm: '0.85rem' } }}
+                          sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
                         >
                           Use S10.AI as your primary system
                         </Typography>
                       </Box>
-                      {!formData.ehrMode && <CheckCircle2 size={18} color="#2E7D32" />}
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio checked={!formData.ehrMode} />}
+                        label=""
+                        sx={{ m: 0 }}
+                      />
+                      {!formData.ehrMode && <CheckCircle2 size={24} color="#2E7D32" />}
                     </CardContent>
                   </Card>
                 </RadioGroup>
@@ -311,37 +327,38 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           </CardContent>
         </Card>
 
-        {/* Alert with better spacing */}
+        {/* Alert */}
         <Alert
           severity="info"
-          icon={<AlertCircle size={16} />}
+          icon={<AlertCircle size={20} />}
           sx={{ 
+            mt: 2,
             borderRadius: 2,
             flexShrink: 0,
-            py: { xs: 1, sm: 1.2 },
             '& .MuiAlert-message': {
-              fontSize: { xs: '0.8rem', sm: '0.85rem' }
+              fontSize: { xs: '0.875rem', sm: '1rem' }
             }
           }}
         >
           Your selection determines the next setup steps for optimal integration.
         </Alert>
 
-        {/* Fixed buttons at bottom with better spacing */}
+        {/* Fixed buttons at bottom */}
         <Box sx={{ 
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
-          gap: { xs: 1.5, sm: 2 },
-          flexShrink: 0
+          gap: 2,
+          flexShrink: 0,
+          pt: 2,
+          mt: 2
         }}>
           <SecondaryButton
             onClick={onBack}
             sx={{ 
-              flex: 1,
+              flex: { xs: 1, sm: 1 },
               order: { xs: 2, sm: 1 },
-              py: { xs: 1.2, sm: 1.5 },
-              borderRadius: 2,
-              fontSize: { xs: '0.85rem', sm: '0.9rem' }
+              py: { xs: 1.5, sm: 1.25 },
+              fontSize: { xs: '0.875rem', sm: '1rem' }
             }}
           >
             Back
@@ -351,12 +368,11 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             onClick={handleSubmit}
             disabled={!formData.phoneNumber || !formData.specialty}
             sx={{ 
-              flex: 2, 
+              flex: { xs: 1, sm: 2 }, 
               fontWeight: 700,
               order: { xs: 1, sm: 2 },
-              py: { xs: 1.2, sm: 1.5 },
-              borderRadius: 2,
-              fontSize: { xs: '0.85rem', sm: '0.9rem' }
+              py: { xs: 1.5, sm: 1.25 },
+              fontSize: { xs: '0.875rem', sm: '1rem' }
             }}
           >
             Continue →

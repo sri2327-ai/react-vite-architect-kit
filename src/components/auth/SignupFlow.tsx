@@ -1,6 +1,16 @@
 
 import React, { useState } from 'react';
-import { Box, Container, Stepper, Step, StepLabel, Paper, StepIcon, Typography } from '@mui/material';
+import { 
+  Box, 
+  Container, 
+  Stepper, 
+  Step, 
+  StepLabel, 
+  Paper, 
+  Typography,
+  useTheme,
+  useMediaQuery 
+} from '@mui/material';
 import { AccountCreation } from './steps/AccountCreation';
 import { UserInformation } from './steps/UserInformation';
 import { EHRSelection } from './steps/EHRSelection';
@@ -38,12 +48,14 @@ export interface SignupData {
 }
 
 const CustomStepIcon = ({ active, completed, icon }: any) => {
+  const theme = useTheme();
+  
   if (completed) {
     return (
       <CheckCircle 
         sx={{ 
-          color: '#2E8B57',
-          fontSize: { xs: 18, sm: 22 }
+          color: 'success.main',
+          fontSize: { xs: 20, sm: 24 }
         }} 
       />
     );
@@ -52,15 +64,15 @@ const CustomStepIcon = ({ active, completed, icon }: any) => {
   return (
     <Box
       sx={{
-        width: { xs: 18, sm: 22 },
-        height: { xs: 18, sm: 22 },
+        width: { xs: 20, sm: 24 },
+        height: { xs: 20, sm: 24 },
         borderRadius: '50%',
-        backgroundColor: active ? 'primary.main' : '#E5E7EB',
-        color: active ? 'white' : '#9CA3AF',
+        backgroundColor: active ? 'primary.main' : 'grey.300',
+        color: active ? 'white' : 'grey.600',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: { xs: '0.7rem', sm: '0.8rem' },
+        fontSize: { xs: '0.75rem', sm: '0.875rem' },
         fontWeight: 600,
         transition: 'all 0.3s ease'
       }}
@@ -73,6 +85,8 @@ const CustomStepIcon = ({ active, completed, icon }: any) => {
 export const SignupFlow: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [signupData, setSignupData] = useState<Partial<SignupData>>({});
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const getVisibleSteps = () => {
     const steps = ['Account Creation', 'User Information'];
@@ -135,13 +149,18 @@ export const SignupFlow: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2 } }}>
+    <Container 
+      maxWidth="md" 
+      sx={{ 
+        px: { xs: 1, sm: 2, md: 3 },
+        py: { xs: 1, sm: 2 }
+      }}
+    >
       <Box 
         sx={{ 
           minHeight: '100vh',
           display: 'flex',
-          flexDirection: 'column',
-          py: { xs: 1, sm: 2 }
+          flexDirection: 'column'
         }}
       >
         <Paper
@@ -150,105 +169,112 @@ export const SignupFlow: React.FC = () => {
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            p: { xs: 2, sm: 3 },
-            borderRadius: 3,
+            p: { xs: 2, sm: 3, md: 4 },
             backgroundColor: 'background.paper',
-            border: `1px solid ${(theme) => theme.palette.divider}`,
-            boxShadow: '0 8px 32px rgba(20, 49, 81, 0.08)',
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
             maxHeight: { xs: 'calc(100vh - 16px)', sm: 'calc(100vh - 32px)' },
             overflow: 'hidden'
           }}
         >
-          <Box sx={{ 
-            display: { xs: 'block', md: 'none' }, 
-            mb: { xs: 1, sm: 1.5 },
-            textAlign: 'center',
-            flexShrink: 0
-          }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.8rem' }}>
-              Step {activeStep + 1} of {visibleSteps.length}
-            </Typography>
-            <Box
-              sx={{
-                width: '100%',
-                height: 3,
-                backgroundColor: '#F0F8FF',
-                borderRadius: 2,
-                overflow: 'hidden'
-              }}
-            >
+          {/* Mobile Progress Bar */}
+          {isMobile && (
+            <Box sx={{ 
+              mb: 2,
+              textAlign: 'center',
+              flexShrink: 0
+            }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                Step {activeStep + 1} of {visibleSteps.length}
+              </Typography>
               <Box
                 sx={{
-                  width: `${((activeStep + 1) / visibleSteps.length) * 100}%`,
-                  height: '100%',
-                  background: 'linear-gradient(90deg, #143151, #387E89)',
-                  transition: 'width 0.3s ease'
+                  width: '100%',
+                  height: 4,
+                  backgroundColor: 'grey.200',
+                  borderRadius: 2,
+                  overflow: 'hidden'
                 }}
-              />
-            </Box>
-          </Box>
-
-          <Stepper 
-            activeStep={activeStep} 
-            sx={{ 
-              mb: { md: 1.5 },
-              display: { xs: 'none', md: 'flex' },
-              flexShrink: 0,
-              '& .MuiStepLabel-label': {
-                fontSize: '0.8rem',
-                fontWeight: 500
-              },
-              '& .MuiStepLabel-label.Mui-active': {
-                color: 'primary.main',
-                fontWeight: 600,
-              },
-              '& .MuiStepLabel-label.Mui-completed': {
-                color: 'primary.main',
-                fontWeight: 500
-              },
-              '& .MuiStepConnector-line': {
-                borderColor: '#E5E7EB',
-                borderTopWidth: 2
-              },
-              '& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line': {
-                borderColor: 'primary.main'
-              },
-              '& .MuiStepConnector-root.Mui-active .MuiStepConnector-line': {
-                borderColor: '#D6E8F5'
-              }
-            }}
-          >
-            {visibleSteps.map((label, index) => (
-              <Step key={label}>
-                <StepLabel 
-                  StepIconComponent={CustomStepIcon}
+              >
+                <Box
                   sx={{
-                    '& .MuiStepLabel-iconContainer': {
-                      pr: 0.5
-                    }
+                    width: `${((activeStep + 1) / visibleSteps.length) * 100}%`,
+                    height: '100%',
+                    backgroundColor: 'primary.main',
+                    transition: 'width 0.3s ease'
                   }}
-                >
-                  {label}
-                </StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+                />
+              </Box>
+            </Box>
+          )}
 
-          <Typography
-            variant="h6"
-            sx={{
-              display: { xs: 'block', md: 'none' },
-              textAlign: 'center',
-              mb: { xs: 1, sm: 1.5 },
-              fontWeight: 600,
-              color: 'primary.main',
-              fontSize: '1rem',
-              flexShrink: 0
-            }}
-          >
-            {visibleSteps[activeStep]}
-          </Typography>
+          {/* Desktop Stepper */}
+          {!isMobile && (
+            <Stepper 
+              activeStep={activeStep} 
+              sx={{ 
+                mb: 3,
+                flexShrink: 0,
+                '& .MuiStepLabel-label': {
+                  fontSize: { sm: '0.875rem', md: '1rem' },
+                  fontWeight: 500
+                },
+                '& .MuiStepLabel-label.Mui-active': {
+                  color: 'primary.main',
+                  fontWeight: 600,
+                },
+                '& .MuiStepLabel-label.Mui-completed': {
+                  color: 'primary.main',
+                  fontWeight: 500
+                },
+                '& .MuiStepConnector-line': {
+                  borderColor: 'grey.300',
+                  borderTopWidth: 2
+                },
+                '& .MuiStepConnector-root.Mui-completed .MuiStepConnector-line': {
+                  borderColor: 'primary.main'
+                },
+                '& .MuiStepConnector-root.Mui-active .MuiStepConnector-line': {
+                  borderColor: 'primary.light'
+                }
+              }}
+            >
+              {visibleSteps.map((label, index) => (
+                <Step key={label}>
+                  <StepLabel 
+                    StepIconComponent={CustomStepIcon}
+                    sx={{
+                      '& .MuiStepLabel-iconContainer': {
+                        pr: 1
+                      }
+                    }}
+                  >
+                    {label}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          )}
 
+          {/* Mobile Step Title */}
+          {isMobile && (
+            <Typography
+              variant="h6"
+              sx={{
+                textAlign: 'center',
+                mb: 2,
+                fontWeight: 600,
+                color: 'primary.main',
+                fontSize: '1.125rem',
+                flexShrink: 0
+              }}
+            >
+              {visibleSteps[activeStep]}
+            </Typography>
+          )}
+
+          {/* Step Content */}
           <Box 
             sx={{ 
               flex: 1,

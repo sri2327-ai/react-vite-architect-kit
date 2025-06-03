@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogContent,
   IconButton,
+  Grid,
 } from '@mui/material';
 import { 
   CheckCircle, 
@@ -41,10 +42,10 @@ interface PricingData {
 }
 
 const features = [
-  { icon: <Cloud size={16} />, text: 'Unlimited clinical note transcriptions' },
-  { icon: <Shield size={16} />, text: 'HIPAA-compliant data security' },
-  { icon: <Headphones size={16} />, text: '24/7 customer support' },
-  { icon: <BarChart3 size={16} />, text: 'Advanced analytics and insights' },
+  { icon: <Cloud size={20} />, text: 'Unlimited clinical note transcriptions' },
+  { icon: <Shield size={20} />, text: 'HIPAA-compliant data security' },
+  { icon: <Headphones size={20} />, text: '24/7 customer support' },
+  { icon: <BarChart3 size={20} />, text: 'Advanced analytics and insights' },
 ];
 
 export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
@@ -118,10 +119,10 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
       flexDirection: 'column',
       overflow: 'hidden'
     }}>
-      {/* Header - Fixed height */}
+      {/* Header */}
       <Box sx={{ 
         textAlign: 'center', 
-        mb: { xs: 1, sm: 1.5 }, 
+        mb: { xs: 2, sm: 3 }, 
         flexShrink: 0 
       }}>
         <Typography
@@ -129,8 +130,8 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           sx={{
             fontWeight: 700,
             color: 'primary.main',
-            mb: 0.5,
-            fontSize: { xs: '1.4rem', sm: '1.8rem' }
+            mb: 1,
+            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
           }}
         >
           Complete Your Setup
@@ -139,7 +140,9 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           variant="body1"
           color="text.secondary"
           sx={{ 
-            fontSize: { xs: '0.85rem', sm: '0.95rem' }
+            fontSize: { xs: '0.875rem', sm: '1rem' },
+            maxWidth: 600,
+            mx: 'auto'
           }}
         >
           Choose your S10.AI subscription plan
@@ -156,7 +159,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
       }}>
         <Card
           sx={{
-            mb: 1,
+            mb: 2,
             border: 2,
             borderColor: 'primary.main',
             backgroundColor: 'background.paper',
@@ -168,73 +171,101 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           }}
         >
           <CardContent sx={{ 
-            p: { xs: 1.5, sm: 2 }, 
+            p: { xs: 2, sm: 3, md: 4 }, 
             flex: 1, 
             display: 'flex', 
             flexDirection: 'column',
             minHeight: 0
           }}>
-            <Box sx={{ textAlign: 'center', mb: 1 }}>
-              <Typography variant="h3" fontWeight={700} color="primary.main" sx={{ fontSize: { xs: '1.6rem', sm: '2rem' } }}>
+            {/* Pricing Header */}
+            <Box sx={{ textAlign: 'center', mb: 3 }}>
+              <Typography variant="h2" fontWeight={700} color="primary.main" sx={{ 
+                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } 
+              }}>
                 ${finalPrice}
               </Typography>
               {promoApplied && (
-                <Typography variant="body2" sx={{ textDecoration: 'line-through', color: 'text.secondary', fontSize: '0.9rem' }}>
+                <Typography variant="h6" sx={{ 
+                  textDecoration: 'line-through', 
+                  color: 'text.secondary',
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}>
                   ${currentPrice}
                 </Typography>
               )}
-              <Typography variant="h6" color="text.secondary" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+              <Typography variant="h6" color="text.secondary" sx={{ 
+                fontSize: { xs: '1rem', sm: '1.25rem' },
+                mb: 1
+              }}>
                 per month
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: '0.75rem' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ 
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}>
                 {data.ehrMode ? 'Professional Plan with EHR' : 'Professional Plan'} - Everything you need
               </Typography>
             </Box>
 
-            <Divider sx={{ my: 1 }} />
+            <Divider sx={{ my: 2 }} />
 
             {/* Promo Code Section */}
-            <Box sx={{ mb: 1 }}>
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
-                <TextField
-                  size="small"
-                  label="Promo Code"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                  disabled={promoApplied}
-                  sx={{ flex: 1 }}
-                  InputProps={{
-                    startAdornment: <Tag size={16} style={{ marginRight: 8, color: '#666' }} />
-                  }}
-                />
-                <SecondaryButton
-                  size="small"
-                  onClick={handlePromoCode}
-                  disabled={!promoCode || promoApplied}
-                  sx={{ py: 1 }}
-                >
-                  Apply
-                </SecondaryButton>
-              </Box>
+            <Box sx={{ mb: 3 }}>
+              <Grid container spacing={2} alignItems="flex-end">
+                <Grid size={{ xs: 12, sm: 8 }}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    label="Promo Code"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    disabled={promoApplied}
+                    InputProps={{
+                      startAdornment: <Tag size={16} style={{ marginRight: 8, color: '#666' }} />
+                    }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <SecondaryButton
+                    fullWidth
+                    size="small"
+                    onClick={handlePromoCode}
+                    disabled={!promoCode || promoApplied}
+                    sx={{ 
+                      py: { xs: 1.5, sm: 1.25 },
+                      fontSize: { xs: '0.875rem', sm: '0.75rem' }
+                    }}
+                  >
+                    Apply
+                  </SecondaryButton>
+                </Grid>
+              </Grid>
               {promoApplied && (
-                <Typography variant="body2" color="success.main" sx={{ mt: 0.5, fontSize: '0.75rem' }}>
+                <Typography variant="body2" color="success.main" sx={{ 
+                  mt: 1, 
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }}>
                   ✓ Promo code applied! You saved ${pricing.promoDiscount}
                 </Typography>
               )}
             </Box>
 
+            {/* Features List */}
             <List sx={{ py: 0, flex: 1 }}>
               {features.map((feature, index) => (
-                <ListItem key={index} sx={{ px: 0, py: 0.25 }}>
-                  <ListItemIcon sx={{ minWidth: 20, color: '#000000' }}>
+                <ListItem key={index} sx={{ px: 0, py: 1 }}>
+                  <ListItemIcon sx={{ 
+                    minWidth: { xs: 32, sm: 40 }, 
+                    color: 'primary.main' 
+                  }}>
                     {feature.icon}
                   </ListItemIcon>
                   <ListItemText
                     primary={feature.text}
                     primaryTypographyProps={{
-                      variant: 'body2',
+                      variant: 'body1',
                       fontWeight: 500,
-                      fontSize: '0.75rem'
+                      fontSize: { xs: '0.875rem', sm: '1rem' }
                     }}
                   />
                 </ListItem>
@@ -243,33 +274,40 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           </CardContent>
         </Card>
 
+        {/* Setup Summary */}
         <Alert
           severity="success"
           sx={{ 
-            mb: 1, 
+            mb: 2, 
             borderRadius: 2,
             backgroundColor: '#F0F8FF',
             borderColor: '#D6E8F5',
             flexShrink: 0
           }}
-          icon={<CheckCircle size={16} />}
+          icon={<CheckCircle size={20} />}
         >
-          <Typography variant="body2" fontWeight={600} sx={{ fontSize: '0.7rem' }}>
+          <Typography variant="body1" fontWeight={600} sx={{ 
+            fontSize: { xs: '0.875rem', sm: '1rem' }
+          }}>
             Setup Summary Complete
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25, fontSize: '0.65rem' }}>
+          <Typography variant="body2" color="text.secondary" sx={{ 
+            mt: 0.5, 
+            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+          }}>
             Account: {data.firstName} {data.lastName} • Specialty: {data.specialty}
             {data.ehrMode && ` • EHR: ${data.ehrSystem}`}
           </Typography>
         </Alert>
 
+        {/* Security Note */}
         <Typography
           variant="body2"
           color="text.secondary"
           sx={{ 
             textAlign: 'center', 
-            mb: 1, 
-            fontSize: '0.7rem', 
+            mb: 2, 
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
             flexShrink: 0 
           }}
         >
@@ -281,18 +319,19 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
       <Box sx={{ 
         display: 'flex', 
         flexDirection: { xs: 'column', sm: 'row' },
-        gap: 1.5,
+        gap: 2,
         flexShrink: 0,
-        pt: 1.5,
-        borderTop: '1px solid #F0F8FF'
+        pt: 2,
+        borderTop: '1px solid',
+        borderColor: 'divider'
       }}>
         <SecondaryButton
           onClick={onBack}
           sx={{ 
-            flex: 1,
+            flex: { xs: 1, sm: 1 },
             order: { xs: 2, sm: 1 },
-            py: 1.25,
-            borderRadius: 2
+            py: { xs: 1.5, sm: 1.25 },
+            fontSize: { xs: '0.875rem', sm: '1rem' }
           }}
         >
           Back
@@ -300,14 +339,13 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         <PrimaryButton
           onClick={handlePayment}
           disabled={loading}
-          startIcon={<CreditCard size={16} />}
+          startIcon={<CreditCard size={20} />}
           sx={{ 
-            flex: 2, 
+            flex: { xs: 1, sm: 2 }, 
             fontWeight: 600,
             order: { xs: 1, sm: 2 },
-            py: 1.25,
-            borderRadius: 2,
-            fontSize: { xs: '0.85rem', sm: '0.95rem' }
+            py: { xs: 1.5, sm: 1.25 },
+            fontSize: { xs: '0.875rem', sm: '1rem' }
           }}
         >
           {loading ? 'Processing Payment...' : `Complete Setup - $${finalPrice}/month`}
@@ -318,12 +356,14 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
       <Dialog
         open={showPaymentModal}
         onClose={handlePaymentModalClose}
-        maxWidth="md"
+        maxWidth="lg"
         fullWidth
+        fullScreen={{ xs: true, sm: false }}
         sx={{
           '& .MuiDialog-paper': {
-            height: '80vh',
-            maxHeight: '600px'
+            height: { xs: '100vh', sm: '80vh' },
+            maxHeight: { xs: '100vh', sm: '800px' },
+            m: { xs: 0, sm: 2 }
           }
         }}
       >
@@ -332,8 +372,8 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
             onClick={handlePaymentModalClose}
             sx={{
               position: 'absolute',
-              right: 8,
-              top: 8,
+              right: { xs: 8, sm: 16 },
+              top: { xs: 8, sm: 16 },
               zIndex: 1,
               backgroundColor: 'background.paper',
               '&:hover': {
@@ -341,7 +381,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
               }
             }}
           >
-            <X />
+            <X size={24} />
           </IconButton>
           {paymentUrl && (
             <iframe
@@ -351,7 +391,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
               style={{ border: 'none' }}
               title="Zoho SecurePay"
               onLoad={() => {
-                // Send payment completion simulation after 5 seconds for demo
+                // Send payment completion simulation after 30 seconds for demo
                 setTimeout(() => {
                   // This would normally come from the payment gateway
                   // window.postMessage('payment_success', '*');
