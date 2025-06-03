@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
+import { templateBuilderService } from '../../services/templateBuilderService';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -46,6 +47,9 @@ const WorkflowBuilder: React.FC = () => {
   };
 
   const handleImportWorkflow = (workflow: any) => {
+    // Get available visit types from template builder
+    const availableVisitTypes = templateBuilderService.getAllVisitTypeNames();
+    
     // Convert predefined workflow to imported workflow format
     const importedWorkflow = {
       id: `imported-${Date.now()}`,
@@ -54,8 +58,8 @@ const WorkflowBuilder: React.FC = () => {
       ehrSystem: workflow.ehrSystem,
       status: 'draft' as const,
       blocks: workflow.blocks,
-      availableVisitTypes: workflow.supportedVisitTypes,
-      visitTypeMappings: workflow.supportedVisitTypes.map((visitType: string) => ({
+      availableVisitTypes: availableVisitTypes,
+      visitTypeMappings: availableVisitTypes.map((visitType: string) => ({
         visitType,
         templateFields: {},
         isConfigured: false
@@ -77,8 +81,8 @@ const WorkflowBuilder: React.FC = () => {
       <Alert severity="info" sx={{ mb: 3 }}>
         <Typography variant="body2">
           <strong>Agentic EHR Automation:</strong> Import pre-built workflows from the library, 
-          configure them for your visit types, map fields to your templates, then execute with 
-          your EHR credentials for seamless automation.
+          configure them for your visit types (from Template Builder), map workflow blocks to your 
+          template note sections, then execute with your EHR credentials for seamless automation.
         </Typography>
       </Alert>
 
@@ -97,7 +101,7 @@ const WorkflowBuilder: React.FC = () => {
         </TabPanel>
         
         <TabPanel value={tabValue} index={1}>
-          <MyWorkflows />
+          <MyWorkflows importedWorkflows={importedWorkflows} setImportedWorkflows={setImportedWorkflows} />
         </TabPanel>
       </Paper>
     </Box>

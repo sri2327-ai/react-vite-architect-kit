@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -51,6 +50,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   AccountTree as WorkflowIcon
 } from '@mui/icons-material';
+import { templateBuilderService } from '../../services/templateBuilderService';
 
 interface WorkflowBlock {
   id: string;
@@ -80,59 +80,69 @@ interface ImportedWorkflow {
   availableVisitTypes: string[];
 }
 
-const MyWorkflows: React.FC = () => {
-  const [workflows, setWorkflows] = useState<ImportedWorkflow[]>([
-    {
-      id: '1',
-      name: 'Epic - Standard Patient Visit',
-      description: 'Complete patient encounter workflow with automated note generation',
-      ehrSystem: 'Epic',
-      status: 'configured',
-      lastRun: '2024-01-15 14:30',
-      availableVisitTypes: ['Office Visit', 'Follow-up', 'Annual Physical'],
-      visitTypeMappings: [
-        {
-          visitType: 'Office Visit',
-          templateFields: {
-            'chief-complaint': 'Chief Complaint',
-            'subjective-note': 'History of Present Illness',
-            'objective-note': 'Physical Examination'
+interface MyWorkflowsProps {
+  importedWorkflows?: any[];
+  setImportedWorkflows?: (workflows: any[]) => void;
+}
+
+const MyWorkflows: React.FC<MyWorkflowsProps> = ({ 
+  importedWorkflows = [], 
+  setImportedWorkflows 
+}) => {
+  const [workflows, setWorkflows] = useState<ImportedWorkflow[]>(
+    importedWorkflows.length > 0 ? importedWorkflows : [
+      {
+        id: '1',
+        name: 'Epic - Standard Patient Visit',
+        description: 'Complete patient encounter workflow with automated note generation',
+        ehrSystem: 'Epic',
+        status: 'configured',
+        lastRun: '2024-01-15 14:30',
+        availableVisitTypes: templateBuilderService.getAllVisitTypeNames(),
+        visitTypeMappings: [
+          {
+            visitType: 'Office Visit',
+            templateFields: {
+              'chief-complaint': 'Chief Complaint',
+              'subjective-note': 'History of Present Illness',
+              'objective-note': 'Physical Examination'
+            },
+            isConfigured: true
           },
-          isConfigured: true
-        },
-        {
-          visitType: 'Follow-up',
-          templateFields: {},
-          isConfigured: false
-        }
-      ],
-      blocks: [
-        {
-          id: 'schedule-filter',
-          type: 'schedule',
-          name: 'Schedule Menu',
-          description: 'Access provider schedule with filters',
-          isEditable: true
-        },
-        {
-          id: 'chief-complaint',
-          type: 'note_entry',
-          name: 'Chief Complaint Entry',
-          description: 'Enter patient chief complaint',
-          ehrField: 'chief_complaint',
-          isEditable: true
-        },
-        {
-          id: 'subjective-note',
-          type: 'note_entry',
-          name: 'Subjective Note',
-          description: 'Enter HPI, ROS, and subjective findings',
-          ehrField: 'subjective',
-          isEditable: true
-        }
-      ]
-    }
-  ]);
+          {
+            visitType: 'Follow-up',
+            templateFields: {},
+            isConfigured: false
+          }
+        ],
+        blocks: [
+          {
+            id: 'schedule-filter',
+            type: 'schedule',
+            name: 'Schedule Menu',
+            description: 'Access provider schedule with filters',
+            isEditable: true
+          },
+          {
+            id: 'chief-complaint',
+            type: 'note_entry',
+            name: 'Chief Complaint Entry',
+            description: 'Enter patient chief complaint',
+            ehrField: 'chief_complaint',
+            isEditable: true
+          },
+          {
+            id: 'subjective-note',
+            type: 'note_entry',
+            name: 'Subjective Note',
+            description: 'Enter HPI, ROS, and subjective findings',
+            ehrField: 'subjective',
+            isEditable: true
+          }
+        ]
+      }
+    ]
+  );
   
   const [executeDialog, setExecuteDialog] = useState(false);
   const [configureDialog, setConfigureDialog] = useState(false);
@@ -229,6 +239,38 @@ const MyWorkflows: React.FC = () => {
     }, 3000);
   };
 
+  const handleFieldMapping = (visitType: string, blockId: string, templateField: string) => {
+    if (!selectedWorkflow) return;
+    
+    setSelectedWorkflow(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        visitTypeMappings: prev.visitTypeMappings.map(mapping =>
+          mapping.visitType === visitType
+            ? {
+                ...mapping,
+                templateFields: {
+                  ...mapping.templateFields,
+                  [blockId]: templateField
+                },
+                isConfigured: Object.keys({
+                  ...mapping.templateFields,
+                  [blockId]: templateField
+                }).length >= prev.blocks.filter(b => b.type === 'note_entry').length
+              }
+            : mapping
+        )
+      };
+    });
+  };
+
+  const getTemplateSectionsForVisitType = (visitTypeName: string) => {
+    const visitType = templateBuilderService.getVisitTypeByName(visitTypeName);
+    return visitType?.template.sections || [];
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'success';
@@ -267,17 +309,9 @@ const MyWorkflows: React.FC = () => {
           <Alert severity="info" sx={{ mb: 3, maxWidth: 600, mx: 'auto' }}>
             <Typography variant="body2">
               <strong>Next Steps:</strong> Go to Workflow Library → Browse predefined EHR workflows → 
-              Import to My Workflows → Configure visit type mappings → Execute with your EHR
+              Import to My Workflows → Configure visit type mappings (from your Template Builder) → Execute with your EHR
             </Typography>
           </Alert>
-          <Button
-            variant="contained"
-            startIcon={<ImportIcon />}
-            onClick={() => console.log('Navigate to workflow library')}
-            size="large"
-          >
-            Go to Workflow Library
-          </Button>
         </Box>
       ) : (
         <Box>
@@ -286,7 +320,7 @@ const MyWorkflows: React.FC = () => {
               My Workflows
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Configure and execute your imported EHR automation workflows
+              Configure and execute your imported EHR automation workflows using visit types from Template Builder
             </Typography>
           </Box>
 
@@ -408,7 +442,7 @@ const MyWorkflows: React.FC = () => {
           {executionStep === 0 && (
             <Box>
               <Alert severity="info" sx={{ mb: 3 }}>
-                Select the visit type for this workflow execution
+                Select the visit type for this workflow execution. Visit types come from your Template Builder.
               </Alert>
               <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel>Visit Type</InputLabel>
@@ -538,56 +572,66 @@ const MyWorkflows: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           <Alert severity="info" sx={{ mb: 3 }}>
-            Map your workflow blocks to template fields for each visit type. This ensures the 
-            automation populates the correct fields in your templates.
+            Map your workflow blocks to template note sections for each visit type. Visit types and template sections 
+            come from your Template Builder. This ensures the automation populates the correct fields in your templates.
           </Alert>
           
-          {selectedWorkflow?.visitTypeMappings.map((mapping) => (
-            <Accordion key={mapping.visitType} sx={{ mb: 2 }}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                  <Typography variant="h6">{mapping.visitType}</Typography>
-                  <Chip 
-                    label={mapping.isConfigured ? 'Configured' : 'Needs Configuration'}
-                    color={mapping.isConfigured ? 'success' : 'warning'}
-                    size="small"
-                  />
-                </Box>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Map workflow blocks to your template fields for {mapping.visitType}
-                </Typography>
-                
-                {selectedWorkflow.blocks
-                  .filter(block => block.type === 'note_entry')
-                  .map((block) => (
-                    <Box key={block.id} sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                        {block.name}
-                      </Typography>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Template Field</InputLabel>
-                        <Select
-                          value={mapping.templateFields[block.id] || ''}
-                          label="Template Field"
-                          onChange={(e) => {
-                            // Handle field mapping update
-                            console.log(`Mapping ${block.id} to ${e.target.value} for ${mapping.visitType}`);
-                          }}
-                        >
-                          {availableTemplateFields.map((field) => (
-                            <MenuItem key={field} value={field}>
-                              {field}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Box>
-                  ))}
-              </AccordionDetails>
-            </Accordion>
-          ))}
+          {selectedWorkflow?.visitTypeMappings.map((mapping) => {
+            const templateSections = getTemplateSectionsForVisitType(mapping.visitType);
+            
+            return (
+              <Accordion key={mapping.visitType} sx={{ mb: 2 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                    <Typography variant="h6">{mapping.visitType}</Typography>
+                    <Chip 
+                      label={mapping.isConfigured ? 'Configured' : 'Needs Configuration'}
+                      color={mapping.isConfigured ? 'success' : 'warning'}
+                      size="small"
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      ({templateSections.length} template sections available)
+                    </Typography>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Map workflow blocks to template note sections for {mapping.visitType}. 
+                    Template sections come from your Template Builder.
+                  </Typography>
+                  
+                  {selectedWorkflow.blocks
+                    .filter(block => block.type === 'note_entry')
+                    .map((block) => (
+                      <Box key={block.id} sx={{ mb: 2 }}>
+                        <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                          {block.name}
+                        </Typography>
+                        <FormControl fullWidth size="small">
+                          <InputLabel>Template Note Section</InputLabel>
+                          <Select
+                            value={mapping.templateFields[block.id] || ''}
+                            label="Template Note Section"
+                            onChange={(e) => handleFieldMapping(mapping.visitType, block.id, e.target.value)}
+                          >
+                            {templateSections.map((section) => (
+                              <MenuItem key={section.id} value={section.name}>
+                                {section.name} ({section.type})
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {mapping.templateFields[block.id] && (
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                            Maps to: {mapping.templateFields[block.id]}
+                          </Typography>
+                        )}
+                      </Box>
+                    ))}
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfigureDialog(false)}>
