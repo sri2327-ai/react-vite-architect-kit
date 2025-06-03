@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -32,7 +33,8 @@ import {
   AccordionDetails,
   Fab,
   Fade,
-  Zoom
+  Zoom,
+  IconButton
 } from '@mui/material';
 import {
   Download as ImportIcon,
@@ -245,7 +247,7 @@ const WorkflowLibrary: React.FC = () => {
     }
   ];
 
-  const filteredWorkflows = workflowTemplates.filter(wf => {
+  const displayedWorkflows = workflowTemplates.filter(wf => {
     const ehrMatch = wf.ehrSystem === userEHR;
     const categoryMatch = selectedCategory === 'all' || wf.category === selectedCategory;
     return ehrMatch && categoryMatch;
@@ -319,7 +321,7 @@ const WorkflowLibrary: React.FC = () => {
             
             <Grid container spacing={2}>
               {visitTypes.map((visitType) => (
-                <Grid item xs={12} sm={6} key={visitType}>
+                <Grid key={visitType} xs={12} sm={6}>
                   <Card 
                     sx={{ 
                       cursor: 'pointer',
@@ -353,11 +355,11 @@ const WorkflowLibrary: React.FC = () => {
                 size="small"
                 placeholder="Add custom visit type..."
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter' && e.target.value.trim()) {
-                    const newType = e.target.value.trim();
+                  if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
+                    const newType = (e.target as HTMLInputElement).value.trim();
                     setVisitTypes(prev => [...prev, newType]);
                     setSelectedVisitTypes(prev => [...prev, newType]);
-                    e.target.value = '';
+                    (e.target as HTMLInputElement).value = '';
                   }
                 }}
               />
@@ -568,12 +570,6 @@ const WorkflowLibrary: React.FC = () => {
     }
   };
 
-  const filteredWorkflows = workflowTemplates.filter(wf => {
-    const ehrMatch = wf.ehrSystem === userEHR;
-    const categoryMatch = selectedCategory === 'all' || wf.category === selectedCategory;
-    return ehrMatch && categoryMatch;
-  });
-
   return (
     <Box sx={{ p: 3 }}>
       <Alert severity="info" sx={{ mb: 3 }}>
@@ -605,7 +601,7 @@ const WorkflowLibrary: React.FC = () => {
         gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
         gap: 3 
       }}>
-        {filteredWorkflows.map((workflow) => (
+        {displayedWorkflows.map((workflow) => (
           <Card key={workflow.id} sx={{ 
             height: '100%', 
             display: 'flex', 
@@ -672,7 +668,7 @@ const WorkflowLibrary: React.FC = () => {
         ))}
       </Box>
 
-      {filteredWorkflows.length === 0 && (
+      {displayedWorkflows.length === 0 && (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <VisitIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h6" gutterBottom color="text.secondary">
@@ -796,7 +792,7 @@ const WorkflowLibrary: React.FC = () => {
         }}
       >
         <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <SettingsIcon color="primary" />
               Configure Workflow: {selectedWorkflow?.name}
