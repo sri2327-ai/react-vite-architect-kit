@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -19,7 +20,11 @@ import {
   Tooltip,
   Paper,
   Fade,
-  useTheme
+  useTheme,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -39,7 +44,12 @@ import {
   Title as TitleIcon,
   Assignment as AssignmentIcon,
   TextSnippet as TextSnippetIcon,
-  Checklist as ChecklistIcon
+  Checklist as ChecklistIcon,
+  SwapHoriz as SwapHorizIcon,
+  ZoomIn as ZoomInIcon,
+  ZoomOut as ZoomOutIcon,
+  FilterList as FilterListIcon,
+  Create as CreateIcon
 } from '@mui/icons-material';
 import AddSectionOverlay from './AddSectionOverlay';
 import SectionConfigDialog from './SectionConfigDialog';
@@ -79,18 +89,48 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [sectionConfigOpen, setSectionConfigOpen] = useState(false);
   const [placementDialogOpen, setPlacementDialogOpen] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [helpOption, setHelpOption] = useState('');
+  const [selectedHelpOption, setSelectedHelpOption] = useState('');
+  const [helpInputValue, setHelpInputValue] = useState('');
   const [aiInstructions, setAiInstructions] = useState('');
   const [aiTitle, setAiTitle] = useState('');
   const [aiDescription, setAiDescription] = useState('');
   const [pendingSection, setPendingSection] = useState<any>(null);
 
   const helpOptions = [
-    { value: 'change-to-list', label: 'Change to List' },
-    { value: 'increase-detail', label: 'Increase Detail' },
-    { value: 'decrease-detail', label: 'Decrease Detail' },
-    { value: 'format-specific', label: 'Format Specific' },
-    { value: 'other', label: 'Other' }
+    { 
+      value: 'change-to-list', 
+      label: 'Change to List',
+      icon: <SwapHorizIcon sx={{ fontSize: 20, color: '#666' }} />,
+      requiresInput: false
+    },
+    { 
+      value: 'increase-detail', 
+      label: 'Increase Detail',
+      icon: <ZoomInIcon sx={{ fontSize: 20, color: '#666' }} />,
+      requiresInput: true,
+      inputLabel: 'How many paragraphs do you prefer?'
+    },
+    { 
+      value: 'decrease-detail', 
+      label: 'Decrease Detail',
+      icon: <ZoomOutIcon sx={{ fontSize: 20, color: '#666' }} />,
+      requiresInput: true,
+      inputLabel: 'How many paragraphs do you prefer?'
+    },
+    { 
+      value: 'format-specific', 
+      label: 'Format Specific',
+      icon: <FilterListIcon sx={{ fontSize: 20, color: '#666' }} />,
+      requiresInput: true,
+      inputLabel: 'Please give an example of how you\'d like this to be formatted:'
+    },
+    { 
+      value: 'other', 
+      label: 'Other',
+      icon: <CreateIcon sx={{ fontSize: 20, color: '#666' }} />,
+      requiresInput: true,
+      inputLabel: 'What do you want changed?'
+    }
   ];
 
   const getTypeColor = (type: string) => {
@@ -206,7 +246,29 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
 
   const handleHelp = (itemId: string) => {
     setSelectedItemId(itemId);
+    setSelectedHelpOption('');
+    setHelpInputValue('');
     setHelpDialogOpen(true);
+  };
+
+  const handleHelpClose = () => {
+    setHelpDialogOpen(false);
+    setSelectedItemId(null);
+    setSelectedHelpOption('');
+    setHelpInputValue('');
+  };
+
+  const handleHelpUpdate = () => {
+    console.log('Help update:', {
+      itemId: selectedItemId,
+      option: selectedHelpOption,
+      input: helpInputValue
+    });
+    
+    // Here you would implement the actual logic to modify the item
+    // based on the selected help option and input
+    
+    handleHelpClose();
   };
 
   const handleAiEdit = (itemId: string) => {
@@ -232,6 +294,10 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     setAiInstructions('');
     setAiTitle('');
     setAiDescription('');
+  };
+
+  const getSelectedHelpOption = () => {
+    return helpOptions.find(option => option.value === selectedHelpOption);
   };
 
   const renderSectionBlock = (item: TemplateItem, index: number) => (
@@ -643,48 +709,143 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         existingSections={items.map(item => ({ id: item.id, name: item.name }))}
       />
 
-      {/* Help Dialog */}
+      {/* Enhanced Help Dialog */}
       <Dialog 
         open={helpDialogOpen} 
-        onClose={() => setHelpDialogOpen(false)} 
+        onClose={handleHelpClose}
         maxWidth="sm" 
         fullWidth
-        PaperProps={{ sx: { borderRadius: 3 } }}
+        PaperProps={{ 
+          sx: { 
+            borderRadius: 3,
+            maxWidth: 600,
+            width: '100%'
+          } 
+        }}
       >
-        <DialogTitle sx={{ pb: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            AI Section Assistant
+        <DialogTitle sx={{ pb: 2, position: 'relative' }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, pr: 4 }}>
+            Edit Auto-Generated Section
           </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" gutterBottom sx={{ mb: 3 }}>
-            How would you like to modify this AI-generated section?
-          </Typography>
-          <TextField
-            fullWidth
-            select
-            value={helpOption}
-            onChange={(e) => setHelpOption(e.target.value)}
-            label="Select modification type"
-            variant="outlined"
+          <IconButton
+            onClick={handleHelpClose}
+            sx={{
+              position: 'absolute',
+              right: 16,
+              top: 16,
+              color: 'grey.500'
+            }}
           >
-            {helpOptions.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent sx={{ pb: 1 }}>
+          <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
+            Select an option:
+          </Typography>
+          
+          <FormControl component="fieldset" fullWidth>
+            <RadioGroup
+              value={selectedHelpOption}
+              onChange={(e) => setSelectedHelpOption(e.target.value)}
+            >
+              {helpOptions.map((option) => (
+                <Card
+                  key={option.value}
+                  sx={{
+                    mb: 2,
+                    border: selectedHelpOption === option.value ? '2px solid #2196f3' : '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      borderColor: selectedHelpOption === option.value ? '#2196f3' : '#bdbdbd'
+                    }
+                  }}
+                  onClick={() => setSelectedHelpOption(option.value)}
+                >
+                  <CardContent sx={{ py: 2, px: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <FormControlLabel
+                      value={option.value}
+                      control={<Radio sx={{ '&.Mui-checked': { color: '#2196f3' } }} />}
+                      label=""
+                      sx={{ margin: 0 }}
+                    />
+                    {option.icon}
+                    <Typography 
+                      variant="body1" 
+                      sx={{ 
+                        fontWeight: 500,
+                        color: selectedHelpOption === option.value ? '#2196f3' : 'text.primary'
+                      }}
+                    >
+                      {option.label}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))}
+            </RadioGroup>
+          </FormControl>
+
+          {/* Conditional Input Field */}
+          {selectedHelpOption && getSelectedHelpOption()?.requiresInput && (
+            <Box sx={{ mt: 3 }}>
+              <Typography 
+                variant="body1" 
+                sx={{ mb: 2, fontWeight: 500 }}
+              >
+                {getSelectedHelpOption()?.inputLabel}
+              </Typography>
+              <TextField
+                fullWidth
+                multiline={selectedHelpOption === 'format-specific' || selectedHelpOption === 'other'}
+                rows={selectedHelpOption === 'format-specific' || selectedHelpOption === 'other' ? 4 : 1}
+                placeholder={selectedHelpOption === 'other' ? 'Describe the changes you want to make...' : 'Enter your answer'}
+                value={helpInputValue}
+                onChange={(e) => setHelpInputValue(e.target.value)}
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2
+                  }
+                }}
+              />
+            </Box>
+          )}
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button onClick={() => setHelpDialogOpen(false)} variant="outlined">
+        
+        <DialogActions sx={{ p: 3, pt: 2 }}>
+          <Button 
+            onClick={handleHelpClose}
+            variant="outlined"
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              py: 1
+            }}
+          >
             Cancel
           </Button>
           <Button 
             variant="contained" 
-            onClick={() => setHelpDialogOpen(false)}
-            disabled={!helpOption}
+            onClick={handleHelpUpdate}
+            disabled={!selectedHelpOption || (getSelectedHelpOption()?.requiresInput && !helpInputValue.trim())}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              backgroundColor: '#2196f3',
+              '&:hover': {
+                backgroundColor: '#1976d2'
+              }
+            }}
           >
-            Apply Changes
+            Update
           </Button>
         </DialogActions>
       </Dialog>
