@@ -54,10 +54,10 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
       flexDirection: 'column',
       overflow: 'hidden'
     }}>
-      {/* Header - Compact */}
+      {/* Header */}
       <Box sx={{ 
         textAlign: 'center', 
-        mb: { xs: 0.5, sm: 1 }, 
+        mb: { xs: 1.5, sm: 2 }, 
         flexShrink: 0 
       }}>
         <Typography
@@ -68,8 +68,8 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             backgroundClip: 'text',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            mb: 0.25,
-            fontSize: { xs: '1.2rem', sm: '1.4rem' }
+            mb: 0.5,
+            fontSize: { xs: '1.3rem', sm: '1.6rem' }
           }}
         >
           Professional Information
@@ -78,20 +78,20 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           variant="body1"
           color="text.secondary"
           sx={{ 
-            fontSize: { xs: '0.75rem', sm: '0.85rem' }
+            fontSize: { xs: '0.85rem', sm: '0.95rem' }
           }}
         >
           Help us customize your experience
         </Typography>
       </Box>
 
-      {/* Content area with reduced height */}
+      {/* Content area with better spacing */}
       <Box sx={{ 
         flex: 1, 
         display: 'flex', 
         flexDirection: 'column', 
         minHeight: 0,
-        gap: { xs: 0.5, sm: 1 }
+        gap: { xs: 1.5, sm: 2 }
       }}>
         <Card
           sx={{
@@ -106,7 +106,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           }}
         >
           <CardContent sx={{ 
-            p: { xs: 1, sm: 1.5 }, 
+            p: { xs: 2, sm: 3 }, 
             flex: 1, 
             display: 'flex', 
             flexDirection: 'column',
@@ -116,7 +116,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             <Box component="form" onSubmit={handleSubmit} sx={{ 
               display: 'flex', 
               flexDirection: 'column',
-              gap: { xs: 1, sm: 1.25 },
+              gap: { xs: 2, sm: 2.5 },
               height: '100%'
             }}>
               {/* Phone Number Field */}
@@ -161,15 +161,15 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 ))}
               </TextField>
 
-              {/* Documentation Mode - Compact */}
+              {/* Documentation Mode with better spacing */}
               <FormControl component="fieldset" sx={{ flex: 1, minHeight: 0 }}>
                 <FormLabel
                   component="legend"
                   sx={{
                     fontWeight: 600,
                     color: 'text.primary',
-                    fontSize: { xs: '0.8rem', sm: '0.9rem' },
-                    mb: 0.5
+                    fontSize: { xs: '0.9rem', sm: '1rem' },
+                    mb: { xs: 1, sm: 1.5 }
                   }}
                 >
                   How do you want to document your sessions?
@@ -181,7 +181,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                   sx={{ 
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: { xs: 0.75, sm: 1 }
+                    gap: { xs: 1.5, sm: 2 }
                   }}
                 >
                   {/* EHR Integration Mode */}
@@ -201,16 +201,16 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                     onClick={() => setFormData(prev => ({ ...prev, ehrMode: true }))}
                   >
                     <CardContent sx={{ 
-                      p: { xs: 1, sm: 1.25 }, 
+                      p: { xs: 1.5, sm: 2 }, 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: 1.5,
-                      '&:last-child': { pb: { xs: 1, sm: 1.25 } }
+                      gap: 2,
+                      '&:last-child': { pb: { xs: 1.5, sm: 2 } }
                     }}>
                       <Box
                         sx={{
-                          width: { xs: 28, sm: 32 },
-                          height: { xs: 28, sm: 32 },
+                          width: { xs: 32, sm: 36 },
+                          height: { xs: 32, sm: 36 },
                           borderRadius: '8px',
                           background: formData.ehrMode 
                             ? 'linear-gradient(135deg, #143151, #387E89)'
@@ -222,26 +222,26 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                           flexShrink: 0
                         }}
                       >
-                        <Database size={16} />
+                        <Database size={18} />
                       </Box>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography 
                           variant="body1" 
                           fontWeight={700} 
                           color={formData.ehrMode ? 'primary.main' : 'text.primary'}
-                          sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                          sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 0.5 }}
                         >
                           EHR Integration
                         </Typography>
                         <Typography 
                           variant="body2" 
                           color="text.secondary"
-                          sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                          sx={{ fontSize: { xs: '0.8rem', sm: '0.85rem' } }}
                         >
                           Connect with your existing system
                         </Typography>
                       </Box>
-                      {formData.ehrMode && <CheckCircle2 size={16} color="#2E7D32" />}
+                      {formData.ehrMode && <CheckCircle2 size={18} color="#2E7D32" />}
                     </CardContent>
                   </Card>
 
@@ -262,16 +262,16 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                     onClick={() => setFormData(prev => ({ ...prev, ehrMode: false }))}
                   >
                     <CardContent sx={{ 
-                      p: { xs: 1, sm: 1.25 }, 
+                      p: { xs: 1.5, sm: 2 }, 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: 1.5,
-                      '&:last-child': { pb: { xs: 1, sm: 1.25 } }
+                      gap: 2,
+                      '&:last-child': { pb: { xs: 1.5, sm: 2 } }
                     }}>
                       <Box
                         sx={{
-                          width: { xs: 28, sm: 32 },
-                          height: { xs: 28, sm: 32 },
+                          width: { xs: 32, sm: 36 },
+                          height: { xs: 32, sm: 36 },
                           borderRadius: '8px',
                           background: !formData.ehrMode 
                             ? 'linear-gradient(135deg, #143151, #387E89)'
@@ -283,26 +283,26 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                           flexShrink: 0
                         }}
                       >
-                        <FileText size={16} />
+                        <FileText size={18} />
                       </Box>
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography 
                           variant="body1" 
                           fontWeight={700} 
                           color={!formData.ehrMode ? 'primary.main' : 'text.primary'}
-                          sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+                          sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 0.5 }}
                         >
                           Standalone Notes
                         </Typography>
                         <Typography 
                           variant="body2" 
                           color="text.secondary"
-                          sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                          sx={{ fontSize: { xs: '0.8rem', sm: '0.85rem' } }}
                         >
                           Use S10.AI as your primary system
                         </Typography>
                       </Box>
-                      {!formData.ehrMode && <CheckCircle2 size={16} color="#2E7D32" />}
+                      {!formData.ehrMode && <CheckCircle2 size={18} color="#2E7D32" />}
                     </CardContent>
                   </Card>
                 </RadioGroup>
@@ -311,27 +311,27 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           </CardContent>
         </Card>
 
-        {/* Compact alert */}
+        {/* Alert with better spacing */}
         <Alert
           severity="info"
-          icon={<AlertCircle size={14} />}
+          icon={<AlertCircle size={16} />}
           sx={{ 
             borderRadius: 2,
             flexShrink: 0,
-            py: { xs: 0.25, sm: 0.5 },
+            py: { xs: 1, sm: 1.2 },
             '& .MuiAlert-message': {
-              fontSize: { xs: '0.65rem', sm: '0.75rem' }
+              fontSize: { xs: '0.8rem', sm: '0.85rem' }
             }
           }}
         >
           Your selection determines the next setup steps for optimal integration.
         </Alert>
 
-        {/* Fixed buttons at bottom */}
+        {/* Fixed buttons at bottom with better spacing */}
         <Box sx={{ 
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
-          gap: { xs: 1, sm: 1.5 },
+          gap: { xs: 1.5, sm: 2 },
           flexShrink: 0
         }}>
           <SecondaryButton
@@ -339,9 +339,9 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             sx={{ 
               flex: 1,
               order: { xs: 2, sm: 1 },
-              py: { xs: 1, sm: 1.25 },
+              py: { xs: 1.2, sm: 1.5 },
               borderRadius: 2,
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
+              fontSize: { xs: '0.85rem', sm: '0.9rem' }
             }}
           >
             Back
@@ -354,9 +354,9 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
               flex: 2, 
               fontWeight: 700,
               order: { xs: 1, sm: 2 },
-              py: { xs: 1, sm: 1.25 },
+              py: { xs: 1.2, sm: 1.5 },
               borderRadius: 2,
-              fontSize: { xs: '0.8rem', sm: '0.9rem' }
+              fontSize: { xs: '0.85rem', sm: '0.9rem' }
             }}
           >
             Continue →
