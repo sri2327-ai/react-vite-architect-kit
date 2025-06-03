@@ -34,6 +34,7 @@ import {
   Check as CheckIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
+import { templateService } from '@/services/templateService';
 
 interface TemplateCreationDialogProps {
   open: boolean;
@@ -95,19 +96,38 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
   const [existingTemplateContent, setExistingTemplateContent] = useState('');
   const [processedContent, setProcessedContent] = useState('');
   const [aiSummary, setAiSummary] = useState('');
+  const [selectedTemplateType, setSelectedTemplateType] = useState('');
+
+  // Get available template types from templateService
+  const availableTemplateTypes = templateService.getTemplateTypes();
 
   const handleMethodSelect = (method: CreateTemplateOption) => {
     setSelectedMethod(method);
+    
+    // If selecting template library, get library templates
+    if (method.id === 5) {
+      const libraryTemplates = [
+        { title: 'SOAP Note', sections: [{ name: 'Chief Complaint' }, { name: 'History' }, { name: 'Assessment' }, { name: 'Plan' }] },
+        { title: 'Progress Note', sections: [{ name: 'Subjective' }, { name: 'Objective' }, { name: 'Plan' }] }
+      ];
+      templateService.registerLibraryTemplates(libraryTemplates);
+    }
+    
     setCurrentStep(1);
   };
 
   const handleNext = () => {
     if (currentStep === 1 && selectedMethod?.id === 2) {
-      // AI Generation - simulate processing
+      // AI Generation with template service integration
       setIsProcessing(true);
       setTimeout(() => {
-        setProcessedContent(`AI-generated template based on: ${previousNotes}\n\nChief Complaint:\n[AI will fill this based on your notes]\n\nHistory of Present Illness:\n[AI will extract relevant history]\n\nAssessment and Plan:\n[AI will suggest assessment and plan]`);
-        setAiSummary('AI has analyzed your previous notes and created a structured template with common medical documentation sections.');
+        const mapping = templateService.getEhrFieldMappings(selectedTemplateType || 'SOAP Note');
+        const generatedContent = mapping 
+          ? `AI-generated template for ${selectedTemplateType}\n\n${mapping.ehrFields.map(field => `${field}:\n[AI will fill this section]\n`).join('\n')}`
+          : `AI-generated template based on: ${previousNotes}\n\nChief Complaint:\n[AI will fill this based on your notes]\n\nHistory of Present Illness:\n[AI will extract relevant history]\n\nAssessment and Plan:\n[AI will suggest assessment and plan]`;
+        
+        setProcessedContent(generatedContent);
+        setAiSummary(`AI has analyzed your input and created a structured template with ${mapping?.ehrFields.length || 'common'} medical documentation sections.`);
         setIsProcessing(false);
         setCurrentStep(2);
       }, 2000);
@@ -127,7 +147,9 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
       method: selectedMethod?.title,
       content: selectedMethod?.id === 2 ? processedContent : existingTemplateContent,
       previousNotes: selectedMethod?.id === 1 ? previousNotes : undefined,
-      aiSummary: selectedMethod?.id === 2 ? aiSummary : undefined
+      aiSummary: selectedMethod?.id === 2 ? aiSummary : undefined,
+      templateType: selectedTemplateType,
+      ehrFields: selectedTemplateType ? templateService.getEhrFieldMappings(selectedTemplateType)?.ehrFields : undefined
     };
     
     onCreateTemplate(templateData);
@@ -145,6 +167,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
     setExistingTemplateContent('');
     setProcessedContent('');
     setAiSummary('');
+    setSelectedTemplateType('');
   };
 
   const renderStepContent = (step: number) => {
@@ -157,7 +180,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             </Typography>
             <Grid container spacing={2}>
               {createTemplateOptions.map((option) => (
-                <Grid component="div" item xs={12} sm={6} key={option.id}>
+                <Grid item xs={12} sm={6} key={option.id}>
                   <Card 
                     sx={{ 
                       height: '100%',
@@ -210,7 +233,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <Chip 
                 icon={selectedMethod?.icon} 
-                label={<span>{selectedMethod?.title || ''}</span>}
+                label={selectedMethod?.title || ''}
                 color="primary"
                 sx={{ mr: 2 }}
               />
@@ -236,6 +259,24 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
               <Box>
                 <TextField
                   fullWidth
+                  select
+                  label="Template Type"
+                  value={selectedTemplateType}
+                  onChange={(e) => setSelectedTemplateType(e.target.value)}
+                  sx={{ mb: 2 }}
+                  SelectProps={{
+                    native: true,
+                  }}
+                >
+                  <option value="">Select Template Type</option>
+                  {availableTemplateTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </TextField>
+                <TextField
+                  fullWidth
                   multiline
                   rows={4}
                   label="Describe what kind of template you want"
@@ -245,7 +286,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
                   sx={{ mb: 2 }}
                 />
                 <Alert severity="info">
-                  AI will analyze your description and create a structured template with relevant medical sections.
+                  AI will analyze your description and create a structured template with relevant medical sections using the selected template type.
                 </Alert>
               </Box>
             )}
@@ -270,9 +311,29 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             )}
 
             {selectedMethod?.id === 5 && (
-              <Alert severity="info">
-                You'll be redirected to the template library to import an existing template.
-              </Alert>
+              <Box>
+                <Alert severity="info" sx={{ mb: 2 }}>
+                  Available template types from library:
+                </Alert>
+                <Box sx={{ mb: 2 }}>
+                  {availableTemplateTypes.map((type) => {
+                    const mapping = templateService.getEhrFieldMappings(type);
+                    return (
+                      <Card key={type} sx={{ mb: 1, p: 2 }}>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          {type}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Fields: {mapping?.ehrFields.join(', ') || 'Standard fields'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Workflow Steps: {mapping?.workflowSteps.length || 0}
+                        </Typography>
+                      </Card>
+                    );
+                  })}
+                </Box>
+              </Box>
             )}
           </Box>
         );
@@ -336,6 +397,19 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
                         {processedContent}
                       </Typography>
                     </Box>
+                  </Box>
+                )}
+
+                {selectedTemplateType && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="subtitle2" gutterBottom>
+                      Template Type: {selectedTemplateType}
+                    </Typography>
+                    {templateService.getEhrFieldMappings(selectedTemplateType) && (
+                      <Typography variant="body2" color="text.secondary">
+                        EHR Fields: {templateService.getEhrFieldMappings(selectedTemplateType)?.ehrFields.join(', ')}
+                      </Typography>
+                    )}
                   </Box>
                 )}
               </Box>
