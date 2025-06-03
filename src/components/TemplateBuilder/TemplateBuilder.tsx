@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
@@ -26,7 +25,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Grid
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import {
@@ -67,6 +67,14 @@ interface ConsultType {
   isNew?: boolean;
 }
 
+interface LibraryTemplate {
+  id: number;
+  name: string;
+  specialty: string;
+  noteType: string;
+  content: string;
+}
+
 const TemplateBuilder: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -85,6 +93,16 @@ const TemplateBuilder: React.FC = () => {
   const [openAddSection, setOpenAddSection] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
 
+  // Form states for different creation methods
+  const [templateName, setTemplateName] = useState('');
+  const [previousNotes, setPreviousNotes] = useState('');
+  const [templateDescription, setTemplateDescription] = useState('');
+  const [selectedLibraryTemplate, setSelectedLibraryTemplate] = useState<LibraryTemplate | null>(null);
+  const [libraryFilters, setLibraryFilters] = useState({
+    specialty: '',
+    noteType: ''
+  });
+
   // Form controls
   const { control, handleSubmit, formState: { errors }, trigger, getValues } = useForm();
 
@@ -101,6 +119,51 @@ const TemplateBuilder: React.FC = () => {
     { id: 4, title: "template 04", specialty: "General", type: "SOAP", fields: [] },
     { id: 5, title: "template 05", specialty: "General", type: "SOAP", fields: [] },
     { id: 6, title: "template 05", specialty: "General", type: "SOAP", fields: [] },
+  ];
+
+  const libraryTemplates: LibraryTemplate[] = [
+    {
+      id: 1,
+      name: "CLINICAL INTERVIEW1",
+      specialty: "cardiologist",
+      noteType: "SOAP",
+      content: "History of Present Illness\nProvide a comprehensive narrative of the patient's current condition. Include details about the onset, duration, and characteristics of the present illness. Note any associated symptoms, and incorporate relevant background information such as lifestyle factors and family medical history. Be sure to structure the narrative in a chronological manner, emphasizing the progression of the condition over time.\n\nAllergies\nList any known allergies the patient has, including reactions to medications, foods, or other substances. If there are no known allergies, indicate this as well.\n• Create a bullet for each known allergy, specifying the substance and the type of reaction.\n• Include a bullet to indicate if there are no known allergies.\n\nFamily Health History\nSummarize the known family health history, focusing on immediate family members and highlighting relevant hereditary conditions."
+    },
+    {
+      id: 2,
+      name: "CLINICAL INTERVIEW2",
+      specialty: "pyschologist",
+      noteType: "SOAP",
+      content: "Psychological assessment content..."
+    },
+    {
+      id: 3,
+      name: "CLINICAL INTERVIEW3",
+      specialty: "cardiologist",
+      noteType: "DPD",
+      content: "Cardiology specific content..."
+    },
+    {
+      id: 4,
+      name: "Dermatology Intake",
+      specialty: "Dermatology",
+      noteType: "SOAP",
+      content: "Dermatology intake content..."
+    },
+    {
+      id: 5,
+      name: "Neurology Followup",
+      specialty: "pyschologist",
+      noteType: "SOAP",
+      content: "Neurology followup content..."
+    },
+    {
+      id: 6,
+      name: "Dermatology Intake1",
+      specialty: "cardiologist",
+      noteType: "DPD",
+      content: "Another dermatology intake content..."
+    }
   ];
 
   const createTemplateOptions = [
@@ -221,7 +284,6 @@ const TemplateBuilder: React.FC = () => {
     setCurrentScreen('templateEditor');
     setOpenModifyTemplate(true);
     setShowTemplate(true);
-    // Initialize with sample data
     setSectionList([]);
   };
 
@@ -240,17 +302,251 @@ const TemplateBuilder: React.FC = () => {
     setShowTemplate(false);
   };
 
+  const handleCreateTemplateMethod = (method: any) => {
+    setTemplateMethod(method);
+    // Reset form states
+    setTemplateName('');
+    setPreviousNotes('');
+    setTemplateDescription('');
+    setSelectedLibraryTemplate(null);
+  };
+
   const onCreateTemplate = async () => {
-    const isValid = await trigger();
-    if (isValid) {
-      const data = getValues();
-      console.log("Create Template Data", data);
-      setOpenCreateTemplate(false);
-      setCurrentScreen('templateEditor');
-      setOpenModifyTemplate(true);
-      setShowTemplate(true);
-      setSectionList([]);
+    // Validate based on selected method
+    if (!templateName.trim()) {
+      return;
     }
+
+    if (templateMethod.id === 1 && !previousNotes.trim()) {
+      return;
+    }
+
+    if (templateMethod.id === 2 && !templateDescription.trim()) {
+      return;
+    }
+
+    if (templateMethod.id === 5 && !selectedLibraryTemplate) {
+      return;
+    }
+
+    console.log("Create Template Data", {
+      method: templateMethod,
+      name: templateName,
+      previousNotes,
+      description: templateDescription,
+      libraryTemplate: selectedLibraryTemplate
+    });
+
+    setOpenCreateTemplate(false);
+    setCurrentScreen('templateEditor');
+    setOpenModifyTemplate(true);
+    setShowTemplate(true);
+    setSectionList([]);
+  };
+
+  const filteredLibraryTemplates = libraryTemplates.filter(template => {
+    return (!libraryFilters.specialty || template.specialty.toLowerCase().includes(libraryFilters.specialty.toLowerCase())) &&
+           (!libraryFilters.noteType || template.noteType === libraryFilters.noteType);
+  });
+
+  // Render different content based on selected method
+  const renderTemplateCreationContent = () => {
+    if (!templateMethod.id) {
+      return (
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mt: 2 }}>
+          {createTemplateOptions.map((option) => (
+            <Box 
+              key={option.id} 
+              sx={{ 
+                flexBasis: 'calc(50% - 12px)', 
+                minWidth: 280,
+                '@media (max-width: 900px)': {
+                  flexBasis: '100%'
+                }
+              }}
+            >
+              <Card
+                elevation={0}
+                sx={{
+                  cursor: "pointer",
+                  transition: "all 0.3s ease-in-out",
+                  border: `2px solid ${bravoColors.highlight.border}`,
+                  borderRadius: 3,
+                  p: 2,
+                  height: '100%',
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0px 12px 24px rgba(0,0,0,0.12)",
+                    borderColor: bravoColors.secondary,
+                  }
+                }}
+                onClick={() => handleCreateTemplateMethod(option)}
+              >
+                <CardContent sx={{ p: 0 }}>
+                  <Box display="flex" flexDirection="column" alignItems="flex-start" gap={1}>
+                    {option.icon}
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        color: bravoColors.text.primary, 
+                        fontWeight: 600,
+                        fontSize: '1.1rem'
+                      }}
+                    >
+                      {option.title}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        color: bravoColors.text.secondary,
+                        fontSize: '0.9rem',
+                        lineHeight: 1.4
+                      }}
+                    >
+                      {option.description}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
+          ))}
+        </Box>
+      );
+    }
+
+    // Show specific form based on selected method
+    return (
+      <Box sx={{ mt: 3 }}>
+        <Box display="flex" alignItems="center" mb={3}>
+          <IconButton onClick={() => setTemplateMethod({})} sx={{ mr: 1 }}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
+            {templateMethod.title}
+          </Typography>
+        </Box>
+
+        <TextField
+          fullWidth
+          label="Template Name *"
+          value={templateName}
+          onChange={(e) => setTemplateName(e.target.value)}
+          variant="outlined"
+          size="small"
+          sx={{ mb: 3 }}
+        />
+
+        {/* Copy Previous Notes */}
+        {templateMethod.id === 1 && (
+          <TextField
+            fullWidth
+            multiline
+            rows={8}
+            label="Copy and paste a Previous Notes"
+            placeholder="Copy and paste a Previous Notes"
+            value={previousNotes}
+            onChange={(e) => setPreviousNotes(e.target.value)}
+            variant="outlined"
+            size="small"
+          />
+        )}
+
+        {/* Generate Template */}
+        {templateMethod.id === 2 && (
+          <TextField
+            fullWidth
+            multiline
+            rows={8}
+            label="Describe the template you want"
+            placeholder="Describe the template you want"
+            value={templateDescription}
+            onChange={(e) => setTemplateDescription(e.target.value)}
+            variant="outlined"
+            size="small"
+          />
+        )}
+
+        {/* Template Library */}
+        {templateMethod.id === 5 && (
+          <Box>
+            <Typography variant="h6" sx={{ mb: 2, textAlign: 'center', fontWeight: 600 }}>
+              Template Library
+            </Typography>
+            
+            <Box display="flex" gap={2} mb={3} justifyContent="center">
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>Specialty</InputLabel>
+                <Select
+                  value={libraryFilters.specialty}
+                  label="Specialty"
+                  onChange={(e) => setLibraryFilters(prev => ({ ...prev, specialty: e.target.value }))}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="cardiologist">Cardiologist</MenuItem>
+                  <MenuItem value="pyschologist">Psychologist</MenuItem>
+                  <MenuItem value="Dermatology">Dermatology</MenuItem>
+                </Select>
+              </FormControl>
+              
+              <FormControl size="small" sx={{ minWidth: 120 }}>
+                <InputLabel>Note Type</InputLabel>
+                <Select
+                  value={libraryFilters.noteType}
+                  label="Note Type"
+                  onChange={(e) => setLibraryFilters(prev => ({ ...prev, noteType: e.target.value }))}
+                >
+                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="SOAP">SOAP</MenuItem>
+                  <MenuItem value="DPD">DPD</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Grid container spacing={2}>
+              {filteredLibraryTemplates.map((template) => (
+                <Grid item xs={12} sm={6} md={4} key={template.id}>
+                  <Card
+                    sx={{
+                      cursor: 'pointer',
+                      border: selectedLibraryTemplate?.id === template.id ? `2px solid ${bravoColors.primaryFlat}` : '1px solid #e0e0e0',
+                      borderRadius: 2,
+                      p: 2,
+                      height: '100%',
+                      '&:hover': {
+                        borderColor: bravoColors.secondary,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      }
+                    }}
+                    onClick={() => setSelectedLibraryTemplate(template)}
+                  >
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, fontSize: '1rem' }}>
+                      {template.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: bravoColors.text.secondary, mb: 0.5 }}>
+                      Specialty: {template.specialty}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: bravoColors.text.secondary }}>
+                      Note Type: {template.noteType}
+                    </Typography>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+
+            {selectedLibraryTemplate && (
+              <Box sx={{ mt: 3, p: 2, border: '2px dashed #ccc', borderRadius: 2 }}>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                  Template Preview
+                </Typography>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: bravoColors.text.secondary }}>
+                  {selectedLibraryTemplate.content}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Box>
+    );
   };
 
   // Render Consult Types Screen
@@ -471,7 +767,8 @@ const TemplateBuilder: React.FC = () => {
         PaperProps={{
           sx: { 
             borderRadius: 3,
-            p: 2
+            p: 2,
+            maxHeight: '90vh'
           }
         }}
       >
@@ -485,97 +782,38 @@ const TemplateBuilder: React.FC = () => {
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3, mt: 2 }}>
-            {createTemplateOptions.map((option) => (
-              <Box 
-                key={option.id} 
-                sx={{ 
-                  flexBasis: 'calc(50% - 12px)', 
-                  minWidth: 280,
-                  '@media (max-width: 900px)': {
-                    flexBasis: '100%'
-                  }
-                }}
-              >
-                <Card
-                  elevation={0}
-                  sx={{
-                    cursor: "pointer",
-                    transition: "all 0.3s ease-in-out",
-                    border: `2px solid ${bravoColors.highlight.border}`,
-                    borderRadius: 3,
-                    p: 2,
-                    height: '100%',
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0px 12px 24px rgba(0,0,0,0.12)",
-                      borderColor: bravoColors.secondary,
-                    },
-                    "&.selected": {
-                      borderColor: bravoColors.primaryFlat,
-                      backgroundColor: bravoColors.highlight.selected,
-                    }
-                  }}
-                  onClick={() => setTemplateMethod(option)}
-                  className={templateMethod.id === option.id ? 'selected' : ''}
-                >
-                  <CardContent sx={{ p: 0 }}>
-                    <Box display="flex" flexDirection="column" alignItems="flex-start" gap={1}>
-                      {option.icon}
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
-                          color: bravoColors.text.primary, 
-                          fontWeight: 600,
-                          fontSize: '1.1rem'
-                        }}
-                      >
-                        {option.title}
-                      </Typography>
-                      <Typography 
-                        variant="body2" 
-                        sx={{ 
-                          color: bravoColors.text.secondary,
-                          fontSize: '0.9rem',
-                          lineHeight: 1.4
-                        }}
-                      >
-                        {option.description}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Box>
-            ))}
-          </Box>
+        <DialogContent sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
+          {renderTemplateCreationContent()}
 
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: bravoColors.text.secondary,
-              mt: 3,
-              textAlign: 'center',
-              fontStyle: 'italic'
-            }}
-          >
-            Always double-check the template to confirm it's correct, complete, and safe to use based on medical advice.
-          </Typography>
+          {templateMethod.id && (
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: bravoColors.text.secondary,
+                mt: 3,
+                textAlign: 'center',
+                fontStyle: 'italic'
+              }}
+            >
+              Always double-check the template to confirm it's correct, complete, and safe to use based on medical advice.
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 1 }}>
           <Button 
             onClick={() => setOpenCreateTemplate(false)}
-            variant="contained"
+            variant="outlined"
             sx={{
-              backgroundColor: bravoColors.secondary,
-              color: 'white',
+              borderColor: bravoColors.secondary,
+              color: bravoColors.secondary,
               borderRadius: 2,
               px: 3,
               py: 1.5,
               fontSize: '0.9rem',
               fontWeight: 600,
               '&:hover': {
-                backgroundColor: bravoColors.primaryFlat,
+                borderColor: bravoColors.primaryFlat,
+                backgroundColor: bravoColors.background.light,
               }
             }}
           >
@@ -584,7 +822,11 @@ const TemplateBuilder: React.FC = () => {
           <Button 
             onClick={onCreateTemplate}
             variant="contained"
-            disabled={!templateMethod.id}
+            disabled={!templateMethod.id || !templateName.trim() || 
+              (templateMethod.id === 1 && !previousNotes.trim()) ||
+              (templateMethod.id === 2 && !templateDescription.trim()) ||
+              (templateMethod.id === 5 && !selectedLibraryTemplate)
+            }
             sx={{
               backgroundColor: bravoColors.secondary,
               color: 'white',
@@ -602,7 +844,7 @@ const TemplateBuilder: React.FC = () => {
               }
             }}
           >
-            CREATE
+            {templateMethod.id === 5 ? 'IMPORT' : 'CREATE'}
           </Button>
         </DialogActions>
       </Dialog>
