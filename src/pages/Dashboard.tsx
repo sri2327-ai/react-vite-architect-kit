@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import { bravoColors } from '@/theme/colors';
 import TemplateBuilder from '@/components/TemplateBuilder/TemplateBuilder';
+import Profile from '@/components/Profile/Profile';
+import BillingHistory from '@/components/BillingHistory/BillingHistory';
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -36,7 +38,7 @@ interface MenuItem {
   component: React.ComponentType;
 }
 
-// Placeholder components
+// Placeholder component for Workflow Builder
 const WorkflowBuilder: React.FC = () => (
   <Box sx={{ p: 3 }}>
     <Typography variant="h4" gutterBottom>
@@ -44,28 +46,6 @@ const WorkflowBuilder: React.FC = () => (
     </Typography>
     <Typography variant="body1" color="text.secondary">
       Design and configure your workflows here.
-    </Typography>
-  </Box>
-);
-
-const Profile: React.FC = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography variant="h4" gutterBottom>
-      Profile
-    </Typography>
-    <Typography variant="body1" color="text.secondary">
-      View and edit your user details here.
-    </Typography>
-  </Box>
-);
-
-const BillingHistory: React.FC = () => (
-  <Box sx={{ p: 3 }}>
-    <Typography variant="h4" gutterBottom>
-      Billing History
-    </Typography>
-    <Typography variant="body1" color="text.secondary">
-      View your billing history and invoices here.
     </Typography>
   </Box>
 );
