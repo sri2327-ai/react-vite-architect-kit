@@ -1,11 +1,9 @@
-
 import React, { useState } from 'react';
 import {
   Box,
   Button,
   TextField,
   Typography,
-  Paper,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -20,15 +18,11 @@ import {
   Tooltip,
   Chip,
   Stack,
-  Divider,
   Grid,
   List,
   ListItem,
   ListItemText,
   ListItemSecondaryAction,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   FormControlLabel,
   Switch,
   Alert,
@@ -68,11 +62,41 @@ const PREDEFINED_SECTIONS = [
     name: 'Medical History',
     description: 'A comprehensive section for gathering patient medical history.',
     elements: [
-      { id: uuidv4(), type: 'text', label: 'Chief Complaint', required: true, placeholder: 'Enter chief complaint' },
-      { id: uuidv4(), type: 'textarea', label: 'History of Present Illness', required: true, placeholder: 'Describe the history of present illness' },
-      { id: uuidv4(), type: 'textarea', label: 'Past Medical History', required: false, placeholder: 'List past medical conditions' },
-      { id: uuidv4(), type: 'textarea', label: 'Current Medications', required: false, placeholder: 'List current medications' },
-      { id: uuidv4(), type: 'textarea', label: 'Allergies', required: false, placeholder: 'List any allergies' }
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Chief Complaint',
+        required: true,
+        placeholder: 'Enter chief complaint'
+      },
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'History of Present Illness',
+        required: true,
+        placeholder: 'Describe the history of present illness'
+      },
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'Past Medical History',
+        required: false,
+        placeholder: 'List past medical conditions'
+      },
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'Current Medications',
+        required: false,
+        placeholder: 'List current medications'
+      },
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'Allergies',
+        required: false,
+        placeholder: 'List any allergies'
+      }
     ]
   },
   {
@@ -80,15 +104,69 @@ const PREDEFINED_SECTIONS = [
     name: 'Physical Exam',
     description: 'A structured section for documenting physical examination findings.',
     elements: [
-      { id: uuidv4(), type: 'text', label: 'General Appearance', required: false, placeholder: 'Describe general appearance' },
-      { id: uuidv4(), type: 'text', label: 'Vital Signs', required: false, placeholder: 'Record vital signs' },
-      { id: uuidv4(), type: 'text', label: 'Skin', required: false, placeholder: 'Describe skin condition' },
-      { id: uuidv4(), type: 'text', label: 'HEENT', required: false, placeholder: 'Describe head, eyes, ears, nose, and throat' },
-      { id: uuidv4(), type: 'text', label: 'Cardiovascular', required: false, placeholder: 'Describe cardiovascular findings' },
-      { id: uuidv4(), type: 'text', label: 'Respiratory', required: false, placeholder: 'Describe respiratory findings' },
-      { id: uuidv4(), type: 'text', label: 'Gastrointestinal', required: false, placeholder: 'Describe gastrointestinal findings' },
-      { id: uuidv4(), type: 'text', label: 'Neurological', required: false, placeholder: 'Describe neurological findings' },
-      { id: uuidv4(), type: 'text', label: 'Musculoskeletal', required: false, placeholder: 'Describe musculoskeletal findings' }
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'General Appearance',
+        required: false,
+        placeholder: 'Describe general appearance'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Vital Signs',
+        required: false,
+        placeholder: 'Record vital signs'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Skin',
+        required: false,
+        placeholder: 'Describe skin condition'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'HEENT',
+        required: false,
+        placeholder: 'Describe head, eyes, ears, nose, and throat'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Cardiovascular',
+        required: false,
+        placeholder: 'Describe cardiovascular findings'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Respiratory',
+        required: false,
+        placeholder: 'Describe respiratory findings'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Gastrointestinal',
+        required: false,
+        placeholder: 'Describe gastrointestinal findings'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Neurological',
+        required: false,
+        placeholder: 'Describe neurological findings'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Musculoskeletal',
+        required: false,
+        placeholder: 'Describe musculoskeletal findings'
+      }
     ]
   },
   {
@@ -96,9 +174,27 @@ const PREDEFINED_SECTIONS = [
     name: 'Assessment and Plan',
     description: 'A section for summarizing the assessment and outlining the treatment plan.',
     elements: [
-      { id: uuidv4(), type: 'textarea', label: 'Assessment', required: true, placeholder: 'Summarize the assessment' },
-      { id: uuidv4(), type: 'textarea', label: 'Plan', required: true, placeholder: 'Outline the treatment plan' },
-      { id: uuidv4(), type: 'textarea', label: 'Follow-up', required: false, placeholder: 'Describe follow-up instructions' }
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'Assessment',
+        required: true,
+        placeholder: 'Summarize the assessment'
+      },
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'Plan',
+        required: true,
+        placeholder: 'Outline the treatment plan'
+      },
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'Follow-up',
+        required: false,
+        placeholder: 'Describe follow-up instructions'
+      }
     ]
   },
   {
@@ -106,9 +202,27 @@ const PREDEFINED_SECTIONS = [
     name: 'Lab Results',
     description: 'A section for recording and interpreting laboratory results.',
     elements: [
-      { id: uuidv4(), type: 'text', label: 'Lab Name', required: true, placeholder: 'Enter lab name' },
-      { id: uuidv4(), type: 'text', label: 'Result', required: true, placeholder: 'Enter result' },
-      { id: uuidv4(), type: 'textarea', label: 'Interpretation', required: false, placeholder: 'Provide interpretation' }
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Lab Name',
+        required: true,
+        placeholder: 'Enter lab name'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Result',
+        required: true,
+        placeholder: 'Enter result'
+      },
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'Interpretation',
+        required: false,
+        placeholder: 'Provide interpretation'
+      }
     ]
   },
   {
@@ -116,9 +230,27 @@ const PREDEFINED_SECTIONS = [
     name: 'Imaging Reports',
     description: 'A section for documenting imaging reports and findings.',
     elements: [
-      { id: uuidv4(), type: 'text', label: 'Imaging Type', required: true, placeholder: 'Enter imaging type' },
-      { id: uuidv4(), type: 'text', label: 'Report Date', required: true, placeholder: 'Enter report date' },
-      { id: uuidv4(), type: 'textarea', label: 'Findings', required: false, placeholder: 'Describe findings' }
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Imaging Type',
+        required: true,
+        placeholder: 'Enter imaging type'
+      },
+      {
+        id: uuidv4(),
+        type: 'text',
+        label: 'Report Date',
+        required: true,
+        placeholder: 'Enter report date'
+      },
+      {
+        id: uuidv4(),
+        type: 'textarea',
+        label: 'Findings',
+        required: false,
+        placeholder: 'Describe findings'
+      }
     ]
   }
 ];
@@ -139,12 +271,18 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
 
   const handleTemplateNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!template) return;
-    onChange({ ...template, name: event.target.value });
+    onChange({
+      ...template,
+      name: event.target.value
+    });
   };
 
   const handleTemplateDescriptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!template) return;
-    onChange({ ...template, description: event.target.value });
+    onChange({
+      ...template,
+      description: event.target.value
+    });
   };
 
   const handleAddElement = (type: string) => {
@@ -354,7 +492,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
         return (
           <>
             <TextField
-              label="Exam Options (comma-separated)"
+              label="Exam Items (comma-separated)"
               fullWidth
               margin="normal"
               value={element.options ? element.options.join(', ') : ''}
@@ -364,7 +502,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
               }}
             />
             <Typography variant="caption" color="textSecondary">
-              Enter exam options separated by commas.
+              Enter exam items separated by commas (e.g., Normal, Abnormal, Not examined).
             </Typography>
           </>
         );
@@ -373,32 +511,82 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     }
   };
 
-  return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
-        <Typography variant="h6" gutterBottom>
-          Template Editor
+  if (!template) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="h6" color="textSecondary">
+          Select a template to edit
         </Typography>
-        <TextField
-          label="Template Name"
-          fullWidth
-          margin="normal"
-          value={template ? template.name : ''}
-          onChange={handleTemplateNameChange}
-        />
-        <TextField
-          label="Template Description"
-          fullWidth
-          margin="normal"
-          value={template ? template.description : ''}
-          onChange={handleTemplateDescriptionChange}
-        />
       </Box>
+    );
+  }
 
-      <Box sx={{ flex: 1, p: 2, overflow: 'auto' }}>
-        <Typography variant="subtitle1" gutterBottom>
-          Elements:
+  return (
+    <Box sx={{ p: 3 }}>
+      <Typography variant="h5" gutterBottom>
+        Template Editor
+      </Typography>
+
+      <TextField
+        label="Template Name"
+        fullWidth
+        margin="normal"
+        value={template.name}
+        onChange={handleTemplateNameChange}
+      />
+
+      <TextField
+        label="Template Description"
+        fullWidth
+        margin="normal"
+        multiline
+        rows={3}
+        value={template.description}
+        onChange={handleTemplateDescriptionChange}
+      />
+
+      <Box sx={{ mt: 3, mb: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          Elements
         </Typography>
+
+        <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+          <TextField
+            label="Element Name"
+            value={newElementName}
+            onChange={handleElementNameChange}
+            size="small"
+          />
+          <Button
+            variant="outlined"
+            onClick={() => handleAddElement('text')}
+            startIcon={<Plus />}
+          >
+            Add Text
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => handleAddElement('textarea')}
+            startIcon={<Plus />}
+          >
+            Add Textarea
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => handleAddElement('select')}
+            startIcon={<Plus />}
+          >
+            Add Select
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setShowPredefinedSections(true)}
+            startIcon={<Plus />}
+          >
+            Add Section
+          </Button>
+        </Stack>
+
         <DragDropContext onDragEnd={handleOnDragEnd}>
           <Droppable droppableId="elements">
             {(provided) => (
@@ -407,46 +595,46 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
                 ref={provided.innerRef}
                 sx={{ bgcolor: 'background.paper', mb: 2 }}
               >
-                {template && template.elements.map((element, index) => (
+                {template.elements.map((element, index) => (
                   <Draggable key={element.id} draggableId={element.id} index={index}>
                     {(provided) => (
                       <ListItem
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        disableGutters
+                        disablePadding
                         secondaryAction={
                           <Box {...provided.dragHandleProps}>
                             <GripVertical color={theme.palette.action.active} />
                           </Box>
                         }
                         sx={{
-                          border: '1px solid',
+                          border: 1,
                           borderColor: 'divider',
                           borderRadius: 1,
                           mb: 1,
-                          bgcolor: 'background.default',
-                          '&:hover': {
-                            bgcolor: 'action.hover'
-                          },
-                          cursor: 'grab'
+                          bgcolor: 'background.paper'
                         }}
                       >
-                        <ListItemText
-                          primary={element.label}
-                          secondary={
-                            <Stack direction="row" alignItems="center" spacing={1}>
-                              <Chip label={element.type} size="small" color="primary" />
-                              {element.required && <Chip label="Required" size="small" color="secondary" />}
-                            </Stack>
-                          }
-                        />
-                        <ListItemSecondaryAction>
-                          <Tooltip title="Edit">
-                            <IconButton edge="end" aria-label="edit" onClick={() => handleEditElement(element)}>
-                              <Edit />
-                            </IconButton>
-                          </Tooltip>
-                        </ListItemSecondaryAction>
+                        <Box sx={{ flex: 1, p: 2 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Box>
+                              <Typography variant="subtitle1">
+                                {element.label}
+                              </Typography>
+                              <Typography variant="caption" color="textSecondary">
+                                Type: {element.type} | Required: {element.required ? 'Yes' : 'No'}
+                              </Typography>
+                            </Box>
+                            <Box>
+                              <IconButton onClick={() => handleEditElement(element)}>
+                                <Edit size={16} />
+                              </IconButton>
+                              <IconButton onClick={() => handleRemoveElement(element.id)} color="error">
+                                <Delete size={16} />
+                              </IconButton>
+                            </Box>
+                          </Box>
+                        </Box>
                       </ListItem>
                     )}
                   </Draggable>
@@ -456,99 +644,65 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
             )}
           </Droppable>
         </DragDropContext>
-
-        <Typography variant="subtitle1" gutterBottom>
-          Add New Element:
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-          <TextField
-            label="Element Name"
-            size="small"
-            value={newElementName}
-            onChange={handleElementNameChange}
-            sx={{ flexGrow: 1 }}
-          />
-          <Button variant="contained" color="primary" onClick={() => handleAddElement('text')}>
-            Text
-          </Button>
-          <Button variant="contained" color="primary" onClick={() => handleAddElement('textarea')}>
-            Textarea
-          </Button>
-          <Button variant="contained" color="primary" onClick={() => handleAddElement('select')}>
-            Select
-          </Button>
-          <Button variant="contained" color="primary" onClick={() => handleAddElement('exam_list')}>
-            Exam List
-          </Button>
-        </Box>
-
-        <Button variant="outlined" onClick={() => setShowPredefinedSections(true)}>
-          Add Predefined Section
-        </Button>
       </Box>
 
-      <Box sx={{ p: 2, borderTop: '1px solid', borderColor: 'divider', textAlign: 'right' }}>
-        <Button variant="contained" color="primary" onClick={onSave}>
+      <Box sx={{ mt: 3 }}>
+        <Button variant="contained" onClick={onSave}>
           Save Template
         </Button>
       </Box>
-      
-      {showPredefinedSections && (
-        <Dialog open={showPredefinedSections} onClose={() => setShowPredefinedSections(false)} maxWidth="md" fullWidth>
-          <DialogTitle>Add Predefined Section</DialogTitle>
-          <DialogContent>
-            <Grid container spacing={2}>
-              {PREDEFINED_SECTIONS.map((section) => (
-                <Grid key={section.id} xs={12} md={4}>
-                  <Card
-                    sx={{
-                      cursor: 'pointer',
-                      '&:hover': { backgroundColor: 'action.hover' },
-                      height: '100%'
-                    }}
-                    onClick={() => handleAddPredefinedSection(section)}
-                  >
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom>
-                        {section.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {section.description}
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setShowPredefinedSections(false)}>Cancel</Button>
-          </DialogActions>
-        </Dialog>
-      )}
 
-      <Dialog open={isEditDialogOpen} onClose={handleCloseEditDialog} fullWidth maxWidth="sm">
+      {/* Predefined Sections Dialog */}
+      <Dialog
+        open={showPredefinedSections}
+        onClose={() => setShowPredefinedSections(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Add Predefined Section</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2}>
+            {PREDEFINED_SECTIONS.map((section) => (
+              <Grid item xs={12} md={4} key={section.id}>
+                <Card
+                  sx={{
+                    cursor: 'pointer',
+                    '&:hover': { bgcolor: 'action.hover' }
+                  }}
+                  onClick={() => handleAddPredefinedSection(section)}
+                >
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      {section.name}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {section.description}
+                    </Typography>
+                    <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+                      {section.elements.length} elements
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowPredefinedSections(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Element Edit Dialog */}
+      <Dialog
+        open={isEditDialogOpen}
+        onClose={handleCloseEditDialog}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Edit Element</DialogTitle>
         <DialogContent>
           {selectedElement && (
             <Box>
-              <FormControl fullWidth margin="normal">
-                <InputLabel id="element-type-label">Element Type</InputLabel>
-                <Select
-                  labelId="element-type-label"
-                  id="element-type-select"
-                  value={selectedElement.type}
-                  label="Element Type"
-                  onChange={(e) => {
-                    handleElementTypeChange(selectedElement.id, e.target.value);
-                  }}
-                >
-                  <MenuItem value="text">Text</MenuItem>
-                  <MenuItem value="textarea">Textarea</MenuItem>
-                  <MenuItem value="select">Select</MenuItem>
-                  <MenuItem value="exam_list">Exam List</MenuItem>
-                </Select>
-              </FormControl>
               <TextField
                 label="Label"
                 fullWidth
@@ -556,55 +710,50 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
                 value={selectedElement.label}
                 onChange={(e) => handleLabelChange(selectedElement.id, e.target.value)}
               />
+
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Type</InputLabel>
+                <Select
+                  value={selectedElement.type}
+                  label="Type"
+                  onChange={(e) => handleElementTypeChange(selectedElement.id, e.target.value)}
+                >
+                  <MenuItem value="text">Text</MenuItem>
+                  <MenuItem value="textarea">Textarea</MenuItem>
+                  <MenuItem value="select">Select</MenuItem>
+                  <MenuItem value="exam_list">Exam List</MenuItem>
+                </Select>
+              </FormControl>
+
               <FormControlLabel
                 control={
                   <Switch
                     checked={selectedElement.required}
                     onChange={(e) => handleRequiredChange(selectedElement.id, e.target.checked)}
-                    name="required"
-                    color="primary"
                   />
                 }
                 label="Required"
               />
+
               {renderElementSettings(selectedElement)}
             </Box>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditDialog}>Cancel</Button>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              if (selectedElement) {
-                handleUpdateElement(selectedElement);
-              }
-            }}
-          >
-            Update
-          </Button>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={() => {
-              if (selectedElement) {
-                handleRemoveElement(selectedElement.id);
-              }
-            }}
-          >
-            Delete
+          <Button onClick={() => handleUpdateElement(selectedElement)} variant="contained">
+            Save
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar */}
       <Snackbar
         open={showSnackbar}
         autoHideDuration={3000}
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
