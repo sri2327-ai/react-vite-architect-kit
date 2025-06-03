@@ -160,7 +160,6 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25, fontSize: '0.65rem' }}>
             Account: {data.firstName} {data.lastName} • Specialty: {data.specialty}
             {data.ehrMode && ` • EHR: ${data.ehrSystem}`}
-            • Retention: {data.retentionDuration?.replace('years', ' Years').replace('year', ' Year')}
           </Typography>
         </Alert>
 
