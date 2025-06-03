@@ -73,6 +73,7 @@ const DynamicWorkflowBuilder: React.FC<DynamicWorkflowBuilderProps> = ({
   const [editingStep, setEditingStep] = useState<string | null>(null);
   const [visitTypeInput, setVisitTypeInput] = useState('');
 
+  // Updated EHR fields with more comprehensive list
   const ehrFields = [
     'Chief Complaint',
     'History of Present Illness',
@@ -85,8 +86,65 @@ const DynamicWorkflowBuilder: React.FC<DynamicWorkflowBuilderProps> = ({
     'Plan',
     'Medications',
     'Allergies',
-    'Vital Signs'
+    'Vital Signs',
+    'Subjective Note',
+    'Objective Note',
+    'Diagnosis',
+    'Preventive Care',
+    'Major Events',
+    'Ongoing Medical Problems'
   ];
+
+  // Initialize template library data
+  useEffect(() => {
+    // Mock library templates data - in real app, this would come from API
+    const mockLibraryTemplates = [
+      {
+        id: 1,
+        title: "CLINICAL INTERVIEW",
+        specality: "General Medicine",
+        type: "SOAP",
+        sections: [
+          {
+            name: "CHIEF COMPLAINT",
+            type: "paragraph",
+            description: "Capture the main reason for the visit"
+          },
+          {
+            name: "HISTORY OF PRESENT ILLNESS",
+            type: "paragraph", 
+            description: "Detailed narrative of the current condition"
+          },
+          {
+            name: "ALLERGIES",
+            type: "bulleted_list",
+            description: "List known allergies"
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "Dermatology Intake",
+        specality: "Dermatology",
+        type: "SOAP",
+        sections: [
+          {
+            name: "CHIEF COMPLAINT",
+            type: "paragraph",
+            description: "Primary skin concern"
+          },
+          {
+            name: "SKIN EXAMINATION",
+            type: "paragraph",
+            description: "Detailed skin assessment"
+          }
+        ]
+      }
+    ];
+
+    // Register library templates with the service
+    templateService.registerLibraryTemplates(mockLibraryTemplates);
+  }, []);
 
   useEffect(() => {
     if (workflow.templateType) {
@@ -152,6 +210,13 @@ const DynamicWorkflowBuilder: React.FC<DynamicWorkflowBuilderProps> = ({
     }
   };
 
+  // Get available template types including library templates
+  const getAvailableTemplateTypes = () => {
+    const builderTemplates = availableTemplates || [];
+    const libraryTemplateTypes = templateService.getTemplateTypes();
+    return [...new Set([...builderTemplates, ...libraryTemplateTypes])];
+  };
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h5" gutterBottom>
@@ -175,7 +240,7 @@ const DynamicWorkflowBuilder: React.FC<DynamicWorkflowBuilderProps> = ({
                 label="Template Type"
                 onChange={(e) => handleTemplateTypeChange(e.target.value)}
               >
-                {availableTemplates.map((template) => (
+                {getAvailableTemplateTypes().map((template) => (
                   <MenuItem key={template} value={template}>
                     {template}
                   </MenuItem>
@@ -232,6 +297,24 @@ const DynamicWorkflowBuilder: React.FC<DynamicWorkflowBuilderProps> = ({
           </Box>
         </CardContent>
       </Card>
+
+      {/* Template Information */}
+      {templateMapping && (
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Template Information
+            </Typography>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                <strong>Template:</strong> {workflow.templateType}<br />
+                <strong>Available EHR Fields:</strong> {templateMapping.ehrFields.join(', ')}<br />
+                <strong>Total Steps:</strong> {workflow.steps.length}
+              </Typography>
+            </Alert>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Workflow Steps */}
       {workflow.steps.length > 0 && (

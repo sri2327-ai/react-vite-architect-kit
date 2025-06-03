@@ -16,17 +16,93 @@ export interface WorkflowStep {
   isEditable: boolean;
 }
 
+export interface LibraryTemplate {
+  id: number;
+  title: string;
+  specality: string;
+  type: string;
+  sections: any[];
+  description?: string;
+}
+
 class TemplateService {
   private templates: Template[] = [];
+  private libraryTemplates: LibraryTemplate[] = [];
+
+  // Register templates from Template Builder
+  registerTemplates(templates: Template[]): void {
+    this.templates = templates;
+  }
+
+  // Register templates from Template Library
+  registerLibraryTemplates(libraryTemplates: LibraryTemplate[]): void {
+    this.libraryTemplates = libraryTemplates;
+    // Convert library templates to Template format and merge
+    const convertedTemplates = this.convertLibraryTemplates(libraryTemplates);
+    this.templates = [...this.templates, ...convertedTemplates];
+  }
+
+  // Convert library templates to Template format
+  private convertLibraryTemplates(libraryTemplates: LibraryTemplate[]): Template[] {
+    return libraryTemplates.map(libTemplate => ({
+      id: `lib-${libTemplate.id}`,
+      name: libTemplate.title,
+      description: libTemplate.description || `${libTemplate.specality} template of type ${libTemplate.type}`,
+      sections: this.convertLibrarySections(libTemplate.sections || []),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }));
+  }
+
+  // Convert library sections to Template sections
+  private convertLibrarySections(librarySections: any[]): TemplateSection[] {
+    return librarySections.map((section, index) => ({
+      id: `section-${index + 1}`,
+      title: section.name,
+      description: section.description,
+      content: section.description,
+      type: section.type === 'paragraph' ? 'text' : 'list',
+      fields: this.generateFieldsFromSection(section, index)
+    }));
+  }
+
+  // Generate fields from library section
+  private generateFieldsFromSection(section: any, sectionIndex: number): TemplateField[] {
+    const fieldType = section.type === 'bulleted_list' ? 'TEXTAREA' : 'TEXT';
+    return [{
+      id: `field-${sectionIndex + 1}`,
+      type: fieldType,
+      label: section.name,
+      placeholder: `Enter ${section.name.toLowerCase()}`,
+      required: true,
+      validation: { maxLength: fieldType === 'TEXTAREA' ? 1000 : 500 },
+      description: section.description
+    }];
+  }
 
   // Get all available template types for workflow mapping
   getTemplateTypes(): string[] {
-    return [...new Set(this.templates.map(t => t.name))];
+    const builderTypes = [...new Set(this.templates.map(t => t.name))];
+    const libraryTypes = [...new Set(this.libraryTemplates.map(t => `${t.title} (${t.specality})`))];
+    return [...builderTypes, ...libraryTypes];
   }
 
   // Get template by type/name
   getTemplateByType(templateType: string): Template | null {
-    return this.templates.find(t => t.name === templateType) || null;
+    // First check builder templates
+    let template = this.templates.find(t => t.name === templateType);
+    
+    // If not found, check library templates
+    if (!template) {
+      const libraryTemplate = this.libraryTemplates.find(t => 
+        `${t.title} (${t.specality})` === templateType
+      );
+      if (libraryTemplate) {
+        template = this.convertLibraryTemplates([libraryTemplate])[0];
+      }
+    }
+    
+    return template || null;
   }
 
   // Get EHR field mappings for a template
@@ -44,9 +120,23 @@ class TemplateService {
     };
   }
 
-  // Register templates from Template Builder
-  registerTemplates(templates: Template[]): void {
-    this.templates = templates;
+  // Get all library templates
+  getLibraryTemplates(): LibraryTemplate[] {
+    return this.libraryTemplates;
+  }
+
+  // Get library templates by specialty
+  getLibraryTemplatesBySpecialty(specialty: string): LibraryTemplate[] {
+    return this.libraryTemplates.filter(t => 
+      t.specality.toLowerCase() === specialty.toLowerCase()
+    );
+  }
+
+  // Get library templates by type
+  getLibraryTemplatesByType(type: string): LibraryTemplate[] {
+    return this.libraryTemplates.filter(t => 
+      t.type.toLowerCase() === type.toLowerCase()
+    );
   }
 
   private extractEhrFields(template: Template): string[] {
@@ -78,6 +168,19 @@ class TemplateService {
       });
     });
 
+    // Add common EHR fields based on template content
+    const templateContent = template.sections.map(s => s.title.toLowerCase()).join(' ');
+    
+    if (templateContent.includes('chief complaint')) fields.push('Chief Complaint');
+    if (templateContent.includes('history') || templateContent.includes('hpi')) fields.push('History of Present Illness');
+    if (templateContent.includes('allerg')) fields.push('Allergies');
+    if (templateContent.includes('family')) fields.push('Family History');
+    if (templateContent.includes('social')) fields.push('Social History');
+    if (templateContent.includes('review') || templateContent.includes('systems')) fields.push('Review of Systems');
+    if (templateContent.includes('exam') || templateContent.includes('physical')) fields.push('Physical Examination');
+    if (templateContent.includes('assess') || templateContent.includes('diagnosis')) fields.push('Assessment');
+    if (templateContent.includes('plan') || templateContent.includes('treatment')) fields.push('Plan');
+
     return [...new Set(fields)];
   }
 
@@ -103,7 +206,7 @@ class TemplateService {
     template.sections.forEach(section => {
       steps.push({
         id: `section-${section.id}`,
-        name: section.title,
+        name: `Navigate to ${section.title} Section`,
         type: 'action',
         isEditable: true
       });
