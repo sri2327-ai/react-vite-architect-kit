@@ -19,7 +19,6 @@ import {
   Card,
   CardContent,
   Container,
-  Grid,
   useTheme,
   useMediaQuery,
   Collapse,
@@ -278,53 +277,59 @@ const BillingHistory: React.FC = () => {
       </Typography>
 
       {/* Summary Cards */}
-      <Grid container spacing={{ xs: 1.5, md: 3 }} sx={{ mb: { xs: 3, md: 4 } }}>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { 
+          xs: 'repeat(2, 1fr)', 
+          md: 'repeat(4, 1fr)' 
+        }, 
+        gap: { xs: 1.5, md: 3 }, 
+        mb: { xs: 3, md: 4 } 
+      }}>
         {summaryStats.map((stat, index) => (
-          <Grid item xs={6} md={3} key={index}>
-            <Card sx={{ 
-              height: '100%',
-              borderRadius: 2,
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: 4
-              }
-            }}>
-              <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                  <Box sx={{ color: stat.color, mr: 1 }}>
-                    {stat.icon}
-                  </Box>
-                  <Typography 
-                    variant={isMobile ? "caption" : "h6"} 
-                    fontWeight={600}
-                    sx={{ fontSize: { xs: '0.75rem', md: '1.1rem' } }}
-                  >
-                    {stat.title}
-                  </Typography>
+          <Card key={index} sx={{ 
+            height: '100%',
+            borderRadius: 2,
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: 4
+            }
+          }}>
+            <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Box sx={{ color: stat.color, mr: 1 }}>
+                  {stat.icon}
                 </Box>
                 <Typography 
-                  variant={isMobile ? "h6" : "h4"} 
-                  sx={{ 
-                    color: stat.color, 
-                    fontWeight: 700,
-                    fontSize: { xs: '1.1rem', md: '2rem' }
-                  }}
+                  variant={isMobile ? "caption" : "h6"} 
+                  fontWeight={600}
+                  sx={{ fontSize: { xs: '0.75rem', md: '1.1rem' } }}
                 >
-                  {stat.value}
+                  {stat.title}
                 </Typography>
-                <Typography 
-                  variant="caption" 
-                  color="text.secondary"
-                  sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}
-                >
-                  {stat.subtitle}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+              </Box>
+              <Typography 
+                variant={isMobile ? "h6" : "h4"} 
+                sx={{ 
+                  color: stat.color, 
+                  fontWeight: 700,
+                  fontSize: { xs: '1.1rem', md: '2rem' }
+                }}
+              >
+                {stat.value}
+              </Typography>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}
+              >
+                {stat.subtitle}
+              </Typography>
+            </CardContent>
+          </Card>
         ))}
-      </Grid>
+      </Box>
 
       {/* Invoice History */}
       <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>

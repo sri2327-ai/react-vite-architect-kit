@@ -20,7 +20,6 @@ import {
   useMediaQuery,
   Link,
   Container,
-  Grid,
   Card,
   CardContent
 } from '@mui/material';
@@ -207,8 +206,12 @@ const Profile: React.FC = () => {
         My Profile
       </Typography>
 
-      <Grid container spacing={{ xs: 2, md: 3 }}>
-        <Grid item xs={12} lg={8}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', lg: 'row' }, 
+        gap: { xs: 2, md: 3 } 
+      }}>
+        <Box sx={{ flex: { lg: 2 } }}>
           {/* Personal Information */}
           <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 2, md: 3 }, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ 
@@ -222,60 +225,52 @@ const Profile: React.FC = () => {
               Personal Information
             </Typography>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<EmailIcon />}
-                  label="Email Address"
-                  value={userProfile.email}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<PhoneIcon />}
-                  label="Phone Number"
-                  value={userProfile.phoneNumber}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<PersonIcon />}
-                  label="First Name"
-                  value={userProfile.firstName}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<PersonIcon />}
-                  label="Last Name"
-                  value={userProfile.lastName}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<BusinessIcon />}
-                  label="Medical Specialty"
-                  value={userProfile.specialty}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<SettingsIcon />}
-                  label="EHR Integration Status"
-                  value={userProfile.ehrMode}
-                  chip
-                />
-              </Grid>
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, 
+              gap: 2 
+            }}>
+              <ProfileField
+                icon={<EmailIcon />}
+                label="Email Address"
+                value={userProfile.email}
+              />
+              <ProfileField
+                icon={<PhoneIcon />}
+                label="Phone Number"
+                value={userProfile.phoneNumber}
+              />
+              <ProfileField
+                icon={<PersonIcon />}
+                label="First Name"
+                value={userProfile.firstName}
+              />
+              <ProfileField
+                icon={<PersonIcon />}
+                label="Last Name"
+                value={userProfile.lastName}
+              />
+              <ProfileField
+                icon={<BusinessIcon />}
+                label="Medical Specialty"
+                value={userProfile.specialty}
+              />
+              <ProfileField
+                icon={<SettingsIcon />}
+                label="EHR Integration Status"
+                value={userProfile.ehrMode}
+                chip
+              />
               {userProfile.ehrMode && userProfile.ehrName && (
-                <Grid item xs={12}>
+                <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
                   <ProfileField
                     icon={<StorageIcon />}
                     label="Connected EHR System"
                     value={userProfile.ehrName}
                   />
-                </Grid>
+                </Box>
               )}
-            </Grid>
+            </Box>
           </Paper>
 
           {/* Data Management */}
@@ -325,9 +320,9 @@ const Profile: React.FC = () => {
               </Typography>
             </Box>
           </Paper>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} lg={4}>
+        <Box sx={{ flex: { lg: 1 } }}>
           {/* Quick Access */}
           <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 2, md: 3 }, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ fontSize: { xs: '1.1rem', md: '1.25rem' } }}>
@@ -412,8 +407,8 @@ const Profile: React.FC = () => {
               You can reactivate anytime without data loss.
             </Typography>
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Logout Dialog */}
       <Dialog open={showLogoutDialog} onClose={() => setShowLogoutDialog(false)} maxWidth="sm" fullWidth>
