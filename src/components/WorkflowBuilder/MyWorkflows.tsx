@@ -638,6 +638,89 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             Visit types and template sections come from your Template Builder.
           </Alert>
           
+          {/* Common Schedule Configuration Section */}
+          <Box sx={{ mb: 4, p: 3, border: 1, borderColor: 'divider', borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ScheduleIcon color="primary" />
+              Schedule Configuration (Common for all visit types)
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              These settings will apply to all visit types in this workflow.
+            </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', md: 'row' }, 
+              gap: 2 
+            }}>
+              <Box sx={{ flex: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Provider Name"
+                  value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.providerName || ''}
+                  onChange={(e) => {
+                    // Update all visit types with the same provider name
+                    if (selectedWorkflow) {
+                      setSelectedWorkflow(prev => {
+                        if (!prev) return null;
+                        return {
+                          ...prev,
+                          visitTypeMappings: prev.visitTypeMappings.map(mapping => ({
+                            ...mapping,
+                            scheduleConfig: {
+                              ...mapping.scheduleConfig,
+                              providerName: e.target.value
+                            }
+                          }))
+                        };
+                      });
+                    }
+                  }}
+                  placeholder="e.g., Dr. Smith"
+                  InputProps={{
+                    startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Location"
+                  value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.location || ''}
+                  onChange={(e) => {
+                    // Update all visit types with the same location
+                    if (selectedWorkflow) {
+                      setSelectedWorkflow(prev => {
+                        if (!prev) return null;
+                        return {
+                          ...prev,
+                          visitTypeMappings: prev.visitTypeMappings.map(mapping => ({
+                            ...mapping,
+                            scheduleConfig: {
+                              ...mapping.scheduleConfig,
+                              location: e.target.value
+                            }
+                          }))
+                        };
+                      });
+                    }
+                  }}
+                  placeholder="e.g., Main Clinic"
+                  InputProps={{
+                    startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                  }}
+                />
+              </Box>
+            </Box>
+          </Box>
+
+          {/* Visit Type Specific Template Mappings */}
+          <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <AssignmentIcon color="primary" />
+            Template Field Mapping by Visit Type
+          </Typography>
+          
           {selectedWorkflow?.visitTypeMappings.map((mapping) => {
             const templateSections = getTemplateSectionsForVisitType(mapping.visitType);
             
@@ -657,54 +740,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   </Box>
                 </AccordionSummary>
                 <AccordionDetails>
-                  {/* Schedule Configuration Section */}
-                  <Box sx={{ mb: 4 }}>
-                    <Typography variant="subtitle1" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ScheduleIcon color="primary" />
-                      Schedule Configuration
-                    </Typography>
-                    <Box sx={{ 
-                      display: 'flex', 
-                      flexDirection: { xs: 'column', md: 'row' }, 
-                      gap: 2 
-                    }}>
-                      <Box sx={{ flex: 1 }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Provider Name"
-                          value={mapping.scheduleConfig.providerName}
-                          onChange={(e) => handleScheduleConfigChange(mapping.visitType, 'providerName', e.target.value)}
-                          placeholder="e.g., Dr. Smith"
-                          InputProps={{
-                            startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                          }}
-                        />
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Location"
-                          value={mapping.scheduleConfig.location}
-                          onChange={(e) => handleScheduleConfigChange(mapping.visitType, 'location', e.target.value)}
-                          placeholder="e.g., Main Clinic"
-                          InputProps={{
-                            startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                  </Box>
-
-                  <Divider sx={{ my: 3 }} />
-
-                  {/* Template Field Mapping Section */}
                   <Box>
-                    <Typography variant="subtitle1" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <AssignmentIcon color="primary" />
-                      Template Field Mapping
-                    </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       Map workflow note blocks to template sections for {mapping.visitType}. 
                       Template sections come from your Template Builder.
