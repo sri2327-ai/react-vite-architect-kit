@@ -32,7 +32,8 @@ import {
   AccordionDetails,
   Fab,
   Fade,
-  Zoom
+  Zoom,
+  IconButton
 } from '@mui/material';
 import {
   Download as ImportIcon,
@@ -353,11 +354,11 @@ const WorkflowLibrary: React.FC = () => {
                 size="small"
                 placeholder="Add custom visit type..."
                 onKeyPress={(e) => {
-                  if (e.key === 'Enter' && e.target.value.trim()) {
-                    const newType = e.target.value.trim();
+                  if (e.key === 'Enter' && (e.target as HTMLInputElement).value.trim()) {
+                    const newType = (e.target as HTMLInputElement).value.trim();
                     setVisitTypes(prev => [...prev, newType]);
                     setSelectedVisitTypes(prev => [...prev, newType]);
-                    e.target.value = '';
+                    (e.target as HTMLInputElement).value = '';
                   }
                 }}
               />
@@ -568,12 +569,6 @@ const WorkflowLibrary: React.FC = () => {
     }
   };
 
-  const filteredWorkflows = workflowTemplates.filter(wf => {
-    const ehrMatch = wf.ehrSystem === userEHR;
-    const categoryMatch = selectedCategory === 'all' || wf.category === selectedCategory;
-    return ehrMatch && categoryMatch;
-  });
-
   return (
     <Box sx={{ p: 3 }}>
       <Alert severity="info" sx={{ mb: 3 }}>
@@ -671,18 +666,6 @@ const WorkflowLibrary: React.FC = () => {
           </Card>
         ))}
       </Box>
-
-      {filteredWorkflows.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <VisitIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
-          <Typography variant="h6" gutterBottom color="text.secondary">
-            No workflows found for selected filters
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Try adjusting your category filter
-          </Typography>
-        </Box>
-      )}
 
       {/* Workflow Details Dialog */}
       <Dialog open={viewDialog} onClose={() => setViewDialog(false)} maxWidth="md" fullWidth>
@@ -796,7 +779,7 @@ const WorkflowLibrary: React.FC = () => {
         }}
       >
         <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <SettingsIcon color="primary" />
               Configure Workflow: {selectedWorkflow?.name}
