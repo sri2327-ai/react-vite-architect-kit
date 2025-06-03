@@ -253,26 +253,51 @@ export const Dashboard: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
-      {/* Mobile App Bar */}
+      {/* Mobile App Bar - Transparent with better styling */}
       {isMobile && (
         <AppBar
           position="fixed"
+          elevation={0}
           sx={{
-            background: bravoColors.primary,
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(10px)',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
             zIndex: theme.zIndex.drawer + 1
           }}
         >
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              onClick={handleDrawerToggle}
-              edge="start"
-              sx={{ mr: 2 }}
+          <Toolbar sx={{ justifyContent: 'space-between', px: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <IconButton
+                onClick={handleDrawerToggle}
+                edge="start"
+                sx={{ 
+                  color: bravoColors.primaryFlat,
+                  '&:hover': {
+                    backgroundColor: 'rgba(20, 49, 81, 0.08)'
+                  }
+                }}
+              >
+                {isDrawerOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
+              </IconButton>
+              <Box
+                component="img"
+                src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
+                alt="S10.AI Logo"
+                sx={{
+                  height: 28,
+                  objectFit: 'contain'
+                }}
+              />
+            </Box>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: bravoColors.primaryFlat,
+                fontWeight: 600,
+                fontSize: '1rem'
+              }}
             >
-              {isDrawerOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
-            </IconButton>
-            <Typography variant="h6" noWrap>
-              S10.AI Dashboard
+              Dashboard
             </Typography>
           </Toolbar>
         </AppBar>
@@ -328,7 +353,7 @@ export const Dashboard: React.FC = () => {
           p: 3,
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: 0 },
-          mt: { xs: 8, md: 0 },
+          mt: { xs: 9, md: 0 },
           transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen
