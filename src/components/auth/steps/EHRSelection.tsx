@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -17,7 +16,7 @@ import {
   ListItemText,
   Chip,
 } from '@mui/material';
-import { Info, Search, Zap, CheckCircle2 } from 'lucide-react';
+import { Info, Search, Zap, CheckCircle2, ArrowBack, ArrowForward } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -69,10 +68,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
           variant="h4"
           sx={{
             fontWeight: 800,
-            background: 'linear-gradient(135deg, #143151, #387E89)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: '#4caf50',
             mb: 1,
             fontSize: { xs: '1.5rem', sm: '1.8rem' }
           }}
@@ -94,14 +90,14 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
           display: 'inline-flex', 
           alignItems: 'center', 
           gap: 1,
-          backgroundColor: '#E8F5E8',
+          backgroundColor: '#e8f5e8',
           px: 1.5,
           py: 0.5,
           borderRadius: 1,
-          border: '1px solid #C8E6C9'
+          border: '1px solid #c8e6c9'
         }}>
-          <Zap size={14} color="#2E7D32" />
-          <Typography variant="body2" sx={{ color: '#2E7D32', fontWeight: 600, fontSize: '0.8rem' }}>
+          <Zap size={14} color="#4caf50" />
+          <Typography variant="body2" sx={{ color: '#4caf50', fontWeight: 600, fontSize: '0.8rem' }}>
             Instant setup for popular EHRs
           </Typography>
         </Box>
@@ -178,22 +174,22 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
                       sx={{
                         borderRadius: 2,
                         border: selectedEHR === ehr.name ? 2 : 1,
-                        borderColor: selectedEHR === ehr.name ? 'primary.main' : '#E0E7FF',
+                        borderColor: selectedEHR === ehr.name ? '#4caf50' : '#e0e7ff',
                         background: selectedEHR === ehr.name 
-                          ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
+                          ? 'linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%)' 
                           : 'background.paper',
                         mb: 0.5,
                         py: 1.5,
                         '&:hover': {
-                          borderColor: 'primary.main',
+                          borderColor: '#4caf50',
                           background: selectedEHR === ehr.name 
-                            ? 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)' 
-                            : 'rgba(20, 49, 81, 0.04)',
+                            ? 'linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%)' 
+                            : 'rgba(76, 175, 80, 0.04)',
                         },
                         '&.Mui-selected': {
-                          background: 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)',
+                          background: 'linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%)',
                           '&:hover': {
-                            background: 'linear-gradient(135deg, #F0F8FF 0%, #E8F4F8 100%)',
+                            background: 'linear-gradient(135deg, #f1f8e9 0%, #e8f5e8 100%)',
                           }
                         }
                       }}
@@ -205,8 +201,8 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
                             height: 32,
                             borderRadius: '8px',
                             background: selectedEHR === ehr.name 
-                              ? 'linear-gradient(135deg, #143151, #387E89)'
-                              : 'linear-gradient(135deg, #F5F7FA, #E8EAED)',
+                              ? 'linear-gradient(135deg, #4caf50, #66bb6a)'
+                              : 'linear-gradient(135deg, #f5f7fa, #e8eaed)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -225,7 +221,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
                             <Typography
                               variant="body1"
                               fontWeight={selectedEHR === ehr.name ? 700 : 600}
-                              color={selectedEHR === ehr.name ? 'primary.main' : 'text.primary'}
+                              color={selectedEHR === ehr.name ? '#4caf50' : 'text.primary'}
                               sx={{ fontSize: '0.95rem' }}
                             >
                               {ehr.name}
@@ -234,11 +230,12 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
                               <Chip 
                                 label="Custom" 
                                 size="small" 
-                                color="secondary"
                                 sx={{ 
                                   height: 20, 
                                   fontSize: '0.7rem',
-                                  fontWeight: 600
+                                  fontWeight: 600,
+                                  backgroundColor: '#e3f2fd',
+                                  color: '#1976d2'
                                 }} 
                               />
                             )}
@@ -252,9 +249,9 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
                           <Radio 
                             checked={selectedEHR === ehr.name}
                             sx={{ 
-                              color: selectedEHR === ehr.name ? 'primary.main' : 'action.active',
+                              color: selectedEHR === ehr.name ? '#4caf50' : 'action.active',
                               '&.Mui-checked': {
-                                color: 'primary.main',
+                                color: '#4caf50',
                               }
                             }} 
                           />
@@ -266,7 +263,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
                       {selectedEHR === ehr.name && (
                         <CheckCircle2 
                           size={16} 
-                          color="#2E7D32"
+                          color="#4caf50"
                           style={{ marginLeft: 8 }}
                         />
                       )}
@@ -287,6 +284,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
         }}>
           <SecondaryButton
             onClick={onBack}
+            startIcon={<ArrowBack />}
             sx={{ 
               flex: 1,
               order: { xs: 2, sm: 1 },
@@ -300,6 +298,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
             type="submit"
             disabled={!selectedEHR}
             onClick={handleSubmit}
+            endIcon={<ArrowForward />}
             sx={{ 
               flex: 2, 
               fontWeight: 700,
@@ -309,7 +308,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
               fontSize: { xs: '0.9rem', sm: '1rem' }
             }}
           >
-            Continue to {selectedEHR === 'Others' ? 'Meeting Setup' : 'Notes Settings'} →
+            Continue to Payment
           </PrimaryButton>
         </Box>
       </Box>

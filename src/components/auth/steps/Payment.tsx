@@ -3,18 +3,19 @@ import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Button,
   Card,
   CardContent,
   TextField,
-  FormControlLabel,
-  Checkbox,
   Divider,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Button,
+  Chip,
+  InputAdornment
 } from '@mui/material';
-import { CreditCard, Lock, CheckCircle } from '@mui/icons-material';
+import { CreditCard, CheckCircle, LocalOffer, ArrowBack } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 
 interface PaymentProps {
   onBack: () => void;
@@ -24,34 +25,47 @@ interface PaymentProps {
 export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
   const [loading, setLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [cvv, setCvv] = useState('');
-  const [nameOnCard, setNameOnCard] = useState('');
-  const [billingAddress, setBillingAddress] = useState('');
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [discount, setDiscount] = useState(0);
   const navigate = useNavigate();
 
-  const handlePayment = async () => {
-    setLoading(true);
-    
-    // Simulate payment processing
+  const zohoPaymentUrl = "https://zohosecurepay.com/books/s10aiinc/securepay?CInvoiceID=2-cab38e1b3e20ae6086682ef94096c3e79c3170a50e8a1445eae7a317be3fe45a83a8fc305b6392e6c032b46515559313bfd7df8d54ea98406754244081b9ca6aab2e67f7acee8330";
+
+  const handleApplyPromo = () => {
+    if (promoCode.toLowerCase() === 'save20') {
+      setPromoApplied(true);
+      setDiscount(20);
+    } else {
+      setPromoApplied(false);
+      setDiscount(0);
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setPaymentSuccess(true);
     setTimeout(() => {
-      setLoading(false);
-      setPaymentSuccess(true);
-      
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate('/login', { 
-          state: { 
-            message: 'Payment successful! Please log in with your credentials to activate your account.',
-            requiresOtpVerification: true,
-            email: data.email
-          }
-        });
-      }, 2000);
+      navigate('/login', { 
+        state: { 
+          message: 'Payment successful! Please log in with your credentials to activate your account.',
+          requiresOtpVerification: true,
+          email: data.email
+        }
+      });
     }, 2000);
   };
+
+  // Listen for payment success from iframe
+  React.useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin === 'https://zohosecurepay.com' && event.data === 'payment_success') {
+        handlePaymentSuccess();
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   if (paymentSuccess) {
     return (
@@ -63,8 +77,8 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         height: '100%',
         textAlign: 'center'
       }}>
-        <CheckCircle sx={{ fontSize: 80, color: 'success.main', mb: 2 }} />
-        <Typography variant="h5" gutterBottom color="success.main" fontWeight={600}>
+        <CheckCircle sx={{ fontSize: 80, color: '#4caf50', mb: 2 }} />
+        <Typography variant="h5" gutterBottom sx={{ color: '#4caf50', fontWeight: 600 }}>
           Payment Successful!
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
@@ -73,10 +87,13 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         <Typography variant="body2" color="text.secondary">
           Redirecting you to login screen...
         </Typography>
-        <CircularProgress size={24} sx={{ mt: 2 }} />
+        <CircularProgress size={24} sx={{ mt: 2, color: '#4caf50' }} />
       </Box>
     );
   }
+
+  const originalPrice = 99.99;
+  const finalPrice = originalPrice - (originalPrice * discount / 100);
 
   return (
     <Box sx={{ 
@@ -84,142 +101,218 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
       flexDirection: 'column', 
       height: '100%'
     }}>
-      <Typography variant="h5" gutterBottom fontWeight={600} sx={{ mb: 3 }}>
-        Complete Your Subscription
-      </Typography>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 3, flexShrink: 0 }}>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 700,
+            color: '#4caf50',
+            mb: 2,
+            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+          }}
+        >
+          Complete Your Subscription
+        </Typography>
+        <Typography
+          variant="h6"
+          color="text.secondary"
+          sx={{ 
+            fontWeight: 500,
+            fontSize: { xs: '1rem', sm: '1.125rem' }
+          }}
+        >
+          Secure payment powered by Zoho
+        </Typography>
+      </Box>
 
       <Box sx={{ flex: 1, overflow: 'auto' }}>
         {/* Subscription Summary */}
-        <Card sx={{ mb: 3, border: '1px solid', borderColor: 'primary.light' }}>
+        <Card sx={{ 
+          mb: 3, 
+          border: '1px solid', 
+          borderColor: '#e0e7ff',
+          backgroundColor: 'background.paper'
+        }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: '#4caf50', fontWeight: 600 }}>
               S10.AI Pro Plan
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
               Full access to clinical workflows, templates, and EHR integration
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h4" color="primary.main" fontWeight={700}>
-                $99.99
+            
+            {/* Pricing */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="body1" fontWeight={600}>
+                Subscription Price:
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                per month
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  color: promoApplied ? 'text.secondary' : '#4caf50',
+                  fontWeight: 700,
+                  textDecoration: promoApplied ? 'line-through' : 'none'
+                }}
+              >
+                ${originalPrice.toFixed(2)}
               </Typography>
             </Box>
+
+            {promoApplied && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography variant="body1" fontWeight={600} sx={{ color: '#4caf50' }}>
+                    After {discount}% discount:
+                  </Typography>
+                  <Chip 
+                    label={`${discount}% OFF`} 
+                    size="small" 
+                    sx={{ 
+                      ml: 1,
+                      backgroundColor: '#e8f5e8',
+                      color: '#4caf50',
+                      fontWeight: 600
+                    }} 
+                  />
+                </Box>
+                <Typography variant="h5" sx={{ color: '#4caf50', fontWeight: 700 }}>
+                  ${finalPrice.toFixed(2)}
+                </Typography>
+              </Box>
+            )}
+
+            <Typography variant="body2" color="text.secondary">
+              per month
+            </Typography>
           </CardContent>
         </Card>
 
-        {/* Payment Form */}
+        {/* Promo Code Section */}
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <LocalOffer sx={{ mr: 1, color: '#4caf50' }} />
+              <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 600 }}>
+                Promo Code
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+              <TextField
+                fullWidth
+                label="Enter promo code"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                placeholder="SAVE20"
+                size="small"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LocalOffer sx={{ color: '#4caf50', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button
+                variant="outlined"
+                onClick={handleApplyPromo}
+                disabled={!promoCode}
+                sx={{
+                  minWidth: 100,
+                  borderColor: '#4caf50',
+                  color: '#4caf50',
+                  '&:hover': {
+                    borderColor: '#388e3c',
+                    backgroundColor: 'rgba(76, 175, 80, 0.04)'
+                  }
+                }}
+              >
+                Apply
+              </Button>
+            </Box>
+
+            {promoApplied && (
+              <Alert severity="success" sx={{ mt: 2, borderRadius: 2 }}>
+                <Typography variant="body2" fontWeight={600}>
+                  Promo code applied! You save ${(originalPrice * discount / 100).toFixed(2)}
+                </Typography>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Payment Section */}
         <Card>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <CreditCard sx={{ mr: 1, color: 'primary.main' }} />
-              <Typography variant="h6">
-                Payment Information
+              <CreditCard sx={{ mr: 1, color: '#4caf50' }} />
+              <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 600 }}>
+                Secure Payment
               </Typography>
             </Box>
 
             <Alert severity="info" sx={{ mb: 3 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Lock sx={{ mr: 1, fontSize: 16 }} />
-                <Typography variant="body2">
-                  Your payment information is secure and encrypted
-                </Typography>
-              </Box>
+              <Typography variant="body2">
+                🔒 Your payment is processed securely through Zoho SecurePay with bank-level encryption
+              </Typography>
             </Alert>
 
-            <TextField
-              fullWidth
-              label="Card Number"
-              value={cardNumber}
-              onChange={(e) => setCardNumber(e.target.value)}
-              placeholder="1234 5678 9012 3456"
-              sx={{ mb: 2 }}
-              size="small"
-            />
-
-            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-              <TextField
-                label="Expiry Date"
-                value={expiryDate}
-                onChange={(e) => setExpiryDate(e.target.value)}
-                placeholder="MM/YY"
-                size="small"
-                sx={{ flex: 1 }}
-              />
-              <TextField
-                label="CVV"
-                value={cvv}
-                onChange={(e) => setCvv(e.target.value)}
-                placeholder="123"
-                size="small"
-                sx={{ flex: 1 }}
+            {/* Zoho Payment Iframe */}
+            <Box sx={{ 
+              width: '100%', 
+              height: 400, 
+              border: '1px solid #e0e7ff',
+              borderRadius: 2,
+              overflow: 'hidden'
+            }}>
+              <iframe
+                src={zohoPaymentUrl}
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                style={{ border: 'none' }}
+                title="Zoho SecurePay"
+                sandbox="allow-forms allow-scripts allow-same-origin"
               />
             </Box>
-
-            <TextField
-              fullWidth
-              label="Name on Card"
-              value={nameOnCard}
-              onChange={(e) => setNameOnCard(e.target.value)}
-              sx={{ mb: 2 }}
-              size="small"
-            />
-
-            <TextField
-              fullWidth
-              label="Billing Address"
-              value={billingAddress}
-              onChange={(e) => setBillingAddress(e.target.value)}
-              multiline
-              rows={2}
-              sx={{ mb: 3 }}
-              size="small"
-            />
-
-            <Divider sx={{ my: 2 }} />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={agreeToTerms}
-                  onChange={(e) => setAgreeToTerms(e.target.checked)}
-                  color="primary"
-                />
-              }
-              label={
-                <Typography variant="body2">
-                  I agree to the terms of service and privacy policy
-                </Typography>
-              }
-            />
           </CardContent>
         </Card>
       </Box>
 
-      {/* Action Buttons */}
+      {/* Navigation Buttons */}
       <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        mt: 3,
-        pt: 2,
-        borderTop: '1px solid',
-        borderColor: 'divider'
+        flexShrink: 0,
+        pt: 3,
+        display: 'flex',
+        gap: 2,
+        mt: 'auto'
       }}>
-        <Button 
-          variant="outlined" 
+        <SecondaryButton
           onClick={onBack}
+          startIcon={<ArrowBack />}
           disabled={loading}
+          sx={{
+            py: { xs: 1.5, sm: 1.25 },
+            fontWeight: 600,
+            fontSize: { xs: '0.875rem', sm: '1rem' },
+            minWidth: 120
+          }}
         >
           Back
-        </Button>
+        </SecondaryButton>
+        
         <Button
-          variant="contained"
-          onClick={handlePayment}
-          disabled={loading || !agreeToTerms || !cardNumber || !expiryDate || !cvv || !nameOnCard}
-          startIcon={loading ? <CircularProgress size={16} /> : <CreditCard />}
+          variant="text"
+          onClick={handlePaymentSuccess}
+          sx={{
+            py: { xs: 1.5, sm: 1.25 },
+            fontWeight: 600,
+            fontSize: { xs: '0.875rem', sm: '1rem' },
+            color: 'text.secondary'
+          }}
         >
-          {loading ? 'Processing...' : 'Complete Payment'}
+          Simulate Payment Success (Demo)
         </Button>
       </Box>
     </Box>
