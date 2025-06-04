@@ -433,7 +433,7 @@ const TemplateBuilder: React.FC = () => {
   // Render Visit Types Screen with edit/delete functionality
   const renderVisitTypes = () => (
     <Box>
-      {/* Add Template Builder Description */}
+      {/* EHR Template Builder Description */}
       <Box sx={{ mb: 4, p: 4, backgroundColor: alpha(bravoColors.primaryFlat, 0.05), borderRadius: 3, border: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}` }}>
         <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 700, mb: 2 }}>
           EHR Template Builder
