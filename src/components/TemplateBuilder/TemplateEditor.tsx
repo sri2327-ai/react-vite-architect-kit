@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
 
 interface TemplateItem {
@@ -22,11 +22,13 @@ interface TemplateItem {
 interface TemplateEditorProps {
   initialItems?: TemplateItem[];
   onSave?: (items: TemplateItem[]) => void;
+  onAddSection?: (section: any) => void;
 }
 
 const TemplateEditor: React.FC<TemplateEditorProps> = ({ 
   initialItems = [], 
-  onSave 
+  onSave,
+  onAddSection 
 }) => {
   const [currentItems, setCurrentItems] = useState<TemplateItem[]>(
     initialItems.length > 0 ? initialItems : [
@@ -52,13 +54,39 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     ]
   );
 
-  const handleSave = (items: TemplateItem[]) => {
+  const handleSave = useCallback((items: TemplateItem[]) => {
     setCurrentItems(items);
     if (onSave) {
       onSave(items);
     }
     console.log('Template saved:', items);
-  };
+  }, [onSave]);
+
+  const handleAddSectionToTemplate = useCallback((section: any) => {
+    const newItem: TemplateItem = {
+      id: Date.now().toString(),
+      name: section.name || section.label || 'New Section',
+      type: section.type || 'paragraph',
+      content: section.content || section.description || 'AI will generate content based on the instructions below.',
+      description: 'A.I. will write content following the guidelines below.'
+    };
+    
+    const updatedItems = [...currentItems, newItem];
+    setCurrentItems(updatedItems);
+    
+    if (onSave) {
+      onSave(updatedItems);
+    }
+
+    console.log('Section added to template:', newItem);
+  }, [currentItems, onSave]);
+
+  // Expose the addSection function to parent components
+  React.useEffect(() => {
+    if (onAddSection) {
+      onAddSection(handleAddSectionToTemplate);
+    }
+  }, [onAddSection, handleAddSectionToTemplate]);
 
   return (
     <DraggableTemplateEditor 

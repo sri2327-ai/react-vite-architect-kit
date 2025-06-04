@@ -101,7 +101,7 @@ const WorkflowBuilder: React.FC = () => {
           <BuildIcon 
             sx={{ 
               fontSize: { xs: 32, md: 40 }, 
-              color: theme.palette.primary.main,
+              color: theme.palette.success.main,
               display: { xs: 'none', md: 'block' }
             }} 
           />
@@ -111,7 +111,11 @@ const WorkflowBuilder: React.FC = () => {
               sx={{ 
                 fontWeight: 700, 
                 color: theme.palette.text.primary,
-                mb: 0.5
+                mb: 0.5,
+                background: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.info.main})`,
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
               }}
             >
               EHR Workflow Builder
@@ -121,7 +125,7 @@ const WorkflowBuilder: React.FC = () => {
               sx={{ 
                 fontWeight: 400, 
                 color: theme.palette.text.secondary,
-                opacity: 0.8
+                opacity: 0.9
               }}
             >
               Automate your clinical workflows with AI-powered efficiency
@@ -135,7 +139,7 @@ const WorkflowBuilder: React.FC = () => {
           sx={{ 
             mb: { xs: 3, md: 4 },
             borderRadius: 3,
-            backgroundColor: theme.palette.info.light + '15',
+            backgroundColor: theme.palette.info.light + '10',
             border: `1px solid ${theme.palette.info.light}`,
             '& .MuiAlert-message': {
               fontSize: { xs: '0.875rem', md: '1rem' },
@@ -160,7 +164,8 @@ const WorkflowBuilder: React.FC = () => {
           borderRadius: { xs: 3, md: 4 },
           overflow: 'hidden',
           border: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.background.paper
+          backgroundColor: theme.palette.background.paper,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.08)'
         }}
       >
         <Box sx={{ 
@@ -181,17 +186,17 @@ const WorkflowBuilder: React.FC = () => {
                 px: { xs: 2, md: 4 },
                 color: theme.palette.text.secondary,
                 '&.Mui-selected': {
-                  color: theme.palette.primary.main,
+                  color: theme.palette.success.main,
                 },
                 '&:hover': {
-                  color: theme.palette.primary.main,
+                  color: theme.palette.success.main,
                   backgroundColor: theme.palette.action.hover
                 }
               },
               '& .MuiTabs-indicator': {
                 height: 3,
                 borderRadius: '3px 3px 0 0',
-                backgroundColor: theme.palette.primary.main
+                backgroundColor: theme.palette.success.main
               }
             }}
           >
@@ -208,7 +213,7 @@ const WorkflowBuilder: React.FC = () => {
                       sx={{ 
                         height: 20, 
                         fontSize: '0.75rem',
-                        backgroundColor: theme.palette.primary.main,
+                        backgroundColor: theme.palette.success.main,
                         color: 'white'
                       }} 
                     />
