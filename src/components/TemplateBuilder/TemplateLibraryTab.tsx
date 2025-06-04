@@ -22,7 +22,7 @@ import {
   ListItemButton,
   ListItemText,
   Paper,
-  Grid2,
+  Grid,
   useTheme,
   useMediaQuery
 } from '@mui/material';
@@ -267,9 +267,9 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
         </FormControl>
       </Box>
 
-      <Grid2 container spacing={3}>
+      <Grid container spacing={3}>
         {filteredTemplates.map((template) => (
-          <Grid2 key={template.id} xs={12} sm={6} md={4}>
+          <Grid item xs={12} sm={6} md={4} key={template.id}>
             <Card 
               sx={{ 
                 cursor: 'pointer',
@@ -319,9 +319,9 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
                 </Box>
               </CardContent>
             </Card>
-          </Grid2>
+          </Grid>
         ))}
-      </Grid2>
+      </Grid>
 
       {/* Enhanced Template Preview Dialog */}
       <Dialog 
