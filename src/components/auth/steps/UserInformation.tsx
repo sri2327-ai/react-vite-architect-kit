@@ -16,7 +16,7 @@ import {
   Chip,
   InputAdornment
 } from '@mui/material';
-import { Phone, Stethoscope, Computer, ArrowBack, ArrowForward } from '@mui/icons-material';
+import { Phone, LocalHospital, Computer, ArrowBack, ArrowForward } from '@mui/icons-material';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -186,7 +186,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                   onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
                   startAdornment={
                     <InputAdornment position="start">
-                      <Stethoscope sx={{ color: 'action.active', fontSize: 20, ml: 1 }} />
+                      <LocalHospital sx={{ color: 'action.active', fontSize: 20, ml: 1 }} />
                     </InputAdornment>
                   }
                 >
