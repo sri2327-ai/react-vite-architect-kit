@@ -116,7 +116,7 @@ export const Dashboard: React.FC = () => {
       overflow: 'hidden',
       position: 'relative'
     }}>
-      {/* Mobile Header - Clean and Minimal */}
+      {/* Mobile Header */}
       {isMobile ? (
         <Box sx={{
           p: 3,
@@ -157,7 +157,7 @@ export const Dashboard: React.FC = () => {
           </IconButton>
         </Box>
       ) : (
-        /* Desktop Header */
+        /* Desktop Header with Profile Name */
         <Box sx={{
           p: isCollapsed ? 2 : 3,
           borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
@@ -170,7 +170,7 @@ export const Dashboard: React.FC = () => {
           zIndex: 1
         }}>
           {!isCollapsed ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               <Box
                 component="img"
                 src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
@@ -185,48 +185,60 @@ export const Dashboard: React.FC = () => {
                   }
                 }}
               />
-              <Typography 
-                variant="h6"
-                sx={{ 
-                  color: 'white', 
-                  fontWeight: 700,
-                  fontSize: '1.1rem',
-                  letterSpacing: '0.5px',
-                  textShadow: '0 1px 2px rgba(0,0,0,0.3)'
-                }}
-              >
-                S10.AI
-              </Typography>
+              
+              {/* Profile Section in Desktop */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Avatar
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    border: '2px solid rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  JD
+                </Avatar>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.2 }}>
+                    John Doe
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.75rem', lineHeight: 1.2 }}>
+                    john@example.com
+                  </Typography>
+                </Box>
+              </Box>
             </Box>
           ) : (
-            <Tooltip title="S10.AI Dashboard" placement="right" arrow>
-              <Box
-                component="img"
-                src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
-                alt="S10.AI"
+            <Tooltip title="John Doe" placement="right" arrow>
+              <Avatar
                 sx={{
-                  height: 44,
                   width: 44,
-                  objectFit: 'contain',
+                  height: 44,
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: '1rem',
                   cursor: 'pointer',
-                  borderRadius: '12px',
-                  padding: '8px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  backdropFilter: 'blur(10px)',
                   transition: 'all 0.3s ease',
                   '&:hover': {
                     transform: 'scale(1.1)',
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                    backgroundColor: 'rgba(255, 255, 255, 0.25)'
                   }
                 }}
                 onClick={() => setIsCollapsed(false)}
-              />
+              >
+                JD
+              </Avatar>
             </Tooltip>
           )}
         </Box>
       )}
 
-      {/* User Profile Section for Mobile - Cleaner */}
+      {/* User Profile Section for Mobile */}
       {isMobile && (
         <Box sx={{
           px: 3,
@@ -402,7 +414,6 @@ export const Dashboard: React.FC = () => {
         position: 'relative',
         zIndex: 1
       }}>
-        {/* Quick Actions for Mobile */}
         {isMobile && (
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
@@ -448,7 +459,6 @@ export const Dashboard: React.FC = () => {
           </Box>
         )}
 
-        {/* Collapse Toggle - Desktop Only */}
         {!isMobile && (
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             <Tooltip title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} placement="top" arrow>
@@ -489,7 +499,7 @@ export const Dashboard: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {/* Enhanced Mobile Menu Button */}
+      {/* Mobile Menu Button with Gradient */}
       {isMobile && (
         <Fade in={!mobileOpen}>
           <Paper
@@ -500,7 +510,7 @@ export const Dashboard: React.FC = () => {
               left: 20,
               zIndex: 1300,
               display: { xs: 'block', md: 'none' },
-              backgroundColor: bravoColors.primaryFlat,
+              background: 'linear-gradient(135deg, #143151 0%, #387E89 100%)',
               borderRadius: '16px',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               backdropFilter: 'blur(20px)',
@@ -558,7 +568,6 @@ export const Dashboard: React.FC = () => {
         </Drawer>
       </Box>
 
-      {/* Enhanced Mobile Drawer - Full Screen */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -590,7 +599,6 @@ export const Dashboard: React.FC = () => {
         </Slide>
       </Drawer>
 
-      {/* Main Content */}
       <Box
         component="main"
         sx={{
