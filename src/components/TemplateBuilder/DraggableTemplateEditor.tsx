@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -93,7 +92,6 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [helpInputValue, setHelpInputValue] = useState('');
   const [aiInstructions, setAiInstructions] = useState('');
   const [aiTitle, setAiTitle] = useState('');
-  const [aiDescription, setAiDescription] = useState('');
   const [pendingSection, setPendingSection] = useState<any>(null);
 
   const helpOptions = [
@@ -191,6 +189,11 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     setPlacementDialogOpen(true);
   };
 
+  const handleBackToConfig = () => {
+    setPlacementDialogOpen(false);
+    setSectionConfigOpen(true);
+  };
+
   const handlePlaceSection = (position: number) => {
     if (pendingSection) {
       const newItem: TemplateItem = {
@@ -276,7 +279,6 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     if (item) {
       setSelectedItemId(itemId);
       setAiTitle(item.name);
-      setAiDescription(item.description || '');
       setAiEditDialogOpen(true);
     }
   };
@@ -285,7 +287,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     if (selectedItemId) {
       setItems(items.map(item => 
         item.id === selectedItemId 
-          ? { ...item, name: aiTitle, description: aiDescription }
+          ? { ...item, name: aiTitle }
           : item
       ));
     }
@@ -293,7 +295,6 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     setSelectedItemId(null);
     setAiInstructions('');
     setAiTitle('');
-    setAiDescription('');
   };
 
   const getSelectedHelpOption = () => {
@@ -508,6 +509,37 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
                   ))}
                 </Box>
               )}
+
+              {/* Special formatting for exam-list and checklist */}
+              {(item.type === 'exam-list' || item.type === 'checklist') && !item.items && (
+                <Box sx={{ mt: 2 }}>
+                  {[
+                    'General Appearance: Recap the patient\'s general appearance, including level of alertness and any acute distress.',
+                    'Cardiovascular: Recap findings related to heart sounds, rate, rhythm, and any murmurs.',
+                    'Respiratory: Recap findings regarding breath sounds, rate, and effort of breathing.',
+                    'Neurological: Recap findings related to mental status, motor and sensory function, and reflexes.',
+                    'Gastrointestinal: Recap findings related to abdominal examination, including palpation, bowel sounds, and any tenderness.',
+                    'Musculoskeletal: Recap findings regarding joint function, muscle strength, and any deformities.',
+                    'Skin: Recap findings on skin condition, including rashes, lesions, or color changes.'
+                  ].map((bullet, idx) => (
+                    <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
+                      <Box 
+                        sx={{ 
+                          width: 6, 
+                          height: 6, 
+                          borderRadius: '50%', 
+                          backgroundColor: getTypeColor(item.type),
+                          mt: 1,
+                          flexShrink: 0
+                        }} 
+                      />
+                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
+                        {bullet}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
             </Paper>
           </Box>
 
@@ -705,6 +737,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       <SectionPlacementDialog
         open={placementDialogOpen}
         onClose={() => setPlacementDialogOpen(false)}
+        onBack={handleBackToConfig}
         onPlaceSection={handlePlaceSection}
         existingSections={items.map(item => ({ id: item.id, name: item.name }))}
       />
@@ -850,7 +883,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* AI Edit Dialog */}
+      {/* AI Edit Dialog - Updated to remove description field */}
       <Dialog 
         open={aiEditDialogOpen} 
         onClose={() => setAiEditDialogOpen(false)} 
@@ -894,16 +927,6 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
               label="Section Title"
               value={aiTitle}
               onChange={(e) => setAiTitle(e.target.value)}
-              variant="outlined"
-            />
-            
-            <TextField
-              fullWidth
-              label="Description"
-              value={aiDescription}
-              onChange={(e) => setAiDescription(e.target.value)}
-              multiline
-              rows={3}
               variant="outlined"
             />
             

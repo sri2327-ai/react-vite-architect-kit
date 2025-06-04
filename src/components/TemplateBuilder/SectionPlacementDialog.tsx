@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -30,13 +31,15 @@ import {
   Title as TitleIcon,
   Assignment as AssignmentIcon,
   TextSnippet as TextSnippetIcon,
-  Checklist as ChecklistIcon
+  Checklist as ChecklistIcon,
+  ArrowBack as ArrowBackIcon
 } from '@mui/icons-material';
 
 interface SectionPlacementDialogProps {
   open: boolean;
   onClose: () => void;
   onPlaceSection: (position: number) => void;
+  onBack?: () => void;
   existingSections: Array<{ id: string; name: string; type?: string; }>;
 }
 
@@ -44,6 +47,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
   open,
   onClose,
   onPlaceSection,
+  onBack,
   existingSections
 }) => {
   const theme = useTheme();
@@ -278,13 +282,28 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
     >
       <DialogTitle>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-              Choose Section Placement
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Select where you'd like to place your new section in the template
-            </Typography>
+          <Box display="flex" alignItems="center" gap={1}>
+            {onBack && (
+              <IconButton 
+                onClick={onBack}
+                sx={{
+                  backgroundColor: alpha(theme.palette.grey[500], 0.1),
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.grey[500], 0.2)
+                  }
+                }}
+              >
+                <ArrowBackIcon />
+              </IconButton>
+            )}
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+                Choose Section Placement
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Select where you'd like to place your new section in the template
+              </Typography>
+            </Box>
           </Box>
           <IconButton 
             onClick={onClose}
