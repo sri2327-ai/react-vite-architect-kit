@@ -131,10 +131,10 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Typography>
       </Box>
 
-      <Box sx={{ flex: 1, overflow: 'auto' }}>
+      {/* Content Area - Remove overflow hidden */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
         {/* Subscription Summary */}
         <Card sx={{ 
-          mb: 3, 
           border: '1px solid', 
           borderColor: '#e0e7ff',
           backgroundColor: 'background.paper'
@@ -194,7 +194,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Card>
 
         {/* Promo Code Section */}
-        <Card sx={{ mb: 3 }}>
+        <Card>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <LocalOffer sx={{ mr: 1, color: '#4caf50' }} />
@@ -248,8 +248,8 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Card>
 
         {/* Payment Section */}
-        <Card>
-          <CardContent>
+        <Card sx={{ flexGrow: 1 }}>
+          <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <CreditCard sx={{ mr: 1, color: '#4caf50' }} />
               <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 600 }}>
@@ -263,27 +263,35 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
               </Typography>
             </Alert>
 
-            {/* Pay Now Button - Always visible unless payment is successful */}
-            <Box sx={{ textAlign: 'center', py: 4, mb: showIframe ? 3 : 0 }}>
+            {/* Pay Now Button - Always visible and prominent */}
+            <Box sx={{ 
+              textAlign: 'center', 
+              py: 4, 
+              mb: 3,
+              backgroundColor: '#f8f9fa',
+              borderRadius: 2,
+              border: '2px solid #4caf50'
+            }}>
               <PrimaryButton
                 onClick={handlePayNow}
                 disabled={loading}
                 sx={{
                   py: 2,
-                  px: 4,
-                  fontSize: '1.125rem',
+                  px: 6,
+                  fontSize: '1.25rem',
                   fontWeight: 700,
-                  minWidth: 200
+                  minWidth: 250,
+                  minHeight: 56
                 }}
               >
-                {loading ? <CircularProgress size={20} color="inherit" /> : 'Pay Now'}
+                {loading ? <CircularProgress size={24} color="inherit" /> : 'Pay Now - $' + finalPrice.toFixed(2)}
               </PrimaryButton>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontWeight: 500 }}>
                 Click to proceed to secure payment gateway
               </Typography>
             </Box>
 
-            {/* Zoho Payment Iframe - Only show after Pay Now is clicked */}
+            {/* Zoho Payment Iframe */}
             {showIframe && (
               <Box sx={{ 
                 width: '100%', 
@@ -291,7 +299,8 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
                 border: '1px solid #e0e7ff',
                 borderRadius: 2,
                 overflow: 'hidden',
-                position: 'relative'
+                position: 'relative',
+                mt: 2
               }}>
                 <iframe
                   src={zohoPaymentUrl}
@@ -332,7 +341,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         pt: 3,
         display: 'flex',
         gap: 2,
-        mt: 'auto'
+        justifyContent: 'space-between'
       }}>
         <SecondaryButton
           onClick={onBack}
