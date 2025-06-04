@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   TextField,
-  Divider,
   Alert,
   CircularProgress,
   Button,
@@ -261,19 +260,24 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
             {/* Zoho Payment Iframe */}
             <Box sx={{ 
               width: '100%', 
-              height: 400, 
+              height: 500, 
               border: '1px solid #e0e7ff',
               borderRadius: 2,
-              overflow: 'hidden'
+              overflow: 'hidden',
+              position: 'relative'
             }}>
               <iframe
                 src={zohoPaymentUrl}
                 width="100%"
                 height="100%"
                 frameBorder="0"
-                style={{ border: 'none' }}
+                style={{ 
+                  border: 'none',
+                  display: 'block'
+                }}
                 title="Zoho SecurePay"
-                sandbox="allow-forms allow-scripts allow-same-origin"
+                allow="payment"
+                sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
               />
             </Box>
           </CardContent>
