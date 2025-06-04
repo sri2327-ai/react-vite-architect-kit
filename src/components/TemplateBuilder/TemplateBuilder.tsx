@@ -38,6 +38,7 @@ import {
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
 import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
+import TemplateLibraryTab from './TemplateLibraryTab';
 import { templateService } from '@/services/templateService';
 
 interface TemplateItem {
@@ -647,18 +648,14 @@ const TemplateBuilder: React.FC = () => {
             }
           }}
         >
-          <Tab label="My Templates" />
-          <Tab label="Template Library" />
+          <Tab label="TEMPLATE" />
+          <Tab label="TEMPLATE LIBRARY" />
         </Tabs>
       </Box>
 
       {/* Tab Content */}
       {currentTab === 0 && renderMyTemplatesContent()}
-      {currentTab === 1 && (
-        <Alert severity="info" sx={{ textAlign: 'center' }}>
-          Template Library functionality will be implemented here
-        </Alert>
-      )}
+      {currentTab === 1 && <TemplateLibraryTab />}
 
       {/* Enhanced Template Creation Dialog */}
       <ImprovedTemplateCreationDialog
