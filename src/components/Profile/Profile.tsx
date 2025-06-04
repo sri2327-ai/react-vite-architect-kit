@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -316,22 +317,40 @@ const Profile: React.FC = () => {
                 label="Medical Specialty"
                 value={profile.specialty}
               />
-              <ProfileField
-                icon={<SettingsIcon />}
-                label="EHR Integration Status"
-                value={profile.ehrMode}
-                chip
-              />
-              {profile.ehrMode && profile.ehrName && (
-                <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
+              
+              {/* Only show EHR Integration Status if ehrMode is true */}
+              {profile.ehrMode && (
+                <>
                   <ProfileField
-                    icon={<StorageIcon />}
-                    label="Connected EHR System"
-                    value={profile.ehrName}
+                    icon={<SettingsIcon />}
+                    label="EHR Integration Status"
+                    value={profile.ehrMode}
+                    chip
                   />
-                </Box>
+                  {profile.ehrName && (
+                    <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
+                      <ProfileField
+                        icon={<StorageIcon />}
+                        label="Connected EHR System"
+                        value={profile.ehrName}
+                      />
+                    </Box>
+                  )}
+                </>
               )}
             </Box>
+
+            {/* Show EHR disabled message if ehrMode is false */}
+            {!profile.ehrMode && (
+              <Alert severity="info" sx={{ mt: 3 }}>
+                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                  EHR Integration Disabled
+                </Typography>
+                <Typography variant="body2">
+                  Your account is currently set to no-EHR mode. EHR integration features and workflow automation are not available.
+                </Typography>
+              </Alert>
+            )}
           </Paper>
 
           {/* Security Settings */}

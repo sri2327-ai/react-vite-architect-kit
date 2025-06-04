@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -39,6 +40,8 @@ import TemplateBuilder from '@/components/TemplateBuilder/TemplateBuilder';
 import Profile from '@/components/Profile/Profile';
 import BillingHistory from '@/components/BillingHistory/BillingHistory';
 import WorkflowBuilder from '@/components/WorkflowBuilder/WorkflowBuilder';
+import { useProfileData } from '@/hooks/useProfileData';
+import { useApiContext } from '@/contexts/ApiContext';
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -49,35 +52,8 @@ interface MenuItem {
   icon: React.ReactNode;
   component: React.ComponentType;
   badge?: string;
+  requiresEHR?: boolean;
 }
-
-const menuItems: MenuItem[] = [
-  {
-    id: 'template-builder',
-    label: 'Template Builder',
-    icon: <LayoutTemplate size={22} />,
-    component: TemplateBuilder
-  },
-  {
-    id: 'workflow-builder',
-    label: 'Workflow Builder',
-    icon: <Workflow size={22} />,
-    component: WorkflowBuilder,
-    badge: 'New'
-  },
-  {
-    id: 'profile',
-    label: 'Profile',
-    icon: <User size={22} />,
-    component: Profile
-  },
-  {
-    id: 'billing-history',
-    label: 'Billing History',
-    icon: <History size={22} />,
-    component: BillingHistory
-  }
-];
 
 export const Dashboard: React.FC = () => {
   const [activeMenuItem, setActiveMenuItem] = useState<string>('template-builder');
@@ -87,8 +63,45 @@ export const Dashboard: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { logout } = useAuthStore();
+  const { useApiData } = useApiContext();
+  const { profile } = useProfileData(useApiData);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+
+  // Define menu items with EHR requirements
+  const allMenuItems: MenuItem[] = [
+    {
+      id: 'template-builder',
+      label: 'Template Builder',
+      icon: <LayoutTemplate size={22} />,
+      component: TemplateBuilder
+    },
+    {
+      id: 'workflow-builder',
+      label: 'Workflow Builder',
+      icon: <Workflow size={22} />,
+      component: WorkflowBuilder,
+      badge: 'New',
+      requiresEHR: true // Only show if EHR mode is enabled
+    },
+    {
+      id: 'profile',
+      label: 'Profile',
+      icon: <User size={22} />,
+      component: Profile
+    },
+    {
+      id: 'billing-history',
+      label: 'Billing History',
+      icon: <History size={22} />,
+      component: BillingHistory
+    }
+  ];
+
+  // Filter menu items based on EHR mode
+  const menuItems = allMenuItems.filter(item => 
+    !item.requiresEHR || (item.requiresEHR && profile?.ehrMode)
+  );
 
   const handleMenuItemClick = (itemId: string) => {
     setActiveMenuItem(itemId);
