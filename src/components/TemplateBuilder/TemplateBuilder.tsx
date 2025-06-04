@@ -244,27 +244,35 @@ const TemplateBuilder: React.FC = () => {
     setEditingTemplate(null);
   };
 
-  // Enhanced template creation handler
+  // Enhanced template creation handler with better debugging
   const handleCreateTemplateFromDialog = (templateData: any) => {
-    console.log('Creating template with data:', templateData);
+    console.log('Creating template with full data:', templateData);
     setIsLoading(true);
     
     setTimeout(() => {
-      // Generate content based on template type
+      // More robust content generation
       let content = '';
-      if (templateData.templateType && templateData.templateType !== 'Custom') {
+      let sections = [];
+      
+      if (templateData.sections && templateData.sections.length > 0) {
+        // If sections are provided, use them
+        sections = templateData.sections;
+        content = templateData.sections.map((section: any) => `${section.name}:\n${section.description || section.content || '[To be filled]'}\n`).join('\n');
+      } else if (templateData.templateType && templateData.templateType !== 'Custom') {
+        // Generate from template service
         content = templateService.generateTemplateContent(templateData.templateType, templateData.customFields);
       } else {
+        // Default content
         content = templateData.content || 'New template content';
       }
       
-      // Create new template with proper structure
+      // Create new template with robust data handling
       const newTemplate: TemplateData = {
-        id: Date.now(), // Use timestamp for unique ID
-        title: templateData.name || templateData.title || 'New Template',
+        id: Date.now(),
+        title: templateData.title || templateData.name || 'New Template',
         specialty: templateData.specialty || selectedVisitType?.name || 'General',
         type: selectedVisitType?.name || templateData.templateType || 'Custom',
-        fields: templateData.ehrFields || templateData.fields || [],
+        fields: templateData.fields || templateData.ehrFields || sections || [],
         content: content,
         lastUsed: 'Just created',
         usageCount: 0,
@@ -273,19 +281,21 @@ const TemplateBuilder: React.FC = () => {
         tags: templateData.tags || []
       };
       
+      console.log('New template being created:', newTemplate);
+      
       // Add template to the list
       setTemplates(prev => {
         const updatedTemplates = [...prev, newTemplate];
-        console.log('Templates updated:', updatedTemplates);
+        console.log('Templates after update:', updatedTemplates);
         return updatedTemplates;
       });
       
       setIsLoading(false);
       setOpenCreateTemplate(false);
       
-      // Show success message in console
+      // Show success message
       console.log('Template created successfully:', newTemplate);
-    }, 500); // Reduced timeout for better UX
+    }, 300);
   };
 
   const handleAddType = () => {

@@ -43,10 +43,12 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   }, [open, sectionName]);
 
   const handleContinue = () => {
+    console.log('Section configuration completed:', { title, instructions, sectionType });
     onContinue();
   };
 
   const handleBack = () => {
+    console.log('Going back to section selection');
     if (onBack) {
       onBack();
     }
@@ -66,7 +68,14 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
             {onBack && (
-              <IconButton onClick={handleBack} sx={{ mr: 1 }}>
+              <IconButton 
+                onClick={handleBack} 
+                sx={{ 
+                  mr: 1,
+                  bgcolor: 'action.hover',
+                  '&:hover': { bgcolor: 'action.selected' }
+                }}
+              >
                 <ArrowBackIcon />
               </IconButton>
             )}
