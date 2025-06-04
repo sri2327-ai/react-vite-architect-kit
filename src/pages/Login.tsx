@@ -96,29 +96,77 @@ export const Login: React.FC = () => {
       minHeight: '100vh',
       width: '100vw',
       display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'white',
-      p: {
-        xs: 3,
-        sm: 4,
-        md: 5,
-        lg: 6
+      flexDirection: {
+        xs: 'column',
+        lg: 'row'
       },
-      overflow: 'auto'
+      overflow: 'hidden'
     }}>
-      {/* Login Form - Now full width and centered */}
+      {/* Left side - Branding - Only show on desktop */}
+      {isDesktop && (
+        <Box sx={{
+          flex: 1,
+          height: '100vh',
+          background: 'linear-gradient(135deg, #143151 0%, #387E89 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          p: 4,
+          color: 'white',
+          textAlign: 'center',
+          position: 'relative'
+        }}>
+          <Box sx={{ maxWidth: 400 }}>
+            <Typography variant="h3" sx={{ 
+              fontWeight: 700,
+              mb: 3,
+              fontSize: { lg: '2.5rem', xl: '3rem' }
+            }}>
+              S10.AI for Clinicians
+            </Typography>
+            <Typography variant="h6" sx={{ 
+              mb: 4,
+              opacity: 0.9,
+              lineHeight: 1.6,
+              fontSize: { lg: '1.125rem', xl: '1.25rem' }
+            }}>
+              Streamline your clinical documentation with AI-powered efficiency
+            </Typography>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              opacity: 0.8
+            }}>
+              <Typography variant="body1">✓ HIPAA Compliant</Typography>
+              <Typography variant="body1">✓ EHR Integration</Typography>
+              <Typography variant="body1">✓ Voice-to-Text</Typography>
+              <Typography variant="body1">✓ Smart Templates</Typography>
+            </Box>
+          </Box>
+        </Box>
+      )}
+
+      {/* Right side - Login Form */}
       <Box sx={{
-        width: '100%',
-        maxWidth: {
-          xs: 360,
-          sm: 400,
-          md: 440
+        flex: {
+          xs: 1,
+          lg: 1
         },
+        minHeight: '100vh',
+        backgroundColor: 'white',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        p: {
+          xs: 3,
+          sm: 4,
+          md: 5,
+          lg: 6
+        },
+        overflow: 'auto'
       }}>
         {/* Logo and Title */}
         <Box sx={{
@@ -130,7 +178,12 @@ export const Login: React.FC = () => {
             sm: 5,
             md: 6
           },
-          width: '100%'
+          width: '100%',
+          maxWidth: {
+            xs: 360,
+            sm: 400,
+            md: 440
+          }
         }}>
           <Box sx={{
             display: 'flex',
@@ -193,7 +246,12 @@ export const Login: React.FC = () => {
 
         {/* Form Container */}
         <Box sx={{
-          width: '100%'
+          width: '100%',
+          maxWidth: {
+            xs: 360,
+            sm: 400,
+            md: 440
+          }
         }}>
           {paymentSuccessMessage && (
             <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
