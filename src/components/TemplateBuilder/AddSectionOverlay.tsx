@@ -18,16 +18,36 @@ import { bravoColors } from '@/theme/colors';
 interface AddSectionOverlayProps {
   open: boolean;
   onClose: () => void;
-  onSectionSelect: (sectionType: string, sectionName: string) => void;
+  onSectionSelect?: (sectionType: string, sectionName: string) => void;
+  onAddSection?: (section: any) => void;
 }
 
 const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
   open,
   onClose,
-  onSectionSelect
+  onSectionSelect,
+  onAddSection
 }) => {
   const handleSectionClick = (type: string, name: string) => {
-    onSectionSelect(type, name);
+    if (onSectionSelect) {
+      onSectionSelect(type, name);
+    }
+    if (onAddSection) {
+      onAddSection({ id: type, name, type, description: getDescription(type) });
+    }
+  };
+
+  const getDescription = (type: string) => {
+    const descriptions = {
+      'paragraph': 'A.I. will write a descriptive block of text following the guidelines below.',
+      'bulleted_list': 'A.I. will create a bulleted list based on the instructions provided',
+      'numbered_list': 'A.I. will create a numbered list based on the instructions provided',
+      'exam_list': 'Structured exam sections with normal limits behavior and customizable subsections',
+      'checklist': 'Manual buttons that insert predefined text when clicked - not AI generated',
+      'heading': 'A simple heading or title for organizing your template',
+      'divider': 'A visual separator to organize sections in your template'
+    };
+    return descriptions[type as keyof typeof descriptions] || 'Section description';
   };
 
   const sectionTypes = [
@@ -109,7 +129,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
       <DialogContent sx={{ px: 3, pb: 3 }}>
         <Grid container spacing={2}>
           {sectionTypes.map((section) => (
-            <Grid xs={12} sm={6} key={section.type}>
+            <Grid item xs={12} sm={6} key={section.type}>
               <Card
                 sx={{
                   cursor: 'pointer',

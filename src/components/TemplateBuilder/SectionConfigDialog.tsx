@@ -210,7 +210,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 </Box>
                 
                 <Grid container spacing={2}>
-                  <Grid xs={12}>
+                  <Grid item xs={12}>
                     <TextField
                       fullWidth
                       size="small"
@@ -220,7 +220,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                       placeholder="e.g., Cardiovascular, Respiratory, etc."
                     />
                   </Grid>
-                  <Grid xs={12}>
+                  <Grid item xs={12}>
                     <TextField
                       fullWidth
                       size="small"
@@ -230,7 +230,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                       placeholder="e.g., Heart rate, rhythm, murmurs, and peripheral pulses"
                     />
                   </Grid>
-                  <Grid xs={12}>
+                  <Grid item xs={12}>
                     <TextField
                       fullWidth
                       size="small"
@@ -331,7 +331,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 </Box>
                 
                 <Grid container spacing={2}>
-                  <Grid xs={12} sm={6}>
+                  <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
                       size="small"
@@ -341,7 +341,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                       placeholder="e.g., Normal Chest X-ray"
                     />
                   </Grid>
-                  <Grid xs={12}>
+                  <Grid item xs={12}>
                     <TextField
                       fullWidth
                       size="small"
