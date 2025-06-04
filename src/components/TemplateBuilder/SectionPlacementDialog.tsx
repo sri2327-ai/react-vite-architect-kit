@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -59,6 +58,14 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
       onPlaceSection(selectedPosition);
       setSelectedPosition(null);
       onClose();
+    }
+  };
+
+  const handleBackClick = () => {
+    // Close all dialogs and reopen the first screen (AddSectionOverlay)
+    onClose();
+    if (onBack) {
+      onBack();
     }
   };
 
@@ -285,7 +292,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           <Box display="flex" alignItems="center" gap={1}>
             {onBack && (
               <IconButton 
-                onClick={onBack}
+                onClick={handleBackClick}
                 sx={{
                   backgroundColor: alpha(theme.palette.grey[500], 0.1),
                   '&:hover': {

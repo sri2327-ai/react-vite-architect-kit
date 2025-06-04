@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -295,7 +294,7 @@ const TemplateBuilder: React.FC = () => {
     currentPage * templatesPerPage
   );
 
-  // Render Visit Types Screen with enhanced design
+  // Render Visit Types Screen with simplified design
   const renderVisitTypes = () => (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
@@ -332,78 +331,44 @@ const TemplateBuilder: React.FC = () => {
         </Button>
       </Box>
 
-      <Box sx={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-        gap: 3 
-      }}>
-        {visitTypes.map((visitType) => (
-          <Card
-            key={visitType.id}
-            sx={{
-              borderRadius: 4,
-              border: '1px solid',
-              borderColor: 'divider',
-              cursor: 'pointer',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              position: 'relative',
-              overflow: 'hidden',
-              '&:hover': {
-                borderColor: bravoColors.primaryFlat,
-                boxShadow: '0 8px 25px rgba(20, 49, 81, 0.15)',
-                transform: 'translateY(-4px)',
-              },
-            }}
-            onClick={() => handleVisitTypeSelect(visitType)}
-          >
-            <CardContent sx={{ p: 4 }}>
-              <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={2}>
-                <Box>
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      color: bravoColors.primaryFlat,
-                      fontWeight: 700,
-                      fontSize: '1.3rem',
-                      mb: 1
-                    }}
-                  >
-                    {visitType.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {visitType.description}
-                  </Typography>
-                </Box>
-                {visitType.isNew && (
-                  <Chip
-                    label="New"
-                    size="small"
-                    sx={{
-                      backgroundColor: '#ff6b6b',
-                      color: 'white',
-                      fontWeight: 600,
-                      fontSize: '0.75rem'
-                    }}
-                  />
-                )}
-              </Box>
-              
-              <Box display="flex" alignItems="center" gap={2}>
-                <Chip
-                  icon={<AssignmentIcon />}
-                  label={`${visitType.templateCount} templates`}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    borderColor: bravoColors.secondary,
-                    color: bravoColors.secondary
-                  }}
+      <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+        {visitTypes.map((visitType, index) => (
+          <React.Fragment key={visitType.id}>
+            <ListItem disablePadding>
+              <ListItemButton 
+                onClick={() => handleVisitTypeSelect(visitType)}
+                sx={{
+                  py: 3,
+                  px: 3,
+                  '&:hover': {
+                    backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
+                  }
+                }}
+              >
+                <ListItemText
+                  primary={
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 600,
+                        color: bravoColors.primaryFlat,
+                        fontSize: '1.1rem'
+                      }}
+                    >
+                      {visitType.name}
+                    </Typography>
+                  }
                 />
+              </ListItemButton>
+            </ListItem>
+            {index < visitTypes.length - 1 && (
+              <Box sx={{ px: 3 }}>
+                <Box sx={{ borderBottom: '1px solid', borderColor: 'divider' }} />
               </Box>
-            </CardContent>
-          </Card>
+            )}
+          </React.Fragment>
         ))}
-      </Box>
+      </List>
     </Box>
   );
 
@@ -427,7 +392,7 @@ const TemplateBuilder: React.FC = () => {
             </Typography>
           </Box>
           <Typography variant="body1" color="text.secondary">
-            Manage your {selectedVisitType?.name.toLowerCase()} documentation templates
+            Click add template to create a new template
           </Typography>
         </Box>
         
@@ -507,9 +472,6 @@ const TemplateBuilder: React.FC = () => {
                   }}
                 >
                   <Box display="flex" alignItems="center" gap={2} sx={{ flex: 1 }}>
-                    <Typography variant="h3" sx={{ fontSize: '1.5rem' }}>
-                      🩺
-                    </Typography>
                     <Box sx={{ flex: 1 }}>
                       <Typography
                         variant="h6"
@@ -520,9 +482,6 @@ const TemplateBuilder: React.FC = () => {
                         }}
                       >
                         {template.title}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {template.specialty}
                       </Typography>
                     </Box>
                     <IconButton 
