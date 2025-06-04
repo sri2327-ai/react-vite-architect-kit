@@ -9,8 +9,14 @@ import {
   Alert,
   useTheme,
   useMediaQuery,
-  Container
+  Container,
+  Chip
 } from '@mui/material';
+import {
+  Build as BuildIcon,
+  Library as LibraryIcon,
+  Info as InfoIcon
+} from '@mui/icons-material';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
 import { templateBuilderService } from '../../services/templateBuilderService';
@@ -33,7 +39,7 @@ function TabPanel(props: TabPanelProps) {
       {...other}
     >
       {value === index && (
-        <Box sx={{ pt: { xs: 2, md: 3 } }}>
+        <Box sx={{ pt: { xs: 3, md: 4 } }}>
           {children}
         </Box>
       )}
@@ -82,30 +88,65 @@ const WorkflowBuilder: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 }, px: { xs: 1, md: 3 } }}>
-      <Box sx={{ mb: { xs: 2, md: 3 } }}>
-        <Typography 
-          variant={isMobile ? "h5" : "h4"} 
-          gutterBottom 
-          sx={{ 
-            fontWeight: 600, 
-            mb: 1,
-            textAlign: { xs: 'center', md: 'left' }
-          }}
-        >
-          EHR Workflow Builder
-        </Typography>
+    <Container maxWidth="xl" sx={{ py: { xs: 3, md: 4 }, px: { xs: 2, md: 3 } }}>
+      <Box sx={{ mb: { xs: 3, md: 4 } }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 2, 
+          mb: 2,
+          flexDirection: { xs: 'column', md: 'row' },
+          textAlign: { xs: 'center', md: 'left' }
+        }}>
+          <BuildIcon 
+            sx={{ 
+              fontSize: { xs: 32, md: 40 }, 
+              color: theme.palette.primary.main,
+              display: { xs: 'none', md: 'block' }
+            }} 
+          />
+          <Box>
+            <Typography 
+              variant={isMobile ? "h4" : "h3"} 
+              sx={{ 
+                fontWeight: 700, 
+                color: theme.palette.text.primary,
+                mb: 0.5
+              }}
+            >
+              EHR Workflow Builder
+            </Typography>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 400, 
+                color: theme.palette.text.secondary,
+                opacity: 0.8
+              }}
+            >
+              Automate your clinical workflows with AI-powered efficiency
+            </Typography>
+          </Box>
+        </Box>
         
         <Alert 
+          icon={<InfoIcon />}
           severity="info" 
           sx={{ 
-            mb: { xs: 2, md: 3 },
+            mb: { xs: 3, md: 4 },
+            borderRadius: 3,
+            backgroundColor: theme.palette.info.light + '15',
+            border: `1px solid ${theme.palette.info.light}`,
             '& .MuiAlert-message': {
-              fontSize: { xs: '0.875rem', md: '1rem' }
+              fontSize: { xs: '0.875rem', md: '1rem' },
+              lineHeight: 1.6
+            },
+            '& .MuiAlert-icon': {
+              color: theme.palette.info.main
             }
           }}
         >
-          <Typography variant="body2" sx={{ lineHeight: 1.5 }}>
+          <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
             <strong>Streamline Your EHR Tasks:</strong> Build automated workflows for your daily clinical activities. 
             Connect your templates, configure settings, and let AI handle repetitive EHR tasks while you focus on patient care.
           </Typography>
@@ -113,14 +154,19 @@ const WorkflowBuilder: React.FC = () => {
       </Box>
 
       <Paper 
-        elevation={2}
+        elevation={0}
         sx={{ 
           width: '100%',
-          borderRadius: { xs: 2, md: 3 },
-          overflow: 'hidden'
+          borderRadius: { xs: 3, md: 4 },
+          overflow: 'hidden',
+          border: `1px solid ${theme.palette.divider}`,
+          backgroundColor: theme.palette.background.paper
         }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ 
+          borderBottom: `2px solid ${theme.palette.divider}`,
+          backgroundColor: theme.palette.background.default
+        }}>
           <Tabs 
             value={tabValue} 
             onChange={handleTabChange} 
@@ -131,15 +177,49 @@ const WorkflowBuilder: React.FC = () => {
                 fontSize: { xs: '0.875rem', md: '1rem' },
                 fontWeight: 600,
                 textTransform: 'none',
-                minHeight: { xs: 48, md: 56 }
+                minHeight: { xs: 56, md: 64 },
+                px: { xs: 2, md: 4 },
+                color: theme.palette.text.secondary,
+                '&.Mui-selected': {
+                  color: theme.palette.primary.main,
+                },
+                '&:hover': {
+                  color: theme.palette.primary.main,
+                  backgroundColor: theme.palette.action.hover
+                }
+              },
+              '& .MuiTabs-indicator': {
+                height: 3,
+                borderRadius: '3px 3px 0 0',
+                backgroundColor: theme.palette.primary.main
               }
             }}
           >
             <Tab 
-              label={`My Workflows${importedWorkflows.length > 0 ? ` (${importedWorkflows.length})` : ''}`}
+              icon={<BuildIcon sx={{ mb: 0.5 }} />}
+              iconPosition="start"
+              label={
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  My Workflows
+                  {importedWorkflows.length > 0 && (
+                    <Chip 
+                      label={importedWorkflows.length} 
+                      size="small" 
+                      sx={{ 
+                        height: 20, 
+                        fontSize: '0.75rem',
+                        backgroundColor: theme.palette.primary.main,
+                        color: 'white'
+                      }} 
+                    />
+                  )}
+                </Box>
+              }
               sx={{ flex: 1 }}
             />
             <Tab 
+              icon={<LibraryIcon sx={{ mb: 0.5 }} />}
+              iconPosition="start"
               label="Workflow Library" 
               sx={{ flex: 1 }}
             />
