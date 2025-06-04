@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -13,7 +12,7 @@ import {
   Chip
 } from '@mui/material';
 import {
-  Build as BuildIcon,
+  Workflow as WorkflowIcon,
   LibraryBooks as LibraryBooksIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
@@ -98,7 +97,7 @@ const WorkflowBuilder: React.FC = () => {
           flexDirection: { xs: 'column', md: 'row' },
           textAlign: { xs: 'center', md: 'left' }
         }}>
-          <BuildIcon 
+          <WorkflowIcon 
             sx={{ 
               fontSize: { xs: 32, md: 40 }, 
               color: theme.palette.success.main,
@@ -110,12 +109,8 @@ const WorkflowBuilder: React.FC = () => {
               variant={isMobile ? "h4" : "h3"} 
               sx={{ 
                 fontWeight: 700, 
-                color: theme.palette.text.primary,
-                mb: 0.5,
-                background: `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.info.main})`,
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
+                color: '#000000',
+                mb: 0.5
               }}
             >
               EHR Workflow Builder
@@ -201,7 +196,7 @@ const WorkflowBuilder: React.FC = () => {
             }}
           >
             <Tab 
-              icon={<BuildIcon sx={{ mb: 0.5 }} />}
+              icon={<WorkflowIcon sx={{ mb: 0.5 }} />}
               iconPosition="start"
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
