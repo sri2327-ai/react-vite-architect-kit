@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -33,7 +32,9 @@ import {
   LogOut,
   Settings
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { bravoColors } from '@/theme/colors';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 import TemplateBuilder from '@/components/TemplateBuilder/TemplateBuilder';
 import Profile from '@/components/Profile/Profile';
 import BillingHistory from '@/components/BillingHistory/BillingHistory';
@@ -84,6 +85,8 @@ export const Dashboard: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   
   const theme = useTheme();
+  const navigate = useNavigate();
+  const { logout } = useAuthStore();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
 
@@ -100,6 +103,11 @@ export const Dashboard: React.FC = () => {
     } else {
       setIsCollapsed(!isCollapsed);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   const ActiveComponent = menuItems.find(item => item.id === activeMenuItem)?.component || TemplateBuilder;
@@ -128,16 +136,29 @@ export const Dashboard: React.FC = () => {
           position: 'relative',
           zIndex: 1
         }}>
-          <Box
-            component="img"
-            src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
-            alt="S10.AI"
-            sx={{
-              height: 40,
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
-            }}
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              sx={{
+                width: 36,
+                height: 36,
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                border: '2px solid rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                fontWeight: 600,
+                fontSize: '0.9rem'
+              }}
+            >
+              JD
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.2 }}>
+                John Doe
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.75rem', lineHeight: 1.2 }}>
+                john@example.com
+              </Typography>
+            </Box>
+          </Box>
           
           <IconButton
             onClick={() => setMobileOpen(false)}
@@ -438,6 +459,7 @@ export const Dashboard: React.FC = () => {
               </Tooltip>
               <Tooltip title="Logout" arrow>
                 <IconButton
+                  onClick={handleLogout}
                   sx={{
                     flex: 1,
                     backgroundColor: 'rgba(255, 255, 255, 0.08)',
