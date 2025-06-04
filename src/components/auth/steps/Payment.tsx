@@ -104,7 +104,9 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
     <Box sx={{ 
       display: 'flex', 
       flexDirection: 'column', 
-      height: '100%'
+      height: '100%',
+      maxHeight: '100%',
+      overflow: 'hidden'
     }}>
       {/* Header */}
       <Box sx={{ textAlign: 'center', mb: 3, flexShrink: 0 }}>
@@ -131,13 +133,21 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Typography>
       </Box>
 
-      {/* Content Area - Remove overflow hidden */}
-      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {/* Scrollable Content Area */}
+      <Box sx={{ 
+        flex: 1, 
+        overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        minHeight: 0
+      }}>
         {/* Subscription Summary */}
         <Card sx={{ 
           border: '1px solid', 
           borderColor: '#e0e7ff',
-          backgroundColor: 'background.paper'
+          backgroundColor: 'background.paper',
+          flexShrink: 0
         }}>
           <CardContent>
             <Typography variant="h6" gutterBottom sx={{ color: '#4caf50', fontWeight: 600 }}>
@@ -194,7 +204,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Card>
 
         {/* Promo Code Section */}
-        <Card>
+        <Card sx={{ flexShrink: 0 }}>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <LocalOffer sx={{ mr: 1, color: '#4caf50' }} />
@@ -248,8 +258,8 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Card>
 
         {/* Payment Section */}
-        <Card sx={{ flexGrow: 1 }}>
-          <CardContent sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <Card sx={{ flexShrink: 0 }}>
+          <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <CreditCard sx={{ mr: 1, color: '#4caf50' }} />
               <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 600 }}>
@@ -263,44 +273,16 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
               </Typography>
             </Alert>
 
-            {/* Pay Now Button - Always visible and prominent */}
-            <Box sx={{ 
-              textAlign: 'center', 
-              py: 4, 
-              mb: 3,
-              backgroundColor: '#f8f9fa',
-              borderRadius: 2,
-              border: '2px solid #4caf50'
-            }}>
-              <PrimaryButton
-                onClick={handlePayNow}
-                disabled={loading}
-                sx={{
-                  py: 2,
-                  px: 6,
-                  fontSize: '1.25rem',
-                  fontWeight: 700,
-                  minWidth: 250,
-                  minHeight: 56
-                }}
-              >
-                {loading ? <CircularProgress size={24} color="inherit" /> : 'Pay Now - $' + finalPrice.toFixed(2)}
-              </PrimaryButton>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontWeight: 500 }}>
-                Click to proceed to secure payment gateway
-              </Typography>
-            </Box>
-
             {/* Zoho Payment Iframe */}
             {showIframe && (
               <Box sx={{ 
                 width: '100%', 
-                height: 500, 
+                height: 400, 
                 border: '1px solid #e0e7ff',
                 borderRadius: 2,
                 overflow: 'hidden',
                 position: 'relative',
-                mt: 2
+                mb: 3
               }}>
                 <iframe
                   src={zohoPaymentUrl}
@@ -335,40 +317,75 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Card>
       </Box>
 
-      {/* Navigation Buttons */}
+      {/* Fixed Pay Now Button and Navigation */}
       <Box sx={{ 
         flexShrink: 0,
         pt: 3,
-        display: 'flex',
-        gap: 2,
-        justifyContent: 'space-between'
+        borderTop: '1px solid #e0e7ff',
+        backgroundColor: 'background.paper'
       }}>
-        <SecondaryButton
-          onClick={onBack}
-          startIcon={<ArrowBack />}
-          disabled={loading}
-          sx={{
-            py: { xs: 1.5, sm: 1.25 },
-            fontWeight: 600,
-            fontSize: { xs: '0.875rem', sm: '1rem' },
-            minWidth: 120
-          }}
-        >
-          Back
-        </SecondaryButton>
-        
-        <Button
-          variant="text"
-          onClick={handlePaymentSuccess}
-          sx={{
-            py: { xs: 1.5, sm: 1.25 },
-            fontWeight: 600,
-            fontSize: { xs: '0.875rem', sm: '1rem' },
-            color: 'text.secondary'
-          }}
-        >
-          Simulate Payment Success (Demo)
-        </Button>
+        {/* Pay Now Button - Always visible and prominent */}
+        <Box sx={{ 
+          textAlign: 'center', 
+          mb: 3,
+          backgroundColor: '#f8f9fa',
+          borderRadius: 2,
+          border: '2px solid #4caf50',
+          p: 3
+        }}>
+          <PrimaryButton
+            onClick={handlePayNow}
+            disabled={loading}
+            sx={{
+              py: 2,
+              px: 6,
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              minWidth: 250,
+              minHeight: 56
+            }}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : `Pay Now - $${finalPrice.toFixed(2)}`}
+          </PrimaryButton>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontWeight: 500 }}>
+            Click to proceed to secure payment gateway
+          </Typography>
+        </Box>
+
+        {/* Navigation Buttons */}
+        <Box sx={{ 
+          display: 'flex',
+          gap: 2,
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <SecondaryButton
+            onClick={onBack}
+            startIcon={<ArrowBack />}
+            disabled={loading}
+            sx={{
+              py: { xs: 1.5, sm: 1.25 },
+              fontWeight: 600,
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              minWidth: 120
+            }}
+          >
+            Back
+          </SecondaryButton>
+          
+          <Button
+            variant="text"
+            onClick={handlePaymentSuccess}
+            sx={{
+              py: { xs: 1.5, sm: 1.25 },
+              fontWeight: 600,
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              color: 'text.secondary'
+            }}
+          >
+            Simulate Payment Success (Demo)
+          </Button>
+        </Box>
       </Box>
     </Box>
   );
