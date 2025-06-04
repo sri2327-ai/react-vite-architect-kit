@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -14,7 +15,7 @@ import {
   Chip,
   InputAdornment
 } from '@mui/material';
-import { Phone, LocalHospital, Computer, ArrowBack, ArrowForward, CheckCircle, Link, FileText } from '@mui/icons-material';
+import { Phone, LocalHospital, Computer, ArrowBack, ArrowForward, CheckCircle, Link, Description } from '@mui/icons-material';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -310,7 +311,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                             mr: 2
                           }}
                         >
-                          <FileText sx={{ color: 'white', fontSize: 20 }} />
+                          <Description sx={{ color: 'white', fontSize: 20 }} />
                         </Box>
                         <Typography variant="h6" sx={{ fontWeight: 700, color: '#2196f3' }}>
                           Standalone Mode
@@ -380,3 +381,4 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
     </Box>
   );
 };
+
