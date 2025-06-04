@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -372,7 +373,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
             ) : (
               <Box>
                 <Typography variant="h6" gutterBottom>
-                  Review & Finalize Template
+                  Template Details
                 </Typography>
                 
                 <TextField
@@ -380,35 +381,46 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
                   label="Template Name"
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
-                  sx={{ mb: 3 }}
+                  sx={{ mb: 2 }}
                   placeholder="Enter a descriptive name for your template"
                 />
-
-                <Typography variant="subtitle1" gutterBottom sx={{ mt: 2, fontWeight: 600 }}>
-                  Template Content:
-                </Typography>
+                
                 <TextField
                   fullWidth
                   multiline
-                  rows={12}
-                  value={selectedMethod?.id === 2 ? processedContent : existingTemplateContent || previousNotes || 'New template content will be generated based on your selections.'}
-                  variant="outlined"
-                  sx={{ 
-                    mb: 2,
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#f9f9f9',
-                      fontFamily: 'monospace',
-                      fontSize: '0.9rem',
-                      lineHeight: 1.6
-                    }
-                  }}
-                  InputProps={{
-                    readOnly: true
-                  }}
+                  rows={2}
+                  label="Template Description (Optional)"
+                  value={templateDescription}
+                  onChange={(e) => setTemplateDescription(e.target.value)}
+                  sx={{ mb: 2 }}
+                  placeholder="Brief description of when to use this template"
                 />
 
+                {selectedMethod?.id === 2 && processedContent && (
+                  <Box>
+                    <Typography variant="subtitle1" gutterBottom sx={{ mt: 2 }}>
+                      AI Generated Content:
+                    </Typography>
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      {aiSummary}
+                    </Alert>
+                    <Box sx={{ 
+                      p: 2, 
+                      border: '1px solid #e0e0e0', 
+                      borderRadius: 1, 
+                      backgroundColor: '#f5f5f5',
+                      maxHeight: 200,
+                      overflow: 'auto'
+                    }}>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                        {processedContent}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+
                 {selectedTemplateType && (
-                  <Box sx={{ mt: 2, p: 2, backgroundColor: '#f5f5f5', borderRadius: 1 }}>
+                  <Box sx={{ mt: 2 }}>
                     <Typography variant="subtitle2" gutterBottom>
                       Template Type: {selectedTemplateType}
                     </Typography>
@@ -518,7 +530,7 @@ const TemplateCreationDialog: React.FC<TemplateCreationDialogProps> = ({
                 fontWeight: 600 
               } 
             }}>
-              Review & Finalize
+              Finalize Details
             </StepLabel>
             <StepContent>
               {renderStepContent(2)}

@@ -268,21 +268,6 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
     }
   };
 
-  const getFinalTemplateContent = () => {
-    if (selectedMethod?.id === 5 && selectedLibraryTemplate) {
-      return templateService.generateTemplateContent(selectedLibraryTemplate.type);
-    } else if (selectedMethod?.id === 2 && processedContent) {
-      return processedContent;
-    } else if (selectedMethod?.id === 1 && previousNotes) {
-      return templateService.generateTemplateContent('SOAP', { previousNotes });
-    } else if (selectedMethod?.id === 4 && existingTemplateContent) {
-      return existingTemplateContent;
-    } else if (selectedMethod?.id === 3) {
-      return templateService.generateTemplateContent('SOAP');
-    }
-    return '';
-  };
-
   const renderStepContent = (step: number) => {
     switch (step) {
       case 0:
@@ -608,29 +593,83 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
             ) : (
               <Box>
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                  Review Final Template
+                  Final Review & Description
                 </Typography>
                 
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={20}
-                  label="Generated Template"
-                  value={getFinalTemplateContent()}
-                  variant="outlined"
-                  InputProps={{
-                    readOnly: true,
-                  }}
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      fontFamily: 'monospace',
-                      fontSize: '0.875rem'
-                    },
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#f8f9fa'
-                    }
-                  }}
-                />
+                {selectedMethod?.id !== 5 && (
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    label="Template Description"
+                    value={templateDescription}
+                    onChange={(e) => setTemplateDescription(e.target.value)}
+                    placeholder="Describe when and how this template should be used..."
+                    sx={{ mb: 3 }}
+                  />
+                )}
+
+                {selectedMethod?.id === 2 && processedContent && (
+                  <Box>
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        ✅ {aiSummary}
+                      </Typography>
+                    </Alert>
+                    
+                    <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                      Generated Template Preview:
+                    </Typography>
+                    <Box sx={{ 
+                      p: 3, 
+                      border: '1px solid #e0e0e0', 
+                      borderRadius: 2, 
+                      backgroundColor: '#f8f9fa',
+                      maxHeight: 300,
+                      overflow: 'auto'
+                    }}>
+                      <Typography variant="body2" sx={{ 
+                        whiteSpace: 'pre-line', 
+                        fontFamily: 'monospace',
+                        fontSize: '0.875rem'
+                      }}>
+                        {processedContent}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+
+                {/* Summary */}
+                <Box sx={{ 
+                  mt: 3, 
+                  p: 3, 
+                  backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
+                  borderRadius: 2,
+                  border: `1px solid ${alpha(bravoColors.primaryFlat, 0.2)}`
+                }}>
+                  <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                    Template Summary
+                  </Typography>
+                  <Stack spacing={1}>
+                    {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
+                      <>
+                        <Typography variant="body2">
+                          <strong>Name:</strong> {selectedLibraryTemplate.name}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Specialty:</strong> {selectedLibraryTemplate.specialty}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Type:</strong> {selectedLibraryTemplate.type}
+                        </Typography>
+                      </>
+                    ) : (
+                      <Typography variant="body2">
+                        <strong>Name:</strong> {templateName}
+                      </Typography>
+                    )}
+                  </Stack>
+                </Box>
               </Box>
             )}
           </Box>

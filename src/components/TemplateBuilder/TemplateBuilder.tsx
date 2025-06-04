@@ -45,8 +45,6 @@ import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
 import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
 import TemplateLibraryTab from './TemplateLibraryTab';
-import AddSectionOverlay from './AddSectionOverlay';
-import SectionConfigDialog from './SectionConfigDialog';
 import { templateService } from '@/services/templateService';
 
 interface TemplateItem {
@@ -433,18 +431,6 @@ const TemplateBuilder: React.FC = () => {
   // Render Visit Types Screen with edit/delete functionality
   const renderVisitTypes = () => (
     <Box>
-      {/* EHR Template Builder Description */}
-      <Box sx={{ mb: 4, p: 4, backgroundColor: alpha(bravoColors.primaryFlat, 0.05), borderRadius: 3, border: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}` }}>
-        <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 700, mb: 2 }}>
-          EHR Template Builder
-        </Typography>
-        <Typography variant="body1" sx={{ color: bravoColors.text?.primary || '#333', lineHeight: 1.6, fontSize: '1.1rem' }}>
-          Streamline Your Clinical Documentation: Create intelligent templates for your medical notes and reports. 
-          Design structured sections, configure AI instructions, and build reusable templates that adapt to your workflow. 
-          Save time on documentation while ensuring comprehensive and consistent patient records.
-        </Typography>
-      </Box>
-
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
         <Box>
           <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 700, mb: 1 }}>
@@ -479,7 +465,6 @@ const TemplateBuilder: React.FC = () => {
         </Button>
       </Box>
 
-      {/* ... keep existing code (Paper with List) */}
       <Paper elevation={1} sx={{ borderRadius: 3 }}>
         <List sx={{ p: 0 }}>
           {visitTypes.map((visitType, index) => (
