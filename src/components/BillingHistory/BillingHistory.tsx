@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -49,7 +48,11 @@ interface Invoice {
   description: string;
 }
 
-const BillingHistory: React.FC = () => {
+interface BillingHistoryProps {
+  sidebarCollapsed?: boolean;
+}
+
+const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = false }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
@@ -57,10 +60,15 @@ const BillingHistory: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-  // More responsive breakpoints for different screen sizes and sidebar states
-  const isVeryNarrow = useMediaQuery('(max-width: 900px)');
-  const isNarrow = useMediaQuery('(max-width: 1200px)');
-  const useCardView = isVeryNarrow;
+  
+  // Calculate available width based on sidebar state
+  const sidebarWidth = sidebarCollapsed ? 72 : 280;
+  const availableWidth = `calc(100vw - ${sidebarWidth}px)`;
+  
+  // More accurate responsive breakpoints considering sidebar
+  const effectiveWidth = window.innerWidth - sidebarWidth;
+  const useCardView = effectiveWidth < 900 || isMobile;
+  const useCompactGrid = effectiveWidth < 1200;
 
   // Mock invoice data
   const invoices: Invoice[] = [
@@ -318,7 +326,8 @@ const BillingHistory: React.FC = () => {
 
   return (
     <Box sx={{ 
-      width: '100%',
+      width: availableWidth,
+      maxWidth: '100%',
       height: '100vh',
       overflow: 'hidden',
       display: 'flex',
@@ -327,7 +336,7 @@ const BillingHistory: React.FC = () => {
       <Box sx={{
         flex: 1,
         overflow: 'auto',
-        p: { xs: 1, sm: 2, md: isVeryNarrow ? 1.5 : 3 }
+        p: { xs: 1, sm: 2, md: useCompactGrid ? 1.5 : 3 }
       }}>
         <Typography 
           variant={isMobile ? "h5" : "h4"} 
@@ -339,7 +348,7 @@ const BillingHistory: React.FC = () => {
             fontSize: { 
               xs: '1.25rem', 
               sm: '1.5rem', 
-              md: isVeryNarrow ? '1.75rem' : '2rem' 
+              md: useCompactGrid ? '1.75rem' : '2rem' 
             }
           }}
         >
@@ -351,10 +360,10 @@ const BillingHistory: React.FC = () => {
           display: 'grid', 
           gridTemplateColumns: { 
             xs: 'repeat(2, 1fr)', 
-            sm: isVeryNarrow ? 'repeat(2, 1fr)' : 'repeat(2, 1fr)',
-            md: isVeryNarrow ? 'repeat(2, 1fr)' : (isNarrow ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)')
+            sm: useCompactGrid ? 'repeat(2, 1fr)' : 'repeat(2, 1fr)',
+            md: useCompactGrid ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'
           }, 
-          gap: { xs: 1, sm: isVeryNarrow ? 1 : 1.5, md: isVeryNarrow ? 1.5 : 2 }, 
+          gap: { xs: 1, sm: useCompactGrid ? 1 : 1.5, md: useCompactGrid ? 1.5 : 2 }, 
           mb: { xs: 3, md: 4 }
         }}>
           {summaryStats.map((stat, index) => (
@@ -370,8 +379,8 @@ const BillingHistory: React.FC = () => {
               <CardContent sx={{ 
                 p: { 
                   xs: 1, 
-                  sm: isVeryNarrow ? 1 : 1.5, 
-                  md: isVeryNarrow ? 1.5 : 2 
+                  sm: useCompactGrid ? 1 : 1.5, 
+                  md: useCompactGrid ? 1.5 : 2 
                 } 
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, flexWrap: 'wrap' }}>
@@ -385,7 +394,7 @@ const BillingHistory: React.FC = () => {
                       fontSize: { 
                         xs: '0.65rem', 
                         sm: '0.75rem', 
-                        md: isVeryNarrow ? '0.75rem' : (isNarrow ? '0.8rem' : '1.1rem')
+                        md: useCompactGrid ? '0.75rem' : '1.1rem'
                       },
                       lineHeight: { xs: 1.2, md: 1.4 },
                       wordBreak: 'break-word'
@@ -402,7 +411,7 @@ const BillingHistory: React.FC = () => {
                     fontSize: { 
                       xs: '0.9rem', 
                       sm: '1.1rem', 
-                      md: isVeryNarrow ? '1.25rem' : (isNarrow ? '1.5rem' : '2rem')
+                      md: useCompactGrid ? '1.25rem' : '2rem'
                     }
                   }}
                 >
@@ -434,7 +443,7 @@ const BillingHistory: React.FC = () => {
             p: { 
               xs: 1.5, 
               sm: 2, 
-              md: isVeryNarrow ? 2 : 3 
+              md: useCompactGrid ? 2 : 3 
             }, 
             borderBottom: '1px solid', 
             borderColor: 'divider' 
@@ -446,7 +455,7 @@ const BillingHistory: React.FC = () => {
               fontSize: { 
                 xs: '1rem', 
                 sm: '1.1rem', 
-                md: isVeryNarrow ? '1.1rem' : '1.25rem' 
+                md: useCompactGrid ? '1.1rem' : '1.25rem' 
               }
             }}>
               <CreditCardIcon color="primary" />

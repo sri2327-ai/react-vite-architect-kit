@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -257,7 +256,11 @@ export const Dashboard: React.FC = () => {
         }}
       >
         <Container maxWidth="xl" sx={{ height: '100%', p: 0 }}>
-          <ActiveComponent />
+          {activeMenuItem === 'billing-history' ? (
+            <BillingHistory sidebarCollapsed={isCollapsed} />
+          ) : (
+            <ActiveComponent />
+          )}
         </Container>
       </Box>
     </Box>
