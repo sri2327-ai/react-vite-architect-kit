@@ -55,8 +55,8 @@ const BillingHistory: React.FC = () => {
   const [expandedCard, setExpandedCard] = useState<string | null>(null);
   
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   // Mock invoice data
   const invoices: Invoice[] = [
@@ -195,18 +195,41 @@ const BillingHistory: React.FC = () => {
     
     return (
       <Card sx={{ mb: 2, borderRadius: 2 }}>
-        <CardContent sx={{ p: 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-            <Box>
-              <Typography variant="subtitle1" fontWeight={600}>
+        <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'flex-start', 
+            mb: 2,
+            flexWrap: 'wrap',
+            gap: 1
+          }}>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography 
+                variant="subtitle1" 
+                fontWeight={600}
+                sx={{ 
+                  fontSize: { xs: '0.9rem', sm: '1rem' },
+                  wordBreak: 'break-word'
+                }}
+              >
                 {invoice.invoiceNumber}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+              >
                 {formatDate(invoice.date)}
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="h6" fontWeight={600} color="primary.main">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+              <Typography 
+                variant="h6" 
+                fontWeight={600} 
+                color="primary.main"
+                sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }}
+              >
                 {formatAmount(invoice.amount)}
               </Typography>
               <Button
@@ -219,19 +242,41 @@ const BillingHistory: React.FC = () => {
             </Box>
           </Box>
           
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            mb: 1,
+            flexWrap: 'wrap',
+            gap: 1
+          }}>
             {getStatusChip(invoice.status)}
-            <Typography variant="caption" color="text.secondary">
+            <Typography 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+            >
               Due: {formatDate(invoice.dueDate)}
             </Typography>
           </Box>
           
           <Collapse in={isExpanded}>
             <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{ 
+                  mb: 2,
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                }}
+              >
                 {invoice.description}
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                gap: 1,
+                flexDirection: { xs: 'column', sm: 'row' }
+              }}>
                 <Button
                   size="small"
                   variant="outlined"
@@ -240,7 +285,10 @@ const BillingHistory: React.FC = () => {
                   href={invoice.zohoInvoiceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  sx={{ flex: 1 }}
+                  sx={{ 
+                    flex: 1,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }}
                 >
                   View
                 </Button>
@@ -249,7 +297,10 @@ const BillingHistory: React.FC = () => {
                   variant="outlined"
                   startIcon={<DownloadIcon />}
                   onClick={() => console.log('Download PDF for', invoice.invoiceNumber)}
-                  sx={{ flex: 1 }}
+                  sx={{ 
+                    flex: 1,
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }}
                 >
                   Download
                 </Button>
@@ -262,14 +313,20 @@ const BillingHistory: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 }, px: { xs: 1, md: 3 } }}>
+    <Box sx={{ 
+      width: '100%', 
+      maxWidth: '100vw',
+      overflow: 'hidden',
+      p: { xs: 1, sm: 2, md: 3 }
+    }}>
       <Typography 
         variant={isMobile ? "h5" : "h4"} 
         gutterBottom 
         sx={{ 
           fontWeight: 600, 
           mb: { xs: 2, md: 3 },
-          textAlign: { xs: 'center', md: 'left' }
+          textAlign: { xs: 'center', md: 'left' },
+          fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }
         }}
       >
         Billing & Subscription
@@ -280,10 +337,11 @@ const BillingHistory: React.FC = () => {
         display: 'grid', 
         gridTemplateColumns: { 
           xs: 'repeat(2, 1fr)', 
+          sm: 'repeat(2, 1fr)',
           md: 'repeat(4, 1fr)' 
         }, 
-        gap: { xs: 1.5, md: 3 }, 
-        mb: { xs: 3, md: 4 } 
+        gap: { xs: 1, sm: 1.5, md: 3 }, 
+        mb: { xs: 3, md: 4 }
       }}>
         {summaryStats.map((stat, index) => (
           <Card key={index} sx={{ 
@@ -295,15 +353,19 @@ const BillingHistory: React.FC = () => {
               boxShadow: 4
             }
           }}>
-            <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Box sx={{ color: stat.color, mr: 1 }}>
+            <CardContent sx={{ p: { xs: 1, sm: 1.5, md: 2 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, flexWrap: 'wrap' }}>
+                <Box sx={{ color: stat.color, mr: 1, flexShrink: 0 }}>
                   {stat.icon}
                 </Box>
                 <Typography 
                   variant={isMobile ? "caption" : "h6"} 
                   fontWeight={600}
-                  sx={{ fontSize: { xs: '0.75rem', md: '1.1rem' } }}
+                  sx={{ 
+                    fontSize: { xs: '0.65rem', sm: '0.75rem', md: '1.1rem' },
+                    lineHeight: { xs: 1.2, md: 1.4 },
+                    wordBreak: 'break-word'
+                  }}
                 >
                   {stat.title}
                 </Typography>
@@ -313,7 +375,7 @@ const BillingHistory: React.FC = () => {
                 sx={{ 
                   color: stat.color, 
                   fontWeight: 700,
-                  fontSize: { xs: '1.1rem', md: '2rem' }
+                  fontSize: { xs: '0.9rem', sm: '1.1rem', md: '2rem' }
                 }}
               >
                 {stat.value}
@@ -321,7 +383,10 @@ const BillingHistory: React.FC = () => {
               <Typography 
                 variant="caption" 
                 color="text.secondary"
-                sx={{ fontSize: { xs: '0.65rem', md: '0.75rem' } }}
+                sx={{ 
+                  fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
+                  lineHeight: 1.2
+                }}
               >
                 {stat.subtitle}
               </Typography>
@@ -331,104 +396,121 @@ const BillingHistory: React.FC = () => {
       </Box>
 
       {/* Invoice History */}
-      <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-        <Box sx={{ p: { xs: 2, md: 3 }, borderBottom: '1px solid', borderColor: 'divider' }}>
+      <Paper elevation={2} sx={{ 
+        borderRadius: 2, 
+        overflow: 'hidden',
+        maxWidth: '100%'
+      }}>
+        <Box sx={{ 
+          p: { xs: 1.5, sm: 2, md: 3 }, 
+          borderBottom: '1px solid', 
+          borderColor: 'divider' 
+        }}>
           <Typography variant="h6" sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             gap: 1,
-            fontSize: { xs: '1.1rem', md: '1.25rem' }
+            fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
           }}>
             <CreditCardIcon color="primary" />
             Payment History
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            sx={{ 
+              mt: 0.5,
+              fontSize: { xs: '0.8rem', sm: '0.875rem' }
+            }}
+          >
             View and manage your subscription payments
           </Typography>
         </Box>
 
-        {isMobile ? (
-          // Mobile Card View
-          <Box sx={{ p: 2 }}>
+        {isTablet ? (
+          // Mobile/Tablet Card View
+          <Box sx={{ p: { xs: 1, sm: 2 } }}>
             {paginatedInvoices.map((invoice) => (
               <MobileInvoiceCard key={invoice.id} invoice={invoice} />
             ))}
           </Box>
         ) : (
           // Desktop Table View
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Invoice</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Due Date</TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 600 }}>Amount</TableCell>
-                  <TableCell align="center" sx={{ fontWeight: 600 }}>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedInvoices.map((invoice) => (
-                  <TableRow key={invoice.id} hover>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={500}>
-                        {formatDate(invoice.date)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box>
-                        <Typography variant="body2" fontWeight={600}>
-                          {invoice.invoiceNumber}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {invoice.description}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      {getStatusChip(invoice.status)}
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {formatDate(invoice.dueDate)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="body2" fontWeight={600}>
-                        {formatAmount(invoice.amount)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                        <Tooltip title="View in Zoho">
-                          <IconButton
-                            size="small"
-                            component={Link}
-                            href={invoice.zohoInvoiceUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            color="primary"
-                          >
-                            <OpenInNewIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Download PDF">
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => console.log('Download PDF for', invoice.invoiceNumber)}
-                          >
-                            <DownloadIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
+          <Box sx={{ overflowX: 'auto' }}>
+            <TableContainer>
+              <Table stickyHeader>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Date</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 150 }}>Invoice</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 100 }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Due Date</TableCell>
+                    <TableCell align="right" sx={{ fontWeight: 600, minWidth: 100 }}>Amount</TableCell>
+                    <TableCell align="center" sx={{ fontWeight: 600, minWidth: 120 }}>Actions</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {paginatedInvoices.map((invoice) => (
+                    <TableRow key={invoice.id} hover>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={500}>
+                          {formatDate(invoice.date)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Box>
+                          <Typography variant="body2" fontWeight={600}>
+                            {invoice.invoiceNumber}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {invoice.description}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        {getStatusChip(invoice.status)}
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {formatDate(invoice.dueDate)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography variant="body2" fontWeight={600}>
+                          {formatAmount(invoice.amount)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                          <Tooltip title="View in Zoho">
+                            <IconButton
+                              size="small"
+                              component={Link}
+                              href={invoice.zohoInvoiceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              color="primary"
+                            >
+                              <OpenInNewIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Download PDF">
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              onClick={() => console.log('Download PDF for', invoice.invoiceNumber)}
+                            >
+                              <DownloadIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
         )}
 
         <TablePagination
@@ -443,21 +525,27 @@ const BillingHistory: React.FC = () => {
             backgroundColor: '#FFFFFF',
             color: '#000000',
             '& .MuiTablePagination-toolbar': {
-              px: { xs: 1, md: 2 },
-              backgroundColor: '#FFFFFF'
+              px: { xs: 1, sm: 1.5, md: 2 },
+              backgroundColor: '#FFFFFF',
+              flexWrap: 'wrap',
+              minHeight: { xs: 'auto', md: 52 }
             },
             '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-              fontSize: { xs: '0.875rem', md: '1rem' },
-              color: '#000000'
+              fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
+              color: '#000000',
+              margin: { xs: '4px 0', md: 0 }
             },
             '& .MuiTablePagination-select': {
-              color: '#000000'
+              color: '#000000',
+              fontSize: { xs: '0.75rem', sm: '0.875rem' }
             },
             '& .MuiTablePagination-actions': {
-              color: '#000000'
+              color: '#000000',
+              ml: { xs: 0, md: 1 }
             },
             '& .MuiIconButton-root': {
-              color: '#000000'
+              color: '#000000',
+              padding: { xs: '4px', md: '8px' }
             },
             '& .MuiSelect-root': {
               color: '#000000'
@@ -474,19 +562,29 @@ const BillingHistory: React.FC = () => {
             mt: 3,
             borderRadius: 2,
             '& .MuiAlert-message': {
-              fontSize: { xs: '0.875rem', md: '1rem' }
+              fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' }
             }
           }}
         >
-          <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              fontWeight: 600, 
+              mb: 1,
+              fontSize: { xs: '0.8rem', sm: '0.875rem' }
+            }}
+          >
             Action Required
           </Typography>
-          <Typography variant="body2">
+          <Typography 
+            variant="body2"
+            sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+          >
             You have overdue or failed payments. Please update your payment method to continue using S10.AI services without interruption.
           </Typography>
         </Alert>
       )}
-    </Container>
+    </Box>
   );
 };
 
