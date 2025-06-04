@@ -45,6 +45,8 @@ import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
 import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
 import TemplateLibraryTab from './TemplateLibraryTab';
+import AddSectionOverlay from './AddSectionOverlay';
+import SectionConfigDialog from './SectionConfigDialog';
 import { templateService } from '@/services/templateService';
 
 interface TemplateItem {
