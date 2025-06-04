@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -27,7 +26,11 @@ import {
   Switch,
   FormControlLabel,
   Stack,
-  Autocomplete
+  Autocomplete,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -111,6 +114,66 @@ const createTemplateOptions: CreateTemplateOption[] = [
   }
 ];
 
+// Sample template library data
+const templateLibrary = [
+  {
+    id: 1,
+    name: "Cardiology Consultation Note",
+    specialty: "Cardiology",
+    type: "Consultation",
+    description: "Comprehensive cardiac evaluation template"
+  },
+  {
+    id: 2,
+    name: "General Medicine SOAP Note",
+    specialty: "General Medicine", 
+    type: "SOAP",
+    description: "Standard primary care documentation"
+  },
+  {
+    id: 3,
+    name: "Emergency Department Assessment",
+    specialty: "Emergency Medicine",
+    type: "Assessment",
+    description: "ED triage and assessment template"
+  },
+  {
+    id: 4,
+    name: "Psychiatry Initial Evaluation",
+    specialty: "Psychiatry",
+    type: "Initial Evaluation",
+    description: "Mental health assessment template"
+  },
+  {
+    id: 5,
+    name: "Orthopedic Exam Note",
+    specialty: "Orthopedics",
+    type: "Physical Exam", 
+    description: "Musculoskeletal assessment template"
+  },
+  {
+    id: 6,
+    name: "Pediatric Well Child Visit",
+    specialty: "Pediatrics",
+    type: "Wellness Visit",
+    description: "Routine pediatric check-up template"
+  },
+  {
+    id: 7,
+    name: "Dermatology Skin Exam",
+    specialty: "Dermatology",
+    type: "Physical Exam", 
+    description: "Comprehensive skin assessment"
+  },
+  {
+    id: 8,
+    name: "Neurology Consultation",
+    specialty: "Neurology",
+    type: "Consultation",
+    description: "Neurological evaluation template"
+  }
+];
+
 const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogProps> = ({
   open,
   onClose,
@@ -119,6 +182,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState<CreateTemplateOption | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedLibraryTemplate, setSelectedLibraryTemplate] = useState<any>(null);
   
   // Form states
   const [templateName, setTemplateName] = useState('');
@@ -155,6 +219,10 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
     setCurrentStep(1);
   };
 
+  const handleLibraryTemplateSelect = (template: any) => {
+    setSelectedLibraryTemplate(template);
+  };
+
   const handleNext = () => {
     if (currentStep === 1 && selectedMethod?.id === 2) {
       // AI processing
@@ -180,20 +248,38 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   };
 
   const handleCreate = () => {
-    const templateData = {
-      name: templateName,
-      description: templateDescription,
-      specialty,
-      templateType,
-      tags: selectedTags,
-      method: selectedMethod?.title,
-      content: selectedMethod?.id === 2 ? processedContent : existingTemplateContent,
-      previousNotes: selectedMethod?.id === 1 ? previousNotes : undefined,
-      aiSummary: selectedMethod?.id === 2 ? aiSummary : undefined,
-      autoSave,
-      shareWithTeam,
-      ehrFields: templateType ? templateService.getEhrFieldMappings(templateType)?.ehrFields : undefined
-    };
+    let templateData;
+
+    if (selectedMethod?.id === 5 && selectedLibraryTemplate) {
+      // Browse Template Library - use selected template
+      templateData = {
+        name: selectedLibraryTemplate.name,
+        description: selectedLibraryTemplate.description,
+        specialty: selectedLibraryTemplate.specialty,
+        templateType: selectedLibraryTemplate.type,
+        content: templateService.generateTemplateContent(selectedLibraryTemplate.type),
+        method: selectedMethod.title,
+        tags: [],
+        autoSave: true,
+        shareWithTeam: false
+      };
+    } else {
+      // Other methods - use form data
+      templateData = {
+        name: templateName,
+        description: templateDescription,
+        specialty,
+        templateType,
+        tags: selectedTags,
+        method: selectedMethod?.title,
+        content: selectedMethod?.id === 2 ? processedContent : existingTemplateContent,
+        previousNotes: selectedMethod?.id === 1 ? previousNotes : undefined,
+        aiSummary: selectedMethod?.id === 2 ? aiSummary : undefined,
+        autoSave,
+        shareWithTeam,
+        ehrFields: templateType ? templateService.getEhrFieldMappings(templateType)?.ehrFields : undefined
+      };
+    }
     
     onCreateTemplate(templateData);
     handleReset();
@@ -203,6 +289,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   const handleReset = () => {
     setCurrentStep(0);
     setSelectedMethod(null);
+    setSelectedLibraryTemplate(null);
     setIsProcessing(false);
     setTemplateName('');
     setTemplateDescription('');
@@ -395,167 +482,227 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
               </Box>
             </Box>
 
-            <Stack spacing={3}>
-              {/* Basic Information */}
+            {/* Browse Template Library - Just show templates */}
+            {selectedMethod?.id === 5 ? (
               <Box>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                  Basic Information
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                  Available Templates
                 </Typography>
-                <Stack spacing={2}>
-                  <TextField
-                    fullWidth
-                    label="Template Name *"
-                    value={templateName}
-                    onChange={(e) => setTemplateName(e.target.value)}
-                    placeholder="e.g., Cardiology Consultation Note"
-                  />
-                  
-                  <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-                    <FormControl fullWidth>
-                      <InputLabel>Specialty *</InputLabel>
-                      <Select
-                        value={specialty}
-                        label="Specialty *"
-                        onChange={(e) => setSpecialty(e.target.value)}
-                      >
-                        {specialties.map((spec) => (
-                          <MenuItem key={spec} value={spec}>{spec}</MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    
-                    <FormControl fullWidth>
-                      <InputLabel>Template Type *</InputLabel>
-                      <Select
-                        value={templateType}
-                        label="Template Type *"
-                        onChange={(e) => setTemplateType(e.target.value)}
-                      >
-                        {templateTypes.map((type) => (
-                          <MenuItem key={type} value={type}>{type}</MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Stack>
-                </Stack>
-              </Box>
-
-              {/* Method-specific content */}
-              {selectedMethod?.id === 1 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                    Previous Notes to Convert
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={6}
-                    label="Paste your previous notes here"
-                    value={previousNotes}
-                    onChange={(e) => setPreviousNotes(e.target.value)}
-                    placeholder="Copy and paste a representative note that you'd like to turn into a template..."
-                  />
-                  <Alert severity="info" sx={{ mt: 1 }}>
-                    AI will analyze your note structure and create reusable template sections.
-                  </Alert>
-                </Box>
-              )}
-
-              {selectedMethod?.id === 2 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                    AI Configuration
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="Clinical Context & Requirements"
-                    value={clinicalContext}
-                    onChange={(e) => setClinicalContext(e.target.value)}
-                    placeholder="Describe your typical patients, common conditions, or specific documentation requirements..."
-                  />
-                  <Alert severity="info" sx={{ mt: 1 }}>
-                    <Typography variant="body2">
-                      The more specific you are, the better AI can tailor the template to your practice.
-                    </Typography>
-                  </Alert>
-                </Box>
-              )}
-
-              {selectedMethod?.id === 4 && (
-                <Box>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                    Import Template Content
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={8}
-                    label="Paste existing template content"
-                    value={existingTemplateContent}
-                    onChange={(e) => setExistingTemplateContent(e.target.value)}
-                    placeholder="Copy and paste template content from another system, colleague, or document..."
-                  />
-                </Box>
-              )}
-
-              {/* Tags and Settings */}
-              <Box>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                  Tags & Settings
-                </Typography>
-                <Stack spacing={2}>
-                  <Autocomplete
-                    multiple
-                    options={commonTags}
-                    value={selectedTags}
-                    onChange={(_, newValue) => setSelectedTags(newValue)}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          variant="filled"
-                          label={option}
-                          {...getTagProps({ index })}
+                
+                <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+                  {templateLibrary.map((template, index) => (
+                    <React.Fragment key={template.id}>
+                      <ListItem disablePadding>
+                        <ListItemButton 
+                          onClick={() => handleLibraryTemplateSelect(template)}
+                          selected={selectedLibraryTemplate?.id === template.id}
                           sx={{
-                            backgroundColor: bravoColors.primaryFlat,
-                            color: 'white'
+                            py: 2,
+                            px: 3,
+                            '&:hover': {
+                              backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
+                            },
+                            '&.Mui-selected': {
+                              backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+                              '&:hover': {
+                                backgroundColor: alpha(bravoColors.primaryFlat, 0.15)
+                              }
+                            }
                           }}
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Add Tags"
-                        placeholder="Select relevant tags..."
-                      />
-                    )}
-                  />
-                  
-                  <Stack direction="row" spacing={3}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={autoSave}
-                          onChange={(e) => setAutoSave(e.target.checked)}
-                        />
-                      }
-                      label="Auto-save while editing"
-                    />
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          checked={shareWithTeam}
-                          onChange={(e) => setShareWithTeam(e.target.checked)}
-                        />
-                      }
-                      label="Share with my team"
-                    />
-                  </Stack>
-                </Stack>
+                        >
+                          <ListItemText
+                            primary={
+                              <Typography
+                                variant="subtitle1"
+                                sx={{
+                                  fontWeight: 600,
+                                  color: selectedLibraryTemplate?.id === template.id ? bravoColors.primaryFlat : 'text.primary'
+                                }}
+                              >
+                                {template.name}
+                              </Typography>
+                            }
+                            secondary={
+                              <Typography variant="body2" color="text.secondary">
+                                {template.specialty} • {template.type}
+                              </Typography>
+                            }
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                      {index < templateLibrary.length - 1 && (
+                        <Box sx={{ px: 3 }}>
+                          <Box sx={{ borderBottom: '1px solid', borderColor: 'divider' }} />
+                        </Box>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </List>
               </Box>
-            </Stack>
+            ) : (
+              // Other methods - show form fields
+              <Stack spacing={3}>
+                {/* Basic Information */}
+                <Box>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                    Basic Information
+                  </Typography>
+                  <Stack spacing={2}>
+                    <TextField
+                      fullWidth
+                      label="Template Name *"
+                      value={templateName}
+                      onChange={(e) => setTemplateName(e.target.value)}
+                      placeholder="e.g., Cardiology Consultation Note"
+                    />
+                    
+                    <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
+                      <FormControl fullWidth>
+                        <InputLabel>Specialty *</InputLabel>
+                        <Select
+                          value={specialty}
+                          label="Specialty *"
+                          onChange={(e) => setSpecialty(e.target.value)}
+                        >
+                          {specialties.map((spec) => (
+                            <MenuItem key={spec} value={spec}>{spec}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      
+                      <FormControl fullWidth>
+                        <InputLabel>Template Type *</InputLabel>
+                        <Select
+                          value={templateType}
+                          label="Template Type *"
+                          onChange={(e) => setTemplateType(e.target.value)}
+                        >
+                          {templateTypes.map((type) => (
+                            <MenuItem key={type} value={type}>{type}</MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Stack>
+                  </Stack>
+                </Box>
+
+                {/* Method-specific content */}
+                {selectedMethod?.id === 1 && (
+                  <Box>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                      Previous Notes to Convert
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={6}
+                      label="Paste your previous notes here"
+                      value={previousNotes}
+                      onChange={(e) => setPreviousNotes(e.target.value)}
+                      placeholder="Copy and paste a representative note that you'd like to turn into a template..."
+                    />
+                    <Alert severity="info" sx={{ mt: 1 }}>
+                      AI will analyze your note structure and create reusable template sections.
+                    </Alert>
+                  </Box>
+                )}
+
+                {selectedMethod?.id === 2 && (
+                  <Box>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                      AI Configuration
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={4}
+                      label="Clinical Context & Requirements"
+                      value={clinicalContext}
+                      onChange={(e) => setClinicalContext(e.target.value)}
+                      placeholder="Describe your typical patients, common conditions, or specific documentation requirements..."
+                    />
+                    <Alert severity="info" sx={{ mt: 1 }}>
+                      <Typography variant="body2">
+                        The more specific you are, the better AI can tailor the template to your practice.
+                      </Typography>
+                    </Alert>
+                  </Box>
+                )}
+
+                {selectedMethod?.id === 4 && (
+                  <Box>
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                      Import Template Content
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={8}
+                      label="Paste existing template content"
+                      value={existingTemplateContent}
+                      onChange={(e) => setExistingTemplateContent(e.target.value)}
+                      placeholder="Copy and paste template content from another system, colleague, or document..."
+                    />
+                  </Box>
+                )}
+
+                {/* Tags and Settings */}
+                <Box>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                    Tags & Settings
+                  </Typography>
+                  <Stack spacing={2}>
+                    <Autocomplete
+                      multiple
+                      options={commonTags}
+                      value={selectedTags}
+                      onChange={(_, newValue) => setSelectedTags(newValue)}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => (
+                          <Chip
+                            variant="filled"
+                            label={option}
+                            {...getTagProps({ index })}
+                            sx={{
+                              backgroundColor: bravoColors.primaryFlat,
+                              color: 'white'
+                            }}
+                          />
+                        ))
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Add Tags"
+                          placeholder="Select relevant tags..."
+                        />
+                      )}
+                    />
+                    
+                    <Stack direction="row" spacing={3}>
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={autoSave}
+                            onChange={(e) => setAutoSave(e.target.checked)}
+                          />
+                        }
+                        label="Auto-save while editing"
+                      />
+                      <FormControlLabel
+                        control={
+                          <Switch
+                            checked={shareWithTeam}
+                            onChange={(e) => setShareWithTeam(e.target.checked)}
+                          />
+                        }
+                        label="Share with my team"
+                      />
+                    </Stack>
+                  </Stack>
+                </Box>
+              </Stack>
+            )}
           </Box>
         );
 
@@ -579,16 +726,18 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                   Final Review & Description
                 </Typography>
                 
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={3}
-                  label="Template Description"
-                  value={templateDescription}
-                  onChange={(e) => setTemplateDescription(e.target.value)}
-                  placeholder="Describe when and how this template should be used..."
-                  sx={{ mb: 3 }}
-                />
+                {selectedMethod?.id !== 5 && (
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={3}
+                    label="Template Description"
+                    value={templateDescription}
+                    onChange={(e) => setTemplateDescription(e.target.value)}
+                    placeholder="Describe when and how this template should be used..."
+                    sx={{ mb: 3 }}
+                  />
+                )}
 
                 {selectedMethod?.id === 2 && processedContent && (
                   <Box>
@@ -632,18 +781,34 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     Template Summary
                   </Typography>
                   <Stack spacing={1}>
-                    <Typography variant="body2">
-                      <strong>Name:</strong> {templateName}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Specialty:</strong> {specialty}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Type:</strong> {templateType}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Tags:</strong> {selectedTags.join(', ') || 'None'}
-                    </Typography>
+                    {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
+                      <>
+                        <Typography variant="body2">
+                          <strong>Name:</strong> {selectedLibraryTemplate.name}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Specialty:</strong> {selectedLibraryTemplate.specialty}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Type:</strong> {selectedLibraryTemplate.type}
+                        </Typography>
+                      </>
+                    ) : (
+                      <>
+                        <Typography variant="body2">
+                          <strong>Name:</strong> {templateName}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Specialty:</strong> {specialty}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Type:</strong> {templateType}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Tags:</strong> {selectedTags.join(', ') || 'None'}
+                        </Typography>
+                      </>
+                    )}
                   </Stack>
                 </Box>
               </Box>
@@ -659,6 +824,9 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   const canProceed = () => {
     if (currentStep === 0) return selectedMethod !== null;
     if (currentStep === 1) {
+      if (selectedMethod?.id === 5) {
+        return selectedLibraryTemplate !== null;
+      }
       const hasBasicInfo = templateName.trim() && specialty && templateType;
       if (selectedMethod?.id === 1) return hasBasicInfo && previousNotes.trim();
       if (selectedMethod?.id === 2) return hasBasicInfo;
@@ -733,7 +901,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                 fontWeight: 600 
               } 
             }}>
-              Configure Template Details
+              {selectedMethod?.id === 5 ? 'Select Template' : 'Configure Template Details'}
             </StepLabel>
             <StepContent>
               {renderStepContent(1)}
