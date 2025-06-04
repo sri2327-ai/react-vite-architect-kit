@@ -11,6 +11,7 @@ interface UserProfile {
   ehrMode: boolean;
   ehrName?: string;
   notesRetentionDuration: number;
+  mfaEnabled: boolean;
 }
 
 export const useProfileData = (useApi: boolean = false) => {
@@ -22,7 +23,8 @@ export const useProfileData = (useApi: boolean = false) => {
     specialty: 'Cardiology',
     ehrMode: true,
     ehrName: 'Epic',
-    notesRetentionDuration: 12
+    notesRetentionDuration: 12,
+    mfaEnabled: false
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -21,7 +21,10 @@ import {
   Container,
   Card,
   CardContent,
-  CircularProgress
+  CircularProgress,
+  Switch,
+  FormControlLabel,
+  TextField
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -37,7 +40,8 @@ import {
   PhoneAndroid as MobileIcon,
   OpenInNew as OpenInNewIcon,
   Security as SecurityIcon,
-  CloudUpload as CloudIcon
+  CloudUpload as CloudIcon,
+  Shield as ShieldIcon
 } from '@mui/icons-material';
 import { useProfileData } from '../../hooks/useProfileData';
 import { useApiContext } from '../../contexts/ApiContext';
@@ -51,6 +55,7 @@ interface UserProfile {
   ehrMode: boolean;
   ehrName?: string;
   notesRetentionDuration: number; // in months
+  mfaEnabled: boolean;
 }
 
 const Profile: React.FC = () => {
@@ -58,6 +63,10 @@ const Profile: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [showMfaDialog, setShowMfaDialog] = useState(false);
+  const [mfaOtp, setMfaOtp] = useState('');
+  const [mfaOtpSent, setMfaOtpSent] = useState(false);
+  const [mfaLoading, setMfaLoading] = useState(false);
   
   const { useApiData } = useApiContext();
   const { profile, loading, error, updateProfile } = useProfileData(useApiData);
@@ -78,6 +87,46 @@ const Profile: React.FC = () => {
     } catch (error) {
       console.error('Failed to update retention duration:', error);
     }
+  };
+
+  const handleMfaToggle = async (enabled: boolean) => {
+    if (enabled) {
+      // Show MFA setup dialog
+      setShowMfaDialog(true);
+      sendMfaOtp();
+    } else {
+      // Disable MFA directly
+      try {
+        await updateProfile({ mfaEnabled: false });
+      } catch (error) {
+        console.error('Failed to disable MFA:', error);
+      }
+    }
+  };
+
+  const sendMfaOtp = async () => {
+    setMfaLoading(true);
+    // Simulate OTP sending
+    setTimeout(() => {
+      setMfaLoading(false);
+      setMfaOtpSent(true);
+    }, 1000);
+  };
+
+  const verifyMfaOtp = async () => {
+    setMfaLoading(true);
+    // Simulate OTP verification
+    setTimeout(async () => {
+      setMfaLoading(false);
+      setShowMfaDialog(false);
+      setMfaOtp('');
+      setMfaOtpSent(false);
+      try {
+        await updateProfile({ mfaEnabled: true });
+      } catch (error) {
+        console.error('Failed to enable MFA:', error);
+      }
+    }, 1000);
   };
 
   const handleCancelSubscription = () => {
@@ -285,6 +334,68 @@ const Profile: React.FC = () => {
             </Box>
           </Paper>
 
+          {/* Security Settings */}
+          <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 2, md: 3 }, borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1, 
+              mb: { xs: 2, md: 3 },
+              fontSize: { xs: '1.1rem', md: '1.25rem' }
+            }}>
+              <SecurityIcon color="primary" />
+              Security & Authentication
+            </Typography>
+
+            <Alert severity="info" sx={{ mb: 3, fontSize: { xs: '0.875rem', md: '1rem' } }}>
+              Enhance your account security with multi-factor authentication using email verification.
+            </Alert>
+
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              p: 2, 
+              backgroundColor: 'grey.50', 
+              borderRadius: 1,
+              mb: 2
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <ShieldIcon color="primary" />
+                <Box>
+                  <Typography variant="body1" fontWeight={600}>
+                    Multi-Factor Authentication (MFA)
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Secure your account with email-based verification codes
+                  </Typography>
+                </Box>
+              </Box>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={profile.mfaEnabled || false}
+                    onChange={(e) => handleMfaToggle(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label=""
+                sx={{ m: 0 }}
+              />
+            </Box>
+
+            {profile.mfaEnabled && (
+              <Box sx={{ p: 2, backgroundColor: 'success.light', borderRadius: 1, mb: 2 }}>
+                <Typography variant="body2" color="success.dark" sx={{ mb: 1 }}>
+                  <strong>MFA is enabled</strong>
+                </Typography>
+                <Typography variant="caption" color="success.dark">
+                  You will receive a verification code via email each time you log in from a new device.
+                </Typography>
+              </Box>
+            )}
+          </Paper>
+
           {/* Data Management */}
           <Paper sx={{ p: { xs: 2, md: 3 }, borderRadius: 2 }}>
             <Typography variant="h6" gutterBottom sx={{ 
@@ -421,6 +532,62 @@ const Profile: React.FC = () => {
           </Paper>
         </Box>
       </Box>
+
+      {/* MFA Setup Dialog */}
+      <Dialog 
+        open={showMfaDialog} 
+        onClose={() => setShowMfaDialog(false)} 
+        maxWidth="sm" 
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography variant="h6" fontWeight={600}>
+            Enable Multi-Factor Authentication
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 3 }}>
+            To enable MFA, please verify your email address by entering the code we've sent to {profile.email}.
+          </Typography>
+          
+          {mfaOtpSent && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              Verification code sent to your email
+            </Alert>
+          )}
+
+          <TextField
+            fullWidth
+            label="Verification Code"
+            value={mfaOtp}
+            onChange={(e) => setMfaOtp(e.target.value)}
+            placeholder="Enter 6-digit code"
+            inputProps={{ maxLength: 6 }}
+            sx={{ mb: 2 }}
+          />
+
+          <Button
+            variant="text"
+            onClick={sendMfaOtp}
+            disabled={mfaLoading}
+            sx={{ mb: 2 }}
+          >
+            {mfaLoading ? 'Sending...' : 'Resend Code'}
+          </Button>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowMfaDialog(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={verifyMfaOtp}
+            disabled={!mfaOtp || mfaOtp.length !== 6 || mfaLoading}
+          >
+            {mfaLoading ? 'Verifying...' : 'Enable MFA'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Logout Dialog */}
       <Dialog open={showLogoutDialog} onClose={() => setShowLogoutDialog(false)} maxWidth="sm" fullWidth>

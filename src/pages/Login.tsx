@@ -1,8 +1,22 @@
 
-import React, { useState } from 'react';
-import { Box, TextField, Typography, Divider, Alert, InputAdornment, IconButton, Link } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { 
+  Box, 
+  TextField, 
+  Typography, 
+  Divider, 
+  Alert, 
+  InputAdornment, 
+  IconButton, 
+  Link,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button
+} from '@mui/material';
 import { Visibility, VisibilityOff, Mail } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { useResponsive } from '@/hooks/useResponsive';
 
@@ -12,8 +26,25 @@ export const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showOtpDialog, setShowOtpDialog] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { isMobile, isDesktop } = useResponsive();
+
+  // Check if coming from signup payment success
+  const locationState = location.state as any;
+  const requiresOtpVerification = locationState?.requiresOtpVerification;
+  const paymentSuccessMessage = locationState?.message;
+  const signupEmail = locationState?.email;
+
+  useEffect(() => {
+    if (signupEmail) {
+      setEmail(signupEmail);
+    }
+  }, [signupEmail]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,15 +54,40 @@ export const Login: React.FC = () => {
     // Simulate login
     setTimeout(() => {
       setLoading(false);
+      
+      // If this is a first-time login after signup, show OTP verification
+      if (requiresOtpVerification) {
+        setShowOtpDialog(true);
+        sendOtp();
+      } else {
+        navigate('/dashboard');
+      }
+    }, 1000);
+  };
+
+  const sendOtp = async () => {
+    setOtpLoading(true);
+    
+    // Simulate OTP sending
+    setTimeout(() => {
+      setOtpLoading(false);
+      setOtpSent(true);
+    }, 1000);
+  };
+
+  const verifyOtp = async () => {
+    setOtpLoading(true);
+    
+    // Simulate OTP verification
+    setTimeout(() => {
+      setOtpLoading(false);
+      setShowOtpDialog(false);
       navigate('/dashboard');
     }, 1000);
   };
 
   const handleGoogleLogin = () => {
-    // Real Google OAuth integration
     const googleAuthUrl = `https://accounts.google.com/oauth/authorize?client_id=${import.meta.env.VITE_GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/google/callback')}&scope=openid%20profile%20email&response_type=code&state=google_oauth`;
-
-    // Open Google OAuth in same window
     window.location.href = googleAuthUrl;
   };
 
@@ -168,6 +224,12 @@ export const Login: React.FC = () => {
             md: 420
           }
         }}>
+          {paymentSuccessMessage && (
+            <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
+              {paymentSuccessMessage}
+            </Alert>
+          )}
+
           {error && (
             <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
               {error}
@@ -340,6 +402,61 @@ export const Login: React.FC = () => {
           </Box>
         </Box>
       </Box>
+
+      {/* OTP Verification Dialog */}
+      <Dialog 
+        open={showOtpDialog} 
+        onClose={() => {}} 
+        maxWidth="sm" 
+        fullWidth
+        disableEscapeKeyDown
+      >
+        <DialogTitle>
+          <Typography variant="h6" fontWeight={600}>
+            Verify Your Email
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 3 }}>
+            To complete your account activation, please enter the verification code sent to your email.
+          </Typography>
+          
+          {otpSent && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              Verification code sent to {email}
+            </Alert>
+          )}
+
+          <TextField
+            fullWidth
+            label="Verification Code"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            placeholder="Enter 6-digit code"
+            inputProps={{ maxLength: 6 }}
+            sx={{ mb: 2 }}
+          />
+
+          <Button
+            variant="text"
+            onClick={sendOtp}
+            disabled={otpLoading}
+            sx={{ mb: 2 }}
+          >
+            {otpLoading ? 'Sending...' : 'Resend Code'}
+          </Button>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            onClick={verifyOtp}
+            disabled={!otp || otp.length !== 6 || otpLoading}
+            fullWidth
+          >
+            {otpLoading ? 'Verifying...' : 'Verify & Continue'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
