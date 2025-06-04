@@ -24,7 +24,11 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemButton
+  ListItemButton,
+  Menu,
+  MenuItem,
+  Divider,
+  Paper
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -33,7 +37,9 @@ import {
   Search as SearchIcon,
   TrendingUp as TrendingUpIcon,
   Assignment as AssignmentIcon,
-  Schedule as ScheduleIcon
+  Schedule as ScheduleIcon,
+  Delete as DeleteIcon,
+  MoreVert as MoreVertIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
@@ -78,6 +84,14 @@ interface VisitType {
   description?: string;
 }
 
+interface LibraryTemplate {
+  id: string;
+  title: string;
+  specialty: string;
+  noteType: string;
+  content: string;
+}
+
 const TemplateBuilder: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -94,6 +108,18 @@ const TemplateBuilder: React.FC = () => {
   const [openAddType, setOpenAddType] = useState(false);
   const [sectionList, setSectionList] = useState<TemplateItem[]>([]);
   const [newTypeName, setNewTypeName] = useState('');
+  
+  // Menu states for edit/delete
+  const [visitTypeMenuAnchor, setVisitTypeMenuAnchor] = useState<null | HTMLElement>(null);
+  const [templateMenuAnchor, setTemplateMenuAnchor] = useState<null | HTMLElement>(null);
+  const [selectedMenuVisitType, setSelectedMenuVisitType] = useState<VisitType | null>(null);
+  const [selectedMenuTemplate, setSelectedMenuTemplate] = useState<TemplateData | null>(null);
+  
+  // Edit dialogs
+  const [editVisitTypeDialog, setEditVisitTypeDialog] = useState(false);
+  const [editTemplateDialog, setEditTemplateDialog] = useState(false);
+  const [editingVisitTypeName, setEditingVisitTypeName] = useState('');
+  const [editingTemplateName, setEditingTemplateName] = useState('');
 
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
@@ -193,7 +219,7 @@ const TemplateBuilder: React.FC = () => {
   const handleVisitTypeSelect = (visitType: VisitType) => {
     setSelectedVisitType(visitType);
     setCurrentScreen('templates');
-    setCurrentPage(1); // Reset pagination
+    setCurrentPage(1);
   };
 
   const handleTemplateEdit = (template: TemplateData) => {
@@ -231,7 +257,6 @@ const TemplateBuilder: React.FC = () => {
   const handleCreateTemplateFromDialog = (templateData: any) => {
     setIsLoading(true);
     
-    // Simulate creation delay
     setTimeout(() => {
       let content = templateData.content;
       
@@ -281,11 +306,115 @@ const TemplateBuilder: React.FC = () => {
     handleBackToTemplates();
   };
 
+  // Menu handlers
+  const handleVisitTypeMenuClick = (event: React.MouseEvent<HTMLElement>, visitType: VisitType) => {
+    event.stopPropagation();
+    setVisitTypeMenuAnchor(event.currentTarget);
+    setSelectedMenuVisitType(visitType);
+  };
+
+  const handleTemplateMenuClick = (event: React.MouseEvent<HTMLElement>, template: TemplateData) => {
+    event.stopPropagation();
+    setTemplateMenuAnchor(event.currentTarget);
+    setSelectedMenuTemplate(template);
+  };
+
+  const handleMenuClose = () => {
+    setVisitTypeMenuAnchor(null);
+    setTemplateMenuAnchor(null);
+    setSelectedMenuVisitType(null);
+    setSelectedMenuTemplate(null);
+  };
+
+  // Edit/Delete handlers
+  const handleEditVisitType = () => {
+    if (selectedMenuVisitType) {
+      setEditingVisitTypeName(selectedMenuVisitType.name);
+      setEditVisitTypeDialog(true);
+    }
+    handleMenuClose();
+  };
+
+  const handleDeleteVisitType = () => {
+    if (selectedMenuVisitType) {
+      setVisitTypes(prev => prev.filter(vt => vt.id !== selectedMenuVisitType.id));
+    }
+    handleMenuClose();
+  };
+
+  const handleEditTemplate = () => {
+    if (selectedMenuTemplate) {
+      setEditingTemplateName(selectedMenuTemplate.title);
+      setEditTemplateDialog(true);
+    }
+    handleMenuClose();
+  };
+
+  const handleDeleteTemplate = () => {
+    if (selectedMenuTemplate) {
+      setTemplates(prev => prev.filter(t => t.id !== selectedMenuTemplate.id));
+    }
+    handleMenuClose();
+  };
+
+  const handleSaveEditVisitType = () => {
+    if (selectedMenuVisitType && editingVisitTypeName.trim()) {
+      setVisitTypes(prev => prev.map(vt => 
+        vt.id === selectedMenuVisitType.id 
+          ? { ...vt, name: editingVisitTypeName.trim().toUpperCase() }
+          : vt
+      ));
+      setEditVisitTypeDialog(false);
+      setEditingVisitTypeName('');
+    }
+  };
+
+  const handleSaveEditTemplate = () => {
+    if (selectedMenuTemplate && editingTemplateName.trim()) {
+      setTemplates(prev => prev.map(t => 
+        t.id === selectedMenuTemplate.id 
+          ? { ...t, title: editingTemplateName.trim() }
+          : t
+      ));
+      setEditTemplateDialog(false);
+      setEditingTemplateName('');
+    }
+  };
+
+  // Handle adding template from library to visit type
+  const handleAddLibraryTemplate = (libraryTemplate: LibraryTemplate, visitTypeName: string) => {
+    const newTemplate: TemplateData = {
+      id: templates.length + 1,
+      title: libraryTemplate.title,
+      specialty: libraryTemplate.specialty,
+      type: visitTypeName,
+      fields: [],
+      content: libraryTemplate.content,
+      lastUsed: 'Just added',
+      usageCount: 0,
+      isFavorite: false,
+      createdBy: 'Library Import',
+      tags: [libraryTemplate.specialty, libraryTemplate.noteType]
+    };
+    
+    setTemplates(prev => [...prev, newTemplate]);
+    
+    // Update visit type template count
+    setVisitTypes(prev => prev.map(vt => 
+      vt.name === visitTypeName 
+        ? { ...vt, templateCount: (vt.templateCount || 0) + 1 }
+        : vt
+    ));
+    
+    console.log(`Added template "${libraryTemplate.title}" to visit type "${visitTypeName}"`);
+  };
+
   // Filter and search logic
   const filteredTemplates = templates.filter(template => {
     const matchesSearch = template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          template.specialty.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    const matchesVisitType = !selectedVisitType || template.type === selectedVisitType.name;
+    return matchesSearch && matchesVisitType;
   });
 
   // Pagination
@@ -295,7 +424,7 @@ const TemplateBuilder: React.FC = () => {
     currentPage * templatesPerPage
   );
 
-  // Render Visit Types Screen with simplified design
+  // Render Visit Types Screen with edit/delete functionality
   const renderVisitTypes = () => (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
@@ -332,48 +461,72 @@ const TemplateBuilder: React.FC = () => {
         </Button>
       </Box>
 
-      <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
-        {visitTypes.map((visitType, index) => (
-          <React.Fragment key={visitType.id}>
-            <ListItem disablePadding>
-              <ListItemButton 
-                onClick={() => handleVisitTypeSelect(visitType)}
-                sx={{
-                  py: 3,
-                  px: 3,
-                  '&:hover': {
-                    backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
-                  }
-                }}
-              >
-                <ListItemText
-                  primary={
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 600,
-                        color: bravoColors.primaryFlat,
-                        fontSize: '1.1rem'
-                      }}
-                    >
-                      {visitType.name}
-                    </Typography>
-                  }
-                />
-              </ListItemButton>
-            </ListItem>
-            {index < visitTypes.length - 1 && (
-              <Box sx={{ px: 3 }}>
-                <Box sx={{ borderBottom: '1px solid', borderColor: 'divider' }} />
-              </Box>
-            )}
-          </React.Fragment>
-        ))}
-      </List>
+      <Paper elevation={1} sx={{ borderRadius: 3 }}>
+        <List sx={{ p: 0 }}>
+          {visitTypes.map((visitType, index) => (
+            <React.Fragment key={visitType.id}>
+              <ListItem disablePadding>
+                <ListItemButton 
+                  onClick={() => handleVisitTypeSelect(visitType)}
+                  sx={{
+                    py: 3,
+                    px: 3,
+                    '&:hover': {
+                      backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
+                    }
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      <Box display="flex" alignItems="center" justifyContent="space-between">
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: bravoColors.primaryFlat,
+                            fontSize: '1.1rem'
+                          }}
+                        >
+                          {visitType.name}
+                        </Typography>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Chip 
+                            label={`${visitType.templateCount || 0} templates`}
+                            size="small"
+                            sx={{
+                              backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+                              color: bravoColors.primaryFlat
+                            }}
+                          />
+                          <IconButton
+                            size="small"
+                            onClick={(e) => handleVisitTypeMenuClick(e, visitType)}
+                            sx={{ color: bravoColors.primaryFlat }}
+                          >
+                            <MoreVertIcon />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    }
+                    secondary={
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                        {visitType.description}
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+              </ListItem>
+              {index < visitTypes.length - 1 && (
+                <Divider sx={{ mx: 3 }} />
+              )}
+            </React.Fragment>
+          ))}
+        </List>
+      </Paper>
     </Box>
   );
 
-  // Render Templates Screen with simplified design
+  // Render Templates Screen with edit/delete functionality
   const renderTemplates = () => (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
@@ -422,7 +575,6 @@ const TemplateBuilder: React.FC = () => {
         </Button>
       </Box>
 
-      {/* Search Bar Only */}
       <TextField
         fullWidth
         placeholder="Search templates by name..."
@@ -445,7 +597,6 @@ const TemplateBuilder: React.FC = () => {
         }}
       />
 
-      {/* Simple Template List */}
       {isLoading ? (
         <Box>
           {Array.from({ length: 4 }).map((_, index) => (
@@ -458,59 +609,70 @@ const TemplateBuilder: React.FC = () => {
           ))}
         </Box>
       ) : paginatedTemplates.length > 0 ? (
-        <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
-          {paginatedTemplates.map((template, index) => (
-            <React.Fragment key={template.id}>
-              <ListItem disablePadding>
-                <ListItemButton 
-                  onClick={() => handleTemplateView(template)}
-                  sx={{
-                    py: 2,
-                    px: 3,
-                    '&:hover': {
-                      backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
-                    }
-                  }}
-                >
-                  <Box display="flex" alignItems="center" gap={2} sx={{ flex: 1 }}>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontWeight: 600,
-                          color: bravoColors.primaryFlat,
-                          fontSize: '1.1rem'
-                        }}
-                      >
-                        {template.title}
-                      </Typography>
+        <Paper elevation={1} sx={{ borderRadius: 3 }}>
+          <List sx={{ p: 0 }}>
+            {paginatedTemplates.map((template, index) => (
+              <React.Fragment key={template.id}>
+                <ListItem disablePadding>
+                  <ListItemButton 
+                    onClick={() => handleTemplateView(template)}
+                    sx={{
+                      py: 2,
+                      px: 3,
+                      '&:hover': {
+                        backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
+                      }
+                    }}
+                  >
+                    <Box display="flex" alignItems="center" gap={2} sx={{ flex: 1 }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: bravoColors.primaryFlat,
+                            fontSize: '1.1rem'
+                          }}
+                        >
+                          {template.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                          {template.specialty} • {template.type}
+                        </Typography>
+                      </Box>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <IconButton 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTemplateEdit(template);
+                          }}
+                          sx={{
+                            backgroundColor: bravoColors.primaryFlat,
+                            color: 'white',
+                            '&:hover': {
+                              backgroundColor: bravoColors.primaryDark
+                            }
+                          }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          onClick={(e) => handleTemplateMenuClick(e, template)}
+                          sx={{ color: bravoColors.primaryFlat }}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      </Box>
                     </Box>
-                    <IconButton 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTemplateEdit(template);
-                      }}
-                      sx={{
-                        backgroundColor: bravoColors.primaryFlat,
-                        color: 'white',
-                        '&:hover': {
-                          backgroundColor: bravoColors.primaryDark
-                        }
-                      }}
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </Box>
-                </ListItemButton>
-              </ListItem>
-              {index < paginatedTemplates.length - 1 && (
-                <Box sx={{ px: 3 }}>
-                  <Box sx={{ borderBottom: '1px solid', borderColor: 'divider' }} />
-                </Box>
-              )}
-            </React.Fragment>
-          ))}
-        </List>
+                  </ListItemButton>
+                </ListItem>
+                {index < paginatedTemplates.length - 1 && (
+                  <Divider sx={{ mx: 3 }} />
+                )}
+              </React.Fragment>
+            ))}
+          </List>
+        </Paper>
       ) : (
         <Card sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
           <Typography variant="h6" gutterBottom color="text.secondary">
@@ -655,7 +817,12 @@ const TemplateBuilder: React.FC = () => {
 
       {/* Tab Content */}
       {currentTab === 0 && renderMyTemplatesContent()}
-      {currentTab === 1 && <TemplateLibraryTab />}
+      {currentTab === 1 && (
+        <TemplateLibraryTab 
+          visitTypes={visitTypes.map(vt => vt.name)}
+          onAddTemplate={handleAddLibraryTemplate}
+        />
+      )}
 
       {/* Enhanced Template Creation Dialog */}
       <ImprovedTemplateCreationDialog
@@ -664,10 +831,25 @@ const TemplateBuilder: React.FC = () => {
         onCreateTemplate={handleCreateTemplateFromDialog}
       />
 
-      {/* Add Visit Type Dialog */}
-      <Dialog open={openAddType} onClose={() => setOpenAddType(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Visit Type</DialogTitle>
-        <DialogContent>
+      {/* Enhanced Add Visit Type Dialog */}
+      <Dialog 
+        open={openAddType} 
+        onClose={() => setOpenAddType(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            minHeight: '200px'
+          }
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
+            Add New Visit Type
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ py: 3 }}>
           <TextField
             autoFocus
             margin="dense"
@@ -677,11 +859,232 @@ const TemplateBuilder: React.FC = () => {
             value={newTypeName}
             onChange={(e) => setNewTypeName(e.target.value)}
             placeholder="e.g., Progress Note, Discharge Summary"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: bravoColors.primaryFlat
+                  }
+                }
+              }
+            }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenAddType(false)}>Cancel</Button>
-          <Button onClick={handleAddType} variant="contained">Add Visit Type</Button>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button 
+            onClick={() => setOpenAddType(false)}
+            variant="outlined"
+            sx={{ 
+              borderRadius: 2,
+              borderColor: bravoColors.primaryFlat,
+              color: bravoColors.primaryFlat,
+              px: 3
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleAddType} 
+            variant="contained"
+            disabled={!newTypeName.trim()}
+            sx={{ 
+              borderRadius: 2,
+              backgroundColor: bravoColors.primaryFlat,
+              px: 3,
+              '&:hover': {
+                backgroundColor: bravoColors.secondary
+              }
+            }}
+          >
+            Add Visit Type
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Visit Type Menu */}
+      <Menu
+        anchorEl={visitTypeMenuAnchor}
+        open={Boolean(visitTypeMenuAnchor)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: { 
+            borderRadius: 2,
+            minWidth: 150,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+          }
+        }}
+      >
+        <MenuItem onClick={handleEditVisitType} sx={{ py: 1.5 }}>
+          <EditIcon sx={{ mr: 2, fontSize: 20 }} />
+          Edit
+        </MenuItem>
+        <MenuItem onClick={handleDeleteVisitType} sx={{ py: 1.5, color: 'error.main' }}>
+          <DeleteIcon sx={{ mr: 2, fontSize: 20 }} />
+          Delete
+        </MenuItem>
+      </Menu>
+
+      {/* Template Menu */}
+      <Menu
+        anchorEl={templateMenuAnchor}
+        open={Boolean(templateMenuAnchor)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: { 
+            borderRadius: 2,
+            minWidth: 150,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+          }
+        }}
+      >
+        <MenuItem onClick={handleEditTemplate} sx={{ py: 1.5 }}>
+          <EditIcon sx={{ mr: 2, fontSize: 20 }} />
+          Edit Name
+        </MenuItem>
+        <MenuItem onClick={handleDeleteTemplate} sx={{ py: 1.5, color: 'error.main' }}>
+          <DeleteIcon sx={{ mr: 2, fontSize: 20 }} />
+          Delete
+        </MenuItem>
+      </Menu>
+
+      {/* Edit Visit Type Dialog */}
+      <Dialog 
+        open={editVisitTypeDialog} 
+        onClose={() => setEditVisitTypeDialog(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            minHeight: '200px'
+          }
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
+            Edit Visit Type
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ py: 3 }}>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Visit Type Name"
+            fullWidth
+            variant="outlined"
+            value={editingVisitTypeName}
+            onChange={(e) => setEditingVisitTypeName(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: bravoColors.primaryFlat
+                  }
+                }
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button 
+            onClick={() => setEditVisitTypeDialog(false)}
+            variant="outlined"
+            sx={{ 
+              borderRadius: 2,
+              borderColor: bravoColors.primaryFlat,
+              color: bravoColors.primaryFlat,
+              px: 3
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSaveEditVisitType} 
+            variant="contained"
+            disabled={!editingVisitTypeName.trim()}
+            sx={{ 
+              borderRadius: 2,
+              backgroundColor: bravoColors.primaryFlat,
+              px: 3,
+              '&:hover': {
+                backgroundColor: bravoColors.secondary
+              }
+            }}
+          >
+            Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Template Dialog */}
+      <Dialog 
+        open={editTemplateDialog} 
+        onClose={() => setEditTemplateDialog(false)} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: 3,
+            minHeight: '200px'
+          }
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h5" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
+            Edit Template Name
+          </Typography>
+        </DialogTitle>
+        <DialogContent sx={{ py: 3 }}>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Template Name"
+            fullWidth
+            variant="outlined"
+            value={editingTemplateName}
+            onChange={(e) => setEditingTemplateName(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                '&:hover': {
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: bravoColors.primaryFlat
+                  }
+                }
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button 
+            onClick={() => setEditTemplateDialog(false)}
+            variant="outlined"
+            sx={{ 
+              borderRadius: 2,
+              borderColor: bravoColors.primaryFlat,
+              color: bravoColors.primaryFlat,
+              px: 3
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSaveEditTemplate} 
+            variant="contained"
+            disabled={!editingTemplateName.trim()}
+            sx={{ 
+              borderRadius: 2,
+              backgroundColor: bravoColors.primaryFlat,
+              px: 3,
+              '&:hover': {
+                backgroundColor: bravoColors.secondary
+              }
+            }}
+          >
+            Save Changes
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
