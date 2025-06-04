@@ -102,7 +102,7 @@ export const Login: React.FC = () => {
       },
       overflow: 'hidden'
     }}>
-      {/* Left side - Branding - Only show on desktop/laptop */}
+      {/* Left side - Branding - Only show on desktop */}
       {isDesktop && (
         <Box sx={{
           flex: 1,
@@ -114,9 +114,37 @@ export const Login: React.FC = () => {
           justifyContent: 'center',
           p: 4,
           color: 'white',
-          textAlign: 'center'
+          textAlign: 'center',
+          position: 'relative'
         }}>
-          {/* Content can be added here if needed */}
+          <Box sx={{ maxWidth: 400 }}>
+            <Typography variant="h3" sx={{ 
+              fontWeight: 700,
+              mb: 3,
+              fontSize: { lg: '2.5rem', xl: '3rem' }
+            }}>
+              S10.AI for Clinicians
+            </Typography>
+            <Typography variant="h6" sx={{ 
+              mb: 4,
+              opacity: 0.9,
+              lineHeight: 1.6,
+              fontSize: { lg: '1.125rem', xl: '1.25rem' }
+            }}>
+              Streamline your clinical documentation with AI-powered efficiency
+            </Typography>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 2,
+              opacity: 0.8
+            }}>
+              <Typography variant="body1">✓ HIPAA Compliant</Typography>
+              <Typography variant="body1">✓ EHR Integration</Typography>
+              <Typography variant="body1">✓ Voice-to-Text</Typography>
+              <Typography variant="body1">✓ Smart Templates</Typography>
+            </Box>
+          </Box>
         </Box>
       )}
 
@@ -146,34 +174,34 @@ export const Login: React.FC = () => {
           flexDirection: 'column',
           alignItems: 'center',
           mb: {
-            xs: 3,
-            sm: 4,
-            md: 5
+            xs: 4,
+            sm: 5,
+            md: 6
           },
           width: '100%',
           maxWidth: {
-            xs: 320,
-            sm: 380,
-            md: 420
+            xs: 360,
+            sm: 400,
+            md: 440
           }
         }}>
           <Box sx={{
             display: 'flex',
             alignItems: 'center',
             mb: {
-              xs: 2,
-              sm: 3
+              xs: 3,
+              sm: 4
             }
           }}>
             <Box 
               component="img" 
               src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png" 
-              alt="Logo" 
+              alt="S10.AI Logo" 
               sx={{
                 height: {
-                  xs: 35,
-                  sm: 40,
-                  md: 50
+                  xs: 40,
+                  sm: 50,
+                  md: 60
                 }
               }} 
             />
@@ -187,12 +215,12 @@ export const Login: React.FC = () => {
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              mb: 1,
+              mb: 2,
               textAlign: 'center',
               fontSize: {
-                xs: '1.5rem',
-                sm: '1.75rem',
-                md: '2rem'
+                xs: '1.75rem',
+                sm: '2rem',
+                md: '2.25rem'
               }
             }}
           >
@@ -204,14 +232,15 @@ export const Login: React.FC = () => {
             sx={{
               textAlign: 'center',
               fontSize: {
-                xs: '0.875rem',
-                sm: '0.95rem',
-                md: '1rem'
+                xs: '1rem',
+                sm: '1.125rem',
+                md: '1.25rem'
               },
-              lineHeight: 1.5
+              lineHeight: 1.5,
+              fontWeight: 500
             }}
           >
-            Sign in to your account
+            Sign in to continue your clinical documentation
           </Typography>
         </Box>
 
@@ -219,9 +248,9 @@ export const Login: React.FC = () => {
         <Box sx={{
           width: '100%',
           maxWidth: {
-            xs: 320,
-            sm: 380,
-            md: 420
+            xs: 360,
+            sm: 400,
+            md: 440
           }
         }}>
           {paymentSuccessMessage && (
@@ -244,22 +273,22 @@ export const Login: React.FC = () => {
                 component="img" 
                 src="https://developers.google.com/identity/images/g-logo.png" 
                 alt="Google" 
-                sx={{ width: 18, height: 18 }} 
+                sx={{ width: 20, height: 20 }} 
               />
             }
             sx={{
               mb: 3,
               py: {
-                xs: 1.25,
-                sm: 1.5
+                xs: 1.5,
+                sm: 1.75
               },
               borderColor: 'divider',
               fontSize: {
-                xs: '0.825rem',
-                sm: '0.875rem',
-                md: '0.95rem'
+                xs: '0.95rem',
+                sm: '1rem',
+                md: '1.125rem'
               },
-              fontWeight: 500,
+              fontWeight: 600,
               '&:hover': {
                 borderColor: 'primary.main',
                 backgroundColor: 'rgba(0, 0, 0, 0.02)'
@@ -269,18 +298,19 @@ export const Login: React.FC = () => {
             Continue with Google
           </SecondaryButton>
 
-          <Divider sx={{ my: { xs: 2.5, sm: 3 } }}>
+          <Divider sx={{ my: { xs: 3, sm: 3.5 } }}>
             <Typography 
               variant="body2" 
               color="text.secondary" 
               sx={{
                 fontSize: {
-                  xs: '0.8rem',
-                  sm: '0.875rem'
-                }
+                  xs: '0.875rem',
+                  sm: '0.95rem'
+                },
+                fontWeight: 500
               }}
             >
-              or
+              or sign in with email
             </Typography>
           </Divider>
 
@@ -293,11 +323,17 @@ export const Login: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               sx={{
-                mb: { xs: 2.5, sm: 3 },
+                mb: { xs: 3, sm: 3.5 },
                 '& .MuiOutlinedInput-root': {
                   fontSize: {
-                    xs: '0.875rem',
-                    sm: '0.95rem'
+                    xs: '1rem',
+                    sm: '1.125rem'
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: {
+                    xs: '1rem',
+                    sm: '1.125rem'
                   }
                 }
               }}
@@ -308,8 +344,8 @@ export const Login: React.FC = () => {
                       color="action" 
                       sx={{
                         fontSize: {
-                          xs: 18,
-                          sm: 20
+                          xs: 20,
+                          sm: 22
                         }
                       }} 
                     />
@@ -326,11 +362,17 @@ export const Login: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               sx={{
-                mb: { xs: 2.5, sm: 3 },
+                mb: { xs: 3, sm: 3.5 },
                 '& .MuiOutlinedInput-root': {
                   fontSize: {
-                    xs: '0.875rem',
-                    sm: '0.95rem'
+                    xs: '1rem',
+                    sm: '1.125rem'
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: {
+                    xs: '1rem',
+                    sm: '1.125rem'
                   }
                 }
               }}
@@ -354,13 +396,13 @@ export const Login: React.FC = () => {
               type="submit"
               disabled={loading}
               sx={{
-                py: { xs: 1.25, sm: 1.5 },
-                mb: { xs: 2.5, sm: 3 },
-                fontWeight: 600,
+                py: { xs: 1.5, sm: 1.75 },
+                mb: { xs: 3, sm: 3.5 },
+                fontWeight: 700,
                 fontSize: {
-                  xs: '0.875rem',
-                  sm: '0.95rem',
-                  md: '1rem'
+                  xs: '1rem',
+                  sm: '1.125rem',
+                  md: '1.25rem'
                 }
               }}
             >
@@ -374,9 +416,9 @@ export const Login: React.FC = () => {
               color="text.secondary" 
               sx={{
                 fontSize: {
-                  xs: '0.8rem',
-                  sm: '0.85rem',
-                  md: '0.875rem'
+                  xs: '0.875rem',
+                  sm: '0.95rem',
+                  md: '1rem'
                 },
                 lineHeight: 1.5
               }}
@@ -390,13 +432,13 @@ export const Login: React.FC = () => {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   textDecoration: 'none',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   '&:hover': {
                     textDecoration: 'underline'
                   }
                 }}
               >
-                Sign up here
+                Create Account
               </Link>
             </Typography>
           </Box>
@@ -410,19 +452,25 @@ export const Login: React.FC = () => {
         maxWidth="sm" 
         fullWidth
         disableEscapeKeyDown
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 2
+          }
+        }}
       >
         <DialogTitle>
-          <Typography variant="h6" fontWeight={600}>
+          <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1.25rem' }}>
             Verify Your Email
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body1" sx={{ mb: 3 }}>
+          <Typography variant="body1" sx={{ mb: 3, fontSize: '1rem', lineHeight: 1.6 }}>
             To complete your account activation, please enter the verification code sent to your email.
           </Typography>
           
           {otpSent && (
-            <Alert severity="success" sx={{ mb: 3 }}>
+            <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
               Verification code sent to {email}
             </Alert>
           )}
@@ -434,24 +482,38 @@ export const Login: React.FC = () => {
             onChange={(e) => setOtp(e.target.value)}
             placeholder="Enter 6-digit code"
             inputProps={{ maxLength: 6 }}
-            sx={{ mb: 2 }}
+            sx={{ 
+              mb: 2,
+              '& .MuiOutlinedInput-root': {
+                fontSize: '1.125rem'
+              }
+            }}
           />
 
           <Button
             variant="text"
             onClick={sendOtp}
             disabled={otpLoading}
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, fontWeight: 600 }}
           >
             {otpLoading ? 'Sending...' : 'Resend Code'}
           </Button>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 3 }}>
           <Button
             variant="contained"
             onClick={verifyOtp}
             disabled={!otp || otp.length !== 6 || otpLoading}
             fullWidth
+            sx={{
+              py: 1.5,
+              fontSize: '1rem',
+              fontWeight: 700,
+              background: 'linear-gradient(90deg, #143151, #387E89)',
+              '&:hover': {
+                background: 'linear-gradient(90deg, #0d1f31, #2c6269)'
+              }
+            }}
           >
             {otpLoading ? 'Verifying...' : 'Verify & Continue'}
           </Button>

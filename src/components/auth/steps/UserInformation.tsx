@@ -4,18 +4,19 @@ import {
   Box,
   Typography,
   TextField,
-  MenuItem,
   FormControl,
-  FormLabel,
+  InputLabel,
+  Select,
+  MenuItem,
+  FormControlLabel,
+  Switch,
   Card,
   CardContent,
   Alert,
-  Grid,
-  Radio,
-  FormControlLabel,
-  RadioGroup,
+  Chip,
+  InputAdornment
 } from '@mui/material';
-import { Phone, Stethoscope, Database, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Phone, Stethoscope, Computer, ArrowBack, ArrowForward } from '@mui/icons-material';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -33,8 +34,18 @@ const specialties = [
   'Dermatology',
   'Emergency Medicine',
   'Psychiatry',
+  'Orthopedic Surgery',
   'Radiology',
-  'Surgery',
+  'Anesthesiology',
+  'Pathology',
+  'Neurology',
+  'Oncology',
+  'Obstetrics & Gynecology',
+  'Ophthalmology',
+  'Otolaryngology',
+  'Urology',
+  'Plastic Surgery',
+  'General Surgery',
   'Other'
 ];
 
@@ -44,10 +55,32 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
     specialty: data.specialty || '',
     ehrMode: data.ehrMode ?? true,
   });
+  const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
+    if (!formData.phoneNumber || !formData.specialty) {
+      setError('Please fill in all required fields');
+      return;
+    }
+
     onNext(formData);
+  };
+
+  const formatPhoneNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, '');
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    if (match) {
+      return `(${match[1]}) ${match[2]}-${match[3]}`;
+    }
+    return value;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhoneNumber(e.target.value);
+    setFormData(prev => ({ ...prev, phoneNumber: formatted }));
   };
 
   return (
@@ -60,7 +93,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
       {/* Header */}
       <Box sx={{ 
         textAlign: 'center', 
-        mb: { xs: 2, sm: 3 }, 
+        mb: { xs: 3, sm: 4 }, 
         flexShrink: 0 
       }}>
         <Typography
@@ -68,33 +101,43 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           sx={{
             fontWeight: 700,
             color: 'primary.main',
-            mb: 1,
+            mb: 2,
             fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
           }}
         >
           Professional Information
         </Typography>
         <Typography
-          variant="body1"
+          variant="h6"
           color="text.secondary"
           sx={{ 
-            fontSize: { xs: '0.875rem', sm: '1rem' },
-            maxWidth: 600,
-            mx: 'auto'
+            fontWeight: 500,
+            fontSize: { xs: '1rem', sm: '1.125rem' },
+            maxWidth: 500,
+            mx: 'auto',
+            lineHeight: 1.6
           }}
         >
-          Help us customize your experience
+          Help us customize S10.AI for your practice
         </Typography>
       </Box>
 
-      {/* Content area */}
-      <Box sx={{ 
-        flex: 1, 
-        display: 'flex', 
-        flexDirection: 'column', 
-        minHeight: 0,
-        overflow: 'auto'
-      }}>
+      {/* Content */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        {error && (
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mb: 3, 
+              borderRadius: 2,
+              flexShrink: 0,
+              fontSize: { xs: '0.875rem', sm: '1rem' }
+            }}
+          >
+            {error}
+          </Alert>
+        )}
+
         <Card
           sx={{
             flex: 1,
@@ -103,279 +146,170 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             backgroundColor: 'background.paper',
             display: 'flex',
             flexDirection: 'column',
-            minHeight: 0,
-            overflow: 'hidden'
+            minHeight: 0
           }}
         >
           <CardContent sx={{ 
-            p: { xs: 2, sm: 3, md: 4 }, 
+            p: { xs: 3, sm: 4, md: 5 }, 
             flex: 1, 
             display: 'flex', 
             flexDirection: 'column',
             minHeight: 0,
             overflow: 'auto'
           }}>
-            <Box component="form" onSubmit={handleSubmit} sx={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              gap: 3,
-              height: '100%'
-            }}>
-              {/* Phone Number Field */}
+            <Box component="form" onSubmit={handleSubmit} sx={{ flex: 1 }}>
+              {/* Phone Number */}
               <TextField
                 fullWidth
-                size="small"
-                variant="outlined"
                 label="Phone Number"
                 value={formData.phoneNumber}
-                onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                onChange={handlePhoneChange}
                 required
-                placeholder="+1 (555) 123-4567"
+                placeholder="(555) 123-4567"
+                sx={{ mb: 3 }}
                 InputProps={{
                   startAdornment: (
-                    <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-                      <Phone size={20} color="#387E89" />
-                    </Box>
+                    <InputAdornment position="start">
+                      <Phone sx={{ color: 'action.active', fontSize: 20 }} />
+                    </InputAdornment>
                   ),
                 }}
+                helperText="We'll use this for account security and important updates"
               />
 
-              {/* Medical Specialty Field */}
-              <TextField
-                fullWidth
-                size="small"
-                variant="outlined"
-                select
-                label="Medical Specialty"
-                value={formData.specialty}
-                onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
-                required
-                InputProps={{
-                  startAdornment: (
-                    <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
-                      <Stethoscope size={20} color="#387E89" />
-                    </Box>
-                  ),
+              {/* Medical Specialty */}
+              <FormControl fullWidth required sx={{ mb: 4 }}>
+                <InputLabel>Medical Specialty</InputLabel>
+                <Select
+                  value={formData.specialty}
+                  label="Medical Specialty"
+                  onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
+                  startAdornment={
+                    <InputAdornment position="start">
+                      <Stethoscope sx={{ color: 'action.active', fontSize: 20, ml: 1 }} />
+                    </InputAdornment>
+                  }
+                >
+                  {specialties.map((specialty) => (
+                    <MenuItem key={specialty} value={specialty}>
+                      {specialty}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* EHR Integration Section */}
+              <Card 
+                sx={{ 
+                  mb: 4, 
+                  border: '2px solid',
+                  borderColor: formData.ehrMode ? 'primary.main' : 'divider',
+                  backgroundColor: formData.ehrMode ? 'primary.50' : 'grey.50',
+                  transition: 'all 0.3s ease'
                 }}
               >
-                {specialties.map((specialty) => (
-                  <MenuItem key={specialty} value={specialty}>
-                    {specialty}
-                  </MenuItem>
-                ))}
-              </TextField>
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <Computer sx={{ color: 'primary.main', mr: 1, fontSize: 24 }} />
+                    <Typography variant="h6" fontWeight={600}>
+                      EHR Integration
+                    </Typography>
+                    <Chip 
+                      label="Recommended" 
+                      size="small" 
+                      color="primary" 
+                      sx={{ ml: 2 }} 
+                    />
+                  </Box>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
+                    Connect S10.AI with your Electronic Health Record system for seamless documentation workflow
+                  </Typography>
 
-              {/* Documentation Mode */}
-              <FormControl component="fieldset" sx={{ flex: 1, minHeight: 0 }}>
-                <FormLabel
-                  component="legend"
-                  sx={{
-                    fontWeight: 600,
-                    color: 'text.primary',
-                    fontSize: { xs: '1rem', sm: '1.125rem' },
-                    mb: 2
-                  }}
-                >
-                  How do you want to document your sessions?
-                </FormLabel>
-
-                <RadioGroup
-                  value={formData.ehrMode}
-                  onChange={(e) => setFormData(prev => ({ ...prev, ehrMode: e.target.value === 'true' }))}
-                  sx={{ 
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 2
-                  }}
-                >
-                  {/* EHR Integration Mode */}
-                  <Card
-                    sx={{
-                      cursor: 'pointer',
-                      border: 2,
-                      borderColor: formData.ehrMode ? 'primary.main' : 'grey.300',
-                      backgroundColor: formData.ehrMode ? 'primary.50' : 'background.paper',
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        borderColor: 'primary.main',
-                        backgroundColor: 'primary.50'
-                      }
-                    }}
-                    onClick={() => setFormData(prev => ({ ...prev, ehrMode: true }))}
-                  >
-                    <CardContent sx={{ 
-                      p: { xs: 2, sm: 3 }, 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 2,
-                      '&:last-child': { pb: { xs: 2, sm: 3 } }
-                    }}>
-                      <Box
-                        sx={{
-                          width: { xs: 40, sm: 48 },
-                          height: { xs: 40, sm: 48 },
-                          borderRadius: 2,
-                          backgroundColor: formData.ehrMode ? 'primary.main' : 'grey.200',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: formData.ehrMode ? 'white' : 'grey.600',
-                          flexShrink: 0
-                        }}
-                      >
-                        <Database size={24} />
-                      </Box>
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography 
-                          variant="h6" 
-                          fontWeight={700} 
-                          color={formData.ehrMode ? 'primary.main' : 'text.primary'}
-                          sx={{ 
-                            fontSize: { xs: '1rem', sm: '1.125rem' }, 
-                            mb: 0.5 
-                          }}
-                        >
-                          EHR Integration
-                        </Typography>
-                        <Typography 
-                          variant="body2" 
-                          color="text.secondary"
-                          sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-                        >
-                          Connect with your existing system
-                        </Typography>
-                      </Box>
-                      <FormControlLabel
-                        value="true"
-                        control={<Radio checked={formData.ehrMode} />}
-                        label=""
-                        sx={{ m: 0 }}
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.ehrMode}
+                        onChange={(e) => setFormData(prev => ({ ...prev, ehrMode: e.target.checked }))}
+                        color="primary"
                       />
-                      {formData.ehrMode && <CheckCircle2 size={24} color="#2E7D32" />}
-                    </CardContent>
-                  </Card>
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body1" fontWeight={600}>
+                          {formData.ehrMode ? 'With EHR Integration' : 'Without EHR Integration'}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {formData.ehrMode 
+                            ? 'Full integration with your EHR system' 
+                            : 'Use S10.AI as a standalone documentation tool'}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </CardContent>
+              </Card>
 
-                  {/* No EHR Mode */}
-                  <Card
-                    sx={{
-                      cursor: 'pointer',
-                      border: 2,
-                      borderColor: !formData.ehrMode ? 'primary.main' : 'grey.300',
-                      backgroundColor: !formData.ehrMode ? 'primary.50' : 'background.paper',
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        borderColor: 'primary.main',
-                        backgroundColor: 'primary.50'
-                      }
-                    }}
-                    onClick={() => setFormData(prev => ({ ...prev, ehrMode: false }))}
-                  >
-                    <CardContent sx={{ 
-                      p: { xs: 2, sm: 3 }, 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: 2,
-                      '&:last-child': { pb: { xs: 2, sm: 3 } }
-                    }}>
-                      <Box
-                        sx={{
-                          width: { xs: 40, sm: 48 },
-                          height: { xs: 40, sm: 48 },
-                          borderRadius: 2,
-                          backgroundColor: !formData.ehrMode ? 'primary.main' : 'grey.200',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: !formData.ehrMode ? 'white' : 'grey.600',
-                          flexShrink: 0
-                        }}
-                      >
-                        <FileText size={24} />
-                      </Box>
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography 
-                          variant="h6" 
-                          fontWeight={700} 
-                          color={!formData.ehrMode ? 'primary.main' : 'text.primary'}
-                          sx={{ 
-                            fontSize: { xs: '1rem', sm: '1.125rem' }, 
-                            mb: 0.5 
-                          }}
-                        >
-                          Standalone Notes
-                        </Typography>
-                        <Typography 
-                          variant="body2" 
-                          color="text.secondary"
-                          sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-                        >
-                          Use S10.AI as your primary system
-                        </Typography>
-                      </Box>
-                      <FormControlLabel
-                        value="false"
-                        control={<Radio checked={!formData.ehrMode} />}
-                        label=""
-                        sx={{ m: 0 }}
-                      />
-                      {!formData.ehrMode && <CheckCircle2 size={24} color="#2E7D32" />}
-                    </CardContent>
-                  </Card>
-                </RadioGroup>
-              </FormControl>
+              {/* Benefits based on selection */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
+                  {formData.ehrMode ? 'EHR Integration Benefits:' : 'Standalone Benefits:'}
+                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {formData.ehrMode ? (
+                    <>
+                      <Typography variant="body2" color="text.secondary">✓ Direct note insertion into your EHR</Typography>
+                      <Typography variant="body2" color="text.secondary">✓ Patient data synchronization</Typography>
+                      <Typography variant="body2" color="text.secondary">✓ Automated billing code suggestions</Typography>
+                      <Typography variant="body2" color="text.secondary">✓ Workflow optimization</Typography>
+                    </>
+                  ) : (
+                    <>
+                      <Typography variant="body2" color="text.secondary">✓ Quick setup and immediate use</Typography>
+                      <Typography variant="body2" color="text.secondary">✓ Flexible documentation workflow</Typography>
+                      <Typography variant="body2" color="text.secondary">✓ Export to any format</Typography>
+                      <Typography variant="body2" color="text.secondary">✓ No IT department coordination needed</Typography>
+                    </>
+                  )}
+                </Box>
+              </Box>
             </Box>
           </CardContent>
         </Card>
 
-        {/* Alert */}
-        <Alert
-          severity="info"
-          icon={<AlertCircle size={20} />}
-          sx={{ 
-            mt: 2,
-            borderRadius: 2,
-            flexShrink: 0,
-            '& .MuiAlert-message': {
-              fontSize: { xs: '0.875rem', sm: '1rem' }
-            }
-          }}
-        >
-          Your selection determines the next setup steps for optimal integration.
-        </Alert>
-
-        {/* Fixed buttons at bottom */}
+        {/* Navigation Buttons */}
         <Box sx={{ 
-          display: 'flex', 
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
           flexShrink: 0,
-          pt: 2,
-          mt: 2
+          pt: 3,
+          display: 'flex',
+          gap: 2,
+          mt: 'auto'
         }}>
           <SecondaryButton
             onClick={onBack}
-            sx={{ 
-              flex: { xs: 1, sm: 1 },
-              order: { xs: 2, sm: 1 },
+            startIcon={<ArrowBack />}
+            sx={{
               py: { xs: 1.5, sm: 1.25 },
-              fontSize: { xs: '0.875rem', sm: '1rem' }
+              fontWeight: 600,
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              minWidth: 120
             }}
           >
             Back
           </SecondaryButton>
+          
           <PrimaryButton
+            fullWidth
             type="submit"
             onClick={handleSubmit}
-            disabled={!formData.phoneNumber || !formData.specialty}
-            sx={{ 
-              flex: { xs: 1, sm: 2 }, 
-              fontWeight: 700,
-              order: { xs: 1, sm: 2 },
+            endIcon={<ArrowForward />}
+            sx={{
               py: { xs: 1.5, sm: 1.25 },
+              fontWeight: 700,
               fontSize: { xs: '0.875rem', sm: '1rem' }
             }}
           >
-            Continue →
+            Continue Setup
           </PrimaryButton>
         </Box>
       </Box>
