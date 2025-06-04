@@ -8,15 +8,13 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormControlLabel,
-  Switch,
   Card,
   CardContent,
   Alert,
   Chip,
   InputAdornment
 } from '@mui/material';
-import { Phone, LocalHospital, Computer, ArrowBack, ArrowForward } from '@mui/icons-material';
+import { Phone, LocalHospital, Computer, ArrowBack, ArrowForward, CheckCircle } from '@mui/icons-material';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -83,6 +81,10 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
     setFormData(prev => ({ ...prev, phoneNumber: formatted }));
   };
 
+  const handleEhrModeSelect = (mode: boolean) => {
+    setFormData(prev => ({ ...prev, ehrMode: mode }));
+  };
+
   return (
     <Box sx={{ 
       height: '100%',
@@ -100,7 +102,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           variant="h4"
           sx={{
             fontWeight: 700,
-            color: 'primary.main',
+            color: '#2e7d32',
             mb: 2,
             fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
           }}
@@ -142,7 +144,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           sx={{
             flex: 1,
             border: '1px solid',
-            borderColor: 'divider',
+            borderColor: '#e0e7ff',
             backgroundColor: 'background.paper',
             display: 'flex',
             flexDirection: 'column',
@@ -170,7 +172,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Phone sx={{ color: 'action.active', fontSize: 20 }} />
+                      <Phone sx={{ color: '#4caf50', fontSize: 20 }} />
                     </InputAdornment>
                   ),
                 }}
@@ -186,7 +188,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                   onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
                   startAdornment={
                     <InputAdornment position="start">
-                      <LocalHospital sx={{ color: 'action.active', fontSize: 20, ml: 1 }} />
+                      <LocalHospital sx={{ color: '#4caf50', fontSize: 20, ml: 1 }} />
                     </InputAdornment>
                   }
                 >
@@ -198,79 +200,146 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 </Select>
               </FormControl>
 
-              {/* EHR Integration Section */}
-              <Card 
-                sx={{ 
-                  mb: 4, 
-                  border: '2px solid',
-                  borderColor: formData.ehrMode ? 'primary.main' : 'divider',
-                  backgroundColor: formData.ehrMode ? 'primary.50' : 'grey.50',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Computer sx={{ color: 'primary.main', mr: 1, fontSize: 24 }} />
-                    <Typography variant="h6" fontWeight={600}>
-                      EHR Integration
-                    </Typography>
-                    <Chip 
-                      label="Recommended" 
-                      size="small" 
-                      color="primary" 
-                      sx={{ ml: 2 }} 
-                    />
-                  </Box>
-                  
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-                    Connect S10.AI with your Electronic Health Record system for seamless documentation workflow
+              {/* EHR Integration Options */}
+              <Box sx={{ mb: 4 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                  <Computer sx={{ color: '#4caf50', mr: 1, fontSize: 24 }} />
+                  <Typography variant="h6" fontWeight={600} sx={{ color: '#2e7d32' }}>
+                    Choose Your Integration
                   </Typography>
+                  <Chip 
+                    label="Required" 
+                    size="small" 
+                    sx={{ 
+                      ml: 2,
+                      backgroundColor: '#e8f5e8',
+                      color: '#2e7d32',
+                      fontWeight: 600
+                    }} 
+                  />
+                </Box>
+                
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
+                  Select how you'd like to use S10.AI in your practice workflow
+                </Typography>
 
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={formData.ehrMode}
-                        onChange={(e) => setFormData(prev => ({ ...prev, ehrMode: e.target.checked }))}
-                        color="primary"
-                      />
-                    }
-                    label={
-                      <Box>
-                        <Typography variant="body1" fontWeight={600}>
-                          {formData.ehrMode ? 'With EHR Integration' : 'Without EHR Integration'}
+                {/* EHR Integration Options */}
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+                  {/* With EHR Integration */}
+                  <Card 
+                    onClick={() => handleEhrModeSelect(true)}
+                    sx={{ 
+                      flex: 1,
+                      cursor: 'pointer',
+                      border: '2px solid',
+                      borderColor: formData.ehrMode ? '#4caf50' : '#e1e5e9',
+                      backgroundColor: formData.ehrMode ? '#f1f8e9' : '#fafafa',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      '&:hover': {
+                        borderColor: formData.ehrMode ? '#4caf50' : '#81c784',
+                        backgroundColor: formData.ehrMode ? '#f1f8e9' : '#f8f9fa',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(76, 175, 80, 0.15)'
+                      }
+                    }}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Computer sx={{ color: '#4caf50', mr: 2, fontSize: 28 }} />
+                        <Typography variant="h6" fontWeight={700} sx={{ color: '#2e7d32' }}>
+                          With EHR Integration
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {formData.ehrMode 
-                            ? 'Full integration with your EHR system' 
-                            : 'Use S10.AI as a standalone documentation tool'}
+                        {formData.ehrMode && (
+                          <CheckCircle sx={{ 
+                            color: '#4caf50', 
+                            ml: 'auto', 
+                            fontSize: 24,
+                            position: 'absolute',
+                            top: 16,
+                            right: 16
+                          }} />
+                        )}
+                      </Box>
+                      
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+                        Full integration with your Electronic Health Record system
+                      </Typography>
+
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography variant="body2" sx={{ color: '#388e3c', fontWeight: 500 }}>
+                          ✓ Direct note insertion into your EHR
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#388e3c', fontWeight: 500 }}>
+                          ✓ Patient data synchronization
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#388e3c', fontWeight: 500 }}>
+                          ✓ Automated billing code suggestions
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#388e3c', fontWeight: 500 }}>
+                          ✓ Workflow optimization
                         </Typography>
                       </Box>
-                    }
-                  />
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
 
-              {/* Benefits based on selection */}
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
-                  {formData.ehrMode ? 'EHR Integration Benefits:' : 'Standalone Benefits:'}
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {formData.ehrMode ? (
-                    <>
-                      <Typography variant="body2" color="text.secondary">✓ Direct note insertion into your EHR</Typography>
-                      <Typography variant="body2" color="text.secondary">✓ Patient data synchronization</Typography>
-                      <Typography variant="body2" color="text.secondary">✓ Automated billing code suggestions</Typography>
-                      <Typography variant="body2" color="text.secondary">✓ Workflow optimization</Typography>
-                    </>
-                  ) : (
-                    <>
-                      <Typography variant="body2" color="text.secondary">✓ Quick setup and immediate use</Typography>
-                      <Typography variant="body2" color="text.secondary">✓ Flexible documentation workflow</Typography>
-                      <Typography variant="body2" color="text.secondary">✓ Export to any format</Typography>
-                      <Typography variant="body2" color="text.secondary">✓ No IT department coordination needed</Typography>
-                    </>
-                  )}
+                  {/* Without EHR Integration */}
+                  <Card 
+                    onClick={() => handleEhrModeSelect(false)}
+                    sx={{ 
+                      flex: 1,
+                      cursor: 'pointer',
+                      border: '2px solid',
+                      borderColor: !formData.ehrMode ? '#2196f3' : '#e1e5e9',
+                      backgroundColor: !formData.ehrMode ? '#e3f2fd' : '#fafafa',
+                      transition: 'all 0.3s ease',
+                      position: 'relative',
+                      '&:hover': {
+                        borderColor: !formData.ehrMode ? '#2196f3' : '#64b5f6',
+                        backgroundColor: !formData.ehrMode ? '#e3f2fd' : '#f8f9fa',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 4px 12px rgba(33, 150, 243, 0.15)'
+                      }
+                    }}
+                  >
+                    <CardContent sx={{ p: 3 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <Computer sx={{ color: '#2196f3', mr: 2, fontSize: 28 }} />
+                        <Typography variant="h6" fontWeight={700} sx={{ color: '#1565c0' }}>
+                          Standalone Mode
+                        </Typography>
+                        {!formData.ehrMode && (
+                          <CheckCircle sx={{ 
+                            color: '#2196f3', 
+                            ml: 'auto', 
+                            fontSize: 24,
+                            position: 'absolute',
+                            top: 16,
+                            right: 16
+                          }} />
+                        )}
+                      </Box>
+                      
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+                        Use S10.AI as a standalone documentation tool
+                      </Typography>
+
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                        <Typography variant="body2" sx={{ color: '#1976d2', fontWeight: 500 }}>
+                          ✓ Quick setup and immediate use
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#1976d2', fontWeight: 500 }}>
+                          ✓ Flexible documentation workflow
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#1976d2', fontWeight: 500 }}>
+                          ✓ Export to any format
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#1976d2', fontWeight: 500 }}>
+                          ✓ No IT department coordination needed
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </Card>
                 </Box>
               </Box>
             </Box>
