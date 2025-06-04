@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -66,7 +65,11 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
       return;
     }
 
-    onNext(formData);
+    console.log('Submitting user information with ehrMode:', ehrMode);
+    onNext({
+      ...formData,
+      ehrMode: ehrMode
+    });
   };
 
   const formatPhoneNumber = (value: string) => {
@@ -84,6 +87,8 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
   };
 
   const handleEhrModeSelect = (mode: boolean) => {
+    console.log('EHR mode selected:', mode);
+    setEhrMode(mode);
     setFormData(prev => ({ ...prev, ehrMode: mode }));
   };
 
@@ -223,7 +228,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 }}>
                   {/* With EHR Integration Card */}
                   <Card
-                    onClick={() => setEhrMode(true)}
+                    onClick={() => handleEhrModeSelect(true)}
                     sx={{
                       flex: 1,
                       cursor: 'pointer',
@@ -281,7 +286,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
 
                   {/* Standalone Mode Card */}
                   <Card
-                    onClick={() => setEhrMode(false)}
+                    onClick={() => handleEhrModeSelect(false)}
                     sx={{
                       flex: 1,
                       cursor: 'pointer',
@@ -381,4 +386,3 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
     </Box>
   );
 };
-

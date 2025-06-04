@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -91,7 +90,8 @@ export const SignupFlow: React.FC = () => {
   const getVisibleSteps = () => {
     const steps = ['Account Creation', 'User Information'];
     
-    if (signupData.ehrMode) {
+    // Only add EHR-related steps if EHR mode is enabled
+    if (signupData.ehrMode === true) {
       steps.push('EHR Selection');
       if (signupData.needsMeeting) {
         steps.push('Meeting');
@@ -108,29 +108,51 @@ export const SignupFlow: React.FC = () => {
     const updatedData = { ...signupData, ...stepData };
     setSignupData(updatedData);
     
-    if (activeStep === 2 && (!updatedData.ehrMode || !updatedData.needsMeeting)) {
-      const nextStepIndex = visibleSteps.indexOf('Payment');
-      setActiveStep(nextStepIndex);
-    } else if (activeStep === 1 && !updatedData.ehrMode) {
-      const nextStepIndex = visibleSteps.indexOf('Payment');
-      setActiveStep(nextStepIndex);
-    } else {
-      setActiveStep((prev) => prev + 1);
+    console.log('Updated signup data:', updatedData);
+    console.log('Current step:', activeStep, 'Step name:', visibleSteps[activeStep]);
+    
+    // If we're on User Information step and EHR mode is disabled, skip directly to Payment
+    if (activeStep === 1 && updatedData.ehrMode === false) {
+      const paymentStepIndex = visibleSteps.indexOf('Payment');
+      console.log('Skipping to Payment step:', paymentStepIndex);
+      setActiveStep(paymentStepIndex);
+      return;
     }
+    
+    // If we're on EHR Selection and no meeting is needed, skip to Payment
+    if (activeStep === 2 && updatedData.ehrMode === true && !updatedData.needsMeeting) {
+      const paymentStepIndex = visibleSteps.indexOf('Payment');
+      console.log('Skipping to Payment step (no meeting needed):', paymentStepIndex);
+      setActiveStep(paymentStepIndex);
+      return;
+    }
+    
+    // Normal progression to next step
+    setActiveStep((prev) => prev + 1);
   };
 
   const handleBack = () => {
-    if (activeStep === visibleSteps.indexOf('Payment') && !signupData.ehrMode) {
-      setActiveStep(1);
-    } else if (activeStep === visibleSteps.indexOf('Payment') && !signupData.needsMeeting) {
-      setActiveStep(2);
-    } else {
-      setActiveStep((prev) => prev - 1);
+    console.log('Going back from step:', activeStep, 'Step name:', visibleSteps[activeStep]);
+    
+    // If we're on Payment step and came from User Information (no EHR mode)
+    if (activeStep === visibleSteps.indexOf('Payment') && signupData.ehrMode === false) {
+      setActiveStep(1); // Go back to User Information
+      return;
     }
+    
+    // If we're on Payment step and came from EHR Selection (no meeting needed)
+    if (activeStep === visibleSteps.indexOf('Payment') && signupData.ehrMode === true && !signupData.needsMeeting) {
+      setActiveStep(2); // Go back to EHR Selection
+      return;
+    }
+    
+    // Normal back progression
+    setActiveStep((prev) => prev - 1);
   };
 
   const renderStep = () => {
     const currentStepName = visibleSteps[activeStep];
+    console.log('Rendering step:', currentStepName, 'at index:', activeStep);
     
     switch (currentStepName) {
       case 'Account Creation':
