@@ -273,11 +273,41 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
               </Typography>
             </Alert>
 
+            {/* Pay Now Button - Show first if iframe not shown */}
+            {!showIframe && (
+              <Box sx={{ 
+                textAlign: 'center', 
+                mb: 3,
+                backgroundColor: '#f8f9fa',
+                borderRadius: 2,
+                border: '2px solid #4caf50',
+                p: 3
+              }}>
+                <PrimaryButton
+                  onClick={handlePayNow}
+                  disabled={loading}
+                  sx={{
+                    py: 2,
+                    px: 6,
+                    fontSize: '1.25rem',
+                    fontWeight: 700,
+                    minWidth: 250,
+                    minHeight: 56
+                  }}
+                >
+                  {loading ? <CircularProgress size={24} color="inherit" /> : `Pay Now - $${finalPrice.toFixed(2)}`}
+                </PrimaryButton>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontWeight: 500 }}>
+                  Click to proceed to secure payment gateway
+                </Typography>
+              </Box>
+            )}
+
             {/* Zoho Payment Iframe */}
             {showIframe && (
               <Box sx={{ 
                 width: '100%', 
-                height: 400, 
+                height: 500, 
                 border: '1px solid #e0e7ff',
                 borderRadius: 2,
                 overflow: 'hidden',
@@ -317,41 +347,13 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
         </Card>
       </Box>
 
-      {/* Fixed Pay Now Button and Navigation */}
+      {/* Fixed Navigation */}
       <Box sx={{ 
         flexShrink: 0,
         pt: 3,
         borderTop: '1px solid #e0e7ff',
         backgroundColor: 'background.paper'
       }}>
-        {/* Pay Now Button - Always visible and prominent */}
-        <Box sx={{ 
-          textAlign: 'center', 
-          mb: 3,
-          backgroundColor: '#f8f9fa',
-          borderRadius: 2,
-          border: '2px solid #4caf50',
-          p: 3
-        }}>
-          <PrimaryButton
-            onClick={handlePayNow}
-            disabled={loading}
-            sx={{
-              py: 2,
-              px: 6,
-              fontSize: '1.25rem',
-              fontWeight: 700,
-              minWidth: 250,
-              minHeight: 56
-            }}
-          >
-            {loading ? <CircularProgress size={24} color="inherit" /> : `Pay Now - $${finalPrice.toFixed(2)}`}
-          </PrimaryButton>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontWeight: 500 }}>
-            Click to proceed to secure payment gateway
-          </Typography>
-        </Box>
-
         {/* Navigation Buttons */}
         <Box sx={{ 
           display: 'flex',

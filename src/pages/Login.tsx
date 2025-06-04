@@ -102,7 +102,7 @@ export const Login: React.FC = () => {
       },
       overflow: 'hidden'
     }}>
-      {/* Left side - Branding - Only show on desktop */}
+      {/* Left side - Empty gradient background - Only show on desktop */}
       {isDesktop && (
         <Box sx={{
           flex: 1,
