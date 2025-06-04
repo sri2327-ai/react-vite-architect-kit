@@ -269,7 +269,7 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
 
       <Grid container spacing={3}>
         {filteredTemplates.map((template) => (
-          <Grid item xs={12} sm={6} md={4} key={template.id}>
+          <Grid xs={12} sm={6} md={4} key={template.id}>
             <Card 
               sx={{ 
                 cursor: 'pointer',
