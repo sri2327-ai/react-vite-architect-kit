@@ -114,63 +114,49 @@ const createTemplateOptions: CreateTemplateOption[] = [
   }
 ];
 
-// Sample template library data
+// Use the same template library data as TemplateLibraryTab
 const templateLibrary = [
   {
     id: 1,
-    name: "Cardiology Consultation Note",
-    specialty: "Cardiology",
-    type: "Consultation",
+    name: "CLINICAL INTERVIEW1",
+    specialty: "cardiologist",
+    type: "SOAP",
     description: "Comprehensive cardiac evaluation template"
   },
   {
     id: 2,
-    name: "General Medicine SOAP Note",
-    specialty: "General Medicine", 
+    name: "CLINICAL INTERVIEW2", 
+    specialty: "pyschologist",
     type: "SOAP",
     description: "Standard primary care documentation"
   },
   {
     id: 3,
-    name: "Emergency Department Assessment",
-    specialty: "Emergency Medicine",
-    type: "Assessment",
+    name: "CLINICAL INTERVIEW3",
+    specialty: "cardiologist",
+    type: "DPD",
     description: "ED triage and assessment template"
   },
   {
     id: 4,
-    name: "Psychiatry Initial Evaluation",
-    specialty: "Psychiatry",
-    type: "Initial Evaluation",
+    name: "Dermatology Intake",
+    specialty: "Dermatology",
+    type: "SOAP",
     description: "Mental health assessment template"
   },
   {
     id: 5,
-    name: "Orthopedic Exam Note",
-    specialty: "Orthopedics",
-    type: "Physical Exam", 
+    name: "Neurology Followup",
+    specialty: "pyschologist",
+    type: "SOAP", 
     description: "Musculoskeletal assessment template"
   },
   {
     id: 6,
-    name: "Pediatric Well Child Visit",
-    specialty: "Pediatrics",
-    type: "Wellness Visit",
+    name: "Dermatology Intake1",
+    specialty: "cardiologist",
+    type: "DPD",
     description: "Routine pediatric check-up template"
-  },
-  {
-    id: 7,
-    name: "Dermatology Skin Exam",
-    specialty: "Dermatology",
-    type: "Physical Exam", 
-    description: "Comprehensive skin assessment"
-  },
-  {
-    id: 8,
-    name: "Neurology Consultation",
-    specialty: "Neurology",
-    type: "Consultation",
-    description: "Neurological evaluation template"
   }
 ];
 
@@ -500,12 +486,12 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                             py: 2,
                             px: 3,
                             '&:hover': {
-                              backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
+                              backgroundColor: bravoColors.highlight.hover
                             },
                             '&.Mui-selected': {
-                              backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+                              backgroundColor: bravoColors.highlight.selected,
                               '&:hover': {
-                                backgroundColor: alpha(bravoColors.primaryFlat, 0.15)
+                                backgroundColor: bravoColors.highlight.hover
                               }
                             }
                           }}

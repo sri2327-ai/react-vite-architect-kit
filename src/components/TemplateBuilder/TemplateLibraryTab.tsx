@@ -17,7 +17,11 @@ import {
   Button,
   Tab,
   Tabs,
-  IconButton
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText
 } from '@mui/material';
 import {
   Close as CloseIcon
@@ -150,11 +154,25 @@ Initial treatment plan and patient education.`
   }
 ];
 
+// Visit types for the selection dialog
+const visitTypes = [
+  'New Patient Visit',
+  'Follow-up Visit',
+  'Consultation',
+  'Annual Physical',
+  'Procedure Visit',
+  'Emergency Visit',
+  'Telemedicine Visit'
+];
+
 const TemplateLibraryTab: React.FC = () => {
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [selectedNoteType, setSelectedNoteType] = useState('');
   const [previewTemplate, setPreviewTemplate] = useState<LibraryTemplate | null>(null);
   const [previewTab, setPreviewTab] = useState(0);
+  const [visitTypeDialog, setVisitTypeDialog] = useState(false);
+  const [selectedVisitType, setSelectedVisitType] = useState('');
+  const [templateToAdd, setTemplateToAdd] = useState<LibraryTemplate | null>(null);
 
   const specialties = ['', 'cardiologist', 'pyschologist', 'Dermatology'];
   const noteTypes = ['', 'SOAP', 'DPD'];
@@ -164,23 +182,6 @@ const TemplateLibraryTab: React.FC = () => {
     const matchesNoteType = !selectedNoteType || template.noteType === selectedNoteType;
     return matchesSpecialty && matchesNoteType;
   });
-
-  const getSpecialtyColor = (specialty: string) => {
-    switch (specialty.toLowerCase()) {
-      case 'cardiologist': return '#4FC3F7';
-      case 'pyschologist': return '#81C784';
-      case 'dermatology': return '#FFB74D';
-      default: return bravoColors.primaryFlat;
-    }
-  };
-
-  const getNoteTypeColor = (noteType: string) => {
-    switch (noteType) {
-      case 'SOAP': return '#64B5F6';
-      case 'DPD': return '#4DB6AC';
-      default: return bravoColors.secondary;
-    }
-  };
 
   const handleTemplateClick = (template: LibraryTemplate) => {
     setPreviewTemplate(template);
@@ -192,9 +193,28 @@ const TemplateLibraryTab: React.FC = () => {
   };
 
   const handleAddToLibrary = () => {
-    // Handle adding template to user's library
-    console.log('Adding template to library:', previewTemplate);
+    setTemplateToAdd(previewTemplate);
+    setVisitTypeDialog(true);
     handleClosePreview();
+  };
+
+  const handleVisitTypeSelect = () => {
+    if (templateToAdd && selectedVisitType) {
+      console.log('Adding template to library:', {
+        template: templateToAdd,
+        visitType: selectedVisitType
+      });
+      // Handle adding template to the selected visit type
+      setVisitTypeDialog(false);
+      setSelectedVisitType('');
+      setTemplateToAdd(null);
+    }
+  };
+
+  const handleCloseVisitTypeDialog = () => {
+    setVisitTypeDialog(false);
+    setSelectedVisitType('');
+    setTemplateToAdd(null);
   };
 
   return (
@@ -254,9 +274,11 @@ const TemplateLibraryTab: React.FC = () => {
             sx={{ 
               cursor: 'pointer',
               transition: 'all 0.2s',
+              border: `1px solid ${bravoColors.highlight.border}`,
               '&:hover': {
                 transform: 'translateY(-4px)',
-                boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+                boxShadow: `0 8px 25px ${bravoColors.highlight.border}`,
+                borderColor: bravoColors.primaryFlat
               }
             }}
             onClick={() => handleTemplateClick(template)}
@@ -275,7 +297,7 @@ const TemplateLibraryTab: React.FC = () => {
                   label={`Specialty: ${template.specialty}`}
                   size="small"
                   sx={{
-                    backgroundColor: getSpecialtyColor(template.specialty),
+                    backgroundColor: bravoColors.secondary,
                     color: 'white',
                     fontWeight: 600,
                     alignSelf: 'flex-start'
@@ -285,8 +307,8 @@ const TemplateLibraryTab: React.FC = () => {
                   label={`Note Type: ${template.noteType}`}
                   size="small"
                   sx={{
-                    backgroundColor: getNoteTypeColor(template.noteType),
-                    color: 'white',
+                    backgroundColor: bravoColors.tertiary,
+                    color: bravoColors.primaryFlat,
                     fontWeight: 600,
                     alignSelf: 'flex-start'
                   }}
@@ -331,17 +353,15 @@ const TemplateLibraryTab: React.FC = () => {
                 sx={{ 
                   textTransform: 'none',
                   fontWeight: 600,
-                  backgroundColor: previewTab === 0 ? bravoColors.primaryFlat : 'transparent',
-                  color: previewTab === 0 ? 'white' : 'inherit',
-                  borderRadius: '8px 8px 0 0',
-                  mx: 1
+                  color: previewTab === 0 ? bravoColors.primaryFlat : 'inherit'
                 }}
               />
               <Tab 
                 label="Example Note" 
                 sx={{ 
                   textTransform: 'none',
-                  fontWeight: 600
+                  fontWeight: 600,
+                  color: previewTab === 1 ? bravoColors.primaryFlat : 'inherit'
                 }}
               />
             </Tabs>
@@ -350,7 +370,7 @@ const TemplateLibraryTab: React.FC = () => {
           {previewTab === 0 && previewTemplate && (
             <Box sx={{ p: 3 }}>
               <Box sx={{ 
-                border: '2px dashed #ccc',
+                border: `2px dashed ${bravoColors.highlight.border}`,
                 borderRadius: 2,
                 p: 3,
                 mb: 3
@@ -385,7 +405,11 @@ const TemplateLibraryTab: React.FC = () => {
           <Button 
             onClick={handleClosePreview}
             variant="outlined"
-            sx={{ textTransform: 'none' }}
+            sx={{ 
+              textTransform: 'none',
+              borderColor: bravoColors.primaryFlat,
+              color: bravoColors.primaryFlat
+            }}
           >
             CANCEL
           </Button>
@@ -401,6 +425,88 @@ const TemplateLibraryTab: React.FC = () => {
             }}
           >
             ADD TO LIBRARY
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Visit Type Selection Dialog */}
+      <Dialog 
+        open={visitTypeDialog} 
+        onClose={handleCloseVisitTypeDialog}
+        maxWidth="sm" 
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            Select Visit Type
+          </Typography>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Choose which visit type this template should be added to:
+          </Typography>
+          
+          <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+            {visitTypes.map((visitType) => (
+              <ListItem key={visitType} disablePadding>
+                <ListItemButton 
+                  onClick={() => setSelectedVisitType(visitType)}
+                  selected={selectedVisitType === visitType}
+                  sx={{
+                    borderRadius: 1,
+                    '&.Mui-selected': {
+                      backgroundColor: bravoColors.highlight.selected,
+                      '&:hover': {
+                        backgroundColor: bravoColors.highlight.hover
+                      }
+                    }
+                  }}
+                >
+                  <ListItemText
+                    primary={
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: selectedVisitType === visitType ? 600 : 400,
+                          color: selectedVisitType === visitType ? bravoColors.primaryFlat : 'text.primary'
+                        }}
+                      >
+                        {visitType}
+                      </Typography>
+                    }
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </DialogContent>
+
+        <DialogActions sx={{ p: 3, pt: 0 }}>
+          <Button 
+            onClick={handleCloseVisitTypeDialog}
+            variant="outlined"
+            sx={{ 
+              textTransform: 'none',
+              borderColor: bravoColors.primaryFlat,
+              color: bravoColors.primaryFlat
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleVisitTypeSelect}
+            variant="contained"
+            disabled={!selectedVisitType}
+            sx={{ 
+              textTransform: 'none',
+              backgroundColor: bravoColors.primaryFlat,
+              '&:hover': {
+                backgroundColor: bravoColors.primaryDark
+              }
+            }}
+          >
+            Add Template
           </Button>
         </DialogActions>
       </Dialog>
