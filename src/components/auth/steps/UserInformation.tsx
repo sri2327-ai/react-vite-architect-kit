@@ -51,10 +51,10 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
   const [formData, setFormData] = useState({
     phoneNumber: data.phoneNumber || '',
     specialty: data.specialty || '',
-    ehrMode: data.ehrMode ?? true,
+    ehrMode: data.ehrMode ?? null,
   });
   const [error, setError] = useState('');
-  const [ehrMode, setEhrMode] = useState(data.ehrMode ?? true);
+  const [ehrMode, setEhrMode] = useState<boolean | null>(data.ehrMode ?? null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,6 +62,11 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
 
     if (!formData.phoneNumber || !formData.specialty) {
       setError('Please fill in all required fields');
+      return;
+    }
+
+    if (ehrMode === null) {
+      setError('Please select a setup mode (EHR Integration or Standalone)');
       return;
     }
 
@@ -221,7 +226,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                     fontSize: { xs: '0.95rem', sm: '1rem', md: '1.125rem' }
                   }}
                 >
-                  Choose Your Setup Mode
+                  Choose Your Setup Mode *
                 </Typography>
 
                 <Box sx={{ 
