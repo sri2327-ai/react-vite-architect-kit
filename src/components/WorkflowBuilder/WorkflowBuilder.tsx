@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -12,10 +13,10 @@ import {
   Chip
 } from '@mui/material';
 import {
-  Workflow as WorkflowIcon,
   LibraryBooks as LibraryBooksIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
+import { Workflow as WorkflowIcon } from 'lucide-react';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
 import { templateBuilderService } from '../../services/templateBuilderService';
@@ -98,10 +99,10 @@ const WorkflowBuilder: React.FC = () => {
           textAlign: { xs: 'center', md: 'left' }
         }}>
           <WorkflowIcon 
-            sx={{ 
-              fontSize: { xs: 32, md: 40 }, 
-              color: theme.palette.success.main,
-              display: { xs: 'none', md: 'block' }
+            size={isMobile ? 32 : 40}
+            color={theme.palette.success.main}
+            style={{ 
+              display: isMobile ? 'none' : 'block'
             }} 
           />
           <Box>
@@ -196,7 +197,7 @@ const WorkflowBuilder: React.FC = () => {
             }}
           >
             <Tab 
-              icon={<WorkflowIcon sx={{ mb: 0.5 }} />}
+              icon={<WorkflowIcon size={20} style={{ marginBottom: '4px' }} />}
               iconPosition="start"
               label={
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
