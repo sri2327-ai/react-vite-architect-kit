@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -13,7 +14,7 @@ import {
   Chip,
   InputAdornment
 } from '@mui/material';
-import { Phone, LocalHospital, Computer, ArrowBack, ArrowForward, CheckCircle } from '@mui/icons-material';
+import { Phone, LocalHospital, Computer, ArrowBack, ArrowForward, CheckCircle, Link, FileText } from '@mui/icons-material';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -251,7 +252,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                             mr: 2
                           }}
                         >
-                          <Integration sx={{ color: 'white', fontSize: 20 }} />
+                          <Link sx={{ color: 'white', fontSize: 20 }} />
                         </Box>
                         <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50' }}>
                           With EHR Integration
@@ -309,7 +310,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                             mr: 2
                           }}
                         >
-                          <Assignment sx={{ color: 'white', fontSize: 20 }} />
+                          <FileText sx={{ color: 'white', fontSize: 20 }} />
                         </Box>
                         <Typography variant="h6" sx={{ fontWeight: 700, color: '#2196f3' }}>
                           Standalone Mode
