@@ -56,6 +56,8 @@ const BillingHistory: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  // More aggressive breakpoint for when sidebar is expanded
+  const useCardView = useMediaQuery('(max-width: 1100px)');
 
   // Mock invoice data
   const invoices: Invoice[] = [
@@ -317,10 +319,8 @@ const BillingHistory: React.FC = () => {
       height: '100vh',
       overflow: 'hidden',
       display: 'flex',
-      flexDirection: 'column',
-      p: 0
+      flexDirection: 'column'
     }}>
-      {/* Scrollable Content Container */}
       <Box sx={{
         flex: 1,
         overflow: 'auto',
@@ -339,15 +339,15 @@ const BillingHistory: React.FC = () => {
           Billing & Subscription
         </Typography>
 
-        {/* Summary Cards */}
+        {/* Summary Cards - More responsive grid */}
         <Box sx={{ 
           display: 'grid', 
           gridTemplateColumns: { 
             xs: 'repeat(2, 1fr)', 
             sm: 'repeat(2, 1fr)',
-            md: 'repeat(4, 1fr)' 
+            md: useCardView ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'
           }, 
-          gap: { xs: 1, sm: 1.5, md: 3 }, 
+          gap: { xs: 1, sm: 1.5, md: 2 }, 
           mb: { xs: 3, md: 4 }
         }}>
           {summaryStats.map((stat, index) => (
@@ -369,7 +369,7 @@ const BillingHistory: React.FC = () => {
                     variant={isMobile ? "caption" : "h6"} 
                     fontWeight={600}
                     sx={{ 
-                      fontSize: { xs: '0.65rem', sm: '0.75rem', md: '1.1rem' },
+                      fontSize: { xs: '0.65rem', sm: '0.75rem', md: useCardView ? '0.8rem' : '1.1rem' },
                       lineHeight: { xs: 1.2, md: 1.4 },
                       wordBreak: 'break-word'
                     }}
@@ -382,7 +382,7 @@ const BillingHistory: React.FC = () => {
                   sx={{ 
                     color: stat.color, 
                     fontWeight: 700,
-                    fontSize: { xs: '0.9rem', sm: '1.1rem', md: '2rem' }
+                    fontSize: { xs: '0.9rem', sm: '1.1rem', md: useCardView ? '1.5rem' : '2rem' }
                   }}
                 >
                   {stat.value}
@@ -406,7 +406,8 @@ const BillingHistory: React.FC = () => {
         <Paper elevation={2} sx={{ 
           borderRadius: 2, 
           overflow: 'hidden',
-          width: '100%'
+          width: '100%',
+          minWidth: 0 // Prevent overflow issues
         }}>
           <Box sx={{ 
             p: { xs: 1.5, sm: 2, md: 3 }, 
@@ -434,26 +435,26 @@ const BillingHistory: React.FC = () => {
             </Typography>
           </Box>
 
-          {isTablet ? (
-            // Mobile/Tablet Card View
+          {useCardView ? (
+            // Card View for mobile/tablet or when sidebar is expanded
             <Box sx={{ p: { xs: 1, sm: 2 } }}>
               {paginatedInvoices.map((invoice) => (
                 <MobileInvoiceCard key={invoice.id} invoice={invoice} />
               ))}
             </Box>
           ) : (
-            // Desktop Table View
-            <Box sx={{ overflowX: 'auto' }}>
-              <TableContainer sx={{ maxHeight: '60vh' }}>
-                <Table stickyHeader>
+            // Desktop Table View only when there's enough space
+            <Box sx={{ width: '100%', overflow: 'hidden' }}>
+              <TableContainer sx={{ maxHeight: '60vh', width: '100%' }}>
+                <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Date</TableCell>
-                      <TableCell sx={{ fontWeight: 600, minWidth: 150 }}>Invoice</TableCell>
-                      <TableCell sx={{ fontWeight: 600, minWidth: 100 }}>Status</TableCell>
-                      <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Due Date</TableCell>
-                      <TableCell align="right" sx={{ fontWeight: 600, minWidth: 100 }}>Amount</TableCell>
-                      <TableCell align="center" sx={{ fontWeight: 600, minWidth: 120 }}>Actions</TableCell>
+                      <TableCell sx={{ fontWeight: 600, minWidth: 100 }}>Date</TableCell>
+                      <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Invoice</TableCell>
+                      <TableCell sx={{ fontWeight: 600, minWidth: 80 }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 600, minWidth: 100 }}>Due Date</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600, minWidth: 80 }}>Amount</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 600, minWidth: 100 }}>Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
