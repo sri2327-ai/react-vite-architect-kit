@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -441,11 +440,27 @@ const BillingHistory: React.FC = () => {
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           sx={{
+            backgroundColor: '#FFFFFF',
+            color: '#000000',
             '& .MuiTablePagination-toolbar': {
-              px: { xs: 1, md: 2 }
+              px: { xs: 1, md: 2 },
+              backgroundColor: '#FFFFFF'
             },
             '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-              fontSize: { xs: '0.875rem', md: '1rem' }
+              fontSize: { xs: '0.875rem', md: '1rem' },
+              color: '#000000'
+            },
+            '& .MuiTablePagination-select': {
+              color: '#000000'
+            },
+            '& .MuiTablePagination-actions': {
+              color: '#000000'
+            },
+            '& .MuiIconButton-root': {
+              color: '#000000'
+            },
+            '& .MuiSelect-root': {
+              color: '#000000'
             }
           }}
         />
