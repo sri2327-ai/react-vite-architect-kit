@@ -43,8 +43,8 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
   };
 
   const handlePayNow = () => {
-    setShowIframe(true);
     setLoading(true);
+    setShowIframe(true);
   };
 
   const handlePaymentSuccess = () => {
@@ -263,28 +263,27 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
               </Typography>
             </Alert>
 
-            {!showIframe && (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <PrimaryButton
-                  onClick={handlePayNow}
-                  disabled={loading}
-                  sx={{
-                    py: 2,
-                    px: 4,
-                    fontSize: '1.125rem',
-                    fontWeight: 700,
-                    minWidth: 200
-                  }}
-                >
-                  {loading ? <CircularProgress size={20} color="inherit" /> : 'Pay Now'}
-                </PrimaryButton>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                  Click to proceed to secure payment gateway
-                </Typography>
-              </Box>
-            )}
+            {/* Pay Now Button - Always visible unless payment is successful */}
+            <Box sx={{ textAlign: 'center', py: 4, mb: showIframe ? 3 : 0 }}>
+              <PrimaryButton
+                onClick={handlePayNow}
+                disabled={loading}
+                sx={{
+                  py: 2,
+                  px: 4,
+                  fontSize: '1.125rem',
+                  fontWeight: 700,
+                  minWidth: 200
+                }}
+              >
+                {loading ? <CircularProgress size={20} color="inherit" /> : 'Pay Now'}
+              </PrimaryButton>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                Click to proceed to secure payment gateway
+              </Typography>
+            </Box>
 
-            {/* Zoho Payment Iframe */}
+            {/* Zoho Payment Iframe - Only show after Pay Now is clicked */}
             {showIframe && (
               <Box sx={{ 
                 width: '100%', 
