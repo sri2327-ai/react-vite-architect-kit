@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -109,22 +110,9 @@ export const Dashboard: React.FC = () => {
               alt="S10.AI Logo"
               sx={{
                 height: 52,
-                mb: 1.5,
                 objectFit: 'contain'
               }}
             />
-            <Typography 
-              variant="h6" 
-              fontWeight={700} 
-              color="white" 
-              sx={{ 
-                fontSize: '1.1rem',
-                textAlign: 'center',
-                letterSpacing: '0.02em'
-              }}
-            >
-              S10.AI Dashboard
-            </Typography>
           </Box>
         ) : (
           <Tooltip title="S10.AI Dashboard" placement="right" arrow>
