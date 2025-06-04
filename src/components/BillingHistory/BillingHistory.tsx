@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -56,8 +57,10 @@ const BillingHistory: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
-  // More aggressive breakpoint for when sidebar is expanded
-  const useCardView = useMediaQuery('(max-width: 1100px)');
+  // More responsive breakpoints for different screen sizes and sidebar states
+  const isVeryNarrow = useMediaQuery('(max-width: 900px)');
+  const isNarrow = useMediaQuery('(max-width: 1200px)');
+  const useCardView = isVeryNarrow;
 
   // Mock invoice data
   const invoices: Invoice[] = [
@@ -324,7 +327,7 @@ const BillingHistory: React.FC = () => {
       <Box sx={{
         flex: 1,
         overflow: 'auto',
-        p: { xs: 1, sm: 2, md: 3 }
+        p: { xs: 1, sm: 2, md: isVeryNarrow ? 1.5 : 3 }
       }}>
         <Typography 
           variant={isMobile ? "h5" : "h4"} 
@@ -333,21 +336,25 @@ const BillingHistory: React.FC = () => {
             fontWeight: 600, 
             mb: { xs: 2, md: 3 },
             textAlign: { xs: 'center', md: 'left' },
-            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }
+            fontSize: { 
+              xs: '1.25rem', 
+              sm: '1.5rem', 
+              md: isVeryNarrow ? '1.75rem' : '2rem' 
+            }
           }}
         >
           Billing & Subscription
         </Typography>
 
-        {/* Summary Cards - More responsive grid */}
+        {/* Summary Cards - Adaptive grid based on available space */}
         <Box sx={{ 
           display: 'grid', 
           gridTemplateColumns: { 
             xs: 'repeat(2, 1fr)', 
-            sm: 'repeat(2, 1fr)',
-            md: useCardView ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'
+            sm: isVeryNarrow ? 'repeat(2, 1fr)' : 'repeat(2, 1fr)',
+            md: isVeryNarrow ? 'repeat(2, 1fr)' : (isNarrow ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)')
           }, 
-          gap: { xs: 1, sm: 1.5, md: 2 }, 
+          gap: { xs: 1, sm: isVeryNarrow ? 1 : 1.5, md: isVeryNarrow ? 1.5 : 2 }, 
           mb: { xs: 3, md: 4 }
         }}>
           {summaryStats.map((stat, index) => (
@@ -360,7 +367,13 @@ const BillingHistory: React.FC = () => {
                 boxShadow: 4
               }
             }}>
-              <CardContent sx={{ p: { xs: 1, sm: 1.5, md: 2 } }}>
+              <CardContent sx={{ 
+                p: { 
+                  xs: 1, 
+                  sm: isVeryNarrow ? 1 : 1.5, 
+                  md: isVeryNarrow ? 1.5 : 2 
+                } 
+              }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, flexWrap: 'wrap' }}>
                   <Box sx={{ color: stat.color, mr: 1, flexShrink: 0 }}>
                     {stat.icon}
@@ -369,7 +382,11 @@ const BillingHistory: React.FC = () => {
                     variant={isMobile ? "caption" : "h6"} 
                     fontWeight={600}
                     sx={{ 
-                      fontSize: { xs: '0.65rem', sm: '0.75rem', md: useCardView ? '0.8rem' : '1.1rem' },
+                      fontSize: { 
+                        xs: '0.65rem', 
+                        sm: '0.75rem', 
+                        md: isVeryNarrow ? '0.75rem' : (isNarrow ? '0.8rem' : '1.1rem')
+                      },
                       lineHeight: { xs: 1.2, md: 1.4 },
                       wordBreak: 'break-word'
                     }}
@@ -382,7 +399,11 @@ const BillingHistory: React.FC = () => {
                   sx={{ 
                     color: stat.color, 
                     fontWeight: 700,
-                    fontSize: { xs: '0.9rem', sm: '1.1rem', md: useCardView ? '1.5rem' : '2rem' }
+                    fontSize: { 
+                      xs: '0.9rem', 
+                      sm: '1.1rem', 
+                      md: isVeryNarrow ? '1.25rem' : (isNarrow ? '1.5rem' : '2rem')
+                    }
                   }}
                 >
                   {stat.value}
@@ -407,10 +428,14 @@ const BillingHistory: React.FC = () => {
           borderRadius: 2, 
           overflow: 'hidden',
           width: '100%',
-          minWidth: 0 // Prevent overflow issues
+          minWidth: 0
         }}>
           <Box sx={{ 
-            p: { xs: 1.5, sm: 2, md: 3 }, 
+            p: { 
+              xs: 1.5, 
+              sm: 2, 
+              md: isVeryNarrow ? 2 : 3 
+            }, 
             borderBottom: '1px solid', 
             borderColor: 'divider' 
           }}>
@@ -418,7 +443,11 @@ const BillingHistory: React.FC = () => {
               display: 'flex', 
               alignItems: 'center', 
               gap: 1,
-              fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
+              fontSize: { 
+                xs: '1rem', 
+                sm: '1.1rem', 
+                md: isVeryNarrow ? '1.1rem' : '1.25rem' 
+              }
             }}>
               <CreditCardIcon color="primary" />
               Payment History
@@ -436,7 +465,7 @@ const BillingHistory: React.FC = () => {
           </Box>
 
           {useCardView ? (
-            // Card View for mobile/tablet or when sidebar is expanded
+            // Card View for narrow screens
             <Box sx={{ p: { xs: 1, sm: 2 } }}>
               {paginatedInvoices.map((invoice) => (
                 <MobileInvoiceCard key={invoice.id} invoice={invoice} />
