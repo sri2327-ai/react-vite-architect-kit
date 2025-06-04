@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -23,7 +24,6 @@ import {
   ListItemButton,
   ListItemText,
   Paper,
-  Grid,
   useTheme,
   useMediaQuery
 } from '@mui/material';
@@ -268,9 +268,17 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
         </FormControl>
       </Box>
 
-      <Grid container spacing={3}>
+      <Box sx={{ 
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(2, 1fr)',
+          md: 'repeat(3, 1fr)'
+        },
+        gap: 3
+      }}>
         {filteredTemplates.map((template) => (
-          <Grid item xs={12} sm={6} md={4} key={template.id}>
+          <Box key={template.id}>
             <Card 
               sx={{ 
                 cursor: 'pointer',
@@ -320,9 +328,9 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
                 </Box>
               </CardContent>
             </Card>
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
 
       {/* Enhanced Template Preview Dialog */}
       <Dialog 
@@ -587,3 +595,4 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
 };
 
 export default TemplateLibraryTab;
+
