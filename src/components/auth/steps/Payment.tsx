@@ -27,6 +27,7 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
   const [discount, setDiscount] = useState(0);
+  const [showIframe, setShowIframe] = useState(false);
   const navigate = useNavigate();
 
   const zohoPaymentUrl = "https://zohosecurepay.com/books/s10aiinc/securepay?CInvoiceID=2-cab38e1b3e20ae6086682ef94096c3e79c3170a50e8a1445eae7a317be3fe45a83a8fc305b6392e6c032b46515559313bfd7df8d54ea98406754244081b9ca6aab2e67f7acee8330";
@@ -39,6 +40,11 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
       setPromoApplied(false);
       setDiscount(0);
     }
+  };
+
+  const handlePayNow = () => {
+    setShowIframe(true);
+    setLoading(true);
   };
 
   const handlePaymentSuccess = () => {
@@ -257,29 +263,66 @@ export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
               </Typography>
             </Alert>
 
+            {!showIframe && (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <PrimaryButton
+                  onClick={handlePayNow}
+                  disabled={loading}
+                  sx={{
+                    py: 2,
+                    px: 4,
+                    fontSize: '1.125rem',
+                    fontWeight: 700,
+                    minWidth: 200
+                  }}
+                >
+                  {loading ? <CircularProgress size={20} color="inherit" /> : 'Pay Now'}
+                </PrimaryButton>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                  Click to proceed to secure payment gateway
+                </Typography>
+              </Box>
+            )}
+
             {/* Zoho Payment Iframe */}
-            <Box sx={{ 
-              width: '100%', 
-              height: 500, 
-              border: '1px solid #e0e7ff',
-              borderRadius: 2,
-              overflow: 'hidden',
-              position: 'relative'
-            }}>
-              <iframe
-                src={zohoPaymentUrl}
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                style={{ 
-                  border: 'none',
-                  display: 'block'
-                }}
-                title="Zoho SecurePay"
-                allow="payment"
-                sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation"
-              />
-            </Box>
+            {showIframe && (
+              <Box sx={{ 
+                width: '100%', 
+                height: 500, 
+                border: '1px solid #e0e7ff',
+                borderRadius: 2,
+                overflow: 'hidden',
+                position: 'relative'
+              }}>
+                <iframe
+                  src={zohoPaymentUrl}
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  style={{ 
+                    border: 'none',
+                    display: 'block'
+                  }}
+                  title="Zoho SecurePay"
+                  onLoad={() => setLoading(false)}
+                />
+                {loading && (
+                  <Box sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                  }}>
+                    <CircularProgress />
+                  </Box>
+                )}
+              </Box>
+            )}
           </CardContent>
         </Card>
       </Box>
