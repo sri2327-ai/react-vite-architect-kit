@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import {
   Build as BuildIcon,
-  Library as LibraryIcon,
+  LibraryBooks as LibraryBooksIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
 import WorkflowLibrary from './WorkflowLibrary';
@@ -218,7 +218,7 @@ const WorkflowBuilder: React.FC = () => {
               sx={{ flex: 1 }}
             />
             <Tab 
-              icon={<LibraryIcon sx={{ mb: 0.5 }} />}
+              icon={<LibraryBooksIcon sx={{ mb: 0.5 }} />}
               iconPosition="start"
               label="Workflow Library" 
               sx={{ flex: 1 }}
