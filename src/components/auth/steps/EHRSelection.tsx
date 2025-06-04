@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -16,7 +17,7 @@ import {
   ListItemText,
   Chip,
 } from '@mui/material';
-import { Info, Search, Zap, CheckCircle2, ArrowBack, ArrowForward } from 'lucide-react';
+import { Info, Search, Zap, CheckCircle2, ArrowLeft, ArrowRight } from 'lucide-react';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
 import { SignupData } from '../SignupFlow';
 
@@ -284,7 +285,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
         }}>
           <SecondaryButton
             onClick={onBack}
-            startIcon={<ArrowBack />}
+            startIcon={<ArrowLeft />}
             sx={{ 
               flex: 1,
               order: { xs: 2, sm: 1 },
@@ -298,7 +299,7 @@ export const EHRSelection: React.FC<EHRSelectionProps> = ({ onNext, onBack, data
             type="submit"
             disabled={!selectedEHR}
             onClick={handleSubmit}
-            endIcon={<ArrowForward />}
+            endIcon={<ArrowRight />}
             sx={{ 
               flex: 2, 
               fontWeight: 700,
