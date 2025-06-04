@@ -17,7 +17,6 @@ import {
   Alert,
   Card,
   CardContent,
-  Container,
   useTheme,
   useMediaQuery,
   Collapse,
@@ -314,276 +313,286 @@ const BillingHistory: React.FC = () => {
 
   return (
     <Box sx={{ 
-      width: '100%', 
-      maxWidth: '100vw',
+      width: '100%',
+      height: '100vh',
       overflow: 'hidden',
-      p: { xs: 1, sm: 2, md: 3 }
+      display: 'flex',
+      flexDirection: 'column',
+      p: 0
     }}>
-      <Typography 
-        variant={isMobile ? "h5" : "h4"} 
-        gutterBottom 
-        sx={{ 
-          fontWeight: 600, 
-          mb: { xs: 2, md: 3 },
-          textAlign: { xs: 'center', md: 'left' },
-          fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }
-        }}
-      >
-        Billing & Subscription
-      </Typography>
-
-      {/* Summary Cards */}
-      <Box sx={{ 
-        display: 'grid', 
-        gridTemplateColumns: { 
-          xs: 'repeat(2, 1fr)', 
-          sm: 'repeat(2, 1fr)',
-          md: 'repeat(4, 1fr)' 
-        }, 
-        gap: { xs: 1, sm: 1.5, md: 3 }, 
-        mb: { xs: 3, md: 4 }
+      {/* Scrollable Content Container */}
+      <Box sx={{
+        flex: 1,
+        overflow: 'auto',
+        p: { xs: 1, sm: 2, md: 3 }
       }}>
-        {summaryStats.map((stat, index) => (
-          <Card key={index} sx={{ 
-            height: '100%',
-            borderRadius: 2,
-            transition: 'all 0.2s ease-in-out',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: 4
-            }
-          }}>
-            <CardContent sx={{ p: { xs: 1, sm: 1.5, md: 2 } }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, flexWrap: 'wrap' }}>
-                <Box sx={{ color: stat.color, mr: 1, flexShrink: 0 }}>
-                  {stat.icon}
-                </Box>
-                <Typography 
-                  variant={isMobile ? "caption" : "h6"} 
-                  fontWeight={600}
-                  sx={{ 
-                    fontSize: { xs: '0.65rem', sm: '0.75rem', md: '1.1rem' },
-                    lineHeight: { xs: 1.2, md: 1.4 },
-                    wordBreak: 'break-word'
-                  }}
-                >
-                  {stat.title}
-                </Typography>
-              </Box>
-              <Typography 
-                variant={isMobile ? "h6" : "h4"} 
-                sx={{ 
-                  color: stat.color, 
-                  fontWeight: 700,
-                  fontSize: { xs: '0.9rem', sm: '1.1rem', md: '2rem' }
-                }}
-              >
-                {stat.value}
-              </Typography>
-              <Typography 
-                variant="caption" 
-                color="text.secondary"
-                sx={{ 
-                  fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
-                  lineHeight: 1.2
-                }}
-              >
-                {stat.subtitle}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
-
-      {/* Invoice History */}
-      <Paper elevation={2} sx={{ 
-        borderRadius: 2, 
-        overflow: 'hidden',
-        maxWidth: '100%'
-      }}>
-        <Box sx={{ 
-          p: { xs: 1.5, sm: 2, md: 3 }, 
-          borderBottom: '1px solid', 
-          borderColor: 'divider' 
-        }}>
-          <Typography variant="h6" sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 1,
-            fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
-          }}>
-            <CreditCardIcon color="primary" />
-            Payment History
-          </Typography>
-          <Typography 
-            variant="body2" 
-            color="text.secondary" 
-            sx={{ 
-              mt: 0.5,
-              fontSize: { xs: '0.8rem', sm: '0.875rem' }
-            }}
-          >
-            View and manage your subscription payments
-          </Typography>
-        </Box>
-
-        {isTablet ? (
-          // Mobile/Tablet Card View
-          <Box sx={{ p: { xs: 1, sm: 2 } }}>
-            {paginatedInvoices.map((invoice) => (
-              <MobileInvoiceCard key={invoice.id} invoice={invoice} />
-            ))}
-          </Box>
-        ) : (
-          // Desktop Table View
-          <Box sx={{ overflowX: 'auto' }}>
-            <TableContainer>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Date</TableCell>
-                    <TableCell sx={{ fontWeight: 600, minWidth: 150 }}>Invoice</TableCell>
-                    <TableCell sx={{ fontWeight: 600, minWidth: 100 }}>Status</TableCell>
-                    <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Due Date</TableCell>
-                    <TableCell align="right" sx={{ fontWeight: 600, minWidth: 100 }}>Amount</TableCell>
-                    <TableCell align="center" sx={{ fontWeight: 600, minWidth: 120 }}>Actions</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {paginatedInvoices.map((invoice) => (
-                    <TableRow key={invoice.id} hover>
-                      <TableCell>
-                        <Typography variant="body2" fontWeight={500}>
-                          {formatDate(invoice.date)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Box>
-                          <Typography variant="body2" fontWeight={600}>
-                            {invoice.invoiceNumber}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {invoice.description}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        {getStatusChip(invoice.status)}
-                      </TableCell>
-                      <TableCell>
-                        <Typography variant="body2">
-                          {formatDate(invoice.dueDate)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography variant="body2" fontWeight={600}>
-                          {formatAmount(invoice.amount)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="center">
-                        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                          <Tooltip title="View in Zoho">
-                            <IconButton
-                              size="small"
-                              component={Link}
-                              href={invoice.zohoInvoiceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              color="primary"
-                            >
-                              <OpenInNewIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Download PDF">
-                            <IconButton
-                              size="small"
-                              color="primary"
-                              onClick={() => console.log('Download PDF for', invoice.invoiceNumber)}
-                            >
-                              <DownloadIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
-        )}
-
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={invoices.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          sx={{
-            backgroundColor: '#FFFFFF',
-            color: '#000000',
-            '& .MuiTablePagination-toolbar': {
-              px: { xs: 1, sm: 1.5, md: 2 },
-              backgroundColor: '#FFFFFF',
-              flexWrap: 'wrap',
-              minHeight: { xs: 'auto', md: 52 }
-            },
-            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-              fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
-              color: '#000000',
-              margin: { xs: '4px 0', md: 0 }
-            },
-            '& .MuiTablePagination-select': {
-              color: '#000000',
-              fontSize: { xs: '0.75rem', sm: '0.875rem' }
-            },
-            '& .MuiTablePagination-actions': {
-              color: '#000000',
-              ml: { xs: 0, md: 1 }
-            },
-            '& .MuiIconButton-root': {
-              color: '#000000',
-              padding: { xs: '4px', md: '8px' }
-            },
-            '& .MuiSelect-root': {
-              color: '#000000'
-            }
-          }}
-        />
-      </Paper>
-
-      {/* Alert for Overdue/Failed Invoices */}
-      {invoices.some(invoice => invoice.status === 'overdue' || invoice.status === 'failed') && (
-        <Alert 
-          severity="warning" 
+        <Typography 
+          variant={isMobile ? "h5" : "h4"} 
+          gutterBottom 
           sx={{ 
-            mt: 3,
-            borderRadius: 2,
-            '& .MuiAlert-message': {
-              fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' }
-            }
+            fontWeight: 600, 
+            mb: { xs: 2, md: 3 },
+            textAlign: { xs: 'center', md: 'left' },
+            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }
           }}
         >
-          <Typography 
-            variant="body2" 
+          Billing & Subscription
+        </Typography>
+
+        {/* Summary Cards */}
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { 
+            xs: 'repeat(2, 1fr)', 
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(4, 1fr)' 
+          }, 
+          gap: { xs: 1, sm: 1.5, md: 3 }, 
+          mb: { xs: 3, md: 4 }
+        }}>
+          {summaryStats.map((stat, index) => (
+            <Card key={index} sx={{ 
+              height: '100%',
+              borderRadius: 2,
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 4
+              }
+            }}>
+              <CardContent sx={{ p: { xs: 1, sm: 1.5, md: 2 } }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, flexWrap: 'wrap' }}>
+                  <Box sx={{ color: stat.color, mr: 1, flexShrink: 0 }}>
+                    {stat.icon}
+                  </Box>
+                  <Typography 
+                    variant={isMobile ? "caption" : "h6"} 
+                    fontWeight={600}
+                    sx={{ 
+                      fontSize: { xs: '0.65rem', sm: '0.75rem', md: '1.1rem' },
+                      lineHeight: { xs: 1.2, md: 1.4 },
+                      wordBreak: 'break-word'
+                    }}
+                  >
+                    {stat.title}
+                  </Typography>
+                </Box>
+                <Typography 
+                  variant={isMobile ? "h6" : "h4"} 
+                  sx={{ 
+                    color: stat.color, 
+                    fontWeight: 700,
+                    fontSize: { xs: '0.9rem', sm: '1.1rem', md: '2rem' }
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+                <Typography 
+                  variant="caption" 
+                  color="text.secondary"
+                  sx={{ 
+                    fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
+                    lineHeight: 1.2
+                  }}
+                >
+                  {stat.subtitle}
+                </Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
+
+        {/* Invoice History */}
+        <Paper elevation={2} sx={{ 
+          borderRadius: 2, 
+          overflow: 'hidden',
+          width: '100%'
+        }}>
+          <Box sx={{ 
+            p: { xs: 1.5, sm: 2, md: 3 }, 
+            borderBottom: '1px solid', 
+            borderColor: 'divider' 
+          }}>
+            <Typography variant="h6" sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1,
+              fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
+            }}>
+              <CreditCardIcon color="primary" />
+              Payment History
+            </Typography>
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ 
+                mt: 0.5,
+                fontSize: { xs: '0.8rem', sm: '0.875rem' }
+              }}
+            >
+              View and manage your subscription payments
+            </Typography>
+          </Box>
+
+          {isTablet ? (
+            // Mobile/Tablet Card View
+            <Box sx={{ p: { xs: 1, sm: 2 } }}>
+              {paginatedInvoices.map((invoice) => (
+                <MobileInvoiceCard key={invoice.id} invoice={invoice} />
+              ))}
+            </Box>
+          ) : (
+            // Desktop Table View
+            <Box sx={{ overflowX: 'auto' }}>
+              <TableContainer sx={{ maxHeight: '60vh' }}>
+                <Table stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Date</TableCell>
+                      <TableCell sx={{ fontWeight: 600, minWidth: 150 }}>Invoice</TableCell>
+                      <TableCell sx={{ fontWeight: 600, minWidth: 100 }}>Status</TableCell>
+                      <TableCell sx={{ fontWeight: 600, minWidth: 120 }}>Due Date</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600, minWidth: 100 }}>Amount</TableCell>
+                      <TableCell align="center" sx={{ fontWeight: 600, minWidth: 120 }}>Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {paginatedInvoices.map((invoice) => (
+                      <TableRow key={invoice.id} hover>
+                        <TableCell>
+                          <Typography variant="body2" fontWeight={500}>
+                            {formatDate(invoice.date)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Box>
+                            <Typography variant="body2" fontWeight={600}>
+                              {invoice.invoiceNumber}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {invoice.description}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusChip(invoice.status)}
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {formatDate(invoice.dueDate)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="right">
+                          <Typography variant="body2" fontWeight={600}>
+                            {formatAmount(invoice.amount)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+                            <Tooltip title="View in Zoho">
+                              <IconButton
+                                size="small"
+                                component={Link}
+                                href={invoice.zohoInvoiceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                color="primary"
+                              >
+                                <OpenInNewIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Download PDF">
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={() => console.log('Download PDF for', invoice.invoiceNumber)}
+                              >
+                                <DownloadIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={invoices.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            sx={{
+              backgroundColor: '#FFFFFF',
+              color: '#000000',
+              borderTop: '1px solid #e0e0e0',
+              '& .MuiTablePagination-toolbar': {
+                px: { xs: 1, sm: 1.5, md: 2 },
+                backgroundColor: '#FFFFFF',
+                flexWrap: 'wrap',
+                minHeight: { xs: 'auto', md: 52 }
+              },
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
+                color: '#000000',
+                margin: { xs: '4px 0', md: 0 }
+              },
+              '& .MuiTablePagination-select': {
+                color: '#000000',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              },
+              '& .MuiTablePagination-actions': {
+                color: '#000000',
+                ml: { xs: 0, md: 1 }
+              },
+              '& .MuiIconButton-root': {
+                color: '#000000',
+                padding: { xs: '4px', md: '8px' }
+              },
+              '& .MuiSelect-root': {
+                color: '#000000'
+              }
+            }}
+          />
+        </Paper>
+
+        {/* Alert for Overdue/Failed Invoices */}
+        {invoices.some(invoice => invoice.status === 'overdue' || invoice.status === 'failed') && (
+          <Alert 
+            severity="warning" 
             sx={{ 
-              fontWeight: 600, 
-              mb: 1,
-              fontSize: { xs: '0.8rem', sm: '0.875rem' }
+              mt: 3,
+              borderRadius: 2,
+              '& .MuiAlert-message': {
+                fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' }
+              }
             }}
           >
-            Action Required
-          </Typography>
-          <Typography 
-            variant="body2"
-            sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
-          >
-            You have overdue or failed payments. Please update your payment method to continue using S10.AI services without interruption.
-          </Typography>
-        </Alert>
-      )}
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                fontWeight: 600, 
+                mb: 1,
+                fontSize: { xs: '0.8rem', sm: '0.875rem' }
+              }}
+            >
+              Action Required
+            </Typography>
+            <Typography 
+              variant="body2"
+              sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+            >
+              You have overdue or failed payments. Please update your payment method to continue using S10.AI services without interruption.
+            </Typography>
+          </Alert>
+        )}
+      </Box>
     </Box>
   );
 };
