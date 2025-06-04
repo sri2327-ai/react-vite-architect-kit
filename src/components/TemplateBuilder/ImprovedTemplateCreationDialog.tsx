@@ -173,32 +173,15 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   // Form states
   const [templateName, setTemplateName] = useState('');
   const [templateDescription, setTemplateDescription] = useState('');
-  const [specialty, setSpecialty] = useState('');
-  const [templateType, setTemplateType] = useState('');
   const [clinicalContext, setClinicalContext] = useState('');
   const [previousNotes, setPreviousNotes] = useState('');
   const [existingTemplateContent, setExistingTemplateContent] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [autoSave, setAutoSave] = useState(true);
-  const [shareWithTeam, setShareWithTeam] = useState(false);
   
   // AI processing results
   const [processedContent, setProcessedContent] = useState('');
   const [aiSummary, setAiSummary] = useState('');
 
-  const specialties = [
-    'General Medicine', 'Cardiology', 'Neurology', 'Dermatology', 
-    'Psychiatry', 'Emergency Medicine', 'Pediatrics', 'Orthopedics',
-    'Endocrinology', 'Gastroenterology', 'Pulmonology', 'Rheumatology'
-  ];
-
   const templateTypes = templateService.getTemplateTypes();
-
-  const commonTags = [
-    'Routine Care', 'Urgent Care', 'Follow-up', 'New Patient', 
-    'Chronic Disease', 'Preventive Care', 'Telemedicine', 'Procedure',
-    'Post-Op', 'Annual Exam', 'Consultation', 'Emergency'
-  ];
 
   const handleMethodSelect = (method: CreateTemplateOption) => {
     setSelectedMethod(method);
@@ -214,13 +197,12 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
       // AI processing
       setIsProcessing(true);
       setTimeout(() => {
-        const generatedContent = templateService.generateTemplateContent(templateType, {
-          specialty,
+        const generatedContent = templateService.generateTemplateContent('SOAP', {
           clinicalContext,
           previousNotes
         });
         setProcessedContent(generatedContent);
-        setAiSummary(`AI has created a ${templateType} template for ${specialty} with ${clinicalContext ? 'specialized sections' : 'standard sections'}.`);
+        setAiSummary(`AI has created a template with ${clinicalContext ? 'specialized sections' : 'standard sections'}.`);
         setIsProcessing(false);
         setCurrentStep(2);
       }, 2500);
@@ -245,25 +227,16 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
         templateType: selectedLibraryTemplate.type,
         content: templateService.generateTemplateContent(selectedLibraryTemplate.type),
         method: selectedMethod.title,
-        tags: [],
-        autoSave: true,
-        shareWithTeam: false
       };
     } else {
       // Other methods - use form data
       templateData = {
         name: templateName,
         description: templateDescription,
-        specialty,
-        templateType,
-        tags: selectedTags,
         method: selectedMethod?.title,
         content: selectedMethod?.id === 2 ? processedContent : existingTemplateContent,
         previousNotes: selectedMethod?.id === 1 ? previousNotes : undefined,
         aiSummary: selectedMethod?.id === 2 ? aiSummary : undefined,
-        autoSave,
-        shareWithTeam,
-        ehrFields: templateType ? templateService.getEhrFieldMappings(templateType)?.ehrFields : undefined
       };
     }
     
@@ -279,14 +252,9 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
     setIsProcessing(false);
     setTemplateName('');
     setTemplateDescription('');
-    setSpecialty('');
-    setTemplateType('');
     setClinicalContext('');
     setPreviousNotes('');
     setExistingTemplateContent('');
-    setSelectedTags([]);
-    setAutoSave(true);
-    setShareWithTeam(false);
     setProcessedContent('');
     setAiSummary('');
   };
@@ -526,12 +494,12 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                 </List>
               </Box>
             ) : (
-              // Other methods - show form fields
+              // Other methods - show simplified form fields
               <Stack spacing={3}>
                 {/* Basic Information */}
                 <Box>
                   <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                    Basic Information
+                    Template Information
                   </Typography>
                   <Stack spacing={2}>
                     <TextField
@@ -541,34 +509,6 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                       onChange={(e) => setTemplateName(e.target.value)}
                       placeholder="e.g., Cardiology Consultation Note"
                     />
-                    
-                    <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-                      <FormControl fullWidth>
-                        <InputLabel>Specialty *</InputLabel>
-                        <Select
-                          value={specialty}
-                          label="Specialty *"
-                          onChange={(e) => setSpecialty(e.target.value)}
-                        >
-                          {specialties.map((spec) => (
-                            <MenuItem key={spec} value={spec}>{spec}</MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      
-                      <FormControl fullWidth>
-                        <InputLabel>Template Type *</InputLabel>
-                        <Select
-                          value={templateType}
-                          label="Template Type *"
-                          onChange={(e) => setTemplateType(e.target.value)}
-                        >
-                          {templateTypes.map((type) => (
-                            <MenuItem key={type} value={type}>{type}</MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </Stack>
                   </Stack>
                 </Box>
 
@@ -631,62 +571,6 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     />
                   </Box>
                 )}
-
-                {/* Tags and Settings */}
-                <Box>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                    Tags & Settings
-                  </Typography>
-                  <Stack spacing={2}>
-                    <Autocomplete
-                      multiple
-                      options={commonTags}
-                      value={selectedTags}
-                      onChange={(_, newValue) => setSelectedTags(newValue)}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            variant="filled"
-                            label={option}
-                            {...getTagProps({ index })}
-                            sx={{
-                              backgroundColor: bravoColors.primaryFlat,
-                              color: 'white'
-                            }}
-                          />
-                        ))
-                      }
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Add Tags"
-                          placeholder="Select relevant tags..."
-                        />
-                      )}
-                    />
-                    
-                    <Stack direction="row" spacing={3}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={autoSave}
-                            onChange={(e) => setAutoSave(e.target.checked)}
-                          />
-                        }
-                        label="Auto-save while editing"
-                      />
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={shareWithTeam}
-                            onChange={(e) => setShareWithTeam(e.target.checked)}
-                          />
-                        }
-                        label="Share with my team"
-                      />
-                    </Stack>
-                  </Stack>
-                </Box>
               </Stack>
             )}
           </Box>
@@ -780,20 +664,9 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                         </Typography>
                       </>
                     ) : (
-                      <>
-                        <Typography variant="body2">
-                          <strong>Name:</strong> {templateName}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Specialty:</strong> {specialty}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Type:</strong> {templateType}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Tags:</strong> {selectedTags.join(', ') || 'None'}
-                        </Typography>
-                      </>
+                      <Typography variant="body2">
+                        <strong>Name:</strong> {templateName}
+                      </Typography>
                     )}
                   </Stack>
                 </Box>
@@ -813,7 +686,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
       if (selectedMethod?.id === 5) {
         return selectedLibraryTemplate !== null;
       }
-      const hasBasicInfo = templateName.trim() && specialty && templateType;
+      const hasBasicInfo = templateName.trim();
       if (selectedMethod?.id === 1) return hasBasicInfo && previousNotes.trim();
       if (selectedMethod?.id === 2) return hasBasicInfo;
       if (selectedMethod?.id === 4) return hasBasicInfo && existingTemplateContent.trim();
