@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -21,7 +20,8 @@ import {
   Link,
   Container,
   Card,
-  CardContent
+  CardContent,
+  CircularProgress
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -39,6 +39,8 @@ import {
   Security as SecurityIcon,
   CloudUpload as CloudIcon
 } from '@mui/icons-material';
+import { useProfileData } from '../../hooks/useProfileData';
+import { useApiContext } from '../../contexts/ApiContext';
 
 interface UserProfile {
   email: string;
@@ -57,17 +59,8 @@ const Profile: React.FC = () => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   
-  // Mock user data - in real app this would come from signup data
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    email: 'doctor@example.com',
-    phoneNumber: '+1 (555) 123-4567',
-    firstName: 'Dr. John',
-    lastName: 'Smith',
-    specialty: 'Cardiology',
-    ehrMode: true,
-    ehrName: 'Epic',
-    notesRetentionDuration: 12
-  });
+  const { useApiData } = useApiContext();
+  const { profile, loading, error, updateProfile } = useProfileData(useApiData);
 
   const retentionOptions = [
     { value: 3, label: '3 Months' },
@@ -79,11 +72,12 @@ const Profile: React.FC = () => {
     { value: -1, label: 'Permanent' }
   ];
 
-  const handleRetentionChange = (duration: number) => {
-    setUserProfile(prev => ({
-      ...prev,
-      notesRetentionDuration: duration
-    }));
+  const handleRetentionChange = async (duration: number) => {
+    try {
+      await updateProfile({ notesRetentionDuration: duration });
+    } catch (error) {
+      console.error('Failed to update retention duration:', error);
+    }
   };
 
   const handleCancelSubscription = () => {
@@ -192,6 +186,24 @@ const Profile: React.FC = () => {
     </Card>
   );
 
+  if (loading) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 3, display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 3 }}>
+        <Alert severity="error">
+          Failed to load profile data: {error}
+        </Alert>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 2, md: 3 }, px: { xs: 1, md: 3 } }}>
       <Typography 
@@ -233,40 +245,40 @@ const Profile: React.FC = () => {
               <ProfileField
                 icon={<EmailIcon />}
                 label="Email Address"
-                value={userProfile.email}
+                value={profile.email}
               />
               <ProfileField
                 icon={<PhoneIcon />}
                 label="Phone Number"
-                value={userProfile.phoneNumber}
+                value={profile.phoneNumber}
               />
               <ProfileField
                 icon={<PersonIcon />}
                 label="First Name"
-                value={userProfile.firstName}
+                value={profile.firstName}
               />
               <ProfileField
                 icon={<PersonIcon />}
                 label="Last Name"
-                value={userProfile.lastName}
+                value={profile.lastName}
               />
               <ProfileField
                 icon={<BusinessIcon />}
                 label="Medical Specialty"
-                value={userProfile.specialty}
+                value={profile.specialty}
               />
               <ProfileField
                 icon={<SettingsIcon />}
                 label="EHR Integration Status"
-                value={userProfile.ehrMode}
+                value={profile.ehrMode}
                 chip
               />
-              {userProfile.ehrMode && userProfile.ehrName && (
+              {profile.ehrMode && profile.ehrName && (
                 <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
                   <ProfileField
                     icon={<StorageIcon />}
                     label="Connected EHR System"
-                    value={userProfile.ehrName}
+                    value={profile.ehrName}
                   />
                 </Box>
               )}
@@ -293,7 +305,7 @@ const Profile: React.FC = () => {
             <FormControl fullWidth sx={{ mb: 3 }}>
               <InputLabel>Clinical Notes Retention Period</InputLabel>
               <Select
-                value={userProfile.notesRetentionDuration}
+                value={profile.notesRetentionDuration}
                 label="Clinical Notes Retention Period"
                 onChange={(e) => handleRetentionChange(Number(e.target.value))}
                 size={isMobile ? "small" : "medium"}
@@ -310,9 +322,9 @@ const Profile: React.FC = () => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                 <strong>Current Setting:</strong> Your clinical notes and templates will be retained for{' '}
                 <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>
-                  {userProfile.notesRetentionDuration === -1 
+                  {profile.notesRetentionDuration === -1 
                     ? 'permanently' 
-                    : `${userProfile.notesRetentionDuration} months`}
+                    : `${profile.notesRetentionDuration} months`}
                 </span>
               </Typography>
               <Typography variant="caption" color="text.secondary">
