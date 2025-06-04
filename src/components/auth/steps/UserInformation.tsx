@@ -94,7 +94,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
 
   return (
     <Box sx={{ 
-      height: '75vh',
+      height: { xs: 'calc(100vh - 200px)', sm: 'calc(100vh - 250px)', md: '75vh' },
       display: 'flex', 
       flexDirection: 'column',
       overflow: 'hidden'
@@ -102,7 +102,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
       {/* Header */}
       <Box sx={{ 
         textAlign: 'center', 
-        mb: { xs: 3, sm: 4 }, 
+        mb: { xs: 2, sm: 3, md: 4 }, 
         flexShrink: 0 
       }}>
         <Typography
@@ -110,8 +110,8 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           sx={{
             fontWeight: 700,
             color: '#2e7d32',
-            mb: 2,
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+            mb: { xs: 1, sm: 1.5, md: 2 },
+            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem', lg: '2.125rem' }
           }}
         >
           Professional Information
@@ -121,10 +121,11 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           color="text.secondary"
           sx={{ 
             fontWeight: 500,
-            fontSize: { xs: '1rem', sm: '1.125rem' },
-            maxWidth: 500,
+            fontSize: { xs: '0.875rem', sm: '1rem', md: '1.125rem' },
+            maxWidth: { xs: '100%', sm: 500 },
             mx: 'auto',
-            lineHeight: 1.6
+            lineHeight: 1.6,
+            px: { xs: 1, sm: 0 }
           }}
         >
           Help us customize S10.AI for your practice
@@ -137,10 +138,10 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
           <Alert 
             severity="error" 
             sx={{ 
-              mb: 3, 
+              mb: { xs: 2, sm: 3 }, 
               borderRadius: 2,
               flexShrink: 0,
-              fontSize: { xs: '0.875rem', sm: '1rem' }
+              fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' }
             }}
           >
             {error}
@@ -155,11 +156,12 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             backgroundColor: 'background.paper',
             display: 'flex',
             flexDirection: 'column',
-            minHeight: 0
+            minHeight: 0,
+            borderRadius: { xs: 2, sm: 3 }
           }}
         >
           <CardContent sx={{ 
-            p: { xs: 3, sm: 4, md: 5 }, 
+            p: { xs: 2, sm: 3, md: 4, lg: 5 }, 
             flex: 1, 
             display: 'flex', 
             flexDirection: 'column',
@@ -175,11 +177,12 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 onChange={handlePhoneChange}
                 required
                 placeholder="(555) 123-4567"
-                sx={{ mb: 3 }}
+                size="small"
+                sx={{ mb: { xs: 2, sm: 3 } }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Phone sx={{ color: '#4caf50', fontSize: 20 }} />
+                      <Phone sx={{ color: '#4caf50', fontSize: { xs: 18, sm: 20 } }} />
                     </InputAdornment>
                   ),
                 }}
@@ -187,7 +190,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
               />
 
               {/* Medical Specialty */}
-              <FormControl fullWidth required sx={{ mb: 4 }}>
+              <FormControl fullWidth required sx={{ mb: { xs: 3, sm: 4 } }} size="small">
                 <InputLabel>Medical Specialty</InputLabel>
                 <Select
                   value={formData.specialty}
@@ -195,7 +198,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                   onChange={(e) => setFormData(prev => ({ ...prev, specialty: e.target.value }))}
                   startAdornment={
                     <InputAdornment position="start">
-                      <LocalHospital sx={{ color: '#4caf50', fontSize: 20, ml: 1 }} />
+                      <LocalHospital sx={{ color: '#4caf50', fontSize: { xs: 18, sm: 20 }, ml: 1 }} />
                     </InputAdornment>
                   }
                 >
@@ -208,14 +211,14 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
               </FormControl>
 
               {/* EHR Mode Selection */}
-              <Box sx={{ mb: 3, flexShrink: 0 }}>
+              <Box sx={{ mb: { xs: 2, sm: 3 }, flexShrink: 0 }}>
                 <Typography
                   variant="h6"
                   sx={{
                     fontWeight: 600,
                     color: 'text.primary',
-                    mb: 2,
-                    fontSize: { xs: '1rem', sm: '1.125rem' }
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '0.95rem', sm: '1rem', md: '1.125rem' }
                   }}
                 >
                   Choose Your Setup Mode
@@ -224,7 +227,7 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                 <Box sx={{ 
                   display: 'flex', 
                   flexDirection: { xs: 'column', sm: 'row' },
-                  gap: 2 
+                  gap: { xs: 1.5, sm: 2 }
                 }}>
                   {/* With EHR Integration Card */}
                   <Card
@@ -244,40 +247,40 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                       }
                     }}
                   >
-                    <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 1, sm: 2 } }}>
                         <Box
                           sx={{
-                            width: 40,
-                            height: 40,
+                            width: { xs: 35, sm: 40 },
+                            height: { xs: 35, sm: 40 },
                             borderRadius: 2,
                             background: 'linear-gradient(135deg, #4caf50, #66bb6a)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            mr: 2
+                            mr: { xs: 1.5, sm: 2 }
                           }}
                         >
-                          <Link sx={{ color: 'white', fontSize: 20 }} />
+                          <Link sx={{ color: 'white', fontSize: { xs: 18, sm: 20 } }} />
                         </Box>
-                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#4caf50', fontSize: { xs: '0.95rem', sm: '1rem', md: '1.125rem' } }}>
                           With EHR Integration
                         </Typography>
                       </Box>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: { xs: 1, sm: 2 }, lineHeight: 1.6, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                         Connect directly to your Electronic Health Record system
                       </Typography>
                       <Box component="ul" sx={{ pl: 2, m: 0 }}>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                           ✓ Direct EHR connectivity
                         </Typography>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                           ✓ Automated data sync
                         </Typography>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                           ✓ Streamlined workflow
                         </Typography>
-                        <Typography component="li" variant="body2" sx={{ color: 'text.secondary' }}>
+                        <Typography component="li" variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                           ✓ Real-time updates
                         </Typography>
                       </Box>
@@ -302,40 +305,40 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
                       }
                     }}
                   >
-                    <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 1, sm: 2 } }}>
                         <Box
                           sx={{
-                            width: 40,
-                            height: 40,
+                            width: { xs: 35, sm: 40 },
+                            height: { xs: 35, sm: 40 },
                             borderRadius: 2,
                             background: 'linear-gradient(135deg, #2196f3, #42a5f5)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            mr: 2
+                            mr: { xs: 1.5, sm: 2 }
                           }}
                         >
-                          <Description sx={{ color: 'white', fontSize: 20 }} />
+                          <Description sx={{ color: 'white', fontSize: { xs: 18, sm: 20 } }} />
                         </Box>
-                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#2196f3' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, color: '#2196f3', fontSize: { xs: '0.95rem', sm: '1rem', md: '1.125rem' } }}>
                           Standalone Mode
                         </Typography>
                       </Box>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: { xs: 1, sm: 2 }, lineHeight: 1.6, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                         Use S10.AI as a standalone documentation tool
                       </Typography>
                       <Box component="ul" sx={{ pl: 2, m: 0 }}>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                           ✓ Quick setup and immediate use
                         </Typography>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                           ✓ Flexible documentation workflow
                         </Typography>
-                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary' }}>
+                        <Typography component="li" variant="body2" sx={{ mb: 0.5, color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                           ✓ Export to any format
                         </Typography>
-                        <Typography component="li" variant="body2" sx={{ color: 'text.secondary' }}>
+                        <Typography component="li" variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '0.75rem', sm: '0.8rem' } }}>
                           ✓ Easily copy paste notes to your EHR
                         </Typography>
                       </Box>
@@ -350,19 +353,19 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
         {/* Navigation Buttons */}
         <Box sx={{ 
           flexShrink: 0,
-          pt: 3,
+          pt: { xs: 2, sm: 3 },
           display: 'flex',
-          gap: 2,
+          gap: { xs: 1.5, sm: 2 },
           mt: 'auto'
         }}>
           <SecondaryButton
             onClick={onBack}
             startIcon={<ArrowBack />}
             sx={{
-              py: { xs: 1.5, sm: 1.25 },
+              py: { xs: 1.25, sm: 1.5 },
               fontWeight: 600,
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              minWidth: 120
+              fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' },
+              minWidth: { xs: 100, sm: 120 }
             }}
           >
             Back
@@ -374,9 +377,9 @@ export const UserInformation: React.FC<UserInformationProps> = ({ onNext, onBack
             onClick={handleSubmit}
             endIcon={<ArrowForward />}
             sx={{
-              py: { xs: 1.5, sm: 1.25 },
+              py: { xs: 1.25, sm: 1.5 },
               fontWeight: 700,
-              fontSize: { xs: '0.875rem', sm: '1rem' }
+              fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' }
             }}
           >
             Continue Setup

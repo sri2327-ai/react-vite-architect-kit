@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -54,7 +55,7 @@ const CustomStepIcon = ({ active, completed, icon }: any) => {
       <CheckCircle 
         sx={{ 
           color: 'success.main',
-          fontSize: { xs: 20, sm: 24 }
+          fontSize: { xs: 18, sm: 20, md: 24 }
         }} 
       />
     );
@@ -63,15 +64,15 @@ const CustomStepIcon = ({ active, completed, icon }: any) => {
   return (
     <Box
       sx={{
-        width: { xs: 20, sm: 24 },
-        height: { xs: 20, sm: 24 },
+        width: { xs: 18, sm: 20, md: 24 },
+        height: { xs: 18, sm: 20, md: 24 },
         borderRadius: '50%',
         backgroundColor: active ? 'primary.main' : 'grey.300',
         color: active ? 'white' : 'grey.600',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+        fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' },
         fontWeight: 600,
         transition: 'all 0.3s ease'
       }}
@@ -172,15 +173,15 @@ export const SignupFlow: React.FC = () => {
 
   return (
     <Container 
-      maxWidth="md" 
+      maxWidth="lg" 
       sx={{ 
-        px: { xs: 1, sm: 2, md: 3 },
-        py: { xs: 1, sm: 2 }
+        px: { xs: 0.5, sm: 1, md: 2, lg: 3 },
+        py: { xs: 0.5, sm: 1, md: 2 }
       }}
     >
       <Box 
         sx={{ 
-          minHeight: '100vh',
+          minHeight: { xs: 'calc(100vh - 80px)', sm: 'calc(100vh - 100px)', md: 'calc(100vh - 120px)' },
           display: 'flex',
           flexDirection: 'column'
         }}
@@ -191,29 +192,30 @@ export const SignupFlow: React.FC = () => {
             flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            p: { xs: 2, sm: 3, md: 4 },
+            p: { xs: 1.5, sm: 2, md: 3, lg: 4 },
             backgroundColor: 'background.paper',
             border: '1px solid',
             borderColor: 'divider',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-            maxHeight: { xs: 'calc(100vh - 16px)', sm: 'calc(100vh - 32px)' },
-            overflow: 'hidden'
+            maxHeight: { xs: 'calc(100vh - 80px)', sm: 'calc(100vh - 100px)', md: 'calc(100vh - 120px)' },
+            overflow: 'hidden',
+            borderRadius: { xs: 2, sm: 3, md: 4 }
           }}
         >
           {/* Mobile Progress Bar */}
           {isMobile && (
             <Box sx={{ 
-              mb: 2,
+              mb: { xs: 1.5, sm: 2 },
               textAlign: 'center',
               flexShrink: 0
             }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
                 Step {activeStep + 1} of {visibleSteps.length}
               </Typography>
               <Box
                 sx={{
                   width: '100%',
-                  height: 4,
+                  height: { xs: 3, sm: 4 },
                   backgroundColor: 'grey.200',
                   borderRadius: 2,
                   overflow: 'hidden'
@@ -236,10 +238,10 @@ export const SignupFlow: React.FC = () => {
             <Stepper 
               activeStep={activeStep} 
               sx={{ 
-                mb: 3,
+                mb: { sm: 2, md: 3 },
                 flexShrink: 0,
                 '& .MuiStepLabel-label': {
-                  fontSize: { sm: '0.875rem', md: '1rem' },
+                  fontSize: { sm: '0.8rem', md: '0.875rem', lg: '1rem' },
                   fontWeight: 500
                 },
                 '& .MuiStepLabel-label.Mui-active': {
@@ -268,7 +270,7 @@ export const SignupFlow: React.FC = () => {
                     StepIconComponent={CustomStepIcon}
                     sx={{
                       '& .MuiStepLabel-iconContainer': {
-                        pr: 1
+                        pr: { sm: 0.5, md: 1 }
                       }
                     }}
                   >
@@ -285,10 +287,10 @@ export const SignupFlow: React.FC = () => {
               variant="h6"
               sx={{
                 textAlign: 'center',
-                mb: 2,
+                mb: { xs: 1.5, sm: 2 },
                 fontWeight: 600,
                 color: 'primary.main',
-                fontSize: '1.125rem',
+                fontSize: { xs: '1rem', sm: '1.125rem' },
                 flexShrink: 0
               }}
             >
