@@ -15,8 +15,7 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
-  Chip,
-  Grid
+  Stack
 } from '@mui/material';
 import { Close as CloseIcon, ArrowBack as ArrowBackIcon, Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 
@@ -209,38 +208,32 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                   )}
                 </Box>
                 
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      label="I want to title this subsection..."
-                      value={item.title}
-                      onChange={(e) => updateExamItem(item.id, 'title', e.target.value)}
-                      placeholder="e.g., Cardiovascular, Respiratory, etc."
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      label="I want the A.I. to report on..."
-                      value={item.instruction}
-                      onChange={(e) => updateExamItem(item.id, 'instruction', e.target.value)}
-                      placeholder="e.g., Heart rate, rhythm, murmurs, and peripheral pulses"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      label="When findings are normal, use this text..."
-                      value={item.normalText}
-                      onChange={(e) => updateExamItem(item.id, 'normalText', e.target.value)}
-                      placeholder="e.g., Within normal limits"
-                    />
-                  </Grid>
-                </Grid>
+                <Stack spacing={2}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="I want to title this subsection..."
+                    value={item.title}
+                    onChange={(e) => updateExamItem(item.id, 'title', e.target.value)}
+                    placeholder="e.g., Cardiovascular, Respiratory, etc."
+                  />
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="I want the A.I. to report on..."
+                    value={item.instruction}
+                    onChange={(e) => updateExamItem(item.id, 'instruction', e.target.value)}
+                    placeholder="e.g., Heart rate, rhythm, murmurs, and peripheral pulses"
+                  />
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="When findings are normal, use this text..."
+                    value={item.normalText}
+                    onChange={(e) => updateExamItem(item.id, 'normalText', e.target.value)}
+                    placeholder="e.g., Within normal limits"
+                  />
+                </Stack>
               </Box>
             ))}
 
@@ -330,8 +323,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                   )}
                 </Box>
                 
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
+                <Stack spacing={2}>
+                  <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', sm: 'row' } }}>
                     <TextField
                       fullWidth
                       size="small"
@@ -339,21 +332,20 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                       value={item.buttonName}
                       onChange={(e) => updateChecklistItem(item.id, 'buttonName', e.target.value)}
                       placeholder="e.g., Normal Chest X-ray"
+                      sx={{ flex: { sm: 1 } }}
                     />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      multiline
-                      rows={2}
-                      label="What text should be added when this button is clicked?"
-                      value={item.insertText}
-                      onChange={(e) => updateChecklistItem(item.id, 'insertText', e.target.value)}
-                      placeholder="e.g., Chest X-ray shows clear lungs with no acute cardiopulmonary abnormalities."
-                    />
-                  </Grid>
-                </Grid>
+                  </Box>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    multiline
+                    rows={2}
+                    label="What text should be added when this button is clicked?"
+                    value={item.insertText}
+                    onChange={(e) => updateChecklistItem(item.id, 'insertText', e.target.value)}
+                    placeholder="e.g., Chest X-ray shows clear lungs with no acute cardiopulmonary abnormalities."
+                  />
+                </Stack>
               </Box>
             ))}
 

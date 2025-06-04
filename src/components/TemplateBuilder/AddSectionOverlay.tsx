@@ -7,10 +7,8 @@ import {
   Typography,
   Box,
   IconButton,
-  Grid,
   Card,
-  CardContent,
-  CardActionArea
+  CardContent
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
@@ -127,55 +125,58 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
       </DialogTitle>
 
       <DialogContent sx={{ px: 3, pb: 3 }}>
-        <Grid container spacing={2}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, 
+          gap: 2 
+        }}>
           {sectionTypes.map((section) => (
-            <Grid item xs={12} sm={6} key={section.type}>
-              <Card
-                sx={{
-                  cursor: 'pointer',
-                  height: '100%',
-                  borderRadius: 2,
-                  border: '2px solid transparent',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-                    borderColor: section.color
-                  }
-                }}
-                onClick={() => handleSectionClick(section.type, section.name)}
-              >
-                <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <Box display="flex" alignItems="center" mb={2}>
-                    <Box
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 2,
-                        backgroundColor: section.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        mr: 2,
-                        fontSize: '1.5rem',
-                        color: 'white',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      {section.icon}
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: section.color }}>
-                      {section.name}
-                    </Typography>
+            <Card
+              key={section.type}
+              sx={{
+                cursor: 'pointer',
+                height: '100%',
+                borderRadius: 2,
+                border: '2px solid transparent',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
+                  borderColor: section.color
+                }
+              }}
+              onClick={() => handleSectionClick(section.type, section.name)}
+            >
+              <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <Box display="flex" alignItems="center" mb={2}>
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 2,
+                      backgroundColor: section.color,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mr: 2,
+                      fontSize: '1.5rem',
+                      color: 'white',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {section.icon}
                   </Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ flex: 1, lineHeight: 1.5 }}>
-                    {section.description}
+                  <Typography variant="h6" sx={{ fontWeight: 600, color: section.color }}>
+                    {section.name}
                   </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+                </Box>
+                <Typography variant="body2" color="text.secondary" sx={{ flex: 1, lineHeight: 1.5 }}>
+                  {section.description}
+                </Typography>
+              </CardContent>
+            </Card>
           ))}
-        </Grid>
+        </Box>
       </DialogContent>
     </Dialog>
   );
