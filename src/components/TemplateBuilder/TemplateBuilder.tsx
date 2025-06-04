@@ -244,23 +244,28 @@ const TemplateBuilder: React.FC = () => {
     setEditingTemplate(null);
   };
 
+  // Enhanced template creation handler
   const handleCreateTemplateFromDialog = (templateData: any) => {
+    console.log('Creating template with data:', templateData);
     setIsLoading(true);
     
     setTimeout(() => {
-      let content = templateData.content;
-      
-      if (templateData.templateType) {
+      // Generate content based on template type
+      let content = '';
+      if (templateData.templateType && templateData.templateType !== 'Custom') {
         content = templateService.generateTemplateContent(templateData.templateType, templateData.customFields);
+      } else {
+        content = templateData.content || 'New template content';
       }
       
+      // Create new template with proper structure
       const newTemplate: TemplateData = {
-        id: templates.length + 1,
-        title: templateData.name,
+        id: Date.now(), // Use timestamp for unique ID
+        title: templateData.name || templateData.title || 'New Template',
         specialty: templateData.specialty || selectedVisitType?.name || 'General',
-        type: templateData.templateType || 'Custom',
-        fields: templateData.ehrFields || [],
-        content: content || 'New template content',
+        type: selectedVisitType?.name || templateData.templateType || 'Custom',
+        fields: templateData.ehrFields || templateData.fields || [],
+        content: content,
         lastUsed: 'Just created',
         usageCount: 0,
         isFavorite: false,
@@ -268,11 +273,19 @@ const TemplateBuilder: React.FC = () => {
         tags: templateData.tags || []
       };
       
-      setTemplates(prev => [...prev, newTemplate]);
-      setIsLoading(false);
+      // Add template to the list
+      setTemplates(prev => {
+        const updatedTemplates = [...prev, newTemplate];
+        console.log('Templates updated:', updatedTemplates);
+        return updatedTemplates;
+      });
       
-      console.log('Created new template:', templateData);
-    }, 1500);
+      setIsLoading(false);
+      setOpenCreateTemplate(false);
+      
+      // Show success message in console
+      console.log('Template created successfully:', newTemplate);
+    }, 500); // Reduced timeout for better UX
   };
 
   const handleAddType = () => {
@@ -793,7 +806,10 @@ const TemplateBuilder: React.FC = () => {
       {/* Enhanced Template Creation Dialog */}
       <ImprovedTemplateCreationDialog
         open={openCreateTemplate}
-        onClose={() => setOpenCreateTemplate(false)}
+        onClose={() => {
+          console.log('Closing template creation dialog');
+          setOpenCreateTemplate(false);
+        }}
         onCreateTemplate={handleCreateTemplateFromDialog}
       />
 
