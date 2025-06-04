@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -439,23 +440,6 @@ export const Dashboard: React.FC = () => {
                   overflow: 'hidden'
                 }}
               >
-                <IconButton
-                  onClick={handleDrawerToggle}
-                  sx={{
-                    width: isCollapsed ? 44 : '100%',
-                    height: 44,
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    borderRadius: '14px',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                      color: 'white',
-                      transform: 'scale(1.02)'
-                    }
-                  }}
-                >
-                  {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-                </IconButton>
               </Paper>
             </Tooltip>
           </Box>
