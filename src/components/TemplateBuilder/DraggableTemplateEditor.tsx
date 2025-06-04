@@ -50,6 +50,25 @@ import {
   FilterList as FilterListIcon,
   Create as CreateIcon
 } from '@mui/icons-material';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import AddSectionOverlay from './AddSectionOverlay';
 import SectionConfigDialog from './SectionConfigDialog';
 import SectionPlacementDialog from './SectionPlacementDialog';
@@ -76,6 +95,351 @@ interface DraggableTemplateEditorProps {
   onSave?: (items: TemplateItem[]) => void;
 }
 
+interface SortableItemProps {
+  item: TemplateItem;
+  index: number;
+  onDelete: (id: string) => void;
+  onCopy: (id: string) => void;
+  onMoveUp: (id: string) => void;
+  onMoveDown: (id: string) => void;
+  onHelp: (id: string) => void;
+  onAiEdit: (id: string) => void;
+  getTypeColor: (type: string) => string;
+  getTypeIcon: (type: string) => React.ReactNode;
+  getTypeLabel: (type: string) => string;
+  theme: any;
+  totalItems: number;
+}
+
+const SortableItem: React.FC<SortableItemProps> = ({
+  item,
+  index,
+  onDelete,
+  onCopy,
+  onMoveUp,
+  onMoveDown,
+  onHelp,
+  onAiEdit,
+  getTypeColor,
+  getTypeIcon,
+  getTypeLabel,
+  theme,
+  totalItems
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <Fade in={true} timeout={300}>
+        <Card 
+          sx={{ 
+            mb: 3,
+            position: 'relative',
+            borderRadius: 3,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            transition: 'all 0.3s ease',
+            border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+            overflow: 'visible',
+            '&:hover': {
+              boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
+              transform: 'translateY(-2px)',
+              '& .drag-handle': {
+                opacity: 1
+              }
+            }
+          }}
+        >
+          {/* Drag Handle */}
+          <Box 
+            className="drag-handle"
+            sx={{
+              position: 'absolute',
+              left: -12,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 2,
+              opacity: 0,
+              transition: 'opacity 0.2s ease'
+            }}
+          >
+            <Tooltip title="Drag to reorder">
+              <IconButton 
+                {...attributes}
+                {...listeners}
+                sx={{ 
+                  backgroundColor: theme.palette.background.paper,
+                  border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                  cursor: 'grab',
+                  color: theme.palette.primary.main,
+                  width: 32,
+                  height: 32,
+                  '&:hover': { 
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    borderColor: theme.palette.primary.main
+                  },
+                  '&:active': { cursor: 'grabbing' },
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                }}
+              >
+                <DragIndicatorIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          <CardContent sx={{ p: 0 }}>
+            {/* Header Section */}
+            <Box sx={{ 
+              p: 3, 
+              pb: 2,
+              background: `linear-gradient(135deg, ${alpha(getTypeColor(item.type), 0.03)} 0%, ${alpha(getTypeColor(item.type), 0.08)} 100%)`
+            }}>
+              <Stack direction="row" alignItems="flex-start" spacing={2}>
+                <Box sx={{ flex: 1 }}>
+                  <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
+                    {getTypeIcon(item.type)}
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        fontWeight: 700,
+                        color: theme.palette.text.primary,
+                        fontSize: '1.1rem'
+                      }}
+                    >
+                      {item.name}
+                    </Typography>
+                    <Chip
+                      label={getTypeLabel(item.type)}
+                      size="small"
+                      sx={{
+                        backgroundColor: alpha(getTypeColor(item.type), 0.15),
+                        color: getTypeColor(item.type),
+                        fontWeight: 600,
+                        fontSize: '0.75rem',
+                        height: 24
+                      }}
+                    />
+                  </Stack>
+                  
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: theme.palette.text.secondary,
+                      lineHeight: 1.6,
+                      fontStyle: 'italic'
+                    }}
+                  >
+                    {item.description || 'A.I. will write a descriptive block of text following the guidelines below.'}
+                  </Typography>
+                </Box>
+
+                {/* Quick Actions */}
+                <Stack direction="row" spacing={1}>
+                  <Tooltip title="Move Up">
+                    <IconButton
+                      size="small"
+                      onClick={() => onMoveUp(item.id)}
+                      disabled={index === 0}
+                      sx={{ 
+                        backgroundColor: alpha(theme.palette.action.active, 0.08),
+                        '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.12) },
+                        '&:disabled': { opacity: 0.3 }
+                      }}
+                    >
+                      <KeyboardArrowUpIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Move Down">
+                    <IconButton
+                      size="small"
+                      onClick={() => onMoveDown(item.id)}
+                      disabled={index === totalItems - 1}
+                      sx={{ 
+                        backgroundColor: alpha(theme.palette.action.active, 0.08),
+                        '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.12) },
+                        '&:disabled': { opacity: 0.3 }
+                      }}
+                    >
+                      <KeyboardArrowDownIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Duplicate">
+                    <IconButton
+                      size="small"
+                      onClick={() => onCopy(item.id)}
+                      sx={{ 
+                        backgroundColor: alpha(theme.palette.info.main, 0.08),
+                        color: theme.palette.info.main,
+                        '&:hover': { backgroundColor: alpha(theme.palette.info.main, 0.15) }
+                      }}
+                    >
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title="Delete">
+                    <IconButton
+                      size="small"
+                      onClick={() => onDelete(item.id)}
+                      sx={{ 
+                        backgroundColor: alpha(theme.palette.error.main, 0.08),
+                        color: theme.palette.error.main,
+                        '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.15) }
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </Stack>
+            </Box>
+
+            <Divider />
+
+            {/* Content Preview */}
+            <Box sx={{ p: 3, pt: 2 }}>
+              <Paper 
+                sx={{ 
+                  p: 2.5, 
+                  backgroundColor: alpha(theme.palette.background.default, 0.5),
+                  border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+                  borderRadius: 2
+                }}
+              >
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    color: theme.palette.text.secondary,
+                    lineHeight: 1.6,
+                    mb: item.items && item.items.length > 0 ? 2 : 0
+                  }}
+                >
+                  {item.content}
+                </Typography>
+                
+                {item.items && item.items.length > 0 && (
+                  <Box>
+                    {item.items.map((subItem, idx) => (
+                      <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1 }}>
+                        <Box 
+                          sx={{ 
+                            width: 6, 
+                            height: 6, 
+                            borderRadius: '50%', 
+                            backgroundColor: getTypeColor(item.type),
+                            mt: 1,
+                            flexShrink: 0
+                          }} 
+                        />
+                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                          {subItem.name && <strong>{subItem.name}: </strong>}{subItem.content}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+
+                {/* Special formatting for exam-list and checklist */}
+                {(item.type === 'exam-list' || item.type === 'checklist') && !item.items && (
+                  <Box sx={{ mt: 2 }}>
+                    {[
+                      'General Appearance: Recap the patient\'s general appearance, including level of alertness and any acute distress.',
+                      'Cardiovascular: Recap findings related to heart sounds, rate, rhythm, and any murmurs.',
+                      'Respiratory: Recap findings regarding breath sounds, rate, and effort of breathing.',
+                      'Neurological: Recap findings related to mental status, motor and sensory function, and reflexes.',
+                      'Gastrointestinal: Recap findings related to abdominal examination, including palpation, bowel sounds, and any tenderness.',
+                      'Musculoskeletal: Recap findings regarding joint function, muscle strength, and any deformities.',
+                      'Skin: Recap findings on skin condition, including rashes, lesions, or color changes.'
+                    ].map((bullet, idx) => (
+                      <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
+                        <Box 
+                          sx={{ 
+                            width: 6, 
+                            height: 6, 
+                            borderRadius: '50%', 
+                            backgroundColor: getTypeColor(item.type),
+                            mt: 1,
+                            flexShrink: 0
+                          }} 
+                        />
+                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
+                          {bullet}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Paper>
+            </Box>
+
+            <Divider />
+
+            {/* Action Buttons */}
+            <Box sx={{ p: 3, pt: 2 }}>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  variant="contained"
+                  startIcon={<AutoFixHighIcon />}
+                  onClick={() => onAiEdit(item.id)}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    px: 3,
+                    flex: 1,
+                    backgroundColor: getTypeColor(item.type),
+                    '&:hover': {
+                      backgroundColor: alpha(getTypeColor(item.type), 0.8)
+                    }
+                  }}
+                >
+                  Edit Instructions
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  startIcon={<HelpIcon />}
+                  onClick={() => onHelp(item.id)}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    px: 3,
+                    borderWidth: 2,
+                    borderColor: getTypeColor(item.type),
+                    color: getTypeColor(item.type),
+                    '&:hover': {
+                      borderWidth: 2,
+                      backgroundColor: alpha(getTypeColor(item.type), 0.04),
+                      borderColor: getTypeColor(item.type)
+                    }
+                  }}
+                >
+                  Get Help
+                </Button>
+              </Stack>
+            </Box>
+          </CardContent>
+        </Card>
+      </Fade>
+    </div>
+  );
+};
+
 const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   initialItems = [],
   onSave
@@ -93,6 +457,13 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [aiInstructions, setAiInstructions] = useState('');
   const [aiTitle, setAiTitle] = useState('');
   const [pendingSection, setPendingSection] = useState<any>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const helpOptions = [
     { 
@@ -168,6 +539,19 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     return labels[type as keyof typeof labels] || type.replace('-', ' ').toUpperCase();
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      setItems((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over?.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   const handleAddSection = (section: any) => {
     if (['paragraph', 'section-header', 'bulleted-list', 'exam-list', 'checklist', 'static-text'].includes(section.id)) {
       setPendingSection(section);
@@ -194,6 +578,11 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     setSectionConfigOpen(true);
   };
 
+  const handleSectionConfigBack = () => {
+    setSectionConfigOpen(false);
+    setAddSectionOpen(true);
+  };
+
   const handlePlaceSection = (position: number) => {
     if (pendingSection) {
       const newItem: TemplateItem = {
@@ -210,11 +599,20 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       
       setPendingSection(null);
       setPlacementDialogOpen(false);
+      
+      // Call onSave if provided
+      if (onSave) {
+        onSave(newItems);
+      }
     }
   };
 
   const handleDeleteItem = (id: string) => {
-    setItems(items.filter(item => item.id !== id));
+    const newItems = items.filter(item => item.id !== id);
+    setItems(newItems);
+    if (onSave) {
+      onSave(newItems);
+    }
   };
 
   const handleCopyItem = (id: string) => {
@@ -225,7 +623,11 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         id: Date.now().toString(),
         name: `${itemToCopy.name} (Copy)`
       };
-      setItems([...items, copiedItem]);
+      const newItems = [...items, copiedItem];
+      setItems(newItems);
+      if (onSave) {
+        onSave(newItems);
+      }
     }
   };
 
@@ -235,6 +637,9 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       const newItems = [...items];
       [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
       setItems(newItems);
+      if (onSave) {
+        onSave(newItems);
+      }
     }
   };
 
@@ -244,6 +649,9 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       const newItems = [...items];
       [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
       setItems(newItems);
+      if (onSave) {
+        onSave(newItems);
+      }
     }
   };
 
@@ -285,11 +693,15 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
 
   const handleSaveAiEdit = () => {
     if (selectedItemId) {
-      setItems(items.map(item => 
+      const newItems = items.map(item => 
         item.id === selectedItemId 
           ? { ...item, name: aiTitle }
           : item
-      ));
+      );
+      setItems(newItems);
+      if (onSave) {
+        onSave(newItems);
+      }
     }
     setAiEditDialogOpen(false);
     setSelectedItemId(null);
@@ -300,300 +712,6 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const getSelectedHelpOption = () => {
     return helpOptions.find(option => option.value === selectedHelpOption);
   };
-
-  const renderSectionBlock = (item: TemplateItem, index: number) => (
-    <Fade in={true} timeout={300} key={item.id}>
-      <Card 
-        sx={{ 
-          mb: 3,
-          position: 'relative',
-          borderRadius: 3,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-          transition: 'all 0.3s ease',
-          border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
-          overflow: 'visible',
-          '&:hover': {
-            boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
-            transform: 'translateY(-2px)',
-            '& .drag-handle': {
-              opacity: 1
-            }
-          }
-        }}
-      >
-        {/* Drag Handle */}
-        <Box 
-          className="drag-handle"
-          sx={{
-            position: 'absolute',
-            left: -12,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            zIndex: 2,
-            opacity: 0,
-            transition: 'opacity 0.2s ease'
-          }}
-        >
-          <Tooltip title="Drag to reorder">
-            <IconButton 
-              sx={{ 
-                backgroundColor: theme.palette.background.paper,
-                border: `2px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                cursor: 'grab',
-                color: theme.palette.primary.main,
-                width: 32,
-                height: 32,
-                '&:hover': { 
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1),
-                  borderColor: theme.palette.primary.main
-                },
-                '&:active': { cursor: 'grabbing' },
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
-              }}
-            >
-              <DragIndicatorIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        <CardContent sx={{ p: 0 }}>
-          {/* Header Section */}
-          <Box sx={{ 
-            p: 3, 
-            pb: 2,
-            background: `linear-gradient(135deg, ${alpha(getTypeColor(item.type), 0.03)} 0%, ${alpha(getTypeColor(item.type), 0.08)} 100%)`
-          }}>
-            <Stack direction="row" alignItems="flex-start" spacing={2}>
-              <Box sx={{ flex: 1 }}>
-                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
-                  {getTypeIcon(item.type)}
-                  <Typography 
-                    variant="h6" 
-                    sx={{ 
-                      fontWeight: 700,
-                      color: theme.palette.text.primary,
-                      fontSize: '1.1rem'
-                    }}
-                  >
-                    {item.name}
-                  </Typography>
-                  <Chip
-                    label={getTypeLabel(item.type)}
-                    size="small"
-                    sx={{
-                      backgroundColor: alpha(getTypeColor(item.type), 0.15),
-                      color: getTypeColor(item.type),
-                      fontWeight: 600,
-                      fontSize: '0.75rem',
-                      height: 24
-                    }}
-                  />
-                </Stack>
-                
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: theme.palette.text.secondary,
-                    lineHeight: 1.6,
-                    fontStyle: 'italic'
-                  }}
-                >
-                  {item.description || 'A.I. will write a descriptive block of text following the guidelines below.'}
-                </Typography>
-              </Box>
-
-              {/* Quick Actions */}
-              <Stack direction="row" spacing={1}>
-                <Tooltip title="Move Up">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleMoveUp(item.id)}
-                    disabled={index === 0}
-                    sx={{ 
-                      backgroundColor: alpha(theme.palette.action.active, 0.08),
-                      '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.12) },
-                      '&:disabled': { opacity: 0.3 }
-                    }}
-                  >
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Move Down">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleMoveDown(item.id)}
-                    disabled={index === items.length - 1}
-                    sx={{ 
-                      backgroundColor: alpha(theme.palette.action.active, 0.08),
-                      '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.12) },
-                      '&:disabled': { opacity: 0.3 }
-                    }}
-                  >
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Duplicate">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleCopyItem(item.id)}
-                    sx={{ 
-                      backgroundColor: alpha(theme.palette.info.main, 0.08),
-                      color: theme.palette.info.main,
-                      '&:hover': { backgroundColor: alpha(theme.palette.info.main, 0.15) }
-                    }}
-                  >
-                    <ContentCopyIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Delete">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleDeleteItem(item.id)}
-                    sx={{ 
-                      backgroundColor: alpha(theme.palette.error.main, 0.08),
-                      color: theme.palette.error.main,
-                      '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.15) }
-                    }}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </Stack>
-            </Stack>
-          </Box>
-
-          <Divider />
-
-          {/* Content Preview */}
-          <Box sx={{ p: 3, pt: 2 }}>
-            <Paper 
-              sx={{ 
-                p: 2.5, 
-                backgroundColor: alpha(theme.palette.background.default, 0.5),
-                border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-                borderRadius: 2
-              }}
-            >
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: theme.palette.text.secondary,
-                  lineHeight: 1.6,
-                  mb: item.items && item.items.length > 0 ? 2 : 0
-                }}
-              >
-                {item.content}
-              </Typography>
-              
-              {item.items && item.items.length > 0 && (
-                <Box>
-                  {item.items.map((subItem, idx) => (
-                    <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1 }}>
-                      <Box 
-                        sx={{ 
-                          width: 6, 
-                          height: 6, 
-                          borderRadius: '50%', 
-                          backgroundColor: getTypeColor(item.type),
-                          mt: 1,
-                          flexShrink: 0
-                        }} 
-                      />
-                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                        {subItem.name && <strong>{subItem.name}: </strong>}{subItem.content}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-
-              {/* Special formatting for exam-list and checklist */}
-              {(item.type === 'exam-list' || item.type === 'checklist') && !item.items && (
-                <Box sx={{ mt: 2 }}>
-                  {[
-                    'General Appearance: Recap the patient\'s general appearance, including level of alertness and any acute distress.',
-                    'Cardiovascular: Recap findings related to heart sounds, rate, rhythm, and any murmurs.',
-                    'Respiratory: Recap findings regarding breath sounds, rate, and effort of breathing.',
-                    'Neurological: Recap findings related to mental status, motor and sensory function, and reflexes.',
-                    'Gastrointestinal: Recap findings related to abdominal examination, including palpation, bowel sounds, and any tenderness.',
-                    'Musculoskeletal: Recap findings regarding joint function, muscle strength, and any deformities.',
-                    'Skin: Recap findings on skin condition, including rashes, lesions, or color changes.'
-                  ].map((bullet, idx) => (
-                    <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
-                      <Box 
-                        sx={{ 
-                          width: 6, 
-                          height: 6, 
-                          borderRadius: '50%', 
-                          backgroundColor: getTypeColor(item.type),
-                          mt: 1,
-                          flexShrink: 0
-                        }} 
-                      />
-                      <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                        {bullet}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              )}
-            </Paper>
-          </Box>
-
-          <Divider />
-
-          {/* Action Buttons */}
-          <Box sx={{ p: 3, pt: 2 }}>
-            <Stack direction="row" spacing={2}>
-              <Button
-                variant="contained"
-                startIcon={<AutoFixHighIcon />}
-                onClick={() => handleAiEdit(item.id)}
-                sx={{
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 3,
-                  flex: 1,
-                  backgroundColor: getTypeColor(item.type),
-                  '&:hover': {
-                    backgroundColor: alpha(getTypeColor(item.type), 0.8)
-                  }
-                }}
-              >
-                Edit Instructions
-              </Button>
-
-              <Button
-                variant="outlined"
-                startIcon={<HelpIcon />}
-                onClick={() => handleHelp(item.id)}
-                sx={{
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  px: 3,
-                  borderWidth: 2,
-                  borderColor: getTypeColor(item.type),
-                  color: getTypeColor(item.type),
-                  '&:hover': {
-                    borderWidth: 2,
-                    backgroundColor: alpha(getTypeColor(item.type), 0.04),
-                    borderColor: getTypeColor(item.type)
-                  }
-                }}
-              >
-                Get Help
-              </Button>
-            </Stack>
-          </Box>
-        </CardContent>
-      </Card>
-    </Fade>
-  );
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
@@ -656,9 +774,34 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         </Box>
       </Paper>
 
-      {/* Template Sections */}
+      {/* Template Sections with Drag and Drop */}
       <Box sx={{ position: 'relative', pl: 2 }}>
-        {items.map((item, index) => renderSectionBlock(item, index))}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+            {items.map((item, index) => (
+              <SortableItem
+                key={item.id}
+                item={item}
+                index={index}
+                onDelete={handleDeleteItem}
+                onCopy={handleCopyItem}
+                onMoveUp={handleMoveUp}
+                onMoveDown={handleMoveDown}
+                onHelp={handleHelp}
+                onAiEdit={handleAiEdit}
+                getTypeColor={getTypeColor}
+                getTypeIcon={getTypeIcon}
+                getTypeLabel={getTypeLabel}
+                theme={theme}
+                totalItems={items.length}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
       </Box>
 
       {/* Empty State */}
@@ -730,6 +873,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         open={sectionConfigOpen}
         onClose={() => setSectionConfigOpen(false)}
         onContinue={handleSectionConfigContinue}
+        onBack={handleSectionConfigBack}
         sectionType={pendingSection?.id || ''}
         sectionName={pendingSection?.name || ''}
       />

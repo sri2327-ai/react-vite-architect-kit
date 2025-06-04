@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
 
 interface TemplateItem {
@@ -28,33 +28,42 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
   initialItems = [], 
   onSave 
 }) => {
-  // Convert to the format expected by DraggableTemplateEditor
-  const convertedItems = initialItems.length > 0 ? initialItems : [
-    {
-      id: '1',
-      name: 'Chief Complaint',
-      type: 'paragraph',
-      content: 'Document the primary reason for the patient visit',
-      description: 'A.I. will write a descriptive block of text following the guidelines below.'
-    },
-    {
-      id: '2', 
-      name: 'History of Present Illness',
-      type: 'bulleted_list',
-      content: 'Document the current illness details',
-      description: 'A.I. will create a bulleted list based on the instructions provided',
-      items: [
-        { content: 'Onset and duration of symptoms' },
-        { content: 'Associated symptoms' },
-        { content: 'Previous treatments attempted' }
-      ]
+  const [currentItems, setCurrentItems] = useState<TemplateItem[]>(
+    initialItems.length > 0 ? initialItems : [
+      {
+        id: '1',
+        name: 'Chief Complaint',
+        type: 'paragraph',
+        content: 'Document the primary reason for the patient visit',
+        description: 'A.I. will write a descriptive block of text following the guidelines below.'
+      },
+      {
+        id: '2', 
+        name: 'History of Present Illness',
+        type: 'bulleted_list',
+        content: 'Document the current illness details',
+        description: 'A.I. will create a bulleted list based on the instructions provided',
+        items: [
+          { content: 'Onset and duration of symptoms' },
+          { content: 'Associated symptoms' },
+          { content: 'Previous treatments attempted' }
+        ]
+      }
+    ]
+  );
+
+  const handleSave = (items: TemplateItem[]) => {
+    setCurrentItems(items);
+    if (onSave) {
+      onSave(items);
     }
-  ];
+    console.log('Template saved:', items);
+  };
 
   return (
     <DraggableTemplateEditor 
-      initialItems={convertedItems}
-      onSave={onSave}
+      initialItems={currentItems}
+      onSave={handleSave}
     />
   );
 };
