@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -191,7 +190,7 @@ export const Dashboard: React.FC = () => {
           </IconButton>
         </Box>
       ) : (
-        /* Desktop Header with Profile Name */
+        /* Desktop Header with Logo Only */
         <Box sx={{
           p: isCollapsed ? 2 : 3,
           borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
@@ -199,111 +198,44 @@ export const Dashboard: React.FC = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          flexDirection: 'column',
           position: 'relative',
           zIndex: 1
         }}>
           {!isCollapsed ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <Box
+              component="img"
+              src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
+              alt="S10.AI Logo"
+              sx={{
+                height: 52,
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                transition: 'transform 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)'
+                }
+              }}
+            />
+          ) : (
+            <Tooltip title="S10.AI" placement="right" arrow>
               <Box
                 component="img"
                 src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
                 alt="S10.AI Logo"
                 sx={{
-                  height: 52,
+                  height: 32,
                   objectFit: 'contain',
                   filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-                  transition: 'transform 0.3s ease',
-                  '&:hover': {
-                    transform: 'scale(1.05)'
-                  }
-                }}
-              />
-              
-              {/* Profile Section in Desktop */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Avatar
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                    border: '2px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                    fontWeight: 600,
-                    fontSize: '0.9rem'
-                  }}
-                >
-                  JD
-                </Avatar>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.2 }}>
-                    John Doe
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.75rem', lineHeight: 1.2 }}>
-                    john@example.com
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          ) : (
-            <Tooltip title="John Doe" placement="right" arrow>
-              <Avatar
-                sx={{
-                  width: 44,
-                  height: 44,
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  border: '2px solid rgba(255, 255, 255, 0.2)',
-                  color: 'white',
-                  fontWeight: 600,
-                  fontSize: '1rem',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   '&:hover': {
-                    transform: 'scale(1.1)',
-                    backgroundColor: 'rgba(255, 255, 255, 0.25)'
+                    transform: 'scale(1.1)'
                   }
                 }}
                 onClick={() => setIsCollapsed(false)}
-              >
-                JD
-              </Avatar>
+              />
             </Tooltip>
           )}
-        </Box>
-      )}
-
-      {/* User Profile Section for Mobile */}
-      {isMobile && (
-        <Box sx={{
-          px: 3,
-          py: 2.5,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          position: 'relative',
-          zIndex: 1
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
-            <Avatar
-              sx={{
-                width: 44,
-                height: 44,
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                fontWeight: 600,
-                fontSize: '1rem'
-              }}
-            >
-              JD
-            </Avatar>
-            <Box>
-              <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 600, fontSize: '1rem' }}>
-                John Doe
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem' }}>
-                john@example.com
-              </Typography>
-            </Box>
-          </Box>
         </Box>
       )}
 
