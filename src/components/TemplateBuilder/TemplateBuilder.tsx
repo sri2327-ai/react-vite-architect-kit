@@ -80,8 +80,6 @@ interface VisitType {
   id: number;
   name: string;
   isNew?: boolean;
-  templateCount?: number;
-  description?: string;
 }
 
 interface LibraryTemplate {
@@ -133,30 +131,22 @@ const TemplateBuilder: React.FC = () => {
     { 
       id: 1, 
       name: "SOAP NOTE", 
-      isNew: false,
-      templateCount: 12,
-      description: "Subjective, Objective, Assessment, Plan documentation"
+      isNew: false
     },
     { 
       id: 2, 
       name: "CONSULTATION NOTE", 
-      isNew: true,
-      templateCount: 8,
-      description: "Specialist consultation documentation"
+      isNew: true
     },
     { 
       id: 3, 
       name: "PROCEDURE NOTE", 
-      isNew: false,
-      templateCount: 15,
-      description: "Medical procedure documentation"
+      isNew: false
     },
     { 
       id: 4, 
       name: "H&P", 
-      isNew: false,
-      templateCount: 6,
-      description: "History and Physical examination"
+      isNew: false
     }
   ]);
 
@@ -290,9 +280,7 @@ const TemplateBuilder: React.FC = () => {
       const newType: VisitType = {
         id: visitTypes.length + 1,
         name: newTypeName.trim().toUpperCase(),
-        isNew: true,
-        templateCount: 0,
-        description: `Custom ${newTypeName.trim()} documentation type`
+        isNew: true
       };
       setVisitTypes([...visitTypes, newType]);
       setNewTypeName('');
@@ -399,13 +387,6 @@ const TemplateBuilder: React.FC = () => {
     
     setTemplates(prev => [...prev, newTemplate]);
     
-    // Update visit type template count
-    setVisitTypes(prev => prev.map(vt => 
-      vt.name === visitTypeName 
-        ? { ...vt, templateCount: (vt.templateCount || 0) + 1 }
-        : vt
-    ));
-    
     console.log(`Added template "${libraryTemplate.title}" to visit type "${visitTypeName}"`);
   };
 
@@ -489,29 +470,14 @@ const TemplateBuilder: React.FC = () => {
                         >
                           {visitType.name}
                         </Typography>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <Chip 
-                            label={`${visitType.templateCount || 0} templates`}
-                            size="small"
-                            sx={{
-                              backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
-                              color: bravoColors.primaryFlat
-                            }}
-                          />
-                          <IconButton
-                            size="small"
-                            onClick={(e) => handleVisitTypeMenuClick(e, visitType)}
-                            sx={{ color: bravoColors.primaryFlat }}
-                          >
-                            <MoreVertIcon />
-                          </IconButton>
-                        </Box>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleVisitTypeMenuClick(e, visitType)}
+                          sx={{ color: bravoColors.primaryFlat }}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
                       </Box>
-                    }
-                    secondary={
-                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                        {visitType.description}
-                      </Typography>
                     }
                   />
                 </ListItemButton>
