@@ -34,7 +34,7 @@ import {
   Search as SearchIcon,
   FilterList as FilterIcon,
   Download as ImportIcon,
-  CheckCircle as CheckIcon,
+  CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
   Note as NoteIcon,
@@ -397,73 +397,61 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
 
       {/* Dynamic Search and Filter Controls */}
       <Box sx={{ mb: { xs: 3, sm: 4 } }}>
-        <Box sx={{ 
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
-          mb: 2
-        }}>
-          <TextField
-            fullWidth
-            placeholder="Search workflows..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="small"
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
-            }}
-            sx={{
-              flex: { sm: 2 },
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: 'background.paper'
-              }
-            }}
-          />
-          <FormControl 
-            size="small" 
-            sx={{ 
-              minWidth: { xs: '100%', sm: 150 },
-              flex: { sm: 1 }
-            }}
-          >
-            <InputLabel>Category</InputLabel>
-            <Select
-              value={selectedCategory}
-              label="Category"
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              startAdornment={<CategoryIcon sx={{ mr: 1, color: 'text.secondary' }} />}
-            >
-              <MenuItem value="all">All Categories</MenuItem>
-              {dynamicCategories.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl 
-            size="small" 
-            sx={{ 
-              minWidth: { xs: '100%', sm: 150 },
-              flex: { sm: 1 }
-            }}
-          >
-            <InputLabel>EHR System</InputLabel>
-            <Select
-              value={selectedEHR}
-              label="EHR System"
-              onChange={(e) => setSelectedEHR(e.target.value)}
-              startAdornment={<EHRIcon sx={{ mr: 1, color: 'text.secondary' }} />}
-            >
-              <MenuItem value="all">All Systems</MenuItem>
-              {dynamicEHRSystems.map((ehr) => (
-                <MenuItem key={ehr} value={ehr}>
-                  {ehr}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
+        <Grid container spacing={2} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6} md={4}>
+            <TextField
+              fullWidth
+              placeholder="Search workflows..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="small"
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'background.paper'
+                }
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={3} md={4}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={selectedCategory}
+                label="Category"
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                startAdornment={<CategoryIcon sx={{ mr: 1, color: 'text.secondary' }} />}
+              >
+                <MenuItem value="all">All Categories</MenuItem>
+                {dynamicCategories.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={3} md={4}>
+            <FormControl fullWidth size="small">
+              <InputLabel>EHR System</InputLabel>
+              <Select
+                value={selectedEHR}
+                label="EHR System"
+                onChange={(e) => setSelectedEHR(e.target.value)}
+                startAdornment={<EHRIcon sx={{ mr: 1, color: 'text.secondary' }} />}
+              >
+                <MenuItem value="all">All Systems</MenuItem>
+                {dynamicEHRSystems.map((ehr) => (
+                  <MenuItem key={ehr} value={ehr}>
+                    {ehr}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
       </Box>
 
       {/* Workflow Cards Grid */}
