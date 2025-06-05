@@ -569,7 +569,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
             onRowsPerPageChange={handleChangeRowsPerPage}
             sx={{
               backgroundColor: '#FFFFFF',
-              color: '#000000',
+              color: '#FFFFFF',
               borderTop: '1px solid #e0e0e0',
               '& .MuiTablePagination-toolbar': {
                 px: { xs: 1, sm: 1.5, md: 2 },
@@ -579,23 +579,23 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
               },
               '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
                 fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
-                color: '#000000',
+                color: '#FFFFFF',
                 margin: { xs: '4px 0', md: 0 }
               },
               '& .MuiTablePagination-select': {
-                color: '#000000',
+                color: '#FFFFFF',
                 fontSize: { xs: '0.75rem', sm: '0.875rem' }
               },
               '& .MuiTablePagination-actions': {
-                color: '#000000',
+                color: '#FFFFFF',
                 ml: { xs: 0, md: 1 }
               },
               '& .MuiIconButton-root': {
-                color: '#000000',
+                color: '#FFFFFF',
                 padding: { xs: '4px', md: '8px' }
               },
               '& .MuiSelect-root': {
-                color: '#000000'
+                color: '#FFFFFF'
               }
             }}
           />
