@@ -1,4 +1,3 @@
-
 export interface TemplateSection {
   id: string;
   name: string;
@@ -22,6 +21,7 @@ export interface VisitType {
 
 class TemplateBuilderService {
   private visitTypes: VisitType[] = [];
+  private listeners: (() => void)[] = [];
 
   // Mock data - in real app this would come from Template Builder
   initializeMockData() {
@@ -84,6 +84,28 @@ class TemplateBuilderService {
     ];
   }
 
+  // Template-related methods
+  getAllTemplates(): Template[] {
+    if (this.visitTypes.length === 0) {
+      this.initializeMockData();
+    }
+    return this.visitTypes.map(vt => vt.template);
+  }
+
+  // Listener methods for template updates
+  addListener(callback: () => void) {
+    this.listeners.push(callback);
+  }
+
+  removeListener(callback: () => void) {
+    this.listeners = this.listeners.filter(listener => listener !== callback);
+  }
+
+  private notifyListeners() {
+    this.listeners.forEach(callback => callback());
+  }
+
+  // Existing visit type methods
   getVisitTypes(): VisitType[] {
     if (this.visitTypes.length === 0) {
       this.initializeMockData();

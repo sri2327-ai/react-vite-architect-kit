@@ -97,7 +97,7 @@ const TemplateBuilder: React.FC = () => {
                 fontWeight: 700, 
                 color: '#000000',
                 mb: 0.5,
-                fontSize: { xs: '1.25rem', sm: '1.75rem', md: '2.5rem' }
+                fontSize: '2rem'
               }}
             >
               Template Builder
@@ -108,7 +108,7 @@ const TemplateBuilder: React.FC = () => {
                 fontWeight: 400, 
                 color: theme.palette.text.secondary,
                 opacity: 0.9,
-                fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' }
+                fontSize: '1.25rem'
               }}
             >
               Create and customize your clinical documentation templates
@@ -215,7 +215,7 @@ const TemplateBuilder: React.FC = () => {
         </Box>
         
         <TabPanel value={tabValue} index={0}>
-          <DraggableTemplateEditor templates={templates} />
+          <DraggableTemplateEditor />
         </TabPanel>
         
         <TabPanel value={tabValue} index={1}>
