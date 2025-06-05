@@ -9,7 +9,8 @@ import {
   Divider,
   Stack,
   Tooltip,
-  Alert
+  Alert,
+  alpha
 } from '@mui/material';
 import {
   Save as SaveIcon,
@@ -298,7 +299,6 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
           <DraggableTemplateEditor 
             initialItems={currentItems}
             onSave={handleSave}
-            onChange={handleItemsChange}
           />
         )}
       </Box>

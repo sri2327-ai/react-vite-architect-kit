@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -5,7 +6,7 @@ import {
   CardContent,
   Typography,
   Button,
-  Grid,
+  Grid2 as Grid,
   Chip,
   IconButton,
   Menu,
@@ -195,7 +196,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImporte
       {isLoading ? (
         <Grid container spacing={3}>
           {Array.from({ length: 6 }).map((_, index) => (
-            <Grid item xs={12} md={6} lg={4} key={index}>
+            <Grid xs={12} md={6} lg={4} key={index}>
               <Card sx={{ borderRadius: 3 }}>
                 <CardContent sx={{ p: 3 }}>
                   <Skeleton variant="text" height={24} sx={{ mb: 1 }} />
@@ -210,7 +211,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImporte
         <>
           <Grid container spacing={3}>
             {paginatedWorkflows.map((workflow) => (
-              <Grid item xs={12} md={6} lg={4} key={workflow.id}>
+              <Grid xs={12} md={6} lg={4} key={workflow.id}>
                 <Card 
                   sx={{ 
                     borderRadius: 3,

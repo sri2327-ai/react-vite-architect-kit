@@ -1,36 +1,38 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import {
   Box,
   Card,
   CardContent,
   Typography,
   Button,
-  Grid,
+  Grid2 as Grid,
   Chip,
+  IconButton,
+  InputAdornment,
   TextField,
+  Menu,
+  MenuItem,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Alert,
   Stack,
-  useTheme,
-  useMediaQuery,
-  alpha,
-  Skeleton,
-  Pagination
+  Divider,
+  alpha
 } from '@mui/material';
 import {
-  Add as AddIcon,
   Search as SearchIcon,
+  FilterList as FilterListIcon,
+  MoreVert as MoreVertIcon,
+  Add as AddIcon,
+  Star as StarIcon,
+  StarBorder as StarBorderIcon,
+  Download as DownloadIcon,
+  Visibility as VisibilityIcon,
   CheckCircle as CheckCircleIcon,
-  TrendingUp as TrendingUpIcon,
-  Assignment as AssignmentIcon,
-  Schedule as ScheduleIcon
+  Schedule as ScheduleIcon,
+  PlayArrow as PlayArrowIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 
@@ -39,89 +41,89 @@ interface WorkflowLibraryProps {
 }
 
 const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
-  const [libraryWorkflows, setLibraryWorkflows] = useState([
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<any>(null);
+  const [previewDialog, setPreviewDialog] = useState(false);
+  const [favorites, setFavorites] = useState<number[]>([]);
+
+  const workflows = [
     {
       id: 1,
-      name: "Patient Registration Automation",
-      description: "Streamline patient intake and registration process",
+      name: "Patient Intake Automation",
+      description: "Streamlines patient registration and initial assessment processes",
       category: "Patient Management",
+      triggers: ["New patient registration", "Appointment scheduled"],
+      actions: ["Send welcome email", "Create medical record", "Schedule intake call"],
       popularity: 95,
-      difficulty: "Beginner",
-      estimatedTime: "15 min",
-      tags: ["Registration", "Intake", "Automation"],
-      triggers: ["New patient form", "Insurance verification"],
-      actions: ["Create patient record", "Schedule appointment", "Send welcome email"]
+      rating: 4.8,
+      usageCount: 1234,
+      tags: ["intake", "automation", "patient-care"]
     },
     {
       id: 2,
       name: "Lab Results Notification",
-      description: "Automatically notify providers when lab results are available",
+      description: "Automatically notifies providers and patients of lab results",
       category: "Clinical",
-      popularity: 88,
-      difficulty: "Intermediate",
-      estimatedTime: "20 min",
-      tags: ["Lab Results", "Notifications", "Clinical"],
-      triggers: ["Lab result received", "Critical value detected"],
-      actions: ["Notify primary provider", "Flag urgent results", "Update patient chart"]
+      triggers: ["Lab results received", "Critical values detected"],
+      actions: ["Notify provider", "Send patient portal message", "Create follow-up task"],
+      popularity: 89,
+      rating: 4.7,
+      usageCount: 987,
+      tags: ["lab-results", "notifications", "clinical"]
+    },
+    {
+      id: 3,
+      name: "Appointment Reminder System",
+      description: "Sends automated reminders to reduce no-shows",
+      category: "Scheduling",
+      triggers: ["Appointment scheduled", "24 hours before appointment"],
+      actions: ["Send SMS reminder", "Send email reminder", "Update patient status"],
+      popularity: 78,
+      rating: 4.6,
+      usageCount: 765,
+      tags: ["reminders", "scheduling", "patient-engagement"]
     }
-  ]);
+  ];
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [importDialog, setImportDialog] = useState(false);
-  const [selectedWorkflow, setSelectedWorkflow] = useState<any>(null);
+  const categories = ['all', 'Patient Management', 'Clinical', 'Scheduling', 'Billing'];
 
-  const workflowsPerPage = 6;
-  const categories = ['All', 'Patient Management', 'Clinical', 'Billing', 'Quality Assurance'];
-
-  const handleImport = (workflow: any) => {
-    setSelectedWorkflow(workflow);
-    setImportDialog(true);
-  };
-
-  const handleConfirmImport = () => {
-    if (selectedWorkflow) {
-      onImportWorkflow(selectedWorkflow);
-      setImportDialog(false);
-      setSelectedWorkflow(null);
-    }
-  };
-
-  const filteredWorkflows = libraryWorkflows.filter(workflow => {
+  const filteredWorkflows = workflows.filter(workflow => {
     const matchesSearch = workflow.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         workflow.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || workflow.category === selectedCategory;
+                         workflow.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         workflow.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory === 'all' || workflow.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const totalPages = Math.ceil(filteredWorkflows.length / workflowsPerPage);
-  const paginatedWorkflows = filteredWorkflows.slice(
-    (currentPage - 1) * workflowsPerPage,
-    currentPage * workflowsPerPage
-  );
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Beginner':
-        return 'success';
-      case 'Intermediate':
-        return 'warning';
-      case 'Advanced':
-        return 'error';
-      default:
-        return 'default';
-    }
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, workflow: any) => {
+    event.stopPropagation();
+    setMenuAnchor(event.currentTarget);
+    setSelectedWorkflow(workflow);
   };
 
-  const getPopularityIcon = (popularity: number) => {
-    if (popularity >= 90) return <TrendingUpIcon sx={{ fontSize: 16, color: 'success.main' }} />;
-    if (popularity >= 70) return <AssignmentIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
-    return <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />;
+  const handleMenuClose = () => {
+    setMenuAnchor(null);
+    setSelectedWorkflow(null);
+  };
+
+  const handlePreview = () => {
+    setPreviewDialog(true);
+    handleMenuClose();
+  };
+
+  const handleImport = (workflow: any) => {
+    onImportWorkflow(workflow);
+    handleMenuClose();
+  };
+
+  const toggleFavorite = (workflowId: number) => {
+    setFavorites(prev => 
+      prev.includes(workflowId) 
+        ? prev.filter(id => id !== workflowId)
+        : [...prev, workflowId]
+    );
   };
 
   return (
@@ -130,259 +132,241 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
         <Box>
           <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 700, mb: 1 }}>
-            Clinical Workflow Library
+            Workflow Library
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Discover and import pre-built clinical workflows
+            Browse and import pre-built clinical workflows
           </Typography>
         </Box>
       </Box>
 
-      {/* Filters */}
-      <Box display="flex" gap={2} mb={3} flexDirection={isMobile ? 'column' : 'row'}>
+      {/* Search and Filters */}
+      <Box display="flex" gap={2} mb={4} flexWrap="wrap">
         <TextField
           placeholder="Search workflows..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ minWidth: 300, flex: 1 }}
           InputProps={{
-            startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />,
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
           }}
-          sx={{ flex: 1 }}
         />
-        <FormControl sx={{ minWidth: 200 }}>
-          <InputLabel>Category</InputLabel>
-          <Select
-            value={selectedCategory}
-            label="Category"
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            {categories.map((category) => (
-              <MenuItem key={category} value={category}>
-                {category}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Box display="flex" gap={1} flexWrap="wrap">
+          {categories.map((category) => (
+            <Chip
+              key={category}
+              label={category === 'all' ? 'All Categories' : category}
+              variant={selectedCategory === category ? "filled" : "outlined"}
+              onClick={() => setSelectedCategory(category)}
+              sx={{
+                backgroundColor: selectedCategory === category ? bravoColors.primaryFlat : 'transparent',
+                color: selectedCategory === category ? 'white' : bravoColors.primaryFlat,
+                borderColor: bravoColors.primaryFlat,
+                '&:hover': {
+                  backgroundColor: selectedCategory === category ? bravoColors.secondary : alpha(bravoColors.primaryFlat, 0.1)
+                }
+              }}
+            />
+          ))}
+        </Box>
       </Box>
 
       {/* Workflows Grid */}
-      {isLoading ? (
-        <Grid container spacing={3}>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Grid item xs={12} md={6} lg={4} key={index}>
-              <Card sx={{ borderRadius: 3 }}>
-                <CardContent sx={{ p: 3 }}>
-                  <Skeleton variant="text" height={24} sx={{ mb: 1 }} />
-                  <Skeleton variant="text" height={20} width="80%" sx={{ mb: 2 }} />
-                  <Skeleton variant="rectangular" height={60} sx={{ mb: 2 }} />
-                  <Skeleton variant="rectangular" height={40} />
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      ) : paginatedWorkflows.length > 0 ? (
-        <>
-          <Grid container spacing={3}>
-            {paginatedWorkflows.map((workflow) => (
-              <Grid item xs={12} md={6} lg={4} key={workflow.id}>
-                <Card 
-                  sx={{ 
-                    borderRadius: 3,
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
-                    }
-                  }}
-                >
-                  <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={2}>
-                      <Typography variant="h6" sx={{ fontWeight: 600, flex: 1 }}>
-                        {workflow.name}
-                      </Typography>
-                      {getPopularityIcon(workflow.popularity)}
-                    </Box>
-
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flex: 1 }}>
+      <Grid container spacing={3}>
+        {filteredWorkflows.map((workflow) => (
+          <Grid xs={12} md={6} lg={4} key={workflow.id}>
+            <Card 
+              sx={{ 
+                borderRadius: 3,
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+                }
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
+                <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={2}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                      {workflow.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       {workflow.description}
                     </Typography>
+                  </Box>
+                  <Box display="flex" alignItems="center" gap={0.5}>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(workflow.id);
+                      }}
+                      sx={{ color: favorites.includes(workflow.id) ? 'warning.main' : 'text.secondary' }}
+                    >
+                      {favorites.includes(workflow.id) ? <StarIcon /> : <StarBorderIcon />}
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => handleMenuClick(e, workflow)}
+                      sx={{ color: bravoColors.primaryFlat }}
+                    >
+                      <MoreVertIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
 
-                    <Box display="flex" alignItems="center" gap={1} mb={2}>
-                      <Chip 
-                        label={workflow.difficulty}
-                        size="small"
-                        color={getDifficultyColor(workflow.difficulty) as any}
-                        variant="outlined"
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        {workflow.estimatedTime}
-                      </Typography>
-                    </Box>
+                <Box mb={2}>
+                  <Chip 
+                    label={workflow.category}
+                    size="small"
+                    sx={{ 
+                      backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+                      color: bravoColors.primaryFlat,
+                      mb: 1
+                    }}
+                  />
+                </Box>
 
-                    <Box mb={2}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
-                        Triggers:
-                      </Typography>
-                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                        {workflow.triggers.slice(0, 2).map((trigger, index) => (
-                          <Chip 
-                            key={index}
-                            label={trigger}
-                            size="small"
-                            sx={{ 
-                              backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
-                              color: bravoColors.primaryFlat,
-                              fontSize: '0.75rem'
-                            }}
-                          />
-                        ))}
-                        {workflow.triggers.length > 2 && (
-                          <Chip 
-                            label={`+${workflow.triggers.length - 2} more`}
-                            size="small"
-                            variant="outlined"
-                            sx={{ fontSize: '0.75rem' }}
-                          />
-                        )}
-                      </Stack>
-                    </Box>
+                <Stack spacing={1} mb={2}>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>Triggers:</strong> {workflow.triggers.length} configured
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>Actions:</strong> {workflow.actions.length} automated
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    <strong>Used by:</strong> {workflow.usageCount.toLocaleString()} organizations
+                  </Typography>
+                </Stack>
 
-                    <Box display="flex" alignItems="center" justifyContent="space-between" mt="auto">
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
-                        <Typography variant="body2" color="text.secondary">
-                          {workflow.popularity}% adoption
-                        </Typography>
-                      </Box>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        startIcon={<AddIcon />}
-                        onClick={() => handleImport(workflow)}
-                        sx={{
-                          backgroundColor: bravoColors.secondary,
-                          color: 'white',
-                          borderRadius: 2,
-                          px: 2,
-                          '&:hover': {
-                            backgroundColor: bravoColors.primaryFlat
-                          }
-                        }}
-                      >
-                        Import
-                      </Button>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+                <Box display="flex" alignItems="center" justifyContent="space-between" mt={2}>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <StarIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                    <Typography variant="body2" color="text.secondary">
+                      {workflow.rating}
+                    </Typography>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleImport(workflow);
+                    }}
+                    sx={{
+                      backgroundColor: bravoColors.secondary,
+                      '&:hover': {
+                        backgroundColor: bravoColors.primaryFlat
+                      }
+                    }}
+                  >
+                    Import
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
           </Grid>
+        ))}
+      </Grid>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <Box display="flex" justifyContent="center" mt={4}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={(event, value) => setCurrentPage(value)}
-                color="primary"
-                sx={{
-                  '& .MuiPaginationItem-root': {
-                    color: 'white',
-                    backgroundColor: bravoColors.primaryFlat,
-                    '&:hover': {
-                      backgroundColor: bravoColors.secondary,
-                    },
-                    '&.Mui-selected': {
-                      backgroundColor: bravoColors.secondary,
-                      color: 'white',
-                    },
-                  },
-                }}
-              />
-            </Box>
-          )}
-        </>
-      ) : (
-        <Card sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
-          <Typography variant="h6" gutterBottom color="text.secondary">
-            No workflows found
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {searchTerm || selectedCategory !== 'All'
-              ? 'Try adjusting your search or filter criteria'
-              : 'Browse available workflows in different categories'
-            }
-          </Typography>
-        </Card>
-      )}
+      {/* Menu */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: { 
+            borderRadius: 2,
+            minWidth: 180,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+          }
+        }}
+      >
+        <MenuItem onClick={handlePreview} sx={{ py: 1.5 }}>
+          <VisibilityIcon sx={{ mr: 2, fontSize: 20 }} />
+          Preview Details
+        </MenuItem>
+        <MenuItem onClick={() => handleImport(selectedWorkflow)} sx={{ py: 1.5 }}>
+          <DownloadIcon sx={{ mr: 2, fontSize: 20 }} />
+          Import Workflow
+        </MenuItem>
+      </Menu>
 
-      {/* Import Confirmation Dialog */}
-      <Dialog open={importDialog} onClose={() => setImportDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            Import Workflow
-          </Typography>
-        </DialogTitle>
-        <DialogContent>
-          {selectedWorkflow && (
-            <Box>
-              <Alert severity="info" sx={{ mb: 3 }}>
-                <Typography variant="body2">
-                  This will add "{selectedWorkflow.name}" to your workflows. You can customize it after importing.
-                </Typography>
-              </Alert>
+      {/* Preview Dialog */}
+      <Dialog 
+        open={previewDialog} 
+        onClose={() => setPreviewDialog(false)} 
+        maxWidth="md" 
+        fullWidth
+      >
+        {selectedWorkflow && (
+          <>
+            <DialogTitle>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                {selectedWorkflow.name}
+              </Typography>
+            </DialogTitle>
+            <DialogContent>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                {selectedWorkflow.description}
+              </Typography>
               
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                Workflow Details:
-              </Typography>
-              <Stack spacing={1} sx={{ mb: 2 }}>
-                <Typography variant="body2">
-                  <strong>Category:</strong> {selectedWorkflow.category}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Difficulty:</strong> {selectedWorkflow.difficulty}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Setup Time:</strong> {selectedWorkflow.estimatedTime}
-                </Typography>
+              <Stack spacing={3}>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                    Triggers
+                  </Typography>
+                  <Stack spacing={1}>
+                    {selectedWorkflow.triggers.map((trigger: string, index: number) => (
+                      <Box key={index} display="flex" alignItems="center" gap={1}>
+                        <PlayArrowIcon sx={{ fontSize: 16, color: bravoColors.secondary }} />
+                        <Typography variant="body2">{trigger}</Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+                
+                <Divider />
+                
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                    Actions
+                  </Typography>
+                  <Stack spacing={1}>
+                    {selectedWorkflow.actions.map((action: string, index: number) => (
+                      <Box key={index} display="flex" alignItems="center" gap={1}>
+                        <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                        <Typography variant="body2">{action}</Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
               </Stack>
-
-              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                Included Components:
-              </Typography>
-              <Stack spacing={1}>
-                <Typography variant="body2">
-                  • {selectedWorkflow.triggers.length} triggers
-                </Typography>
-                <Typography variant="body2">
-                  • {selectedWorkflow.actions.length} actions
-                </Typography>
-              </Stack>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setImportDialog(false)}>
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleConfirmImport} 
-            variant="contained"
-            sx={{
-              backgroundColor: bravoColors.primaryFlat,
-              '&:hover': {
-                backgroundColor: bravoColors.secondary
-              }
-            }}
-          >
-            Import Workflow
-          </Button>
-        </DialogActions>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setPreviewDialog(false)}>
+                Close
+              </Button>
+              <Button 
+                variant="contained" 
+                onClick={() => {
+                  handleImport(selectedWorkflow);
+                  setPreviewDialog(false);
+                }}
+                sx={{ backgroundColor: bravoColors.primaryFlat }}
+              >
+                Import Workflow
+              </Button>
+            </DialogActions>
+          </>
+        )}
       </Dialog>
     </Box>
   );

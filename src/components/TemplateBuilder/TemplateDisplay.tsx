@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import {
   Edit as EditIcon,
-  Copy as CopyIcon,
+  ContentCopy as ContentCopyIcon,
   Share as ShareIcon,
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
@@ -180,7 +180,7 @@ const TemplateDisplay: React.FC<TemplateDisplayProps> = ({
                     '&:hover': { transform: 'scale(1.1)' }
                   }}
                 >
-                  <CopyIcon />
+                  <ContentCopyIcon />
                 </IconButton>
               </Tooltip>
               
