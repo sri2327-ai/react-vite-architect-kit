@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -100,7 +99,7 @@ const WorkflowBuilder: React.FC = () => {
         }}>
           <WorkflowIcon 
             size={isMobile ? 32 : 40}
-            color={theme.palette.success.main}
+            color="black"
             style={{ 
               display: isMobile ? 'none' : 'block'
             }} 
