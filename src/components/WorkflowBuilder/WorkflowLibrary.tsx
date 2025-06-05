@@ -48,7 +48,8 @@ import {
   LocalHospital as EHRIcon,
   Assignment as TaskIcon,
   LocationOn as LocationIcon,
-  Today as TodayIcon
+  Today as TodayIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 
@@ -299,13 +300,13 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
 
   const getBlockColor = (type: string) => {
     switch (type) {
-      case 'schedule': return 'primary';
-      case 'patient_select': return 'secondary';
-      case 'encounter_open': return 'info';
-      case 'note_entry': return 'success';
-      case 'diagnosis': return 'warning';
-      case 'save': return 'error';
-      default: return 'default';
+      case 'schedule': return '#6366F1'; // Indigo
+      case 'patient_select': return '#8B5CF6'; // Purple  
+      case 'encounter_open': return '#06B6D4'; // Cyan
+      case 'note_entry': return '#10B981'; // Emerald
+      case 'diagnosis': return '#F59E0B'; // Amber
+      case 'save': return '#EF4444'; // Red
+      default: return '#6B7280'; // Gray
     }
   };
 
@@ -512,71 +513,207 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
         ))}
       </Box>
 
-      {/* Workflow Details Dialog */}
+      {/* Enhanced Workflow Details Dialog */}
       <Dialog 
         open={showWorkflowDetails} 
         onClose={() => setShowWorkflowDetails(false)} 
-        maxWidth="md" 
+        maxWidth="lg" 
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+            maxHeight: '90vh'
+          }
+        }}
       >
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <WorkflowIcon color="primary" />
-            {selectedWorkflow?.name} - Automation Blocks
+        <DialogTitle sx={{ 
+          p: 0,
+          background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+          color: 'white',
+          position: 'relative'
+        }}>
+          <Box sx={{ p: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{
+                width: 40,
+                height: 40,
+                borderRadius: 2,
+                bgcolor: 'rgba(255, 255, 255, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <WorkflowIcon sx={{ color: 'white', fontSize: 24 }} />
+              </Box>
+              <Box>
+                <Typography variant="h5" sx={{ fontWeight: 700, color: 'white' }}>
+                  {selectedWorkflow?.name}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                  Automation Blocks Overview
+                </Typography>
+              </Box>
+            </Box>
+            <IconButton 
+              onClick={() => setShowWorkflowDetails(false)}
+              sx={{ 
+                color: 'white',
+                bgcolor: 'rgba(255, 255, 255, 0.1)',
+                '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.2)' }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent>
+        
+        <DialogContent sx={{ p: 4, bgcolor: '#f8fafc' }}>
           {selectedWorkflow && (
             <Box>
-              <Alert severity="info" sx={{ mb: 3 }}>
-                This workflow contains {selectedWorkflow.blocks.length} automation blocks that will 
-                execute in sequence when you run the workflow in your EHR.
+              <Alert 
+                severity="info" 
+                sx={{ 
+                  mb: 4,
+                  borderRadius: 2,
+                  bgcolor: alpha('#3B82F6', 0.08),
+                  border: `1px solid ${alpha('#3B82F6', 0.2)}`,
+                  '& .MuiAlert-icon': { color: '#3B82F6' }
+                }}
+              >
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                  This workflow contains <strong>{selectedWorkflow.blocks.length} automation blocks</strong> that will 
+                  execute in sequence when you run the workflow in your EHR system.
+                </Typography>
               </Alert>
               
-              <Stepper orientation="vertical">
+              <Box sx={{ position: 'relative' }}>
                 {selectedWorkflow.blocks.map((block, index) => (
-                  <Step key={block.id} active={true}>
-                    <StepLabel>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box key={block.id} sx={{ display: 'flex', mb: 3, position: 'relative' }}>
+                    {/* Step Number */}
+                    <Box sx={{ 
+                      minWidth: 40, 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      alignItems: 'center',
+                      mr: 3
+                    }}>
+                      <Box sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '50%',
+                        bgcolor: getBlockColor(block.type),
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                      }}>
+                        {index + 1}
+                      </Box>
+                      {index < selectedWorkflow.blocks.length - 1 && (
+                        <Box sx={{
+                          width: 2,
+                          height: 40,
+                          bgcolor: alpha(getBlockColor(block.type), 0.3),
+                          mt: 1,
+                          borderRadius: 1
+                        }} />
+                      )}
+                    </Box>
+
+                    {/* Block Content */}
+                    <Paper sx={{ 
+                      flex: 1, 
+                      p: 3, 
+                      borderRadius: 2,
+                      border: `1px solid ${alpha(getBlockColor(block.type), 0.2)}`,
+                      bgcolor: 'white',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                        transform: 'translateY(-1px)'
+                      }
+                    }}>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                        <Box sx={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: 1.5,
+                          bgcolor: alpha(getBlockColor(block.type), 0.1),
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: getBlockColor(block.type)
+                        }}>
+                          {getBlockIcon(block.type)}
+                        </Box>
+                        <Box sx={{ flex: 1 }}>
+                          <Typography variant="h6" sx={{ 
+                            fontWeight: 600, 
+                            color: getBlockColor(block.type),
+                            mb: 0.5
+                          }}>
+                            {block.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5 }}>
+                            {block.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                         <Chip 
-                          icon={getBlockIcon(block.type)}
-                          label={block.name}
-                          color={getBlockColor(block.type) as any}
+                          label={block.type.replace('_', ' ').toUpperCase()}
                           size="small"
+                          sx={{
+                            bgcolor: alpha(getBlockColor(block.type), 0.1),
+                            color: getBlockColor(block.type),
+                            fontWeight: 600,
+                            fontSize: '0.7rem'
+                          }}
                         />
                         {block.isEditable && (
-                          <Chip label="Editable" size="small" variant="outlined" />
+                          <Chip 
+                            label="Configurable" 
+                            size="small" 
+                            variant="outlined"
+                            sx={{
+                              borderColor: alpha('#10B981', 0.3),
+                              color: '#10B981',
+                              fontSize: '0.7rem'
+                            }}
+                          />
                         )}
                         {block.ehrField && (
                           <Chip 
                             label={`Maps to: ${block.ehrField}`} 
                             size="small" 
-                            color="info"
-                            variant="outlined"
+                            sx={{
+                              bgcolor: alpha('#06B6D4', 0.1),
+                              color: '#06B6D4',
+                              fontSize: '0.7rem'
+                            }}
                           />
                         )}
                       </Box>
-                    </StepLabel>
-                    <StepContent>
-                      <Typography variant="body2" color="text.secondary">
-                        {block.description}
-                      </Typography>
-                      {block.config && (
-                        <Box sx={{ mt: 1 }}>
-                          <Typography variant="caption" color="text.secondary">
-                            Configuration: {JSON.stringify(block.config)}
-                          </Typography>
-                        </Box>
-                      )}
-                    </StepContent>
-                  </Step>
+                    </Paper>
+                  </Box>
                 ))}
-              </Stepper>
+              </Box>
             </Box>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setShowWorkflowDetails(false)}>
+        
+        <DialogActions sx={{ p: 3, bgcolor: '#f8fafc', borderTop: '1px solid rgba(0,0,0,0.08)' }}>
+          <Button 
+            onClick={() => setShowWorkflowDetails(false)}
+            variant="outlined"
+            sx={{ borderRadius: 2 }}
+          >
             Close
           </Button>
           <Button 
@@ -588,6 +725,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                 handleImportClick(selectedWorkflow);
               }
             }}
+            sx={{ borderRadius: 2 }}
           >
             Import This Workflow
           </Button>
