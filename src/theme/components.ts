@@ -108,7 +108,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
   MuiAppBar: {
     styleOverrides: {
       root: {
-        backgroundColor: bravoColors.primaryFlat,
+        background: bravoColors.button.gradient,
         color: bravoColors.text.white,
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
       },
@@ -231,7 +231,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
   MuiToolbar: {
     styleOverrides: {
       root: {
-        backgroundColor: bravoColors.primaryFlat,
+        background: bravoColors.button.gradient,
         color: bravoColors.text.white,
       },
     },

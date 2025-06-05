@@ -507,210 +507,220 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             </Alert>
           </Box>
 
-          <Grid container spacing={3}>
+          <Box sx={{ 
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: 'repeat(2, 1fr)',
+              xl: 'repeat(3, 1fr)'
+            },
+            gap: 3
+          }}>
             {workflows.map((workflow) => (
-              <Grid item xs={12} lg={6} xl={4} key={workflow.id}>
-                <Card 
-                  sx={{ 
-                    height: '100%', 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 3,
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      boxShadow: 6,
-                      transform: 'translateY(-2px)'
-                    }
-                  }}
-                >
-                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                    {/* Header Section */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                          <EHRIcon color="primary" />
-                          <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                            {workflow.name}
-                          </Typography>
-                        </Box>
-                        <Typography variant="body1" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
-                          {workflow.description}
+              <Card 
+                key={workflow.id}
+                sx={{ 
+                  height: '100%', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 3,
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    boxShadow: 6,
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+              >
+                <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                  {/* Header Section */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                        <EHRIcon color="primary" />
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                          {workflow.name}
                         </Typography>
                       </Box>
-                      <IconButton
-                        size="small"
-                        onClick={(e) => setAnchorEl(e.currentTarget)}
-                        sx={{ ml: 1 }}
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+                        {workflow.description}
+                      </Typography>
+                    </Box>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => setAnchorEl(e.currentTarget)}
+                      sx={{ ml: 1 }}
+                    >
+                      <MoreIcon />
+                    </IconButton>
+                  </Box>
+                  
+                  {/* Status and Info Chips */}
+                  <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap', gap: 1 }}>
+                    <Chip
+                      label={workflow.status === 'active' ? 'RUNNING' : workflow.status.toUpperCase()}
+                      color={getStatusColor(workflow.status)}
+                      size="medium"
+                      icon={getStatusIcon(workflow.status)}
+                      sx={{ fontWeight: 600 }}
+                    />
+                    <Chip 
+                      label={workflow.ehrSystem} 
+                      size="medium" 
+                      color="primary" 
+                      variant="outlined"
+                      icon={<EHRIcon />}
+                    />
+                    <Chip 
+                      label={`${workflow.blocks.length} automation steps`} 
+                      size="medium" 
+                      variant="outlined"
+                      icon={<AIIcon />}
+                    />
+                  </Stack>
+
+                  {/* Clinical Workflow Steps */}
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <ChecklistIcon color="primary" />
+                      Clinical Automation Steps
+                    </Typography>
+                    
+                    <Paper elevation={0} sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
+                      <Box sx={{ 
+                        display: 'grid',
+                        gridTemplateColumns: {
+                          xs: '1fr',
+                          sm: 'repeat(2, 1fr)'
+                        },
+                        gap: 1
+                      }}>
+                        {workflow.blocks.slice(0, 6).map((block, index) => (
+                          <Box key={block.id} sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 1,
+                            p: 1,
+                            borderRadius: 1,
+                            backgroundColor: 'white',
+                            border: '1px solid',
+                            borderColor: 'grey.200'
+                          }}>
+                            <Box sx={{ 
+                              minWidth: 24, 
+                              height: 24, 
+                              borderRadius: '50%', 
+                              backgroundColor: 'primary.main', 
+                              color: 'white', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              fontSize: '0.75rem',
+                              fontWeight: 600
+                            }}>
+                              {index + 1}
+                            </Box>
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Typography variant="body2" sx={{ 
+                                fontWeight: 500, 
+                                fontSize: '0.875rem',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}>
+                                {block.name}
+                              </Typography>
+                              <Chip 
+                                label={getBlockTypeLabel(block.type)} 
+                                size="small" 
+                                variant="outlined" 
+                                sx={{ height: 16, fontSize: '0.65rem', mt: 0.5 }}
+                              />
+                            </Box>
+                            {block.isEditable && (
+                              <SettingsIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            )}
+                          </Box>
+                        ))}
+                        {workflow.blocks.length > 6 && (
+                          <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center', display: 'block', mt: 1 }}>
+                            +{workflow.blocks.length - 6} more automation steps
+                          </Typography>
+                        )}
+                      </Box>
+                    </Paper>
+                  </Box>
+
+                  {/* Configuration Status */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <MapIcon color="primary" />
+                      Configuration Status
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {getConfigurationStatus(workflow)}
+                    </Typography>
+                  </Box>
+
+                  {/* Last Run Info */}
+                  {workflow.lastRun && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                      <TimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      <Typography variant="caption" color="text.secondary">
+                        Last executed: {workflow.lastRun}
+                      </Typography>
+                    </Box>
+                  )}
+                </CardContent>
+                
+                {/* Action Buttons */}
+                <Box sx={{ p: 3, pt: 0 }}>
+                  <Stack spacing={2}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="outlined"
+                        size="medium"
+                        startIcon={<SettingsIcon />}
+                        onClick={() => handleConfigureWorkflow(workflow)}
+                        sx={{ flex: 1 }}
                       >
-                        <MoreIcon />
-                      </IconButton>
+                        Configure
+                      </Button>
+                      <Button
+                        variant="contained"
+                        size="medium"
+                        startIcon={<PlayIcon />}
+                        onClick={() => handleExecuteWorkflow(workflow)}
+                        disabled={workflow.status === 'error' || workflow.status === 'draft'}
+                        sx={{ flex: 1 }}
+                      >
+                        Execute
+                      </Button>
                     </Box>
                     
-                    {/* Status and Info Chips */}
-                    <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap', gap: 1 }}>
-                      <Chip
-                        label={workflow.status === 'active' ? 'RUNNING' : workflow.status.toUpperCase()}
-                        color={getStatusColor(workflow.status)}
-                        size="medium"
-                        icon={getStatusIcon(workflow.status)}
-                        sx={{ fontWeight: 600 }}
-                      />
-                      <Chip 
-                        label={workflow.ehrSystem} 
-                        size="medium" 
-                        color="primary" 
-                        variant="outlined"
-                        icon={<EHRIcon />}
-                      />
-                      <Chip 
-                        label={`${workflow.blocks.length} automation steps`} 
-                        size="medium" 
-                        variant="outlined"
-                        icon={<AIIcon />}
-                      />
-                    </Stack>
-
-                    {/* Clinical Workflow Steps */}
-                    <Box sx={{ mb: 3 }}>
-                      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ChecklistIcon color="primary" />
-                        Clinical Automation Steps
-                      </Typography>
-                      
-                      <Paper elevation={0} sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
-                        <Grid container spacing={1}>
-                          {workflow.blocks.slice(0, 6).map((block, index) => (
-                            <Grid item xs={12} sm={6} key={block.id}>
-                              <Box sx={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: 1,
-                                p: 1,
-                                borderRadius: 1,
-                                backgroundColor: 'white',
-                                border: '1px solid',
-                                borderColor: 'grey.200'
-                              }}>
-                                <Box sx={{ 
-                                  minWidth: 24, 
-                                  height: 24, 
-                                  borderRadius: '50%', 
-                                  backgroundColor: 'primary.main', 
-                                  color: 'white', 
-                                  display: 'flex', 
-                                  alignItems: 'center', 
-                                  justifyContent: 'center',
-                                  fontSize: '0.75rem',
-                                  fontWeight: 600
-                                }}>
-                                  {index + 1}
-                                </Box>
-                                <Box sx={{ flex: 1, minWidth: 0 }}>
-                                  <Typography variant="body2" sx={{ 
-                                    fontWeight: 500, 
-                                    fontSize: '0.875rem',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
-                                  }}>
-                                    {block.name}
-                                  </Typography>
-                                  <Chip 
-                                    label={getBlockTypeLabel(block.type)} 
-                                    size="small" 
-                                    variant="outlined" 
-                                    sx={{ height: 16, fontSize: '0.65rem', mt: 0.5 }}
-                                  />
-                                </Box>
-                                {block.isEditable && (
-                                  <SettingsIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                                )}
-                              </Box>
-                            </Grid>
-                          ))}
-                          {workflow.blocks.length > 6 && (
-                            <Grid item xs={12}>
-                              <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center', display: 'block', mt: 1 }}>
-                                +{workflow.blocks.length - 6} more automation steps
-                              </Typography>
-                            </Grid>
-                          )}
-                        </Grid>
-                      </Paper>
-                    </Box>
-
-                    {/* Configuration Status */}
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <MapIcon color="primary" />
-                        Configuration Status
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {getConfigurationStatus(workflow)}
-                      </Typography>
-                    </Box>
-
-                    {/* Last Run Info */}
-                    {workflow.lastRun && (
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                        <TimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="caption" color="text.secondary">
-                          Last executed: {workflow.lastRun}
-                        </Typography>
-                      </Box>
+                    {workflow.status === 'draft' && (
+                      <Alert severity="warning" sx={{ fontSize: '0.875rem' }}>
+                        <strong>Setup Required:</strong> Configure visit type mappings to enable workflow execution
+                      </Alert>
                     )}
-                  </CardContent>
-                  
-                  {/* Action Buttons */}
-                  <Box sx={{ p: 3, pt: 0 }}>
-                    <Stack spacing={2}>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button
-                          variant="outlined"
-                          size="medium"
-                          startIcon={<SettingsIcon />}
-                          onClick={() => handleConfigureWorkflow(workflow)}
-                          sx={{ flex: 1 }}
-                        >
-                          Configure
-                        </Button>
-                        <Button
-                          variant="contained"
-                          size="medium"
-                          startIcon={<PlayIcon />}
-                          onClick={() => handleExecuteWorkflow(workflow)}
-                          disabled={workflow.status === 'error' || workflow.status === 'draft'}
-                          sx={{ flex: 1 }}
-                        >
-                          Execute
-                        </Button>
-                      </Box>
-                      
-                      {workflow.status === 'draft' && (
-                        <Alert severity="warning" sx={{ fontSize: '0.875rem' }}>
-                          <strong>Setup Required:</strong> Configure visit type mappings to enable workflow execution
-                        </Alert>
-                      )}
-                      
-                      {workflow.status === 'configured' && (
-                        <Alert severity="success" sx={{ fontSize: '0.875rem' }}>
-                          <strong>Ready to Use:</strong> Workflow configured and ready for EHR execution
-                        </Alert>
-                      )}
+                    
+                    {workflow.status === 'configured' && (
+                      <Alert severity="success" sx={{ fontSize: '0.875rem' }}>
+                        <strong>Ready to Use:</strong> Workflow configured and ready for EHR execution
+                      </Alert>
+                    )}
 
-                      {workflow.status === 'active' && (
-                        <Alert severity="info" sx={{ fontSize: '0.875rem' }}>
-                          <strong>Currently Running:</strong> AI automation is active in your EHR
-                        </Alert>
-                      )}
-                    </Stack>
-                  </Box>
-                </Card>
-              </Grid>
+                    {workflow.status === 'active' && (
+                      <Alert severity="info" sx={{ fontSize: '0.875rem' }}>
+                        <strong>Currently Running:</strong> AI automation is active in your EHR
+                      </Alert>
+                    )}
+                  </Stack>
+                </Box>
+              </Card>
             ))}
-          </Grid>
+          </Box>
         </Box>
       )}
 
