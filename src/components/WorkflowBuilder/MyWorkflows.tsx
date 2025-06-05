@@ -48,6 +48,7 @@ import {
   Pause as PauseIcon,
   Settings as SettingsIcon,
   CheckCircle as CheckCircleIcon,
+  Check as CheckIcon,
   Schedule as ScheduleIcon,
   Assignment as AssignmentIcon,
   ExpandMore as ExpandMoreIcon,
@@ -458,11 +459,12 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               borderColor: 'grey.300'
             }}
           >
-            <WorkflowIcon sx={{ 
-              fontSize: { xs: 60, sm: 70, md: 80 }, 
-              color: 'text.secondary', 
-              mb: { xs: 2, sm: 3 } 
-            }} />
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: { xs: 2, sm: 3 } }}>
+              <WorkflowIcon 
+                size={isSmallMobile ? 60 : isMobile ? 70 : 80}
+                color={theme.palette.text.secondary}
+              />
+            </Box>
             <Typography 
               variant={isSmallMobile ? "h5" : isMobile ? "h4" : "h4"} 
               gutterBottom 
@@ -526,12 +528,12 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         <Box>
           <Box sx={{ mb: { xs: 3, sm: 4 } }}>
             <Typography 
-              variant={isSmallMobile ? "h5" : isMobile ? "h4" : "h4"} 
+              variant={isSmallMobile ? "h6" : isMobile ? "h5" : "h5"} 
               gutterBottom 
               sx={{ 
                 fontWeight: 600, 
                 color: 'text.primary',
-                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+                fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.5rem' }
               }}
             >
               My Clinical Workflows
@@ -1028,7 +1030,12 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     fontSize: { xs: '0.875rem', sm: '1rem' }
                   }}
                 >
-                  <WorkflowIcon color="primary" sx={{ fontSize: { xs: 16, sm: 18 } }} />
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <WorkflowIcon 
+                      size={isSmallMobile ? 16 : 18}
+                      color={theme.palette.primary.main}
+                    />
+                  </Box>
                   Configured Visit Types
                 </Typography>
                 <Stack 
