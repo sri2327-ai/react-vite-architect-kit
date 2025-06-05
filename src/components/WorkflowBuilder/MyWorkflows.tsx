@@ -35,7 +35,10 @@ import {
   AccordionSummary,
   AccordionDetails,
   Stack,
-  Paper
+  Paper,
+  useTheme,
+  useMediaQuery,
+  Container
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -112,6 +115,10 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
   importedWorkflows = [], 
   setImportedWorkflows 
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [workflows, setWorkflows] = useState<ImportedWorkflow[]>(
     importedWorkflows.length > 0 ? importedWorkflows : [
       {
@@ -435,43 +442,75 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
   };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 } }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
       {workflows.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
+        <Box sx={{ textAlign: 'center', py: { xs: 4, sm: 6, md: 8 } }}>
           <Paper 
             elevation={0} 
             sx={{ 
-              p: 6, 
-              borderRadius: 4, 
+              p: { xs: 3, sm: 4, md: 6 }, 
+              borderRadius: { xs: 3, sm: 4 }, 
               backgroundColor: 'grey.50',
               border: '2px dashed',
               borderColor: 'grey.300'
             }}
           >
-            <WorkflowIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 3 }} />
-            <Typography variant="h4" gutterBottom color="text.primary" sx={{ fontWeight: 600 }}>
+            <WorkflowIcon sx={{ 
+              fontSize: { xs: 60, sm: 70, md: 80 }, 
+              color: 'text.secondary', 
+              mb: { xs: 2, sm: 3 } 
+            }} />
+            <Typography 
+              variant={isSmallMobile ? "h5" : isMobile ? "h4" : "h4"} 
+              gutterBottom 
+              color="text.primary" 
+              sx={{ 
+                fontWeight: 600,
+                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+              }}
+            >
               No Clinical Workflows Yet
             </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>
+            <Typography 
+              variant="h6" 
+              color="text.secondary" 
+              sx={{ 
+                mb: { xs: 3, sm: 4 }, 
+                maxWidth: { xs: 300, sm: 500 }, 
+                mx: 'auto',
+                fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+              }}
+            >
               Start automating your clinical documentation by importing workflows from our library
             </Typography>
             
             <Alert 
               severity="info" 
               sx={{ 
-                mb: 4, 
-                maxWidth: 700, 
+                mb: { xs: 3, sm: 4 }, 
+                maxWidth: { xs: 350, sm: 600, md: 700 }, 
                 mx: 'auto',
-                fontSize: '1rem',
+                fontSize: { xs: '0.875rem', sm: '1rem' },
                 '& .MuiAlert-message': {
                   textAlign: 'left'
                 }
               }}
             >
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+              <Typography 
+                variant="subtitle1" 
+                sx={{ 
+                  fontWeight: 600, 
+                  mb: 1,
+                  fontSize: { xs: '1rem', sm: '1.125rem' }
+                }}
+              >
                 Quick Start Guide:
               </Typography>
-              <Typography component="div" variant="body1">
+              <Typography 
+                component="div" 
+                variant="body1"
+                sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+              >
                 1. <strong>Browse Library:</strong> Go to Workflow Library tab<br />
                 2. <strong>Import Workflow:</strong> Choose a clinical workflow template<br />
                 3. <strong>Configure:</strong> Map to your visit types and EHR fields<br />
@@ -482,15 +521,38 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         </Box>
       ) : (
         <Box>
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
+          <Box sx={{ mb: { xs: 3, sm: 4 } }}>
+            <Typography 
+              variant={isSmallMobile ? "h5" : isMobile ? "h4" : "h4"} 
+              gutterBottom 
+              sx={{ 
+                fontWeight: 600, 
+                color: 'text.primary',
+                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+              }}
+            >
               My Clinical Workflows
             </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+            <Typography 
+              variant="h6" 
+              color="text.secondary" 
+              sx={{ 
+                mb: 2,
+                fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+              }}
+            >
               AI-powered automation for your EHR documentation and clinical workflows
             </Typography>
             
-            <Alert severity="info" sx={{ mb: 3 }}>
+            <Alert 
+              severity="info" 
+              sx={{ 
+                mb: 3,
+                '& .MuiAlert-message': {
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }
+              }}
+            >
               <Typography variant="body1">
                 <strong>For Clinicians:</strong> These workflows automate repetitive EHR tasks, allowing you to focus on patient care. 
                 Each workflow connects to your visit types from Template Builder and executes common documentation patterns.
@@ -502,10 +564,11 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             display: 'grid',
             gridTemplateColumns: {
               xs: '1fr',
-              lg: 'repeat(2, 1fr)',
-              xl: 'repeat(3, 1fr)'
+              sm: 'repeat(auto-fit, minmax(350px, 1fr))',
+              md: 'repeat(auto-fit, minmax(400px, 1fr))',
+              lg: 'repeat(auto-fit, minmax(450px, 1fr))'
             },
-            gap: 3
+            gap: { xs: 2, sm: 3 }
           }}>
             {workflows.map((workflow) => (
               <Card 
@@ -516,69 +579,129 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   flexDirection: 'column',
                   border: '1px solid',
                   borderColor: 'divider',
-                  borderRadius: 3,
+                  borderRadius: { xs: 2, sm: 3 },
                   transition: 'all 0.2s ease',
                   '&:hover': {
-                    boxShadow: 6,
-                    transform: 'translateY(-2px)'
+                    boxShadow: { xs: 3, sm: 6 },
+                    transform: { xs: 'none', sm: 'translateY(-2px)' }
                   }
                 }}
               >
-                <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
                   {/* Header Section */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                        <EHRIcon color="primary" />
-                        <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'flex-start', 
+                    mb: { xs: 2, sm: 3 },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 1, sm: 0 }
+                  }}>
+                    <Box sx={{ flexGrow: 1, width: { xs: '100%', sm: 'auto' } }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: { xs: 1, sm: 2 }, 
+                        mb: 1,
+                        flexWrap: 'wrap'
+                      }}>
+                        <EHRIcon color="primary" sx={{ fontSize: { xs: 20, sm: 24 } }} />
+                        <Typography 
+                          variant={isSmallMobile ? "h6" : "h5"} 
+                          sx={{ 
+                            fontWeight: 600, 
+                            color: 'text.primary',
+                            fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.5rem' },
+                            lineHeight: 1.2
+                          }}
+                        >
                           {workflow.name}
                         </Typography>
                       </Box>
-                      <Typography variant="body1" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+                      <Typography 
+                        variant="body1" 
+                        color="text.secondary" 
+                        sx={{ 
+                          mb: 2, 
+                          lineHeight: 1.6,
+                          fontSize: { xs: '0.875rem', sm: '1rem' }
+                        }}
+                      >
                         {workflow.description}
                       </Typography>
                     </Box>
                     <IconButton
                       size="small"
                       onClick={(e) => setAnchorEl(e.currentTarget)}
-                      sx={{ ml: 1 }}
+                      sx={{ 
+                        ml: { xs: 0, sm: 1 },
+                        alignSelf: { xs: 'flex-end', sm: 'flex-start' }
+                      }}
                     >
                       <MoreIcon />
                     </IconButton>
                   </Box>
                   
                   {/* Status and Info Chips */}
-                  <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap', gap: 1 }}>
+                  <Stack 
+                    direction="row" 
+                    spacing={1} 
+                    sx={{ 
+                      mb: { xs: 2, sm: 3 }, 
+                      flexWrap: 'wrap', 
+                      gap: 1,
+                      '& .MuiChip-root': {
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                      }
+                    }}
+                  >
                     <Chip
                       label={workflow.status === 'active' ? 'RUNNING' : workflow.status.toUpperCase()}
                       color={getStatusColor(workflow.status)}
-                      size="medium"
+                      size={isSmallMobile ? "small" : "medium"}
                       icon={getStatusIcon(workflow.status)}
                       sx={{ fontWeight: 600 }}
                     />
                     <Chip 
                       label={workflow.ehrSystem} 
-                      size="medium" 
+                      size={isSmallMobile ? "small" : "medium"}
                       color="primary" 
                       variant="outlined"
-                      icon={<EHRIcon />}
+                      icon={<EHRIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
                     />
                     <Chip 
                       label={`${workflow.blocks.length} automation steps`} 
-                      size="medium" 
+                      size={isSmallMobile ? "small" : "medium"}
                       variant="outlined"
-                      icon={<AIIcon />}
+                      icon={<AIIcon sx={{ fontSize: { xs: 16, sm: 20 } }} />}
                     />
                   </Stack>
 
                   {/* Clinical Workflow Steps */}
-                  <Box sx={{ mb: 3 }}>
-                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <ChecklistIcon color="primary" />
+                  <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                    <Typography 
+                      variant={isSmallMobile ? "subtitle1" : "h6"} 
+                      sx={{ 
+                        mb: 2, 
+                        fontWeight: 600, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 1,
+                        fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+                      }}
+                    >
+                      <ChecklistIcon color="primary" sx={{ fontSize: { xs: 18, sm: 20 } }} />
                       Clinical Automation Steps
                     </Typography>
                     
-                    <Paper elevation={0} sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
+                    <Paper 
+                      elevation={0} 
+                      sx={{ 
+                        bgcolor: 'grey.50', 
+                        borderRadius: { xs: 1, sm: 2 }, 
+                        p: { xs: 1.5, sm: 2 } 
+                      }}
+                    >
                       <Box sx={{ 
                         display: 'grid',
                         gridTemplateColumns: {
@@ -587,27 +710,27 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         },
                         gap: 1
                       }}>
-                        {workflow.blocks.slice(0, 6).map((block, index) => (
+                        {workflow.blocks.slice(0, isSmallMobile ? 4 : 6).map((block, index) => (
                           <Box key={block.id} sx={{ 
                             display: 'flex', 
                             alignItems: 'center', 
                             gap: 1,
-                            p: 1,
+                            p: { xs: 0.75, sm: 1 },
                             borderRadius: 1,
                             backgroundColor: 'white',
                             border: '1px solid',
                             borderColor: 'grey.200'
                           }}>
                             <Box sx={{ 
-                              minWidth: 24, 
-                              height: 24, 
+                              minWidth: { xs: 20, sm: 24 }, 
+                              height: { xs: 20, sm: 24 }, 
                               borderRadius: '50%', 
                               backgroundColor: 'primary.main', 
                               color: 'white', 
                               display: 'flex', 
                               alignItems: 'center', 
                               justifyContent: 'center',
-                              fontSize: '0.75rem',
+                              fontSize: { xs: '0.65rem', sm: '0.75rem' },
                               fontWeight: 600
                             }}>
                               {index + 1}
@@ -615,7 +738,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                             <Box sx={{ flex: 1, minWidth: 0 }}>
                               <Typography variant="body2" sx={{ 
                                 fontWeight: 500, 
-                                fontSize: '0.875rem',
+                                fontSize: { xs: '0.75rem', sm: '0.875rem' },
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap'
@@ -626,17 +749,33 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                                 label={getBlockTypeLabel(block.type)} 
                                 size="small" 
                                 variant="outlined" 
-                                sx={{ height: 16, fontSize: '0.65rem', mt: 0.5 }}
+                                sx={{ 
+                                  height: { xs: 14, sm: 16 }, 
+                                  fontSize: { xs: '0.6rem', sm: '0.65rem' }, 
+                                  mt: 0.5 
+                                }}
                               />
                             </Box>
                             {block.isEditable && (
-                              <SettingsIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                              <SettingsIcon sx={{ 
+                                fontSize: { xs: 14, sm: 16 }, 
+                                color: 'text.secondary' 
+                              }} />
                             )}
                           </Box>
                         ))}
-                        {workflow.blocks.length > 6 && (
-                          <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center', display: 'block', mt: 1 }}>
-                            +{workflow.blocks.length - 6} more automation steps
+                        {workflow.blocks.length > (isSmallMobile ? 4 : 6) && (
+                          <Typography 
+                            variant="caption" 
+                            color="text.secondary" 
+                            sx={{ 
+                              textAlign: 'center', 
+                              display: 'block', 
+                              mt: 1,
+                              fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                            }}
+                          >
+                            +{workflow.blocks.length - (isSmallMobile ? 4 : 6)} more automation steps
                           </Typography>
                         )}
                       </Box>
@@ -645,20 +784,47 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
 
                   {/* Configuration Status */}
                   <Box sx={{ mb: 2 }}>
-                    <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <MapIcon color="primary" />
+                    <Typography 
+                      variant="body1" 
+                      sx={{ 
+                        fontWeight: 500, 
+                        mb: 1, 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 1,
+                        fontSize: { xs: '0.875rem', sm: '1rem' }
+                      }}
+                    >
+                      <MapIcon color="primary" sx={{ fontSize: { xs: 16, sm: 18 } }} />
                       Configuration Status
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                    >
                       {getConfigurationStatus(workflow)}
                     </Typography>
                   </Box>
 
                   {/* Last Run Info */}
                   {workflow.lastRun && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                      <TimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                      <Typography variant="caption" color="text.secondary">
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: 1, 
+                      mb: 2,
+                      flexWrap: 'wrap'
+                    }}>
+                      <TimeIcon sx={{ 
+                        fontSize: { xs: 14, sm: 16 }, 
+                        color: 'text.secondary' 
+                      }} />
+                      <Typography 
+                        variant="caption" 
+                        color="text.secondary"
+                        sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                      >
                         Last executed: {workflow.lastRun}
                       </Typography>
                     </Box>
@@ -666,19 +832,24 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 </CardContent>
                 
                 {/* Action Buttons */}
-                <Box sx={{ p: 3, pt: 0 }}>
+                <Box sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
                   <Stack spacing={2}>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      gap: 1,
+                      flexDirection: { xs: 'column', sm: 'row' }
+                    }}>
                       <Button
                         variant="outlined"
-                        size="medium"
-                        startIcon={<SettingsIcon />}
+                        size={isSmallMobile ? "small" : "medium"}
+                        startIcon={<SettingsIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />}
                         onClick={() => handleConfigureWorkflow(workflow)}
                         sx={{ 
                           flex: 1,
                           borderColor: '#81C784',
                           color: '#388E3C',
                           backgroundColor: '#F1F8E9',
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
                           '&:hover': {
                             borderColor: '#66BB6A',
                             backgroundColor: '#E8F5E8',
@@ -690,30 +861,58 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       </Button>
                       <Button
                         variant="contained"
-                        size="medium"
-                        startIcon={<PlayIcon />}
+                        size={isSmallMobile ? "small" : "medium"}
+                        startIcon={<PlayIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />}
                         onClick={() => handleExecuteWorkflow(workflow)}
                         disabled={workflow.status === 'error' || workflow.status === 'draft'}
-                        sx={{ flex: 1 }}
+                        sx={{ 
+                          flex: 1,
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                        }}
                       >
                         Execute
                       </Button>
                     </Box>
                     
+                    {/* Status Alerts */}
                     {workflow.status === 'draft' && (
-                      <Alert severity="warning" sx={{ fontSize: '0.875rem' }}>
+                      <Alert 
+                        severity="warning" 
+                        sx={{ 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          '& .MuiAlert-message': {
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                          }
+                        }}
+                      >
                         <strong>Setup Required:</strong> Configure visit type mappings to enable workflow execution
                       </Alert>
                     )}
                     
                     {workflow.status === 'configured' && (
-                      <Alert severity="success" sx={{ fontSize: '0.875rem' }}>
+                      <Alert 
+                        severity="success" 
+                        sx={{ 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          '& .MuiAlert-message': {
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                          }
+                        }}
+                      >
                         <strong>Ready to Use:</strong> Workflow configured and ready for EHR execution
                       </Alert>
                     )}
 
                     {workflow.status === 'active' && (
-                      <Alert severity="info" sx={{ fontSize: '0.875rem' }}>
+                      <Alert 
+                        severity="info" 
+                        sx={{ 
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                          '& .MuiAlert-message': {
+                            fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                          }
+                        }}
+                      >
                         <strong>Currently Running:</strong> AI automation is active in your EHR
                       </Alert>
                     )}
@@ -725,17 +924,52 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         </Box>
       )}
 
-      {/* Workflow Execution Dialog */}
-      <Dialog open={executeDialog} onClose={() => setExecuteDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <EHRIcon color="primary" />
-            Execute Workflow: {selectedWorkflow?.name}
+      {/* Workflow Execution Dialog - Mobile Optimized */}
+      <Dialog 
+        open={executeDialog} 
+        onClose={() => setExecuteDialog(false)} 
+        maxWidth="sm" 
+        fullWidth
+        fullScreen={isSmallMobile}
+        sx={{
+          '& .MuiDialog-paper': {
+            m: { xs: 1, sm: 2 },
+            maxHeight: { xs: '95vh', sm: '90vh' }
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          pb: 1,
+          fontSize: { xs: '1.125rem', sm: '1.25rem' }
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: { xs: 1, sm: 2 },
+            flexDirection: { xs: 'column', sm: 'row' },
+            textAlign: { xs: 'center', sm: 'left' }
+          }}>
+            <EHRIcon color="primary" sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            <Typography 
+              variant={isSmallMobile ? "h6" : "h6"}
+              sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}
+            >
+              Execute Workflow: {selectedWorkflow?.name}
+            </Typography>
           </Box>
         </DialogTitle>
-        <DialogContent>
-          <Box sx={{ mb: 3 }}>
-            <Stepper activeStep={executionStep} alternativeLabel>
+        <DialogContent sx={{ pt: 1 }}>
+          <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+            <Stepper 
+              activeStep={executionStep} 
+              alternativeLabel={!isSmallMobile}
+              orientation={isSmallMobile ? "vertical" : "horizontal"}
+              sx={{
+                '& .MuiStepLabel-label': {
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                }
+              }}
+            >
               {executionSteps.map((label) => (
                 <Step key={label}>
                   <StepLabel>{label}</StepLabel>
@@ -748,21 +982,63 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
 
           {executionStep === 0 && (
             <Box>
-              <Alert severity="info" sx={{ mb: 3 }}>
-                <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
+              <Alert 
+                severity="info" 
+                sx={{ 
+                  mb: { xs: 2, sm: 3 },
+                  '& .MuiAlert-message': {
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }
+                }}
+              >
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    fontWeight: 600, 
+                    mb: 1,
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }}
+                >
                   Ready to Execute Clinical Workflow
                 </Typography>
-                <Typography variant="body2">
+                <Typography 
+                  variant="body2"
+                  sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                >
                   This workflow will execute across all configured visit types. Enter your {selectedWorkflow?.ehrSystem} credentials to authenticate and begin automation.
                 </Typography>
               </Alert>
               
-              <Box sx={{ mb: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
-                <Typography variant="subtitle2" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <WorkflowIcon color="primary" />
+              <Box sx={{ 
+                mb: { xs: 2, sm: 3 }, 
+                p: { xs: 1.5, sm: 2 }, 
+                backgroundColor: 'grey.50', 
+                borderRadius: 1 
+              }}>
+                <Typography 
+                  variant="subtitle2" 
+                  sx={{ 
+                    mb: 1, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 1,
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }}
+                >
+                  <WorkflowIcon color="primary" sx={{ fontSize: { xs: 16, sm: 18 } }} />
                   Configured Visit Types
                 </Typography>
-                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                <Stack 
+                  direction="row" 
+                  spacing={1} 
+                  sx={{ 
+                    flexWrap: 'wrap', 
+                    gap: 1,
+                    '& .MuiChip-root': {
+                      fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                    }
+                  }}
+                >
                   {selectedWorkflow?.visitTypeMappings
                     .filter(mapping => mapping.isConfigured)
                     .map(mapping => (
@@ -785,6 +1061,9 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
                 sx={{ mb: 2 }}
                 size="small"
+                InputLabelProps={{
+                  style: { fontSize: isSmallMobile ? '0.875rem' : '1rem' }
+                }}
               />
               <TextField
                 fullWidth
@@ -794,22 +1073,41 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
                 sx={{ mb: 2 }}
                 size="small"
+                InputLabelProps={{
+                  style: { fontSize: isSmallMobile ? '0.875rem' : '1rem' }
+                }}
               />
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={mfaEnabled}
                     onChange={(e) => setMfaEnabled(e.target.checked)}
+                    size={isSmallMobile ? "small" : "medium"}
                   />
                 }
-                label={`My ${selectedWorkflow?.ehrSystem} has Multi-Factor Authentication (MFA)`}
+                label={
+                  <Typography 
+                    variant="body2"
+                    sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                  >
+                    My {selectedWorkflow?.ehrSystem} has Multi-Factor Authentication (MFA)
+                  </Typography>
+                }
               />
             </Box>
           )}
 
           {executionStep === 1 && mfaEnabled && (
             <Box>
-              <Alert severity="warning" sx={{ mb: 3 }}>
+              <Alert 
+                severity="warning" 
+                sx={{ 
+                  mb: { xs: 2, sm: 3 },
+                  '& .MuiAlert-message': {
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }
+                }}
+              >
                 MFA detected. Please check your device for the OTP code and enter it below.
               </Alert>
               <TextField
@@ -820,16 +1118,31 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 placeholder="123456"
                 inputProps={{ maxLength: 6 }}
                 size="small"
+                InputLabelProps={{
+                  style: { fontSize: isSmallMobile ? '0.875rem' : '1rem' }
+                }}
               />
             </Box>
           )}
 
           {executionStep === 2 && (
             <Box>
-              <Alert severity="success" sx={{ mb: 2 }}>
+              <Alert 
+                severity="success" 
+                sx={{ 
+                  mb: 2,
+                  '& .MuiAlert-message': {
+                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                  }
+                }}
+              >
                 Authentication successful! Executing workflow automation...
               </Alert>
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+              >
                 The workflow is now automating your {selectedWorkflow?.ehrSystem} system across all configured visit types. 
                 You can monitor progress in the workflow dashboard.
               </Typography>
@@ -837,14 +1150,29 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
           )}
 
           {executionStep === 3 && (
-            <Alert severity="success">
+            <Alert 
+              severity="success"
+              sx={{
+                '& .MuiAlert-message': {
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }
+              }}
+            >
               Workflow executed successfully! Your {selectedWorkflow?.ehrSystem} encounters have been 
               automated according to your configured visit type mappings.
             </Alert>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setExecuteDialog(false)}>
+        <DialogActions sx={{ 
+          p: { xs: 2, sm: 3 },
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 1, sm: 0 }
+        }}>
+          <Button 
+            onClick={() => setExecuteDialog(false)}
+            fullWidth={isSmallMobile}
+            sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+          >
             {executionStep === 3 ? 'Close' : 'Cancel'}
           </Button>
           {executionStep === 0 && (
@@ -852,6 +1180,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               variant="contained"
               onClick={handleStartExecution}
               disabled={!credentials.username || !credentials.password || isExecuting}
+              fullWidth={isSmallMobile}
+              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
             >
               Authenticate & Start
             </Button>
@@ -861,6 +1191,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               variant="contained"
               onClick={handleMfaVerification}
               disabled={!otpCode || isExecuting}
+              fullWidth={isSmallMobile}
+              sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
             >
               Verify OTP
             </Button>
@@ -868,31 +1200,76 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Configuration Dialog */}
-      <Dialog open={configureDialog} onClose={() => setConfigureDialog(false)} maxWidth="md" fullWidth>
-        <DialogTitle>
+      {/* Configuration Dialog - Mobile Optimized */}
+      <Dialog 
+        open={configureDialog} 
+        onClose={() => setConfigureDialog(false)} 
+        maxWidth="md" 
+        fullWidth
+        fullScreen={isMobile}
+        sx={{
+          '& .MuiDialog-paper': {
+            m: { xs: 0, md: 2 },
+            maxHeight: { xs: '100vh', md: '95vh' }
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          fontSize: { xs: '1.125rem', sm: '1.25rem' },
+          pb: { xs: 1, sm: 2 }
+        }}>
           Configure Workflow: {selectedWorkflow?.name}
         </DialogTitle>
-        <DialogContent>
-          <Alert severity="info" sx={{ mb: 3 }}>
+        <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>
+          <Alert 
+            severity="info" 
+            sx={{ 
+              mb: { xs: 2, sm: 3 },
+              '& .MuiAlert-message': {
+                fontSize: { xs: '0.875rem', sm: '1rem' }
+              }
+            }}
+          >
             Configure schedule settings, note types, and map workflow blocks to template note sections for each visit type. 
             Visit types and template sections come from your Template Builder. You can select multiple note headings for each field.
           </Alert>
           
           {/* Common Schedule Configuration Section */}
-          <Box sx={{ mb: 4, p: 3, border: 1, borderColor: 'divider', borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <ScheduleIcon color="primary" />
+          <Box sx={{ 
+            mb: { xs: 3, sm: 4 }, 
+            p: { xs: 2, sm: 3 }, 
+            border: 1, 
+            borderColor: 'divider', 
+            borderRadius: { xs: 1, sm: 2 } 
+          }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                mb: 2, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+              }}
+            >
+              <ScheduleIcon color="primary" sx={{ fontSize: { xs: 18, sm: 20 } }} />
               Schedule Configuration (Common for all visit types)
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography 
+              variant="body2" 
+              color="text.secondary" 
+              sx={{ 
+                mb: { xs: 2, sm: 3 },
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+              }}
+            >
               These settings will apply to all visit types in this workflow.
             </Typography>
             <Box sx={{ 
               display: 'flex', 
               flexDirection: { xs: 'column', md: 'row' }, 
               gap: 2,
-              mb: 3
+              mb: { xs: 2, sm: 3 }
             }}>
               <Box sx={{ flex: 1 }}>
                 <TextField
@@ -903,7 +1280,10 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   onChange={(e) => handleGlobalScheduleConfigChange('providerName', e.target.value)}
                   placeholder="e.g., Dr. Smith"
                   InputProps={{
-                    startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                    startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary', fontSize: { xs: 16, sm: 18 } }} />
+                  }}
+                  InputLabelProps={{
+                    style: { fontSize: isSmallMobile ? '0.875rem' : '1rem' }
                   }}
                 />
               </Box>
@@ -916,38 +1296,60 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   onChange={(e) => handleGlobalScheduleConfigChange('location', e.target.value)}
                   placeholder="e.g., Main Clinic"
                   InputProps={{
-                    startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                    startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary', fontSize: { xs: 16, sm: 18 } }} />
+                  }}
+                  InputLabelProps={{
+                    style: { fontSize: isSmallMobile ? '0.875rem' : '1rem' }
                   }}
                 />
               </Box>
             </Box>
             
             {/* Previous Visit Note Import Option */}
-            <Box sx={{ p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+            <Box sx={{ 
+              p: { xs: 1.5, sm: 2 }, 
+              backgroundColor: 'grey.50', 
+              borderRadius: 1 
+            }}>
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote || false}
                     onChange={(e) => handleGlobalScheduleConfigChange('importPreviousNote', e.target.checked)}
+                    size={isSmallMobile ? "small" : "medium"}
                   />
                 }
                 label={
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <ChecklistIcon color="primary" />
-                    <Typography variant="body2">
+                    <ChecklistIcon color="primary" sx={{ fontSize: { xs: 16, sm: 18 } }} />
+                    <Typography 
+                      variant="body2"
+                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                    >
                       Import previous visit note as checklist
                     </Typography>
                   </Box>
                 }
               />
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block', mb: 2 }}>
+              <Typography 
+                variant="caption" 
+                color="text.secondary" 
+                sx={{ 
+                  ml: 4, 
+                  display: 'block', 
+                  mb: 2,
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                }}
+              >
                 Automatically import the last visit note to reference during the current encounter
               </Typography>
               
               {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote && (
-                <Box sx={{ ml: 4, mt: 2 }}>
+                <Box sx={{ ml: { xs: 2, sm: 4 }, mt: 2 }}>
                   <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                    <InputLabel>Import Note For</InputLabel>
+                    <InputLabel style={{ fontSize: isSmallMobile ? '0.875rem' : '1rem' }}>
+                      Import Note For
+                    </InputLabel>
                     <Select
                       value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor || 'all'}
                       label="Import Note For"
@@ -960,7 +1362,9 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   
                   {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor === 'selected' && (
                     <FormControl fullWidth size="small">
-                      <InputLabel>Select Visit Types</InputLabel>
+                      <InputLabel style={{ fontSize: isSmallMobile ? '0.875rem' : '1rem' }}>
+                        Select Visit Types
+                      </InputLabel>
                       <Select
                         multiple
                         value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.selectedVisitTypes || []}
@@ -969,7 +1373,12 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         renderValue={(selected) => (
                           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {(selected as string[]).map((value) => (
-                              <Chip key={value} label={value} size="small" />
+                              <Chip 
+                                key={value} 
+                                label={value} 
+                                size="small"
+                                sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                              />
                             ))}
                           </Box>
                         )}
@@ -988,8 +1397,17 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
           </Box>
 
           {/* Visit Type Specific Configuration */}
-          <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <AssignmentIcon color="primary" />
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              mb: 2, 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1,
+              fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+            }}
+          >
+            <AssignmentIcon color="primary" sx={{ fontSize: { xs: 18, sm: 20 } }} />
             Visit Type Configuration
           </Typography>
           
@@ -997,31 +1415,77 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             const templateSections = getTemplateSectionsForVisitType(mapping.visitType);
             
             return (
-              <Accordion key={mapping.visitType} sx={{ mb: 2 }}>
+              <Accordion 
+                key={mapping.visitType} 
+                sx={{ 
+                  mb: 2,
+                  '& .MuiAccordionSummary-content': {
+                    margin: { xs: '8px 0', sm: '12px 0' }
+                  }
+                }}
+              >
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                    <Typography variant="h6">{mapping.visitType}</Typography>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: { xs: 1, sm: 2 }, 
+                    width: '100%',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    alignItems: { xs: 'flex-start', sm: 'center' }
+                  }}>
+                    <Typography 
+                      variant="h6"
+                      sx={{ fontSize: { xs: '1rem', sm: '1.125rem' } }}
+                    >
+                      {mapping.visitType}
+                    </Typography>
                     <Chip 
                       label={mapping.isConfigured ? 'Configured' : 'Needs Configuration'}
                       color={mapping.isConfigured ? 'success' : 'warning'}
                       size="small"
+                      sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
                     />
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography 
+                      variant="caption" 
+                      color="text.secondary"
+                      sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                    >
                       ({templateSections.length} template sections available)
                     </Typography>
                   </Box>
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails sx={{ px: { xs: 1, sm: 2 } }}>
                   <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ 
+                        mb: { xs: 2, sm: 3 },
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                      }}
+                    >
                       Configure note type and map workflow blocks to template sections for {mapping.visitType}.
                       You can select multiple note headings for each workflow block.
                     </Typography>
                     
                     {/* Note Type Configuration */}
-                    <Box sx={{ mb: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
-                      <Typography variant="subtitle2" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <NoteIcon color="primary" />
+                    <Box sx={{ 
+                      mb: { xs: 2, sm: 3 }, 
+                      p: { xs: 1.5, sm: 2 }, 
+                      backgroundColor: 'grey.50', 
+                      borderRadius: 1 
+                    }}>
+                      <Typography 
+                        variant="subtitle2" 
+                        sx={{ 
+                          mb: 2, 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: 1,
+                          fontSize: { xs: '0.875rem', sm: '1rem' }
+                        }}
+                      >
+                        <NoteIcon color="primary" sx={{ fontSize: { xs: 16, sm: 18 } }} />
                         Note Type Configuration
                       </Typography>
                       <TextField
@@ -1032,26 +1496,63 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         onChange={(e) => handleNoteTypeChange(mapping.visitType, e.target.value)}
                         placeholder="e.g., Progress Note, SOAP Note, H&P Note"
                         helperText="Specify the note type that will be selected in your EHR system for this visit type"
+                        InputLabelProps={{
+                          style: { fontSize: isSmallMobile ? '0.875rem' : '1rem' }
+                        }}
+                        FormHelperTextProps={{
+                          style: { fontSize: isSmallMobile ? '0.7rem' : '0.75rem' }
+                        }}
                       />
                     </Box>
 
                     {/* Template Field Mapping */}
-                    <Typography variant="subtitle2" sx={{ mb: 2 }}>
+                    <Typography 
+                      variant="subtitle2" 
+                      sx={{ 
+                        mb: 2,
+                        fontSize: { xs: '0.875rem', sm: '1rem' }
+                      }}
+                    >
                       Template Field Mapping
                     </Typography>
                     
                     {selectedWorkflow.blocks
                       .filter(block => block.type === 'note_entry')
                       .map((block) => (
-                        <Box key={block.id} sx={{ mb: 3, p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
-                          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                        <Box 
+                          key={block.id} 
+                          sx={{ 
+                            mb: { xs: 2, sm: 3 }, 
+                            p: { xs: 1.5, sm: 2 }, 
+                            border: 1, 
+                            borderColor: 'divider', 
+                            borderRadius: 1 
+                          }}
+                        >
+                          <Typography 
+                            variant="subtitle2" 
+                            sx={{ 
+                              mb: 2, 
+                              fontWeight: 600,
+                              fontSize: { xs: '0.875rem', sm: '1rem' }
+                            }}
+                          >
                             {block.name}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                          <Typography 
+                            variant="body2" 
+                            color="text.secondary" 
+                            sx={{ 
+                              mb: 2,
+                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                            }}
+                          >
                             {block.description}
                           </Typography>
                           <FormControl fullWidth size="small">
-                            <InputLabel>Select Template Note Sections (Multiple)</InputLabel>
+                            <InputLabel style={{ fontSize: isSmallMobile ? '0.875rem' : '1rem' }}>
+                              Select Template Note Sections (Multiple)
+                            </InputLabel>
                             <Select
                               multiple
                               value={mapping.templateFields[block.id] || []}
@@ -1060,7 +1561,14 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                               renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                   {(selected as string[]).map((value) => (
-                                    <Chip key={value} label={value} size="small" color="primary" variant="outlined" />
+                                    <Chip 
+                                      key={value} 
+                                      label={value} 
+                                      size="small" 
+                                      color="primary" 
+                                      variant="outlined"
+                                      sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                                    />
                                   ))}
                                 </Box>
                               )}
@@ -1074,13 +1582,27 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                                   <ListItemText 
                                     primary={section.name} 
                                     secondary={section.type}
+                                    primaryTypographyProps={{
+                                      fontSize: isSmallMobile ? '0.875rem' : '1rem'
+                                    }}
+                                    secondaryTypographyProps={{
+                                      fontSize: isSmallMobile ? '0.75rem' : '0.875rem'
+                                    }}
                                   />
                                 </MenuItem>
                               ))}
                             </Select>
                           </FormControl>
                           {mapping.templateFields[block.id] && mapping.templateFields[block.id].length > 0 && (
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                            <Typography 
+                              variant="caption" 
+                              color="text.secondary" 
+                              sx={{ 
+                                mt: 1, 
+                                display: 'block',
+                                fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                              }}
+                            >
                               Maps to: {mapping.templateFields[block.id].join(', ')}
                             </Typography>
                           )}
@@ -1092,11 +1614,23 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             );
           })}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfigureDialog(false)}>
+        <DialogActions sx={{ 
+          p: { xs: 2, sm: 3 },
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 1, sm: 0 }
+        }}>
+          <Button 
+            onClick={() => setConfigureDialog(false)}
+            fullWidth={isSmallMobile}
+            sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+          >
             Cancel
           </Button>
-          <Button variant="contained">
+          <Button 
+            variant="contained"
+            fullWidth={isSmallMobile}
+            sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+          >
             Save Configuration
           </Button>
         </DialogActions>
@@ -1108,16 +1642,22 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         open={Boolean(anchorEl)}
         onClose={() => setAnchorEl(null)}
       >
-        <MenuItem onClick={() => setAnchorEl(null)}>
-          <EditIcon sx={{ mr: 1 }} />
+        <MenuItem 
+          onClick={() => setAnchorEl(null)}
+          sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+        >
+          <EditIcon sx={{ mr: 1, fontSize: { xs: 16, sm: 18 } }} />
           Edit Workflow
         </MenuItem>
-        <MenuItem onClick={() => setAnchorEl(null)}>
-          <DeleteIcon sx={{ mr: 1 }} />
+        <MenuItem 
+          onClick={() => setAnchorEl(null)}
+          sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+        >
+          <DeleteIcon sx={{ mr: 1, fontSize: { xs: 16, sm: 18 } }} />
           Delete Workflow
         </MenuItem>
       </Menu>
-    </Box>
+    </Container>
   );
 };
 
