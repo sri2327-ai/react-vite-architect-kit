@@ -27,7 +27,7 @@ import {
   AccordionDetails,
   useTheme,
   useMediaQuery,
-  Grid
+  Grid2 as Grid
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -358,12 +358,12 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
       {/* Header Section */}
       <Box sx={{ mb: { xs: 3, sm: 4 } }}>
         <Typography 
-          variant={isMobile ? "h5" : "h4"} 
+          variant="h4"
           gutterBottom 
           sx={{ 
             fontWeight: 600, 
             color: 'text.primary',
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+            fontSize: '2rem'
           }}
         >
           Clinical Workflow Library
@@ -373,7 +373,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
           color="text.secondary" 
           sx={{ 
             mb: 2,
-            fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
+            fontSize: '1.25rem'
           }}
         >
           Pre-built automation workflows for common clinical tasks and EHR documentation
@@ -398,7 +398,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
       {/* Dynamic Search and Filter Controls */}
       <Box sx={{ mb: { xs: 3, sm: 4 } }}>
         <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid item xs={12} sm={6} md={4}>
+          <Grid xs={12} sm={6} md={4}>
             <TextField
               fullWidth
               placeholder="Search workflows..."
@@ -415,7 +415,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={3} md={4}>
+          <Grid xs={12} sm={3} md={4}>
             <FormControl fullWidth size="small">
               <InputLabel>Category</InputLabel>
               <Select
@@ -433,7 +433,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={12} sm={3} md={4}>
+          <Grid xs={12} sm={3} md={4}>
             <FormControl fullWidth size="small">
               <InputLabel>EHR System</InputLabel>
               <Select

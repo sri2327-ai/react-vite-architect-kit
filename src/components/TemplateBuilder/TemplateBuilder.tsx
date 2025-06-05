@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -18,7 +18,6 @@ import {
 } from '@mui/icons-material';
 import TemplateLibraryTab from './TemplateLibraryTab';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
-import { templateBuilderService } from '../../services/templateBuilderService';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -48,19 +47,9 @@ function TabPanel(props: TabPanelProps) {
 
 const TemplateBuilder: React.FC = () => {
   const [tabValue, setTabValue] = useState(0);
-  const [templates, setTemplates] = useState(templateBuilderService.getAllTemplates());
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  useEffect(() => {
-    const handleTemplatesUpdate = () => {
-      setTemplates(templateBuilderService.getAllTemplates());
-    };
-
-    templateBuilderService.addListener(handleTemplatesUpdate);
-    return () => templateBuilderService.removeListener(handleTemplatesUpdate);
-  }, []);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -92,23 +81,23 @@ const TemplateBuilder: React.FC = () => {
           />
           <Box>
             <Typography 
-              variant={isSmallMobile ? "h5" : isMobile ? "h4" : "h3"} 
+              variant="h4"
               sx={{ 
-                fontWeight: 700, 
+                fontWeight: 600, 
                 color: '#000000',
                 mb: 0.5,
-                fontSize: { xs: '1.25rem', sm: '1.75rem', md: '2.5rem' }
+                fontSize: '2rem'
               }}
             >
               Template Builder
             </Typography>
             <Typography 
-              variant={isSmallMobile ? "body2" : "h6"} 
+              variant="h6" 
               sx={{ 
                 fontWeight: 400, 
                 color: theme.palette.text.secondary,
                 opacity: 0.9,
-                fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' }
+                fontSize: '1.25rem'
               }}
             >
               Create and customize your clinical documentation templates
@@ -215,7 +204,7 @@ const TemplateBuilder: React.FC = () => {
         </Box>
         
         <TabPanel value={tabValue} index={0}>
-          <DraggableTemplateEditor templates={templates} />
+          <DraggableTemplateEditor />
         </TabPanel>
         
         <TabPanel value={tabValue} index={1}>
