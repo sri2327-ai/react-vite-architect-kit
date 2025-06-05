@@ -22,14 +22,13 @@ import {
   Description as TemplateIcon,
   Person as ProfileIcon,
   Payment as BillingIcon,
-  Settings as SettingsIcon,
   Logout as LogoutIcon,
   AccountCircle as AccountIcon
 } from '@mui/icons-material';
-import { WorkflowBuilder } from '../components/WorkflowBuilder';
-import { TemplateBuilder } from '../components/TemplateBuilder';
-import { Profile } from '../components/Profile';
-import { BillingHistory } from '../components/BillingHistory';
+import WorkflowBuilder from '../components/WorkflowBuilder/WorkflowBuilder';
+import TemplateBuilder from '../components/TemplateBuilder/TemplateBuilder';
+import Profile from '../components/Profile/Profile';
+import BillingHistory from '../components/BillingHistory/BillingHistory';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -58,7 +57,6 @@ const Dashboard: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -210,21 +208,6 @@ const Dashboard: React.FC = () => {
 
             {/* Profile Menu */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {!isMobile && (
-                <IconButton
-                  size="large"
-                  onClick={handleProfileMenuOpen}
-                  sx={{ 
-                    color: theme.palette.text.primary,
-                    '&:hover': {
-                      backgroundColor: theme.palette.action.hover
-                    }
-                  }}
-                >
-                  <SettingsIcon />
-                </IconButton>
-              )}
-              
               <IconButton
                 size="large"
                 onClick={handleProfileMenuOpen}

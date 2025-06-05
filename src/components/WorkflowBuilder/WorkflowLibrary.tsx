@@ -1,652 +1,541 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
   Card,
   CardContent,
+  CardActions,
   Button,
   Chip,
-  IconButton,
-  Alert,
+  Grid,
   TextField,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Stack,
-  Paper,
-  Container,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  useTheme,
+  useMediaQuery,
+  Rating,
+  Avatar,
   Divider,
   List,
   ListItem,
-  ListItemText,
   ListItemIcon,
-  ListItemButton,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  useTheme,
-  useMediaQuery,
-  Grid2 as Grid
+  ListItemText,
+  Paper
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import {
   Search as SearchIcon,
-  FilterList as FilterIcon,
-  Download as ImportIcon,
-  CheckCircle as CheckCircleIcon,
-  Schedule as ScheduleIcon,
-  Person as PersonIcon,
-  Note as NoteIcon,
-  Computer as EHRIcon,
-  Psychology as AIIcon,
-  AccessTime as TimeIcon,
+  GetApp as DownloadIcon,
+  Visibility as PreviewIcon,
   Star as StarIcon,
-  Favorite as FavoriteIcon,
-  FavoriteBorder as FavoriteBorderIcon,
-  TrendingUp as TrendingIcon,
-  Category as CategoryIcon,
-  ExpandMore as ExpandMoreIcon,
-  AccountTree as WorkflowIcon,
-  Assignment as AssignmentIcon,
-  Security as SecurityIcon,
-  Speed as SpeedIcon,
-  Analytics as AnalyticsIcon,
-  LocalHospital as HospitalIcon,
-  Business as BusinessIcon
+  CheckCircle as CheckIcon,
+  Schedule as TimeIcon,
+  People as PeopleIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 
-interface WorkflowBlock {
-  id: string;
-  type: string;
-  name: string;
-  description: string;
-  ehrField?: string;
-  isEditable: boolean;
-  config?: any;
-}
-
-interface Workflow {
+interface WorkflowTemplate {
   id: string;
   name: string;
   description: string;
   category: string;
-  ehrSystem: string;
-  avgTimeSaved: string;
-  successRate: number;
-  trendingScore: number;
-  blocks: WorkflowBlock[];
+  author: string;
+  rating: number;
+  downloads: number;
+  steps: number;
+  image: string;
 }
 
-interface WorkflowLibraryProps {
-  onImportWorkflow: (workflow: Workflow) => void;
-}
-
-const workflowData: Workflow[] = [
+const workflowTemplates: WorkflowTemplate[] = [
   {
     id: '1',
-    name: 'Standard Patient Visit',
-    description: 'Automated workflow for routine patient check-ups, including vitals, history, and assessment.',
-    category: 'General Medicine',
-    ehrSystem: 'Epic',
-    avgTimeSaved: '15-20 minutes',
-    successRate: 95,
-    trendingScore: 88,
-    blocks: [
-      {
-        id: '101',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '102',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '103',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '104',
-        type: 'note_entry',
-        name: 'Chief Complaint',
-        description: 'Enter patient chief complaint',
-        ehrField: 'chief_complaint',
-        isEditable: true
-      },
-      {
-        id: '105',
-        type: 'note_entry',
-        name: 'Subjective Note',
-        description: 'Enter HPI, ROS, and subjective findings',
-        ehrField: 'subjective',
-        isEditable: true
-      }
-    ]
+    name: 'Patient Intake Form',
+    description: 'A comprehensive form to collect patient information during intake.',
+    category: 'patient-intake',
+    author: 'HealthAI',
+    rating: 4.5,
+    downloads: 120,
+    steps: 5,
+    image: '/images/workflow-templates/patient-intake.png',
   },
   {
     id: '2',
-    name: 'Post-Op Follow-Up',
-    description: 'Streamlined workflow for post-operative evaluations and documentation.',
-    category: 'Surgery',
-    ehrSystem: 'Cerner',
-    avgTimeSaved: '10-15 minutes',
-    successRate: 92,
-    trendingScore: 79,
-    blocks: [
-      {
-        id: '201',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '202',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '203',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '204',
-        type: 'note_entry',
-        name: 'Incision Check',
-        description: 'Document incision appearance and healing',
-        ehrField: 'incision_check',
-        isEditable: true
-      },
-      {
-        id: '205',
-        type: 'note_entry',
-        name: 'Pain Level',
-        description: 'Assess and document patient pain level',
-        ehrField: 'pain_level',
-        isEditable: true
-      }
-    ]
+    name: 'SOAP Note Generator',
+    description: 'Generates a structured SOAP note based on patient encounter details.',
+    category: 'documentation',
+    author: 'Dr. Smith',
+    rating: 4.2,
+    downloads: 95,
+    steps: 4,
+    image: '/images/workflow-templates/soap-note.png',
   },
   {
     id: '3',
-    name: 'Mental Health Assessment',
-    description: 'Comprehensive workflow for mental health evaluations and treatment planning.',
-    category: 'Mental Health',
-    ehrSystem: 'Athenahealth',
-    avgTimeSaved: '20-25 minutes',
-    successRate: 88,
-    trendingScore: 92,
-    blocks: [
-      {
-        id: '301',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '302',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '303',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '304',
-        type: 'note_entry',
-        name: 'Mood Assessment',
-        description: 'Evaluate and document patient mood and affect',
-        ehrField: 'mood_assessment',
-        isEditable: true
-      },
-      {
-        id: '305',
-        type: 'note_entry',
-        name: 'Risk Factors',
-        description: 'Identify and document potential risk factors',
-        ehrField: 'risk_factors',
-        isEditable: true
-      }
-    ]
+    name: 'Billing Code Automation',
+    description: 'Automatically suggests billing codes based on diagnosis and procedures.',
+    category: 'billing',
+    author: 'MedBill Solutions',
+    rating: 4.8,
+    downloads: 150,
+    steps: 3,
+    image: '/images/workflow-templates/billing-automation.png',
   },
   {
     id: '4',
-    name: 'Pediatric Vaccination Visit',
-    description: 'Efficient workflow for pediatric vaccination appointments and immunization records.',
-    category: 'Pediatrics',
-    ehrSystem: 'Allscripts',
-    avgTimeSaved: '12-18 minutes',
-    successRate: 90,
-    trendingScore: 85,
-    blocks: [
-      {
-        id: '401',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '402',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '403',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '404',
-        type: 'note_entry',
-        name: 'Vaccination Record',
-        description: 'Document vaccinations administered during visit',
-        ehrField: 'vaccination_record',
-        isEditable: true
-      },
-      {
-        id: '405',
-        type: 'note_entry',
-        name: 'Adverse Reactions',
-        description: 'Record any adverse reactions to vaccinations',
-        ehrField: 'adverse_reactions',
-        isEditable: true
-      }
-    ]
+    name: 'Follow-up Appointment Scheduler',
+    description: 'Schedules follow-up appointments and sends reminders to patients.',
+    category: 'follow-up',
+    author: 'CareConnect',
+    rating: 4.0,
+    downloads: 80,
+    steps: 6,
+    image: '/images/workflow-templates/follow-up.png',
   },
   {
     id: '5',
-    name: 'Cardiology Consultation',
-    description: 'Specialized workflow for cardiology consultations and cardiac risk assessments.',
-    category: 'Cardiology',
-    ehrSystem: 'NextGen',
-    avgTimeSaved: '25-30 minutes',
-    successRate: 93,
-    trendingScore: 81,
-    blocks: [
-      {
-        id: '501',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '502',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '503',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '504',
-        type: 'note_entry',
-        name: 'Cardiac History',
-        description: 'Record patient cardiac history and risk factors',
-        ehrField: 'cardiac_history',
-        isEditable: true
-      },
-      {
-        id: '505',
-        type: 'note_entry',
-        name: 'ECG Analysis',
-        description: 'Analyze and document ECG findings',
-        ehrField: 'ecg_analysis',
-        isEditable: true
-      }
-    ]
-  }
+    name: 'Medication Reconciliation',
+    description: 'Reconciles patient medications to prevent errors and improve safety.',
+    category: 'patient-intake',
+    author: 'PharmaCheck',
+    rating: 4.6,
+    downloads: 110,
+    steps: 4,
+    image: '/images/workflow-templates/medication-reconciliation.png',
+  },
+  {
+    id: '6',
+    name: 'Discharge Summary Generator',
+    description: 'Generates a detailed discharge summary for patients leaving the hospital.',
+    category: 'documentation',
+    author: 'Hospital Systems Inc.',
+    rating: 4.3,
+    downloads: 100,
+    steps: 5,
+    image: '/images/workflow-templates/discharge-summary.png',
+  },
+  {
+    id: '7',
+    name: 'Insurance Pre-authorization',
+    description: 'Automates the process of obtaining pre-authorization for medical procedures.',
+    category: 'billing',
+    author: 'InsureFast',
+    rating: 4.7,
+    downloads: 130,
+    steps: 3,
+    image: '/images/workflow-templates/insurance-preauth.png',
+  },
+  {
+    id: '8',
+    name: 'Patient Satisfaction Survey',
+    description: 'Collects patient feedback to improve the quality of care.',
+    category: 'follow-up',
+    author: 'QualityCare Solutions',
+    rating: 4.1,
+    downloads: 90,
+    steps: 6,
+    image: '/images/workflow-templates/patient-satisfaction.png',
+  },
 ];
 
-const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) => {
+const WorkflowLibrary: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedEHR, setSelectedEHR] = useState('all');
-  const [hoveredWorkflow, setHoveredWorkflow] = useState<string | null>(null);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('popular');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<WorkflowTemplate | null>(null);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const dynamicCategories = [...new Set(workflowData.map(workflow => workflow.category))];
-  const dynamicEHRSystems = [...new Set(workflowData.map(workflow => workflow.ehrSystem))];
-
-  const filteredWorkflows = workflowData.filter(workflow => {
+  const filteredWorkflows = workflowTemplates.filter((workflow) => {
     const searchMatch = workflow.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                         workflow.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const categoryMatch = selectedCategory === 'all' || workflow.category === selectedCategory;
-    const ehrMatch = selectedEHR === 'all' || workflow.ehrSystem === selectedEHR;
-    return searchMatch && categoryMatch && ehrMatch;
+    const categoryMatch = categoryFilter === 'all' || workflow.category === categoryFilter;
+    return searchMatch && categoryMatch;
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case 'popular':
+        return b.downloads - a.downloads;
+      case 'newest':
+        return 0;
+      case 'rating':
+        return b.rating - a.rating;
+      case 'name':
+        return a.name.localeCompare(b.name);
+      default:
+        return 0;
+    }
   });
 
-  const handleImport = (workflow: Workflow) => {
-    onImportWorkflow(workflow);
+  const handlePreview = (workflow: WorkflowTemplate) => {
+    setSelectedWorkflow(workflow);
+    setPreviewOpen(true);
+  };
+
+  const handleImport = (workflow: WorkflowTemplate) => {
+    console.log('Importing workflow:', workflow.name);
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
-      {/* Header Section */}
-      <Box sx={{ mb: { xs: 3, sm: 4 } }}>
-        <Typography 
-          variant="h4"
-          gutterBottom 
-          sx={{ 
-            fontWeight: 600, 
-            color: 'text.primary',
-            fontSize: '2rem'
+    <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+      {/* Search and Filter Section */}
+      <Box sx={{ 
+        mb: { xs: 3, sm: 4 },
+        display: 'flex',
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: 2, sm: 3 },
+        alignItems: { xs: 'stretch', sm: 'center' }
+      }}>
+        <TextField
+          fullWidth
+          placeholder="Search workflow templates..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          size="small"
+          InputProps={{
+            startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
           }}
-        >
-          Clinical Workflow Library
-        </Typography>
-        <Typography 
-          variant="h6" 
-          color="text.secondary" 
           sx={{ 
-            mb: 2,
-            fontSize: '1.25rem'
-          }}
-        >
-          Pre-built automation workflows for common clinical tasks and EHR documentation
-        </Typography>
-        
-        <Alert 
-          severity="info" 
-          sx={{ 
-            mb: 3,
-            '& .MuiAlert-message': {
-              fontSize: { xs: '0.875rem', sm: '1rem' }
+            maxWidth: { sm: 300, md: 400 },
+            '& .MuiOutlinedInput-root': {
+              fontSize: { xs: '0.875rem', md: '1rem' }
             }
           }}
-        >
-          <Typography variant="body1">
-            <strong>For Healthcare Teams:</strong> Import proven workflow templates to automate 
-            repetitive EHR tasks. Each workflow includes step-by-step automation for common clinical scenarios.
-          </Typography>
-        </Alert>
-      </Box>
-
-      {/* Dynamic Search and Filter Controls */}
-      <Box sx={{ mb: { xs: 3, sm: 4 } }}>
-        <Grid container spacing={2} sx={{ mb: 2 }}>
-          <Grid xs={12} sm={6} md={4}>
-            <TextField
-              fullWidth
-              placeholder="Search workflows..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              size="small"
-              InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'background.paper'
-                }
-              }}
-            />
-          </Grid>
-          <Grid xs={12} sm={3} md={4}>
-            <FormControl fullWidth size="small">
-              <InputLabel>Category</InputLabel>
-              <Select
-                value={selectedCategory}
-                label="Category"
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                startAdornment={<CategoryIcon sx={{ mr: 1, color: 'text.secondary' }} />}
-              >
-                <MenuItem value="all">All Categories</MenuItem>
-                {dynamicCategories.map((category) => (
-                  <MenuItem key={category} value={category}>
-                    {category}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid xs={12} sm={3} md={4}>
-            <FormControl fullWidth size="small">
-              <InputLabel>EHR System</InputLabel>
-              <Select
-                value={selectedEHR}
-                label="EHR System"
-                onChange={(e) => setSelectedEHR(e.target.value)}
-                startAdornment={<EHRIcon sx={{ mr: 1, color: 'text.secondary' }} />}
-              >
-                <MenuItem value="all">All Systems</MenuItem>
-                {dynamicEHRSystems.map((ehr) => (
-                  <MenuItem key={ehr} value={ehr}>
-                    {ehr}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-      </Box>
-
-      {/* Workflow Cards Grid */}
-      <Box sx={{ 
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(auto-fit, minmax(350px, 1fr))',
-          md: 'repeat(auto-fit, minmax(400px, 1fr))',
-          lg: 'repeat(auto-fit, minmax(450px, 1fr))'
-        },
-        gap: { xs: 2, sm: 3 },
-        mb: 4
-      }}>
-        {filteredWorkflows.map((workflow) => (
-          <Card 
-            key={workflow.id}
-            sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: { xs: 2, sm: 3 },
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                boxShadow: { xs: 3, sm: 6 },
-                transform: { xs: 'none', sm: 'translateY(-2px)' }
-              }
-            }}
+        />
+        
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 120 } }}>
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={categoryFilter}
+            label="Category"
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}
           >
-            <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-              {/* Header Section */}
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'flex-start', 
-                mb: { xs: 2, sm: 3 } 
-              }}>
-                <Box sx={{ flexGrow: 1 }}>
+            <MenuItem value="all">All Categories</MenuItem>
+            <MenuItem value="patient-intake">Patient Intake</MenuItem>
+            <MenuItem value="documentation">Documentation</MenuItem>
+            <MenuItem value="billing">Billing</MenuItem>
+            <MenuItem value="follow-up">Follow-up</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 120 } }}>
+          <InputLabel>Sort by</InputLabel>
+          <Select
+            value={sortBy}
+            label="Sort by"
+            onChange={(e) => setSortBy(e.target.value)}
+            sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}
+          >
+            <MenuItem value="popular">Most Popular</MenuItem>
+            <MenuItem value="newest">Newest</MenuItem>
+            <MenuItem value="rating">Highest Rated</MenuItem>
+            <MenuItem value="name">Name</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Workflow Templates Grid */}
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+        {filteredWorkflows.map((workflow) => (
+          <Grid item xs={12} sm={6} lg={4} key={workflow.id}>
+            <Card 
+              sx={{ 
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: { xs: 2, md: 3 },
+                boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                '&:hover': {
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                  transform: 'translateY(-2px)'
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              <CardContent sx={{ flexGrow: 1, p: { xs: 2, md: 3 } }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'flex-start',
+                  mb: 2 
+                }}>
                   <Typography 
                     variant="h6" 
-                    component="h3" 
                     sx={{ 
-                      fontWeight: 600, 
-                      color: 'text.primary',
-                      fontSize: { xs: '1.125rem', sm: '1.25rem' }
+                      fontWeight: 600,
+                      fontSize: { xs: '1rem', md: '1.25rem' },
+                      lineHeight: 1.3,
+                      mb: 1
                     }}
                   >
                     {workflow.name}
                   </Typography>
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
+                  <Chip 
+                    label={workflow.category} 
+                    size="small" 
+                    color="primary" 
+                    variant="outlined"
                     sx={{ 
-                      mb: 1, 
-                      fontSize: { xs: '0.875rem', sm: '1rem' },
-                      lineHeight: 1.6
+                      fontSize: { xs: '0.7rem', md: '0.75rem' },
+                      height: { xs: 24, md: 28 }
                     }}
-                  >
-                    {workflow.description}
-                  </Typography>
-                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
-                    <Chip 
-                      label={workflow.category} 
-                      size="small" 
-                      color="info" 
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
-                    />
-                    <Chip 
-                      label={workflow.ehrSystem} 
-                      size="small" 
-                      color="primary" 
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
-                    />
-                  </Stack>
+                  />
                 </Box>
-              </Box>
 
-              {/* Workflow Highlights */}
-              <Box sx={{ mb: { xs: 2, sm: 3 } }}>
                 <Typography 
-                  variant="subtitle2" 
+                  variant="body2" 
+                  color="text.secondary" 
                   sx={{ 
-                    mb: 1, 
-                    fontWeight: 600,
-                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                    mb: 2,
+                    fontSize: { xs: '0.75rem', md: '0.875rem' },
+                    lineHeight: 1.5
                   }}
                 >
-                  Workflow Highlights
+                  {workflow.description}
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TimeIcon sx={{ color: 'text.secondary', fontSize: '1rem' }} />
+
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 2, 
+                  mb: 2,
+                  flexWrap: 'wrap'
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Rating 
+                      value={workflow.rating} 
+                      readOnly 
+                      size="small"
+                      precision={0.1}
+                    />
                     <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                      variant="caption" 
+                      sx={{ 
+                        ml: 0.5,
+                        fontSize: { xs: '0.7rem', md: '0.75rem' }
+                      }}
                     >
-                      Avg. Time Saved: {workflow.avgTimeSaved}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: '1rem' }} />
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
-                      Success Rate: {workflow.successRate}%
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TrendingIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
-                      Trending Score: {workflow.trendingScore}
+                      ({workflow.downloads})
                     </Typography>
                   </Box>
                 </Box>
-              </Box>
 
-              {/* Workflow Steps Preview */}
-              <Box>
-                <Typography 
-                  variant="subtitle2" 
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  mb: 1
+                }}>
+                  <Typography 
+                    variant="caption" 
+                    color="text.secondary"
+                    sx={{ 
+                      fontSize: { xs: '0.7rem', md: '0.75rem' }
+                    }}
+                  >
+                    By {workflow.author}
+                  </Typography>
+                  <Chip 
+                    label={`${workflow.steps} steps`} 
+                    size="small" 
+                    variant="outlined"
+                    sx={{ 
+                      fontSize: { xs: '0.7rem', md: '0.75rem' },
+                      height: { xs: 20, md: 24 }
+                    }}
+                  />
+                </Box>
+              </CardContent>
+
+              <CardActions sx={{ 
+                p: { xs: 2, md: 3 }, 
+                pt: 0,
+                gap: 1
+              }}>
+                <Button 
+                  size="small" 
+                  startIcon={<PreviewIcon />}
+                  onClick={() => handlePreview(workflow)}
                   sx={{ 
-                    mb: 1, 
-                    fontWeight: 600,
-                    fontSize: { xs: '0.875rem', sm: '1rem' }
+                    fontSize: { xs: '0.75rem', md: '0.875rem' }
+                  }}
+                >
+                  Preview
+                </Button>
+                <Button 
+                  size="small" 
+                  variant="contained"
+                  startIcon={<DownloadIcon />}
+                  onClick={() => handleImport(workflow)}
+                  sx={{ 
+                    fontSize: { xs: '0.75rem', md: '0.875rem' }
+                  }}
+                >
+                  Import
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {/* Preview Dialog */}
+      <Dialog 
+        open={previewOpen} 
+        onClose={() => setPreviewOpen(false)}
+        maxWidth="md"
+        fullWidth
+        fullScreen={isSmallMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: { xs: 0, sm: 3 },
+            maxHeight: { xs: '100vh', sm: '90vh' }
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          fontSize: { xs: '1.25rem', md: '1.5rem' },
+          fontWeight: 600,
+          pb: 1
+        }}>
+          <Box>
+            {selectedWorkflow?.name}
+            <Typography 
+              variant="body2" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}
+            >
+              by {selectedWorkflow?.author}
+            </Typography>
+          </Box>
+          <IconButton 
+            onClick={() => setPreviewOpen(false)}
+            size="small"
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          {selectedWorkflow && (
+            <Box>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  mb: 3,
+                  fontSize: { xs: '0.875rem', md: '1rem' },
+                  lineHeight: 1.6
+                }}
+              >
+                {selectedWorkflow.description}
+              </Typography>
+
+              <Paper 
+                variant="outlined" 
+                sx={{ 
+                  p: { xs: 2, md: 3 }, 
+                  mb: 3,
+                  borderRadius: { xs: 2, md: 3 }
+                }}
+              >
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    mb: 2,
+                    fontSize: { xs: '1rem', md: '1.125rem' },
+                    fontWeight: 600
                   }}
                 >
                   Workflow Steps
                 </Typography>
-                <List dense sx={{ py: 0 }}>
-                  {workflow.blocks.slice(0, 3).map((block) => (
-                    <ListItem key={block.id} disableGutters sx={{ py: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 'auto', mr: 1 }}>
-                        <AssignmentIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
+                <List dense>
+                  {Array.from({ length: selectedWorkflow.steps }, (_, i) => (
+                    <ListItem key={i} sx={{ py: 0.5 }}>
+                      <ListItemIcon>
+                        <CheckIcon 
+                          color="primary" 
+                          sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}
+                        />
                       </ListItemIcon>
                       <ListItemText 
-                        primary={block.name} 
-                        secondary={block.description}
+                        primary={`Step ${i + 1}: Sample workflow step`}
                         primaryTypographyProps={{
-                          fontSize: isMobile ? '0.875rem' : '1rem'
-                        }}
-                        secondaryTypographyProps={{
-                          fontSize: isMobile ? '0.75rem' : '0.875rem'
+                          fontSize: { xs: '0.875rem', md: '1rem' }
                         }}
                       />
                     </ListItem>
                   ))}
-                  {workflow.blocks.length > 3 && (
-                    <Typography 
-                      variant="caption" 
-                      color="text.secondary" 
-                      sx={{ 
-                        display: 'block', 
-                        textAlign: 'right',
-                        fontSize: { xs: '0.7rem', sm: '0.75rem' }
-                      }}
-                    >
-                      +{workflow.blocks.length - 3} more steps
-                    </Typography>
-                  )}
                 </List>
-              </Box>
-            </CardContent>
-            <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<ImportIcon />}
-                fullWidth
-                onClick={() => handleImport(workflow)}
-                sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-              >
-                Import Workflow
-              </Button>
-            </Box>
-          </Card>
-        ))}
-      </Box>
+              </Paper>
 
-      {filteredWorkflows.length === 0 && (
-        <Alert severity="warning" sx={{ mt: 3, fontSize: '1rem' }}>
-          No workflows match your search criteria. Please adjust your search or filters.
-        </Alert>
-      )}
-    </Container>
+              <Box sx={{ 
+                display: 'flex', 
+                gap: 3, 
+                mb: 3,
+                flexDirection: { xs: 'column', sm: 'row' }
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <StarIcon 
+                    color="primary" 
+                    sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}
+                  />
+                  <Typography sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}>
+                    {selectedWorkflow.rating} rating
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <PeopleIcon 
+                    color="primary" 
+                    sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}
+                  />
+                  <Typography sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}>
+                    {selectedWorkflow.downloads} downloads
+                  </Typography>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <TimeIcon 
+                    color="primary" 
+                    sx={{ fontSize: { xs: '1rem', md: '1.25rem' } }}
+                  />
+                  <Typography sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}>
+                    ~{selectedWorkflow.steps * 2} min setup
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 3, gap: 1 }}>
+          <Button 
+            onClick={() => setPreviewOpen(false)}
+            sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}
+          >
+            Close
+          </Button>
+          <Button 
+            variant="contained"
+            startIcon={<DownloadIcon />}
+            onClick={() => {
+              if (selectedWorkflow) {
+                handleImport(selectedWorkflow);
+                setPreviewOpen(false);
+              }
+            }}
+            sx={{ fontSize: { xs: '0.875rem', md: '1rem' } }}
+          >
+            Import Workflow
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 
