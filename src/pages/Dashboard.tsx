@@ -161,14 +161,14 @@ export const Dashboard: React.FC = () => {
                 fontSize: '0.9rem'
               }}
             >
-              JD
+              {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
             </Avatar>
             <Box>
               <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.2 }}>
-                John Doe
+                {profile?.firstName} {profile?.lastName}
               </Typography>
               <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.75rem', lineHeight: 1.2 }}>
-                john@example.com
+                {profile?.email}
               </Typography>
             </Box>
           </Box>
@@ -191,50 +191,91 @@ export const Dashboard: React.FC = () => {
           </IconButton>
         </Box>
       ) : (
-        /* Desktop Header with Logo Only */
+        /* Desktop Header with Logo and Profile */
         <Box sx={{
           p: isCollapsed ? 2 : 3,
           borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
           minHeight: isCollapsed ? 80 : 100,
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           position: 'relative',
           zIndex: 1
         }}>
           {!isCollapsed ? (
-            <Box
-              component="img"
-              src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
-              alt="S10.AI Logo"
-              sx={{
-                height: 52,
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-                transition: 'transform 0.3s ease',
-                '&:hover': {
-                  transform: 'scale(1.05)'
-                }
-              }}
-            />
-          ) : (
-            <Tooltip title="S10.AI" placement="right" arrow>
+            <>
               <Box
                 component="img"
                 src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
                 alt="S10.AI Logo"
                 sx={{
-                  height: 32,
+                  height: 40,
                   objectFit: 'contain',
                   filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                  transition: 'transform 0.3s ease',
+                  mb: 2,
+                  '&:hover': {
+                    transform: 'scale(1.05)'
+                  }
+                }}
+              />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
+                <Avatar
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '0.75rem'
+                  }}
+                >
+                  {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
+                </Avatar>
+                <Box>
+                  <Typography variant="caption" sx={{ 
+                    color: 'white', 
+                    fontWeight: 600, 
+                    fontSize: '0.8rem', 
+                    lineHeight: 1.2,
+                    display: 'block'
+                  }}>
+                    {profile?.firstName} {profile?.lastName}
+                  </Typography>
+                  <Typography variant="caption" sx={{ 
+                    color: 'rgba(255, 255, 255, 0.6)', 
+                    fontSize: '0.7rem', 
+                    lineHeight: 1.2 
+                  }}>
+                    {profile?.email}
+                  </Typography>
+                </Box>
+              </Box>
+            </>
+          ) : (
+            <Tooltip title={`${profile?.firstName} ${profile?.lastName}`} placement="right" arrow>
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  border: '2px solid rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   '&:hover': {
-                    transform: 'scale(1.1)'
+                    transform: 'scale(1.1)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.25)'
                   }
                 }}
                 onClick={() => setIsCollapsed(false)}
-              />
+              >
+                {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
+              </Avatar>
             </Tooltip>
           )}
         </Box>
@@ -440,6 +481,22 @@ export const Dashboard: React.FC = () => {
                   overflow: 'hidden'
                 }}
               >
+                <IconButton
+                  onClick={handleDrawerToggle}
+                  sx={{
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    padding: 1.5,
+                    borderRadius: '14px',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      color: 'white',
+                      transform: 'scale(1.05)'
+                    }
+                  }}
+                >
+                  {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+                </IconButton>
               </Paper>
             </Tooltip>
           </Box>
