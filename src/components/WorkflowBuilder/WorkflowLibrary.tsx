@@ -358,12 +358,12 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
       {/* Header Section */}
       <Box sx={{ mb: { xs: 3, sm: 4 } }}>
         <Typography 
-          variant={isMobile ? "h5" : "h4"} 
+          variant={isMobile ? "h6" : "h5"} 
           gutterBottom 
           sx={{ 
             fontWeight: 600, 
             color: 'text.primary',
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
+            fontSize: { xs: '1.125rem', sm: '1.25rem', md: '1.5rem' }
           }}
         >
           Clinical Workflow Library
