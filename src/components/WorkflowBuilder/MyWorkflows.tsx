@@ -34,7 +34,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid2 as Grid,
+  Grid,
   Stack,
   Paper
 } from '@mui/material';
@@ -509,7 +509,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
 
           <Grid container spacing={3}>
             {workflows.map((workflow) => (
-              <Grid xs={12} lg={6} xl={4} key={workflow.id}>
+              <Grid item xs={12} lg={6} xl={4} key={workflow.id}>
                 <Card 
                   sx={{ 
                     height: '100%', 
@@ -589,7 +589,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       <Paper elevation={0} sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
                         <Grid container spacing={1}>
                           {workflow.blocks.slice(0, 6).map((block, index) => (
-                            <Grid xs={12} sm={6} key={block.id}>
+                            <Grid item xs={12} sm={6} key={block.id}>
                               <Box sx={{ 
                                 display: 'flex', 
                                 alignItems: 'center', 
@@ -638,7 +638,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                             </Grid>
                           ))}
                           {workflow.blocks.length > 6 && (
-                            <Grid xs={12}>
+                            <Grid item xs={12}>
                               <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center', display: 'block', mt: 1 }}>
                                 +{workflow.blocks.length - 6} more automation steps
                               </Typography>
