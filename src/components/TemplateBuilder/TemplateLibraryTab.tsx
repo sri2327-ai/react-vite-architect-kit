@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -43,6 +41,7 @@ interface LibraryTemplate {
 interface TemplateLibraryTabProps {
   visitTypes?: string[];
   onAddTemplate?: (template: LibraryTemplate, visitType: string) => void;
+  onSelectTemplate?: (template: any) => void;
 }
 
 const libraryTemplates: LibraryTemplate[] = [
@@ -165,7 +164,8 @@ Initial treatment plan and patient education.`
 
 const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({ 
   visitTypes = [],
-  onAddTemplate 
+  onAddTemplate,
+  onSelectTemplate 
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -188,7 +188,20 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
   });
 
   const handleTemplateClick = (template: LibraryTemplate) => {
-    setPreviewTemplate(template);
+    if (onSelectTemplate) {
+      // Convert LibraryTemplate to TemplateData format
+      const templateData = {
+        id: parseInt(template.id),
+        name: template.title,
+        specialty: template.specialty,
+        type: template.noteType,
+        content: template.content,
+        description: template.content
+      };
+      onSelectTemplate(templateData);
+    } else {
+      setPreviewTemplate(template);
+    }
   };
 
   const handleClosePreview = () => {
@@ -595,4 +608,3 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
 };
 
 export default TemplateLibraryTab;
-

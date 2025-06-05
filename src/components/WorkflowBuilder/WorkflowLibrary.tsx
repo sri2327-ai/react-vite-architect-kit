@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -6,7 +5,7 @@ import {
   CardContent,
   Typography,
   Button,
-  Grid2 as Grid,
+  Grid,
   Chip,
   IconButton,
   InputAdornment,
@@ -178,7 +177,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
       {/* Workflows Grid */}
       <Grid container spacing={3}>
         {filteredWorkflows.map((workflow) => (
-          <Grid xs={12} md={6} lg={4} key={workflow.id}>
+          <Grid item xs={12} md={6} lg={4} key={workflow.id}>
             <Card 
               sx={{ 
                 borderRadius: 3,
