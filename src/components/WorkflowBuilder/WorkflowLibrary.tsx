@@ -298,15 +298,16 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
     }
   };
 
-  const getBlockColor = (type: string) => {
+  const getBlockGradient = (type: string) => {
+    // Use variations of the bravo gradient for different block types
     switch (type) {
-      case 'schedule': return '#6366F1'; // Indigo
-      case 'patient_select': return '#8B5CF6'; // Purple  
-      case 'encounter_open': return '#06B6D4'; // Cyan
-      case 'note_entry': return '#10B981'; // Emerald
-      case 'diagnosis': return '#F59E0B'; // Amber
-      case 'save': return '#EF4444'; // Red
-      default: return '#6B7280'; // Gray
+      case 'schedule': return 'linear-gradient(135deg, #143151 0%, #2c5a7a 100%)';
+      case 'patient_select': return 'linear-gradient(135deg, #1a3a5c 0%, #387E89 100%)'; 
+      case 'encounter_open': return 'linear-gradient(135deg, #2a4d6b 0%, #4a8fa3 100%)';
+      case 'note_entry': return 'linear-gradient(135deg, #143151 20%, #387E89 80%)';
+      case 'diagnosis': return 'linear-gradient(135deg, #0f2842 0%, #2c6269 100%)';
+      case 'save': return 'linear-gradient(135deg, #1f4660 0%, #4a9fb0 100%)';
+      default: return bravoColors.button.gradient;
     }
   };
 
@@ -529,7 +530,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
       >
         <DialogTitle sx={{ 
           p: 0,
-          background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+          background: bravoColors.button.gradient,
           color: 'white',
           position: 'relative'
         }}>
@@ -576,9 +577,9 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                 sx={{ 
                   mb: 4,
                   borderRadius: 2,
-                  bgcolor: alpha('#3B82F6', 0.08),
-                  border: `1px solid ${alpha('#3B82F6', 0.2)}`,
-                  '& .MuiAlert-icon': { color: '#3B82F6' }
+                  bgcolor: alpha(bravoColors.primaryFlat, 0.08),
+                  border: `1px solid ${alpha(bravoColors.primaryFlat, 0.2)}`,
+                  '& .MuiAlert-icon': { color: bravoColors.primaryFlat }
                 }}
               >
                 <Typography variant="body1" sx={{ fontWeight: 500 }}>
@@ -602,7 +603,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                         width: 32,
                         height: 32,
                         borderRadius: '50%',
-                        bgcolor: getBlockColor(block.type),
+                        background: getBlockGradient(block.type),
                         color: 'white',
                         display: 'flex',
                         alignItems: 'center',
@@ -617,7 +618,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                         <Box sx={{
                           width: 2,
                           height: 40,
-                          bgcolor: alpha(getBlockColor(block.type), 0.3),
+                          background: `linear-gradient(135deg, ${alpha(bravoColors.primaryFlat, 0.3)} 0%, ${alpha(bravoColors.secondary, 0.3)} 100%)`,
                           mt: 1,
                           borderRadius: 1
                         }} />
@@ -629,7 +630,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                       flex: 1, 
                       p: 3, 
                       borderRadius: 2,
-                      border: `1px solid ${alpha(getBlockColor(block.type), 0.2)}`,
+                      border: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
                       bgcolor: 'white',
                       boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                       transition: 'all 0.2s ease',
@@ -643,18 +644,18 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                           width: 36,
                           height: 36,
                           borderRadius: 1.5,
-                          bgcolor: alpha(getBlockColor(block.type), 0.1),
+                          background: `linear-gradient(135deg, ${alpha(bravoColors.primaryFlat, 0.1)} 0%, ${alpha(bravoColors.secondary, 0.1)} 100%)`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: getBlockColor(block.type)
+                          color: bravoColors.primaryFlat
                         }}>
                           {getBlockIcon(block.type)}
                         </Box>
                         <Box sx={{ flex: 1 }}>
                           <Typography variant="h6" sx={{ 
                             fontWeight: 600, 
-                            color: getBlockColor(block.type),
+                            color: bravoColors.primaryFlat,
                             mb: 0.5
                           }}>
                             {block.name}
@@ -670,8 +671,8 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                           label={block.type.replace('_', ' ').toUpperCase()}
                           size="small"
                           sx={{
-                            bgcolor: alpha(getBlockColor(block.type), 0.1),
-                            color: getBlockColor(block.type),
+                            background: `linear-gradient(135deg, ${alpha(bravoColors.primaryFlat, 0.1)} 0%, ${alpha(bravoColors.secondary, 0.1)} 100%)`,
+                            color: bravoColors.primaryFlat,
                             fontWeight: 600,
                             fontSize: '0.7rem'
                           }}
@@ -682,8 +683,8 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                             size="small" 
                             variant="outlined"
                             sx={{
-                              borderColor: alpha('#10B981', 0.3),
-                              color: '#10B981',
+                              borderColor: alpha(bravoColors.secondary, 0.3),
+                              color: bravoColors.secondary,
                               fontSize: '0.7rem'
                             }}
                           />
@@ -693,8 +694,8 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                             label={`Maps to: ${block.ehrField}`} 
                             size="small" 
                             sx={{
-                              bgcolor: alpha('#06B6D4', 0.1),
-                              color: '#06B6D4',
+                              background: `linear-gradient(135deg, ${alpha(bravoColors.secondary, 0.1)} 0%, ${alpha(bravoColors.primaryFlat, 0.1)} 100%)`,
+                              color: bravoColors.secondary,
                               fontSize: '0.7rem'
                             }}
                           />
