@@ -88,11 +88,6 @@ const WorkflowBuilder: React.FC = () => {
     setTabValue(0);
   };
 
-  const handleEditWorkflow = (workflow: any) => {
-    console.log('Editing workflow:', workflow);
-    // TODO: Implement workflow editing functionality
-  };
-
   return (
     <Container 
       maxWidth="xl" 
@@ -111,7 +106,7 @@ const WorkflowBuilder: React.FC = () => {
           textAlign: { xs: 'center', sm: 'left' }
         }}>
           <WorkflowIcon 
-            size={isSmallMobile ? 24 : isMobile ? 28 : 32}
+            size={isSmallMobile ? 28 : isMobile ? 32 : 40}
             color="black"
             style={{ 
               display: isSmallMobile ? 'none' : 'block'
@@ -119,23 +114,23 @@ const WorkflowBuilder: React.FC = () => {
           />
           <Box>
             <Typography 
-              variant={isSmallMobile ? "h6" : isMobile ? "h5" : "h4"} 
+              variant={isSmallMobile ? "h5" : isMobile ? "h4" : "h3"} 
               sx={{ 
                 fontWeight: 700, 
                 color: '#000000',
                 mb: 0.5,
-                fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' }
+                fontSize: { xs: '1.25rem', sm: '1.75rem', md: '2.5rem' }
               }}
             >
               EHR Workflow Builder
             </Typography>
             <Typography 
-              variant={isSmallMobile ? "body2" : "body1"} 
+              variant={isSmallMobile ? "body2" : "h6"} 
               sx={{ 
                 fontWeight: 400, 
                 color: theme.palette.text.secondary,
                 opacity: 0.9,
-                fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' }
+                fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' }
               }}
             >
               Automate your clinical workflows with AI-powered efficiency
@@ -260,10 +255,7 @@ const WorkflowBuilder: React.FC = () => {
         </Box>
         
         <TabPanel value={tabValue} index={0}>
-          <MyWorkflows 
-            importedWorkflows={importedWorkflows} 
-            setImportedWorkflows={setImportedWorkflows}
-          />
+          <MyWorkflows importedWorkflows={importedWorkflows} setImportedWorkflows={setImportedWorkflows} />
         </TabPanel>
         
         <TabPanel value={tabValue} index={1}>

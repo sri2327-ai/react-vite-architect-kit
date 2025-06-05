@@ -568,11 +568,12 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             sx={{
-              backgroundColor: 'white',
+              backgroundColor: '#FFFFFF',
+              color: '#000000',
               borderTop: '1px solid #e0e0e0',
               '& .MuiTablePagination-toolbar': {
                 px: { xs: 1, sm: 1.5, md: 2 },
-                backgroundColor: 'white',
+                backgroundColor: '#FFFFFF',
                 flexWrap: 'wrap',
                 minHeight: { xs: 'auto', md: 52 }
               },
