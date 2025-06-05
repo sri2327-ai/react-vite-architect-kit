@@ -15,16 +15,11 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  ListItemButton,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Collapse,
   Divider,
   Alert,
   useTheme,
   useMediaQuery,
-  Tooltip,
   Menu,
   MenuItem,
   Fab
@@ -33,45 +28,23 @@ import { alpha } from '@mui/material/styles';
 import {
   Add as AddIcon,
   PlayArrow as PlayIcon,
-  Stop as StopIcon,
+  Pause as PauseIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   ContentCopy as CopyIcon,
-  Download as ExportIcon,
-  Upload as ImportIcon,
+  Share as ShareIcon,
+  MoreVert as MoreVertIcon,
   Star as StarIcon,
   Favorite as FavoriteIcon,
   FavoriteBorder as FavoriteBorderIcon,
-  Share as ShareIcon,
-  MoreVert as MoreVertIcon,
-  Visibility as ViewIcon,
-  VisibilityOff as HideIcon,
-  PlayCircleOutline as PlayCircleIcon,
-  Pause as PauseIcon,
-  Settings as SettingsIcon,
   CheckCircle as CheckCircleIcon,
-  Check as CheckIcon,
   Schedule as ScheduleIcon,
   Assignment as AssignmentIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   TrendingUp as TrendingIcon,
   AccessTime as TimeIcon,
-  Computer as EHRIcon,
-  Psychology as AIIcon,
-  AccountTree as WorkflowIcon,
-  LocalHospital as HospitalIcon,
-  Note as NoteIcon,
-  Person as PersonIcon,
-  Security as SecurityIcon,
-  Speed as SpeedIcon,
-  Analytics as AnalyticsIcon,
-  Notifications as NotificationIcon,
-  Warning as WarningIcon,
-  Info as InfoIcon,
-  CheckCircleOutline as CheckCircleOutlineIcon,
-  RadioButtonUnchecked as RadioButtonUncheckedIcon,
-  Error as ErrorIcon
+  AccountTree as WorkflowIcon
 } from '@mui/icons-material';
 
 interface WorkflowBlock {
@@ -103,7 +76,8 @@ interface Workflow {
 }
 
 interface MyWorkflowsProps {
-  onEditWorkflow: (workflow: Workflow) => void;
+  importedWorkflows: any[];
+  setImportedWorkflows: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const mockWorkflows: Workflow[] = [
@@ -274,16 +248,23 @@ const mockWorkflows: Workflow[] = [
   }
 ];
 
-const MyWorkflows: React.FC<MyWorkflowsProps> = ({ onEditWorkflow }) => {
-  const [workflows, setWorkflows] = useState<Workflow[]>(mockWorkflows);
+const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImportedWorkflows }) => {
+  // Combine mock workflows with imported workflows
+  const allWorkflows = [...mockWorkflows, ...importedWorkflows];
+  const [workflows, setWorkflows] = useState<Workflow[]>(allWorkflows);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedWorkflow, setSelectedWorkflow] = useState<string | null>(null);
   const [expandedWorkflow, setExpandedWorkflow] = useState<string | null>(null);
   
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  // Update workflows when importedWorkflows changes
+  useEffect(() => {
+    const combined = [...mockWorkflows, ...importedWorkflows];
+    setWorkflows(combined);
+  }, [importedWorkflows]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, workflowId: string) => {
     setAnchorEl(event.currentTarget);
@@ -332,12 +313,20 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ onEditWorkflow }) => {
   };
 
   const handleDelete = (workflowId: string) => {
-    setWorkflows(prev => prev.filter(workflow => workflow.id !== workflowId));
+    // Check if it's an imported workflow
+    const isImported = workflowId.startsWith('imported-');
+    
+    if (isImported) {
+      // Remove from imported workflows
+      setImportedWorkflows(prev => prev.filter(workflow => workflow.id !== workflowId));
+    } else {
+      // Remove from local workflows
+      setWorkflows(prev => prev.filter(workflow => workflow.id !== workflowId));
+    }
     handleMenuClose();
   };
 
   const handleRunWorkflow = (workflowId: string) => {
-    console.log('Running workflow:', workflowId);
     setWorkflows(prev => prev.map(workflow => 
       workflow.id === workflowId 
         ? { 
@@ -458,7 +447,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ onEditWorkflow }) => {
               <Button
                 variant="outlined"
                 size={isSmallMobile ? "medium" : "large"}
-                startIcon={<ImportIcon />}
+                startIcon={<AddIcon />}
                 sx={{ 
                   borderRadius: 2,
                   fontSize: { xs: '0.875rem', sm: '1rem' }
@@ -749,7 +738,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ onEditWorkflow }) => {
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <PlayCircleIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
+                        <PlayIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
                         <Typography 
                           variant="body2" 
                           color="text.secondary"
@@ -889,7 +878,6 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ onEditWorkflow }) => {
                       variant="outlined"
                       size="small"
                       startIcon={<EditIcon />}
-                      onClick={() => onEditWorkflow(workflow)}
                       sx={{ 
                         flex: 1, 
                         fontSize: { xs: '0.8rem', sm: '0.875rem' },
@@ -942,13 +930,9 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ onEditWorkflow }) => {
             <CopyIcon sx={{ mr: 1, fontSize: 18 }} />
             Duplicate
           </MenuItem>
-          <MenuItem onClick={() => selectedWorkflow && onEditWorkflow(workflows.find(w => w.id === selectedWorkflow)!)}>
+          <MenuItem>
             <EditIcon sx={{ mr: 1, fontSize: 18 }} />
             Edit
-          </MenuItem>
-          <MenuItem>
-            <ExportIcon sx={{ mr: 1, fontSize: 18 }} />
-            Export
           </MenuItem>
           <MenuItem>
             <ShareIcon sx={{ mr: 1, fontSize: 18 }} />

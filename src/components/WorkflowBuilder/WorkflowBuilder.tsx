@@ -88,6 +88,11 @@ const WorkflowBuilder: React.FC = () => {
     setTabValue(0);
   };
 
+  const handleEditWorkflow = (workflow: any) => {
+    console.log('Editing workflow:', workflow);
+    // TODO: Implement workflow editing functionality
+  };
+
   return (
     <Container 
       maxWidth="xl" 
@@ -255,7 +260,10 @@ const WorkflowBuilder: React.FC = () => {
         </Box>
         
         <TabPanel value={tabValue} index={0}>
-          <MyWorkflows importedWorkflows={importedWorkflows} setImportedWorkflows={setImportedWorkflows} />
+          <MyWorkflows 
+            importedWorkflows={importedWorkflows} 
+            setImportedWorkflows={setImportedWorkflows}
+          />
         </TabPanel>
         
         <TabPanel value={tabValue} index={1}>
