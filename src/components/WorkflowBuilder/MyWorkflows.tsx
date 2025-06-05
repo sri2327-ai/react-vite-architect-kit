@@ -34,7 +34,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid,
+  Grid2 as Grid,
   Stack,
   Paper
 } from '@mui/material';
@@ -509,7 +509,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
 
           <Grid container spacing={3}>
             {workflows.map((workflow) => (
-              <Grid item xs={12} lg={6} xl={4} key={workflow.id}>
+              <Grid xs={12} lg={6} xl={4} key={workflow.id}>
                 <Card 
                   sx={{ 
                     height: '100%', 
@@ -530,7 +530,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                       <Box sx={{ flexGrow: 1 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                          <EHRIcon color="primary" />
+                          <EHRIcon sx={{ color: '#6B7280' }} />
                           <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
                             {workflow.name}
                           </Typography>
@@ -560,7 +560,10 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       <Chip 
                         label={workflow.ehrSystem} 
                         size="medium" 
-                        color="primary" 
+                        sx={{ 
+                          color: '#6B7280',
+                          borderColor: '#6B7280'
+                        }}
                         variant="outlined"
                         icon={<EHRIcon />}
                       />
@@ -568,6 +571,10 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         label={`${workflow.blocks.length} automation steps`} 
                         size="medium" 
                         variant="outlined"
+                        sx={{ 
+                          color: '#6B7280',
+                          borderColor: '#6B7280'
+                        }}
                         icon={<AIIcon />}
                       />
                     </Stack>
@@ -575,14 +582,14 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     {/* Clinical Workflow Steps */}
                     <Box sx={{ mb: 3 }}>
                       <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ChecklistIcon color="primary" />
+                        <ChecklistIcon sx={{ color: '#6B7280' }} />
                         Clinical Automation Steps
                       </Typography>
                       
                       <Paper elevation={0} sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
                         <Grid container spacing={1}>
                           {workflow.blocks.slice(0, 6).map((block, index) => (
-                            <Grid item xs={12} sm={6} key={block.id}>
+                            <Grid xs={12} sm={6} key={block.id}>
                               <Box sx={{ 
                                 display: 'flex', 
                                 alignItems: 'center', 
@@ -597,7 +604,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                                   minWidth: 24, 
                                   height: 24, 
                                   borderRadius: '50%', 
-                                  backgroundColor: 'primary.main', 
+                                  backgroundColor: '#6B7280', 
                                   color: 'white', 
                                   display: 'flex', 
                                   alignItems: 'center', 
@@ -631,7 +638,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                             </Grid>
                           ))}
                           {workflow.blocks.length > 6 && (
-                            <Grid item xs={12}>
+                            <Grid xs={12}>
                               <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center', display: 'block', mt: 1 }}>
                                 +{workflow.blocks.length - 6} more automation steps
                               </Typography>
@@ -644,7 +651,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     {/* Configuration Status */}
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <MapIcon color="primary" />
+                        <MapIcon sx={{ color: '#6B7280' }} />
                         Configuration Status
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -695,7 +702,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       )}
                       
                       {workflow.status === 'configured' && (
-                        <Alert severity="success" sx={{ fontSize: '0.875rem' }}>
+                        <Alert severity="info" sx={{ fontSize: '0.875rem' }}>
                           <strong>Ready to Use:</strong> Workflow configured and ready for EHR execution
                         </Alert>
                       )}
