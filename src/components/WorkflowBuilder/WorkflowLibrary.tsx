@@ -34,7 +34,7 @@ import {
   Search as SearchIcon,
   FilterList as FilterIcon,
   Download as ImportIcon,
-  CheckCircle as CheckIcon,
+  CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
   Note as NoteIcon,

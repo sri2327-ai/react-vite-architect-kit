@@ -30,8 +30,7 @@ import {
   ChevronRight,
   Menu,
   X,
-  LogOut,
-  Settings
+  LogOut
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { bravoColors } from '@/theme/colors';
@@ -78,7 +77,7 @@ export const Dashboard: React.FC = () => {
     },
     {
       id: 'workflow-builder',
-      label: 'Workflow Builder',
+      label: 'EHR Workflow Builder',
       icon: <Workflow size={22} />,
       component: WorkflowBuilder,
       badge: 'New',
@@ -86,13 +85,13 @@ export const Dashboard: React.FC = () => {
     },
     {
       id: 'profile',
-      label: 'Profile',
+      label: 'My Profile',
       icon: <User size={22} />,
       component: Profile
     },
     {
       id: 'billing-history',
-      label: 'Billing History',
+      label: 'Billing & Subscription',
       icon: <History size={22} />,
       component: BillingHistory
     }
@@ -425,25 +424,6 @@ export const Dashboard: React.FC = () => {
         {isMobile && (
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
-              <Tooltip title="Settings" arrow>
-                <IconButton
-                  sx={{
-                    flex: 1,
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    borderRadius: '12px',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    py: 1.5,
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                      color: 'white',
-                      transform: 'translateY(-1px)'
-                    }
-                  }}
-                >
-                  <Settings size={18} />
-                </IconButton>
-              </Tooltip>
               <Tooltip title="Logout" arrow>
                 <IconButton
                   onClick={handleLogout}
