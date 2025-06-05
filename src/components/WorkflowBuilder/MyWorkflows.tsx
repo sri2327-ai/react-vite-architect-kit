@@ -1,14 +1,11 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Button,
   Card,
   CardContent,
-  Grid,
+  Button,
   Chip,
-  Stack,
   IconButton,
   Menu,
   MenuItem,
@@ -17,738 +14,1110 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  Select,
+  FormControlLabel,
+  Checkbox,
+  Alert,
+  LinearProgress,
+  Stepper,
+  Step,
+  StepLabel,
+  Tabs,
+  Tab,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider,
   FormControl,
   InputLabel,
-  Alert,
+  Select,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Divider,
-  useTheme,
-  Paper,
-  Container
+  Stack,
+  Paper
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import {
-  Add as AddIcon,
-  MoreVert as MoreVertIcon,
+  PlayArrow as PlayIcon,
+  MoreVert as MoreIcon,
+  Download as ImportIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Play as PlayIcon,
-  Pause as PauseIcon,
-  ExpandMore as ExpandMoreIcon,
-  Settings as SettingsIcon,
-  Schedule as ScheduleIcon,
-  Assignment as AssignmentIcon,
-  CheckCircle as CheckCircleIcon,
+  CheckCircle as CheckIcon,
   Error as ErrorIcon,
-  Info as InfoIcon
+  Warning as WarningIcon,
+  Settings as SettingsIcon,
+  Map as MapIcon,
+  Assignment as AssignmentIcon,
+  ExpandMore as ExpandMoreIcon,
+  AccountTree as WorkflowIcon,
+  Schedule as ScheduleIcon,
+  Person as PersonIcon,
+  LocationOn as LocationIcon,
+  Note as NoteIcon,
+  History as HistoryIcon,
+  Checklist as ChecklistIcon,
+  Computer as EHRIcon,
+  AccessTime as TimeIcon,
+  LocalHospital as ClinicIcon,
+  Psychology as AIIcon,
+  Security as SecurityIcon
 } from '@mui/icons-material';
-import { useWorkflowData } from '../../hooks/useWorkflowData';
-import { useApiContext } from '../../contexts/ApiContext';
 import { templateBuilderService } from '../../services/templateBuilderService';
-import { useResponsive } from '../../hooks/useResponsive';
+
+interface WorkflowBlock {
+  id: string;
+  type: string;
+  name: string;
+  description: string;
+  ehrField?: string;
+  isEditable: boolean;
+  config?: any;
+}
+
+interface ScheduleConfig {
+  providerName: string;
+  location: string;
+  importPreviousNote: boolean;
+  importPreviousNoteFor: 'all' | 'selected';
+  selectedVisitTypes: string[];
+}
+
+interface VisitTypeMapping {
+  visitType: string;
+  templateFields: { [blockId: string]: string[] }; // Changed to array for multiple selections
+  scheduleConfig: ScheduleConfig;
+  noteType: string;
+  isConfigured: boolean;
+}
+
+interface ImportedWorkflow {
+  id: string;
+  name: string;
+  description: string;
+  ehrSystem: string;
+  status: 'draft' | 'configured' | 'active' | 'error';
+  lastRun?: string;
+  blocks: WorkflowBlock[];
+  visitTypeMappings: VisitTypeMapping[];
+  availableVisitTypes: string[];
+}
 
 interface MyWorkflowsProps {
-  importedWorkflows: any[];
-  setImportedWorkflows: React.Dispatch<React.SetStateAction<any[]>>;
+  importedWorkflows?: any[];
+  setImportedWorkflows?: (workflows: any[]) => void;
 }
 
 const MyWorkflows: React.FC<MyWorkflowsProps> = ({ 
-  importedWorkflows, 
+  importedWorkflows = [], 
   setImportedWorkflows 
 }) => {
-  const theme = useTheme();
-  const { isMobile, isTablet } = useResponsive();
-  const { useApiData } = useApiContext();
-  const {
-    workflows: apiWorkflows,
-    loading,
-    error,
-    createWorkflow,
-    updateWorkflow,
-    deleteWorkflow
-  } = useWorkflowData(useApiData);
-
-  // Combine API workflows with imported workflows
-  const allWorkflows = [...apiWorkflows, ...importedWorkflows];
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedWorkflow, setSelectedWorkflow] = useState<any>(null);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [configDialogOpen, setConfigDialogOpen] = useState(false);
-  const [newWorkflow, setNewWorkflow] = useState({
-    name: '',
-    description: '',
-    ehrSystem: '',
-    availableVisitTypes: [] as string[],
-    visitTypeMappings: [] as any[]
-  });
-
-  // Dynamic EHR systems - can be fetched from API
-  const [ehrSystems, setEhrSystems] = useState([
-    'Epic',
-    'Cerner',
-    'AllScripts',
-    'eClinicalWorks',
-    'NextGen',
-    'Athenahealth',
-    'Practice Fusion',
-    'Other'
-  ]);
-
-  // Dynamic visit types from template service
-  const [availableVisitTypes, setAvailableVisitTypes] = useState<string[]>([]);
-
-  useEffect(() => {
-    // Load dynamic data
-    const visitTypes = templateBuilderService.getAllVisitTypeNames();
-    setAvailableVisitTypes(visitTypes);
-    
-    // If using API, fetch EHR systems
-    if (useApiData) {
-      // This would fetch from API in real implementation
-      // fetchEhrSystems().then(setEhrSystems);
-    }
-  }, [useApiData]);
-
-  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, workflow: any) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedWorkflow(workflow);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedWorkflow(null);
-  };
-
-  const handleCreateWorkflow = async () => {
-    try {
-      const workflowData = {
-        ...newWorkflow,
-        status: 'draft' as const,
-        blocks: [],
-        visitTypeMappings: availableVisitTypes.map(visitType => ({
-          visitType,
-          templateFields: {},
-          scheduleConfig: {
-            providerName: '',
-            location: ''
+  const [workflows, setWorkflows] = useState<ImportedWorkflow[]>(
+    importedWorkflows.length > 0 ? importedWorkflows : [
+      {
+        id: '1',
+        name: 'Epic - Standard Patient Visit',
+        description: 'Complete patient encounter workflow with automated note generation',
+        ehrSystem: 'Epic',
+        status: 'configured',
+        lastRun: '2024-01-15 14:30',
+        availableVisitTypes: templateBuilderService.getAllVisitTypeNames(),
+        visitTypeMappings: [
+          {
+            visitType: 'Office Visit',
+            templateFields: {
+              'chief-complaint': ['Chief Complaint', 'Presenting Problem'],
+              'subjective-note': ['History of Present Illness', 'Review of Systems'],
+              'objective-note': ['Physical Examination', 'Vital Signs']
+            },
+            scheduleConfig: {
+              providerName: 'Dr. Smith',
+              location: 'Main Clinic',
+              importPreviousNote: false,
+              importPreviousNoteFor: 'all',
+              selectedVisitTypes: []
+            },
+            noteType: 'Progress Note',
+            isConfigured: true
           },
-          isConfigured: false
+          {
+            visitType: 'Follow-up',
+            templateFields: {},
+            scheduleConfig: {
+              providerName: '',
+              location: '',
+              importPreviousNote: false,
+              importPreviousNoteFor: 'all',
+              selectedVisitTypes: []
+            },
+            noteType: '',
+            isConfigured: false
+          }
+        ],
+        blocks: [
+          {
+            id: 'schedule-menu',
+            type: 'schedule',
+            name: 'Schedule Menu',
+            description: 'Access provider schedule with date and location filters',
+            isEditable: true
+          },
+          {
+            id: 'provider-filter',
+            type: 'schedule',
+            name: 'Provider Name Filter',
+            description: 'Filter schedule by provider name',
+            isEditable: true
+          },
+          {
+            id: 'date-filter',
+            type: 'schedule',
+            name: "Today's Date",
+            description: 'Set schedule to current date',
+            isEditable: false
+          },
+          {
+            id: 'location-filter',
+            type: 'schedule',
+            name: 'Location Filter',
+            description: 'Filter schedule by clinic location',
+            isEditable: true
+          },
+          {
+            id: 'patient-select',
+            type: 'patient_select',
+            name: 'Patient Selection',
+            description: 'Select patient from filtered schedule',
+            isEditable: false
+          },
+          {
+            id: 'encounter-open',
+            type: 'encounter_open',
+            name: 'Open Encounter Chart',
+            description: 'Open patient encounter for current date and choose note type',
+            isEditable: true
+          },
+          {
+            id: 'chief-complaint',
+            type: 'note_entry',
+            name: 'Chief Complaint Entry',
+            description: 'Enter patient chief complaint',
+            ehrField: 'chief_complaint',
+            isEditable: true
+          },
+          {
+            id: 'subjective-note',
+            type: 'note_entry',
+            name: 'Subjective Note',
+            description: 'Enter HPI, ROS, and subjective findings',
+            ehrField: 'subjective',
+            isEditable: true
+          }
+        ]
+      }
+    ]
+  );
+  
+  const [executeDialog, setExecuteDialog] = useState(false);
+  const [configureDialog, setConfigureDialog] = useState(false);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<ImportedWorkflow | null>(null);
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [mfaEnabled, setMfaEnabled] = useState(false);
+  const [otpCode, setOtpCode] = useState('');
+  const [executionStep, setExecutionStep] = useState(0);
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const executionSteps = [
+    'EHR Login', 
+    'Security Verification',
+    'AI Automation Running',
+    'Complete'
+  ];
+
+  const handleExecuteWorkflow = (workflow: ImportedWorkflow) => {
+    setSelectedWorkflow(workflow);
+    setExecuteDialog(true);
+    setExecutionStep(0);
+    setCredentials({ username: '', password: '' });
+    setOtpCode('');
+    setMfaEnabled(false);
+  };
+
+  const handleConfigureWorkflow = (workflow: ImportedWorkflow) => {
+    setSelectedWorkflow(workflow);
+    setConfigureDialog(true);
+  };
+
+  const handleStartExecution = async () => {
+    if (!credentials.username || !credentials.password) return;
+    
+    setIsExecuting(true);
+    setExecutionStep(1);
+    
+    // Simulate authentication
+    setTimeout(() => {
+      if (mfaEnabled) {
+        setExecutionStep(1); // Wait for OTP
+      } else {
+        setExecutionStep(2);
+        startWorkflowExecution();
+      }
+      setIsExecuting(false);
+    }, 2000);
+  };
+
+  const handleMfaVerification = () => {
+    if (!otpCode) return;
+    
+    setIsExecuting(true);
+    setTimeout(() => {
+      setExecutionStep(2);
+      startWorkflowExecution();
+    }, 1000);
+  };
+
+  const startWorkflowExecution = () => {
+    setTimeout(() => {
+      setExecutionStep(3);
+      setIsExecuting(false);
+      // Update workflow status
+      if (selectedWorkflow) {
+        setWorkflows(prev => prev.map(w => 
+          w.id === selectedWorkflow.id 
+            ? { ...w, status: 'active' as const, lastRun: new Date().toLocaleString() }
+            : w
+        ));
+      }
+    }, 3000);
+  };
+
+  const handleFieldMapping = (visitType: string, blockId: string, templateFields: string[]) => {
+    if (!selectedWorkflow) return;
+    
+    setSelectedWorkflow(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        visitTypeMappings: prev.visitTypeMappings.map(mapping =>
+          mapping.visitType === visitType
+            ? {
+                ...mapping,
+                templateFields: {
+                  ...mapping.templateFields,
+                  [blockId]: templateFields
+                },
+                isConfigured: Object.keys({
+                  ...mapping.templateFields,
+                  [blockId]: templateFields
+                }).length >= prev.blocks.filter(b => b.type === 'note_entry').length
+              }
+            : mapping
+        )
+      };
+    });
+  };
+
+  const handleScheduleConfigChange = (visitType: string, field: keyof ScheduleConfig, value: string | boolean | string[]) => {
+    if (!selectedWorkflow) return;
+    
+    setSelectedWorkflow(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        visitTypeMappings: prev.visitTypeMappings.map(mapping =>
+          mapping.visitType === visitType
+            ? {
+                ...mapping,
+                scheduleConfig: {
+                  ...mapping.scheduleConfig,
+                  [field]: value
+                }
+              }
+            : mapping
+        )
+      };
+    });
+  };
+
+  const handleGlobalScheduleConfigChange = (field: keyof ScheduleConfig, value: string | boolean | string[]) => {
+    if (!selectedWorkflow) return;
+    
+    setSelectedWorkflow(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        visitTypeMappings: prev.visitTypeMappings.map(mapping => ({
+          ...mapping,
+          scheduleConfig: {
+            ...mapping.scheduleConfig,
+            [field]: value
+          }
         }))
       };
-
-      if (useApiData) {
-        await createWorkflow(workflowData);
-      } else {
-        // Add to imported workflows if not using API
-        const newImportedWorkflow = {
-          ...workflowData,
-          id: `manual-${Date.now()}`,
-          lastModified: new Date().toISOString(),
-          isConfigured: false
-        };
-        setImportedWorkflows(prev => [...prev, newImportedWorkflow]);
-      }
-
-      setCreateDialogOpen(false);
-      setNewWorkflow({
-        name: '',
-        description: '',
-        ehrSystem: '',
-        availableVisitTypes: [],
-        visitTypeMappings: []
-      });
-    } catch (error) {
-      console.error('Failed to create workflow:', error);
-    }
+    });
   };
 
-  const handleConfigureWorkflow = (workflow: any) => {
-    setSelectedWorkflow(workflow);
-    setConfigDialogOpen(true);
-    handleMenuClose();
+  const handleNoteTypeChange = (visitType: string, noteType: string) => {
+    if (!selectedWorkflow) return;
+    
+    setSelectedWorkflow(prev => {
+      if (!prev) return null;
+      
+      return {
+        ...prev,
+        visitTypeMappings: prev.visitTypeMappings.map(mapping =>
+          mapping.visitType === visitType
+            ? {
+                ...mapping,
+                noteType: noteType
+              }
+            : mapping
+        )
+      };
+    });
   };
 
-  const handleDeleteWorkflow = async (workflowId: string) => {
-    try {
-      if (useApiData) {
-        await deleteWorkflow(workflowId);
-      } else {
-        // Remove from imported workflows
-        setImportedWorkflows(prev => prev.filter(w => w.id !== workflowId));
-      }
-    } catch (error) {
-      console.error('Failed to delete workflow:', error);
-    }
-    handleMenuClose();
-  };
-
-  const handleToggleStatus = async (workflow: any) => {
-    const newStatus = workflow.status === 'active' ? 'paused' : 'active';
-    try {
-      if (useApiData) {
-        await updateWorkflow(workflow.id, { status: newStatus });
-      } else {
-        // Update in imported workflows
-        setImportedWorkflows(prev => 
-          prev.map(w => w.id === workflow.id ? { ...w, status: newStatus } : w)
-        );
-      }
-    } catch (error) {
-      console.error('Failed to update workflow status:', error);
-    }
-    handleMenuClose();
+  const getTemplateSectionsForVisitType = (visitTypeName: string) => {
+    const visitType = templateBuilderService.getVisitTypeByName(visitTypeName);
+    return visitType?.template.sections || [];
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return theme.palette.success.main;
-      case 'paused': return theme.palette.warning.main;
-      case 'draft': return theme.palette.grey[500];
-      default: return theme.palette.grey[500];
+      case 'active': return 'success';
+      case 'configured': return 'info';
+      case 'error': return 'error';
+      default: return 'warning';
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active': return <CheckCircleIcon sx={{ fontSize: 16 }} />;
-      case 'paused': return <PauseIcon sx={{ fontSize: 16 }} />;
-      case 'draft': return <EditIcon sx={{ fontSize: 16 }} />;
-      default: return <InfoIcon sx={{ fontSize: 16 }} />;
+      case 'active': return <CheckIcon />;
+      case 'configured': return <SettingsIcon />;
+      case 'error': return <ErrorIcon />;
+      default: return <WarningIcon />;
     }
   };
 
-  if (loading) {
-    return (
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Typography>Loading workflows...</Typography>
-      </Container>
-    );
-  }
+  const getConfigurationStatus = (workflow: ImportedWorkflow) => {
+    const configuredMappings = workflow.visitTypeMappings.filter(m => 
+      m.isConfigured && 
+      m.noteType && 
+      Object.keys(m.templateFields).length >= workflow.blocks.filter(b => b.type === 'note_entry').length
+    ).length;
+    const totalMappings = workflow.visitTypeMappings.length;
+    return `${configuredMappings}/${totalMappings} visit types configured`;
+  };
 
-  if (error) {
-    return (
-      <Container maxWidth="xl" sx={{ py: 4 }}>
-        <Alert severity="error">{error}</Alert>
-      </Container>
-    );
-  }
+  const getBlockTypeIcon = (type: string) => {
+    switch (type) {
+      case 'schedule': return <ScheduleIcon color="primary" />;
+      case 'patient_select': return <PersonIcon color="primary" />;
+      case 'encounter_open': return <NoteIcon color="primary" />;
+      case 'note_entry': return <ChecklistIcon color="primary" />;
+      default: return <AIIcon color="primary" />;
+    }
+  };
+
+  const getBlockTypeLabel = (type: string) => {
+    switch (type) {
+      case 'schedule': return 'Schedule';
+      case 'patient_select': return 'Patient';
+      case 'encounter_open': return 'Chart';
+      case 'note_entry': return 'Documentation';
+      default: return 'Automation';
+    }
+  };
 
   return (
-    <Container 
-      maxWidth="xl" 
-      sx={{ 
-        py: { xs: 2, sm: 3, md: 4 },
-        px: { xs: 1, sm: 2, md: 3 }
-      }}
-    >
-      {/* Header */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: { xs: 'stretch', sm: 'center' },
-        mb: { xs: 2, md: 3 },
-        flexDirection: { xs: 'column', sm: 'row' },
-        gap: { xs: 2, sm: 0 }
-      }}>
-        <Box>
-          <Typography 
-            variant={isMobile ? "h6" : "h5"} 
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      {workflows.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <Paper 
+            elevation={0} 
             sx={{ 
-              fontWeight: 700,
-              mb: 0.5,
-              fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' }
+              p: 6, 
+              borderRadius: 4, 
+              backgroundColor: 'grey.50',
+              border: '2px dashed',
+              borderColor: 'grey.300'
             }}
           >
-            My Workflows
-          </Typography>
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              color: theme.palette.text.secondary,
-              fontSize: { xs: '0.8rem', sm: '0.875rem' }
-            }}
-          >
-            {allWorkflows.length} workflow{allWorkflows.length !== 1 ? 's' : ''} configured
-          </Typography>
+            <WorkflowIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 3 }} />
+            <Typography variant="h4" gutterBottom color="text.primary" sx={{ fontWeight: 600 }}>
+              No Clinical Workflows Yet
+            </Typography>
+            <Typography variant="h6" color="text.secondary" sx={{ mb: 4, maxWidth: 500, mx: 'auto' }}>
+              Start automating your clinical documentation by importing workflows from our library
+            </Typography>
+            
+            <Alert 
+              severity="info" 
+              sx={{ 
+                mb: 4, 
+                maxWidth: 700, 
+                mx: 'auto',
+                fontSize: '1rem',
+                '& .MuiAlert-message': {
+                  textAlign: 'left'
+                }
+              }}
+            >
+              <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+                Quick Start Guide:
+              </Typography>
+              <Typography component="div" variant="body1">
+                1. <strong>Browse Library:</strong> Go to Workflow Library tab<br />
+                2. <strong>Import Workflow:</strong> Choose a clinical workflow template<br />
+                3. <strong>Configure:</strong> Map to your visit types and EHR fields<br />
+                4. <strong>Execute:</strong> Run automated documentation with your EHR
+              </Typography>
+            </Alert>
+          </Paper>
         </Box>
-        
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setCreateDialogOpen(true)}
-          sx={{
-            borderRadius: { xs: 2, md: 3 },
-            textTransform: 'none',
-            fontWeight: 600,
-            px: { xs: 2, md: 3 },
-            py: { xs: 1, md: 1.5 },
-            fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' },
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            '&:hover': {
-              boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
-              transform: 'translateY(-1px)'
-            },
-            transition: 'all 0.3s ease',
-            width: { xs: '100%', sm: 'auto' }
-          }}
-        >
-          Create New Workflow
-        </Button>
-      </Box>
-
-      {/* Workflows Grid */}
-      {allWorkflows.length === 0 ? (
-        <Paper 
-          sx={{ 
-            textAlign: 'center', 
-            py: { xs: 6, md: 8 },
-            px: { xs: 2, md: 4 },
-            borderRadius: { xs: 2, md: 3 },
-            border: `2px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
-            backgroundColor: alpha(theme.palette.primary.main, 0.02)
-          }}
-        >
-          <AssignmentIcon 
-            sx={{ 
-              fontSize: { xs: 60, md: 80 }, 
-              color: alpha(theme.palette.primary.main, 0.3),
-              mb: 2
-            }} 
-          />
-          <Typography 
-            variant={isMobile ? "h6" : "h5"} 
-            sx={{ 
-              fontWeight: 600,
-              color: theme.palette.text.primary,
-              mb: 1,
-              fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' }
-            }}
-          >
-            No Workflows Yet
-          </Typography>
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: theme.palette.text.secondary,
-              mb: { xs: 3, md: 4 },
-              maxWidth: { xs: '100%', sm: 500 },
-              mx: 'auto',
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              lineHeight: { xs: 1.4, md: 1.6 }
-            }}
-          >
-            Create your first workflow to automate EHR tasks or import one from the Workflow Library.
-          </Typography>
-          <Button
-            variant="contained"
-            size={isMobile ? "medium" : "large"}
-            startIcon={<AddIcon />}
-            onClick={() => setCreateDialogOpen(true)}
-            sx={{
-              borderRadius: { xs: 2, md: 3 },
-              textTransform: 'none',
-              fontWeight: 600,
-              px: { xs: 3, md: 4 },
-              py: { xs: 1, md: 1.5 },
-              fontSize: { xs: '0.875rem', md: '1rem' }
-            }}
-          >
-            Create Your First Workflow
-          </Button>
-        </Paper>
       ) : (
-        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
-          {allWorkflows.map((workflow) => (
-            <Grid item xs={12} sm={6} lg={4} key={workflow.id}>
+        <Box>
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: 'text.primary' }}>
+              My Clinical Workflows
+            </Typography>
+            <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+              AI-powered automation for your EHR documentation and clinical workflows
+            </Typography>
+            
+            <Alert severity="info" sx={{ mb: 3 }}>
+              <Typography variant="body1">
+                <strong>For Clinicians:</strong> These workflows automate repetitive EHR tasks, allowing you to focus on patient care. 
+                Each workflow connects to your visit types from Template Builder and executes common documentation patterns.
+              </Typography>
+            </Alert>
+          </Box>
+
+          <Box sx={{ 
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              lg: 'repeat(2, 1fr)',
+              xl: 'repeat(3, 1fr)'
+            },
+            gap: 3
+          }}>
+            {workflows.map((workflow) => (
               <Card 
+                key={workflow.id}
                 sx={{ 
-                  height: '100%',
-                  borderRadius: { xs: 2, md: 3 },
-                  transition: 'all 0.3s ease',
-                  border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+                  height: '100%', 
+                  display: 'flex', 
+                  flexDirection: 'column',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 3,
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    transform: 'translateY(-4px)'
+                    boxShadow: 6,
+                    transform: 'translateY(-2px)'
                   }
                 }}
               >
-                <CardContent sx={{ p: { xs: 2, md: 3 }, height: '100%' }}>
-                  {/* Card Header */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'flex-start',
-                    mb: 2 
-                  }}>
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography 
-                        variant="h6" 
-                        sx={{ 
-                          fontWeight: 700,
-                          mb: 0.5,
-                          fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
-                          lineHeight: 1.3,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical'
-                        }}
-                      >
-                        {workflow.name}
+                <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                  {/* Header Section */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                        <EHRIcon color="primary" />
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                          {workflow.name}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body1" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
+                        {workflow.description}
                       </Typography>
-                      <Stack 
-                        direction="row" 
-                        spacing={1} 
-                        alignItems="center"
-                        flexWrap="wrap"
-                        sx={{ gap: 1 }}
-                      >
-                        <Chip
-                          icon={getStatusIcon(workflow.status)}
-                          label={workflow.status.charAt(0).toUpperCase() + workflow.status.slice(1)}
-                          size="small"
-                          sx={{
-                            backgroundColor: alpha(getStatusColor(workflow.status), 0.15),
-                            color: getStatusColor(workflow.status),
-                            fontWeight: 600,
-                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                            height: { xs: 20, sm: 24 }
-                          }}
-                        />
-                        <Chip
-                          label={workflow.ehrSystem}
-                          size="small"
-                          variant="outlined"
-                          sx={{
-                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                            height: { xs: 20, sm: 24 }
-                          }}
-                        />
-                      </Stack>
                     </Box>
-
                     <IconButton
                       size="small"
-                      onClick={(e) => handleMenuClick(e, workflow)}
+                      onClick={(e) => setAnchorEl(e.currentTarget)}
                       sx={{ ml: 1 }}
                     >
-                      <MoreVertIcon fontSize="small" />
+                      <MoreIcon />
                     </IconButton>
                   </Box>
+                  
+                  {/* Status and Info Chips */}
+                  <Stack direction="row" spacing={1} sx={{ mb: 3, flexWrap: 'wrap', gap: 1 }}>
+                    <Chip
+                      label={workflow.status === 'active' ? 'RUNNING' : workflow.status.toUpperCase()}
+                      color={getStatusColor(workflow.status)}
+                      size="medium"
+                      icon={getStatusIcon(workflow.status)}
+                      sx={{ fontWeight: 600 }}
+                    />
+                    <Chip 
+                      label={workflow.ehrSystem} 
+                      size="medium" 
+                      color="primary" 
+                      variant="outlined"
+                      icon={<EHRIcon />}
+                    />
+                    <Chip 
+                      label={`${workflow.blocks.length} automation steps`} 
+                      size="medium" 
+                      variant="outlined"
+                      icon={<AIIcon />}
+                    />
+                  </Stack>
 
-                  {/* Description */}
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      color: theme.palette.text.secondary,
-                      mb: 2,
-                      fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                      lineHeight: 1.5,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical'
-                    }}
-                  >
-                    {workflow.description || 'No description provided'}
-                  </Typography>
-
-                  {/* Workflow Details Accordion */}
-                  <Accordion 
-                    elevation={0}
-                    sx={{ 
-                      backgroundColor: 'transparent',
-                      '&:before': { display: 'none' },
-                      '& .MuiAccordionSummary-root': {
-                        px: 0,
-                        minHeight: { xs: 32, sm: 40 }
-                      }
-                    }}
-                  >
-                    <AccordionSummary 
-                      expandIcon={<ExpandMoreIcon />}
-                      sx={{ 
-                        '& .MuiAccordionSummary-content': { 
-                          my: 0,
-                          alignItems: 'center'
-                        }
-                      }}
-                    >
-                      <Typography 
-                        variant="body2" 
-                        sx={{ 
-                          fontWeight: 600,
-                          fontSize: { xs: '0.8rem', sm: '0.875rem' }
-                        }}
-                      >
-                        Workflow Details
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails sx={{ px: 0, pt: 0 }}>
-                      <Stack spacing={1.5}>
-                        {/* Blocks */}
-                        <Box>
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              fontWeight: 600,
-                              color: theme.palette.text.primary,
-                              fontSize: { xs: '0.7rem', sm: '0.75rem' }
-                            }}
-                          >
-                            Blocks: {workflow.blocks?.length || 0}
-                          </Typography>
-                        </Box>
-
-                        {/* Visit Types */}
-                        <Box>
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              fontWeight: 600,
-                              color: theme.palette.text.primary,
-                              display: 'block',
-                              mb: 0.5,
-                              fontSize: { xs: '0.7rem', sm: '0.75rem' }
-                            }}
-                          >
-                            Visit Types:
-                          </Typography>
-                          <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ gap: 0.5 }}>
-                            {workflow.availableVisitTypes?.slice(0, 3).map((visitType: string, index: number) => (
-                              <Chip
-                                key={index}
-                                label={visitType}
-                                size="small"
-                                variant="outlined"
-                                sx={{
-                                  fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                                  height: { xs: 18, sm: 20 }
-                                }}
+                  {/* Clinical Workflow Steps */}
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <ChecklistIcon color="primary" />
+                      Clinical Automation Steps
+                    </Typography>
+                    
+                    <Paper elevation={0} sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
+                      <Box sx={{ 
+                        display: 'grid',
+                        gridTemplateColumns: {
+                          xs: '1fr',
+                          sm: 'repeat(2, 1fr)'
+                        },
+                        gap: 1
+                      }}>
+                        {workflow.blocks.slice(0, 6).map((block, index) => (
+                          <Box key={block.id} sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 1,
+                            p: 1,
+                            borderRadius: 1,
+                            backgroundColor: 'white',
+                            border: '1px solid',
+                            borderColor: 'grey.200'
+                          }}>
+                            <Box sx={{ 
+                              minWidth: 24, 
+                              height: 24, 
+                              borderRadius: '50%', 
+                              backgroundColor: 'primary.main', 
+                              color: 'white', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              fontSize: '0.75rem',
+                              fontWeight: 600
+                            }}>
+                              {index + 1}
+                            </Box>
+                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                              <Typography variant="body2" sx={{ 
+                                fontWeight: 500, 
+                                fontSize: '0.875rem',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}>
+                                {block.name}
+                              </Typography>
+                              <Chip 
+                                label={getBlockTypeLabel(block.type)} 
+                                size="small" 
+                                variant="outlined" 
+                                sx={{ height: 16, fontSize: '0.65rem', mt: 0.5 }}
                               />
-                            ))}
-                            {workflow.availableVisitTypes?.length > 3 && (
-                              <Chip
-                                label={`+${workflow.availableVisitTypes.length - 3}`}
-                                size="small"
-                                variant="outlined"
-                                sx={{
-                                  fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                                  height: { xs: 18, sm: 20 }
-                                }}
-                              />
+                            </Box>
+                            {block.isEditable && (
+                              <SettingsIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                             )}
-                          </Stack>
-                        </Box>
-
-                        {/* Last Modified */}
-                        {workflow.lastModified && (
-                          <Typography 
-                            variant="caption" 
-                            sx={{ 
-                              color: theme.palette.text.secondary,
-                              fontSize: { xs: '0.7rem', sm: '0.75rem' }
-                            }}
-                          >
-                            Modified: {new Date(workflow.lastModified).toLocaleDateString()}
+                          </Box>
+                        ))}
+                        {workflow.blocks.length > 6 && (
+                          <Typography variant="caption" color="text.secondary" sx={{ textAlign: 'center', display: 'block', mt: 1 }}>
+                            +{workflow.blocks.length - 6} more automation steps
                           </Typography>
                         )}
-                      </Stack>
-                    </AccordionDetails>
-                  </Accordion>
+                      </Box>
+                    </Paper>
+                  </Box>
 
-                  {/* Action Buttons */}
-                  <Divider sx={{ my: 2 }} />
-                  <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <Button
-                      size="small"
-                      startIcon={<SettingsIcon />}
-                      onClick={() => handleConfigureWorkflow(workflow)}
-                      sx={{
-                        textTransform: 'none',
-                        fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                        px: { xs: 1, sm: 2 }
-                      }}
-                    >
-                      Configure
-                    </Button>
-                  </Stack>
+                  {/* Configuration Status */}
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <MapIcon color="primary" />
+                      Configuration Status
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {getConfigurationStatus(workflow)}
+                    </Typography>
+                  </Box>
+
+                  {/* Last Run Info */}
+                  {workflow.lastRun && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                      <TimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                      <Typography variant="caption" color="text.secondary">
+                        Last executed: {workflow.lastRun}
+                      </Typography>
+                    </Box>
+                  )}
                 </CardContent>
+                
+                {/* Action Buttons */}
+                <Box sx={{ p: 3, pt: 0 }}>
+                  <Stack spacing={2}>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        variant="outlined"
+                        size="medium"
+                        startIcon={<SettingsIcon />}
+                        onClick={() => handleConfigureWorkflow(workflow)}
+                        sx={{ 
+                          flex: 1,
+                          borderColor: '#81C784',
+                          color: '#388E3C',
+                          backgroundColor: '#F1F8E9',
+                          '&:hover': {
+                            borderColor: '#66BB6A',
+                            backgroundColor: '#E8F5E8',
+                            color: '#2E7D32'
+                          }
+                        }}
+                      >
+                        Configure
+                      </Button>
+                      <Button
+                        variant="contained"
+                        size="medium"
+                        startIcon={<PlayIcon />}
+                        onClick={() => handleExecuteWorkflow(workflow)}
+                        disabled={workflow.status === 'error' || workflow.status === 'draft'}
+                        sx={{ flex: 1 }}
+                      >
+                        Execute
+                      </Button>
+                    </Box>
+                    
+                    {workflow.status === 'draft' && (
+                      <Alert severity="warning" sx={{ fontSize: '0.875rem' }}>
+                        <strong>Setup Required:</strong> Configure visit type mappings to enable workflow execution
+                      </Alert>
+                    )}
+                    
+                    {workflow.status === 'configured' && (
+                      <Alert severity="success" sx={{ fontSize: '0.875rem' }}>
+                        <strong>Ready to Use:</strong> Workflow configured and ready for EHR execution
+                      </Alert>
+                    )}
+
+                    {workflow.status === 'active' && (
+                      <Alert severity="info" sx={{ fontSize: '0.875rem' }}>
+                        <strong>Currently Running:</strong> AI automation is active in your EHR
+                      </Alert>
+                    )}
+                  </Stack>
+                </Box>
               </Card>
-            </Grid>
-          ))}
-        </Grid>
+            ))}
+          </Box>
+        </Box>
       )}
 
-      {/* Menu */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleMenuClose}
-        PaperProps={{
-          sx: {
-            borderRadius: 2,
-            minWidth: 180,
-            boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
-          }
-        }}
-      >
-        <MenuItem onClick={() => handleConfigureWorkflow(selectedWorkflow)}>
-          <SettingsIcon sx={{ mr: 1, fontSize: 20 }} />
-          Configure
-        </MenuItem>
-        <MenuItem onClick={() => handleToggleStatus(selectedWorkflow)}>
-          {selectedWorkflow?.status === 'active' ? (
-            <>
-              <PauseIcon sx={{ mr: 1, fontSize: 20 }} />
-              Pause
-            </>
-          ) : (
-            <>
-              <PlayIcon sx={{ mr: 1, fontSize: 20 }} />
-              Activate
-            </>
-          )}
-        </MenuItem>
-        <Divider />
-        <MenuItem 
-          onClick={() => handleDeleteWorkflow(selectedWorkflow?.id)}
-          sx={{ color: theme.palette.error.main }}
-        >
-          <DeleteIcon sx={{ mr: 1, fontSize: 20 }} />
-          Delete
-        </MenuItem>
-      </Menu>
-
-      {/* Create Workflow Dialog */}
-      <Dialog 
-        open={createDialogOpen} 
-        onClose={() => setCreateDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-        fullScreen={isMobile}
-        PaperProps={{
-          sx: {
-            borderRadius: isMobile ? 0 : 3,
-            maxHeight: { xs: '100vh', sm: '90vh' }
-          }
-        }}
-      >
-        <DialogTitle sx={{ 
-          fontWeight: 600,
-          fontSize: { xs: '1.1rem', sm: '1.25rem' }
-        }}>
-          Create New Workflow
+      {/* Workflow Execution Dialog */}
+      <Dialog open={executeDialog} onClose={() => setExecuteDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <EHRIcon color="primary" />
+            Execute Workflow: {selectedWorkflow?.name}
+          </Box>
         </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-          <Stack spacing={3}>
-            <TextField
-              fullWidth
-              label="Workflow Name"
-              value={newWorkflow.name}
-              onChange={(e) => setNewWorkflow({...newWorkflow, name: e.target.value})}
-              variant="outlined"
-              size={isMobile ? "small" : "medium"}
-            />
-            
-            <TextField
-              fullWidth
-              label="Description"
-              value={newWorkflow.description}
-              onChange={(e) => setNewWorkflow({...newWorkflow, description: e.target.value})}
-              multiline
-              rows={3}
-              variant="outlined"
-              size={isMobile ? "small" : "medium"}
-            />
-            
-            <FormControl fullWidth size={isMobile ? "small" : "medium"}>
-              <InputLabel>EHR System</InputLabel>
-              <Select
-                value={newWorkflow.ehrSystem}
-                label="EHR System"
-                onChange={(e) => setNewWorkflow({...newWorkflow, ehrSystem: e.target.value})}
-              >
-                {ehrSystems.map((system) => (
-                  <MenuItem key={system} value={system}>{system}</MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+        <DialogContent>
+          <Box sx={{ mb: 3 }}>
+            <Stepper activeStep={executionStep} alternativeLabel>
+              {executionSteps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+          </Box>
 
-            <Alert severity="info" sx={{ borderRadius: 2 }}>
-              <Typography variant="body2">
-                Visit types and workflow blocks can be configured after creation.
+          {isExecuting && <LinearProgress sx={{ mb: 2 }} />}
+
+          {executionStep === 0 && (
+            <Box>
+              <Alert severity="info" sx={{ mb: 3 }}>
+                <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
+                  Ready to Execute Clinical Workflow
+                </Typography>
+                <Typography variant="body2">
+                  This workflow will execute across all configured visit types. Enter your {selectedWorkflow?.ehrSystem} credentials to authenticate and begin automation.
+                </Typography>
+              </Alert>
+              
+              <Box sx={{ mb: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <WorkflowIcon color="primary" />
+                  Configured Visit Types
+                </Typography>
+                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                  {selectedWorkflow?.visitTypeMappings
+                    .filter(mapping => mapping.isConfigured)
+                    .map(mapping => (
+                      <Chip 
+                        key={mapping.visitType}
+                        label={mapping.visitType}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ))
+                  }
+                </Stack>
+              </Box>
+
+              <TextField
+                fullWidth
+                label={`${selectedWorkflow?.ehrSystem} Username`}
+                value={credentials.username}
+                onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
+                sx={{ mb: 2 }}
+                size="small"
+              />
+              <TextField
+                fullWidth
+                label={`${selectedWorkflow?.ehrSystem} Password`}
+                type="password"
+                value={credentials.password}
+                onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
+                sx={{ mb: 2 }}
+                size="small"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={mfaEnabled}
+                    onChange={(e) => setMfaEnabled(e.target.checked)}
+                  />
+                }
+                label={`My ${selectedWorkflow?.ehrSystem} has Multi-Factor Authentication (MFA)`}
+              />
+            </Box>
+          )}
+
+          {executionStep === 1 && mfaEnabled && (
+            <Box>
+              <Alert severity="warning" sx={{ mb: 3 }}>
+                MFA detected. Please check your device for the OTP code and enter it below.
+              </Alert>
+              <TextField
+                fullWidth
+                label="Enter OTP Code"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+                placeholder="123456"
+                inputProps={{ maxLength: 6 }}
+                size="small"
+              />
+            </Box>
+          )}
+
+          {executionStep === 2 && (
+            <Box>
+              <Alert severity="success" sx={{ mb: 2 }}>
+                Authentication successful! Executing workflow automation...
+              </Alert>
+              <Typography variant="body2" color="text.secondary">
+                The workflow is now automating your {selectedWorkflow?.ehrSystem} system across all configured visit types. 
+                You can monitor progress in the workflow dashboard.
               </Typography>
+            </Box>
+          )}
+
+          {executionStep === 3 && (
+            <Alert severity="success">
+              Workflow executed successfully! Your {selectedWorkflow?.ehrSystem} encounters have been 
+              automated according to your configured visit type mappings.
             </Alert>
-          </Stack>
+          )}
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 2 }}>
-          <Button 
-            onClick={() => setCreateDialogOpen(false)}
-            size={isMobile ? "small" : "medium"}
-          >
-            Cancel
+        <DialogActions>
+          <Button onClick={() => setExecuteDialog(false)}>
+            {executionStep === 3 ? 'Close' : 'Cancel'}
           </Button>
-          <Button 
-            variant="contained" 
-            onClick={handleCreateWorkflow}
-            disabled={!newWorkflow.name || !newWorkflow.ehrSystem}
-            size={isMobile ? "small" : "medium"}
-          >
-            Create Workflow
-          </Button>
+          {executionStep === 0 && (
+            <Button
+              variant="contained"
+              onClick={handleStartExecution}
+              disabled={!credentials.username || !credentials.password || isExecuting}
+            >
+              Authenticate & Start
+            </Button>
+          )}
+          {executionStep === 1 && mfaEnabled && (
+            <Button
+              variant="contained"
+              onClick={handleMfaVerification}
+              disabled={!otpCode || isExecuting}
+            >
+              Verify OTP
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
 
       {/* Configuration Dialog */}
-      <Dialog 
-        open={configDialogOpen} 
-        onClose={() => setConfigDialogOpen(false)}
-        maxWidth="md"
-        fullWidth
-        fullScreen={isMobile}
-        PaperProps={{
-          sx: {
-            borderRadius: isMobile ? 0 : 3,
-            maxHeight: { xs: '100vh', sm: '90vh' }
-          }
-        }}
-      >
-        <DialogTitle sx={{ 
-          fontWeight: 600,
-          fontSize: { xs: '1.1rem', sm: '1.25rem' }
-        }}>
-          Configure: {selectedWorkflow?.name}
+      <Dialog open={configureDialog} onClose={() => setConfigureDialog(false)} maxWidth="md" fullWidth>
+        <DialogTitle>
+          Configure Workflow: {selectedWorkflow?.name}
         </DialogTitle>
-        <DialogContent sx={{ pt: 2 }}>
-          <Typography variant="body1" sx={{ mb: 2 }}>
-            Advanced workflow configuration coming soon. This will include:
+        <DialogContent>
+          <Alert severity="info" sx={{ mb: 3 }}>
+            Configure schedule settings, note types, and map workflow blocks to template note sections for each visit type. 
+            Visit types and template sections come from your Template Builder. You can select multiple note headings for each field.
+          </Alert>
+          
+          {/* Common Schedule Configuration Section */}
+          <Box sx={{ mb: 4, p: 3, border: 1, borderColor: 'divider', borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ScheduleIcon color="primary" />
+              Schedule Configuration (Common for all visit types)
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              These settings will apply to all visit types in this workflow.
+            </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', md: 'row' }, 
+              gap: 2,
+              mb: 3
+            }}>
+              <Box sx={{ flex: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Provider Name"
+                  value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.providerName || ''}
+                  onChange={(e) => handleGlobalScheduleConfigChange('providerName', e.target.value)}
+                  placeholder="e.g., Dr. Smith"
+                  InputProps={{
+                    startAdornment: <PersonIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                  }}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Location"
+                  value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.location || ''}
+                  onChange={(e) => handleGlobalScheduleConfigChange('location', e.target.value)}
+                  placeholder="e.g., Main Clinic"
+                  InputProps={{
+                    startAdornment: <LocationIcon sx={{ mr: 1, color: 'text.secondary' }} />
+                  }}
+                />
+              </Box>
+            </Box>
+            
+            {/* Previous Visit Note Import Option */}
+            <Box sx={{ p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote || false}
+                    onChange={(e) => handleGlobalScheduleConfigChange('importPreviousNote', e.target.checked)}
+                  />
+                }
+                label={
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <ChecklistIcon color="primary" />
+                    <Typography variant="body2">
+                      Import previous visit note as checklist
+                    </Typography>
+                  </Box>
+                }
+              />
+              <Typography variant="caption" color="text.secondary" sx={{ ml: 4, display: 'block', mb: 2 }}>
+                Automatically import the last visit note to reference during the current encounter
+              </Typography>
+              
+              {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote && (
+                <Box sx={{ ml: 4, mt: 2 }}>
+                  <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                    <InputLabel>Import Note For</InputLabel>
+                    <Select
+                      value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor || 'all'}
+                      label="Import Note For"
+                      onChange={(e) => handleGlobalScheduleConfigChange('importPreviousNoteFor', e.target.value)}
+                    >
+                      <MenuItem value="all">All visit types</MenuItem>
+                      <MenuItem value="selected">Selected visit types only</MenuItem>
+                    </Select>
+                  </FormControl>
+                  
+                  {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor === 'selected' && (
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Select Visit Types</InputLabel>
+                      <Select
+                        multiple
+                        value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.selectedVisitTypes || []}
+                        label="Select Visit Types"
+                        onChange={(e) => handleGlobalScheduleConfigChange('selectedVisitTypes', e.target.value as string[])}
+                        renderValue={(selected) => (
+                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                            {(selected as string[]).map((value) => (
+                              <Chip key={value} label={value} size="small" />
+                            ))}
+                          </Box>
+                        )}
+                      >
+                        {selectedWorkflow?.availableVisitTypes.map((visitType) => (
+                          <MenuItem key={visitType} value={visitType}>
+                            {visitType}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                </Box>
+              )}
+            </Box>
+          </Box>
+
+          {/* Visit Type Specific Configuration */}
+          <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <AssignmentIcon color="primary" />
+            Visit Type Configuration
           </Typography>
-          <Stack spacing={1} sx={{ ml: 2 }}>
-            <Typography variant="body2">• Visit type mapping configuration</Typography>
-            <Typography variant="body2">• Template field assignments</Typography>
-            <Typography variant="body2">• Schedule and provider settings</Typography>
-            <Typography variant="body2">• Workflow block sequencing</Typography>
-            <Typography variant="body2">• AI automation rules</Typography>
-          </Stack>
+          
+          {selectedWorkflow?.visitTypeMappings.map((mapping) => {
+            const templateSections = getTemplateSectionsForVisitType(mapping.visitType);
+            
+            return (
+              <Accordion key={mapping.visitType} sx={{ mb: 2 }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                    <Typography variant="h6">{mapping.visitType}</Typography>
+                    <Chip 
+                      label={mapping.isConfigured ? 'Configured' : 'Needs Configuration'}
+                      color={mapping.isConfigured ? 'success' : 'warning'}
+                      size="small"
+                    />
+                    <Typography variant="caption" color="text.secondary">
+                      ({templateSections.length} template sections available)
+                    </Typography>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                      Configure note type and map workflow blocks to template sections for {mapping.visitType}.
+                      You can select multiple note headings for each workflow block.
+                    </Typography>
+                    
+                    {/* Note Type Configuration */}
+                    <Box sx={{ mb: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+                      <Typography variant="subtitle2" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <NoteIcon color="primary" />
+                        Note Type Configuration
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="EHR Note Type"
+                        value={mapping.noteType || ''}
+                        onChange={(e) => handleNoteTypeChange(mapping.visitType, e.target.value)}
+                        placeholder="e.g., Progress Note, SOAP Note, H&P Note"
+                        helperText="Specify the note type that will be selected in your EHR system for this visit type"
+                      />
+                    </Box>
+
+                    {/* Template Field Mapping */}
+                    <Typography variant="subtitle2" sx={{ mb: 2 }}>
+                      Template Field Mapping
+                    </Typography>
+                    
+                    {selectedWorkflow.blocks
+                      .filter(block => block.type === 'note_entry')
+                      .map((block) => (
+                        <Box key={block.id} sx={{ mb: 3, p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
+                            {block.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            {block.description}
+                          </Typography>
+                          <FormControl fullWidth size="small">
+                            <InputLabel>Select Template Note Sections (Multiple)</InputLabel>
+                            <Select
+                              multiple
+                              value={mapping.templateFields[block.id] || []}
+                              label="Select Template Note Sections (Multiple)"
+                              onChange={(e) => handleFieldMapping(mapping.visitType, block.id, e.target.value as string[])}
+                              renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                  {(selected as string[]).map((value) => (
+                                    <Chip key={value} label={value} size="small" color="primary" variant="outlined" />
+                                  ))}
+                                </Box>
+                              )}
+                            >
+                              {templateSections.map((section) => (
+                                <MenuItem key={section.id} value={section.name}>
+                                  <Checkbox 
+                                    checked={(mapping.templateFields[block.id] || []).includes(section.name)} 
+                                    size="small"
+                                  />
+                                  <ListItemText 
+                                    primary={section.name} 
+                                    secondary={section.type}
+                                  />
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          {mapping.templateFields[block.id] && mapping.templateFields[block.id].length > 0 && (
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                              Maps to: {mapping.templateFields[block.id].join(', ')}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))}
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
+            );
+          })}
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 2 }}>
-          <Button 
-            onClick={() => setConfigDialogOpen(false)}
-            size={isMobile ? "small" : "medium"}
-          >
-            Close
+        <DialogActions>
+          <Button onClick={() => setConfigureDialog(false)}>
+            Cancel
+          </Button>
+          <Button variant="contained">
+            Save Configuration
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+
+      {/* Context Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+      >
+        <MenuItem onClick={() => setAnchorEl(null)}>
+          <EditIcon sx={{ mr: 1 }} />
+          Edit Workflow
+        </MenuItem>
+        <MenuItem onClick={() => setAnchorEl(null)}>
+          <DeleteIcon sx={{ mr: 1 }} />
+          Delete Workflow
+        </MenuItem>
+      </Menu>
+    </Box>
   );
 };
 
