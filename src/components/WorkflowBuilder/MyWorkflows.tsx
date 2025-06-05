@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -86,7 +85,7 @@ interface ScheduleConfig {
 
 interface VisitTypeMapping {
   visitType: string;
-  templateFields: { [blockId: string]: string };
+  templateFields: { [blockId: string]: string[] }; // Changed to array for multiple selections
   scheduleConfig: ScheduleConfig;
   noteType: string;
   isConfigured: boolean;
@@ -127,9 +126,9 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
           {
             visitType: 'Office Visit',
             templateFields: {
-              'chief-complaint': 'Chief Complaint',
-              'subjective-note': 'History of Present Illness',
-              'objective-note': 'Physical Examination'
+              'chief-complaint': ['Chief Complaint', 'Presenting Problem'],
+              'subjective-note': ['History of Present Illness', 'Review of Systems'],
+              'objective-note': ['Physical Examination', 'Vital Signs']
             },
             scheduleConfig: {
               providerName: 'Dr. Smith',
@@ -222,7 +221,6 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
   const [executeDialog, setExecuteDialog] = useState(false);
   const [configureDialog, setConfigureDialog] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState<ImportedWorkflow | null>(null);
-  const [selectedVisitType, setSelectedVisitType] = useState('');
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [mfaEnabled, setMfaEnabled] = useState(false);
   const [otpCode, setOtpCode] = useState('');
@@ -231,7 +229,6 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const executionSteps = [
-    'Select Visit Type',
     'EHR Login', 
     'Security Verification',
     'AI Automation Running',
@@ -245,7 +242,6 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
     setCredentials({ username: '', password: '' });
     setOtpCode('');
     setMfaEnabled(false);
-    setSelectedVisitType('');
   };
 
   const handleConfigureWorkflow = (workflow: ImportedWorkflow) => {
@@ -253,23 +249,18 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
     setConfigureDialog(true);
   };
 
-  const handleVisitTypeSelection = () => {
-    if (!selectedVisitType) return;
-    setExecutionStep(1);
-  };
-
   const handleStartExecution = async () => {
     if (!credentials.username || !credentials.password) return;
     
     setIsExecuting(true);
-    setExecutionStep(2);
+    setExecutionStep(1);
     
     // Simulate authentication
     setTimeout(() => {
       if (mfaEnabled) {
-        setExecutionStep(2); // Wait for OTP
+        setExecutionStep(1); // Wait for OTP
       } else {
-        setExecutionStep(3);
+        setExecutionStep(2);
         startWorkflowExecution();
       }
       setIsExecuting(false);
@@ -281,14 +272,14 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
     
     setIsExecuting(true);
     setTimeout(() => {
-      setExecutionStep(3);
+      setExecutionStep(2);
       startWorkflowExecution();
     }, 1000);
   };
 
   const startWorkflowExecution = () => {
     setTimeout(() => {
-      setExecutionStep(4);
+      setExecutionStep(3);
       setIsExecuting(false);
       // Update workflow status
       if (selectedWorkflow) {
@@ -301,7 +292,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
     }, 3000);
   };
 
-  const handleFieldMapping = (visitType: string, blockId: string, templateField: string) => {
+  const handleFieldMapping = (visitType: string, blockId: string, templateFields: string[]) => {
     if (!selectedWorkflow) return;
     
     setSelectedWorkflow(prev => {
@@ -315,11 +306,11 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 ...mapping,
                 templateFields: {
                   ...mapping.templateFields,
-                  [blockId]: templateField
+                  [blockId]: templateFields
                 },
                 isConfigured: Object.keys({
                   ...mapping.templateFields,
-                  [blockId]: templateField
+                  [blockId]: templateFields
                 }).length >= prev.blocks.filter(b => b.type === 'note_entry').length
               }
             : mapping
@@ -685,13 +676,13 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         onClick={() => handleConfigureWorkflow(workflow)}
                         sx={{ 
                           flex: 1,
-                          borderColor: '#64B5F6',
-                          color: '#1976D2',
-                          backgroundColor: '#F3F9FF',
+                          borderColor: '#81C784',
+                          color: '#388E3C',
+                          backgroundColor: '#F1F8E9',
                           '&:hover': {
-                            borderColor: '#42A5F5',
-                            backgroundColor: '#E3F2FD',
-                            color: '#1565C0'
+                            borderColor: '#66BB6A',
+                            backgroundColor: '#E8F5E8',
+                            color: '#2E7D32'
                           }
                         }}
                       >
@@ -737,7 +728,10 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
       {/* Workflow Execution Dialog */}
       <Dialog open={executeDialog} onClose={() => setExecuteDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Execute Workflow: {selectedWorkflow?.name}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <EHRIcon color="primary" />
+            Execute Workflow: {selectedWorkflow?.name}
+          </Box>
         </DialogTitle>
         <DialogContent>
           <Box sx={{ mb: 3 }}>
@@ -755,30 +749,35 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
           {executionStep === 0 && (
             <Box>
               <Alert severity="info" sx={{ mb: 3 }}>
-                Select the visit type for this workflow execution. Visit types come from your Template Builder.
+                <Typography variant="body1" sx={{ fontWeight: 600, mb: 1 }}>
+                  Ready to Execute Clinical Workflow
+                </Typography>
+                <Typography variant="body2">
+                  This workflow will execute across all configured visit types. Enter your {selectedWorkflow?.ehrSystem} credentials to authenticate and begin automation.
+                </Typography>
               </Alert>
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Visit Type</InputLabel>
-                <Select
-                  value={selectedVisitType}
-                  label="Visit Type"
-                  onChange={(e) => setSelectedVisitType(e.target.value)}
-                >
-                  {selectedWorkflow?.availableVisitTypes.map((visitType) => (
-                    <MenuItem key={visitType} value={visitType}>
-                      {visitType}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-          )}
+              
+              <Box sx={{ mb: 3, p: 2, backgroundColor: 'grey.50', borderRadius: 1 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <WorkflowIcon color="primary" />
+                  Configured Visit Types
+                </Typography>
+                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
+                  {selectedWorkflow?.visitTypeMappings
+                    .filter(mapping => mapping.isConfigured)
+                    .map(mapping => (
+                      <Chip 
+                        key={mapping.visitType}
+                        label={mapping.visitType}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ))
+                  }
+                </Stack>
+              </Box>
 
-          {executionStep === 1 && (
-            <Box>
-              <Alert severity="info" sx={{ mb: 3 }}>
-                Enter your {selectedWorkflow?.ehrSystem} credentials to authenticate and execute the workflow
-              </Alert>
               <TextField
                 fullWidth
                 label={`${selectedWorkflow?.ehrSystem} Username`}
@@ -808,7 +807,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             </Box>
           )}
 
-          {executionStep === 2 && mfaEnabled && (
+          {executionStep === 1 && mfaEnabled && (
             <Box>
               <Alert severity="warning" sx={{ mb: 3 }}>
                 MFA detected. Please check your device for the OTP code and enter it below.
@@ -825,39 +824,30 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             </Box>
           )}
 
-          {executionStep === 3 && (
+          {executionStep === 2 && (
             <Box>
               <Alert severity="success" sx={{ mb: 2 }}>
-                Authentication successful! Executing workflow for {selectedVisitType}...
+                Authentication successful! Executing workflow automation...
               </Alert>
               <Typography variant="body2" color="text.secondary">
-                The workflow is now automating your {selectedWorkflow?.ehrSystem} system. 
+                The workflow is now automating your {selectedWorkflow?.ehrSystem} system across all configured visit types. 
                 You can monitor progress in the workflow dashboard.
               </Typography>
             </Box>
           )}
 
-          {executionStep === 4 && (
+          {executionStep === 3 && (
             <Alert severity="success">
-              Workflow executed successfully! Your {selectedWorkflow?.ehrSystem} encounter has been 
-              automated according to the {selectedVisitType} configuration.
+              Workflow executed successfully! Your {selectedWorkflow?.ehrSystem} encounters have been 
+              automated according to your configured visit type mappings.
             </Alert>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setExecuteDialog(false)}>
-            {executionStep === 4 ? 'Close' : 'Cancel'}
+            {executionStep === 3 ? 'Close' : 'Cancel'}
           </Button>
           {executionStep === 0 && (
-            <Button
-              variant="contained"
-              onClick={handleVisitTypeSelection}
-              disabled={!selectedVisitType}
-            >
-              Continue
-            </Button>
-          )}
-          {executionStep === 1 && (
             <Button
               variant="contained"
               onClick={handleStartExecution}
@@ -866,7 +856,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               Authenticate & Start
             </Button>
           )}
-          {executionStep === 2 && mfaEnabled && (
+          {executionStep === 1 && mfaEnabled && (
             <Button
               variant="contained"
               onClick={handleMfaVerification}
@@ -886,7 +876,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         <DialogContent>
           <Alert severity="info" sx={{ mb: 3 }}>
             Configure schedule settings, note types, and map workflow blocks to template note sections for each visit type. 
-            Visit types and template sections come from your Template Builder.
+            Visit types and template sections come from your Template Builder. You can select multiple note headings for each field.
           </Alert>
           
           {/* Common Schedule Configuration Section */}
@@ -1025,6 +1015,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   <Box>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                       Configure note type and map workflow blocks to template sections for {mapping.visitType}.
+                      You can select multiple note headings for each workflow block.
                     </Typography>
                     
                     {/* Note Type Configuration */}
@@ -1052,27 +1043,45 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     {selectedWorkflow.blocks
                       .filter(block => block.type === 'note_entry')
                       .map((block) => (
-                        <Box key={block.id} sx={{ mb: 2 }}>
-                          <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                        <Box key={block.id} sx={{ mb: 3, p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
                             {block.name}
                           </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            {block.description}
+                          </Typography>
                           <FormControl fullWidth size="small">
-                            <InputLabel>Template Note Section</InputLabel>
+                            <InputLabel>Select Template Note Sections (Multiple)</InputLabel>
                             <Select
-                              value={mapping.templateFields[block.id] || ''}
-                              label="Template Note Section"
-                              onChange={(e) => handleFieldMapping(mapping.visitType, block.id, e.target.value)}
+                              multiple
+                              value={mapping.templateFields[block.id] || []}
+                              label="Select Template Note Sections (Multiple)"
+                              onChange={(e) => handleFieldMapping(mapping.visitType, block.id, e.target.value as string[])}
+                              renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                  {(selected as string[]).map((value) => (
+                                    <Chip key={value} label={value} size="small" color="primary" variant="outlined" />
+                                  ))}
+                                </Box>
+                              )}
                             >
                               {templateSections.map((section) => (
                                 <MenuItem key={section.id} value={section.name}>
-                                  {section.name} ({section.type})
+                                  <Checkbox 
+                                    checked={(mapping.templateFields[block.id] || []).includes(section.name)} 
+                                    size="small"
+                                  />
+                                  <ListItemText 
+                                    primary={section.name} 
+                                    secondary={section.type}
+                                  />
                                 </MenuItem>
                               ))}
                             </Select>
                           </FormControl>
-                          {mapping.templateFields[block.id] && (
+                          {mapping.templateFields[block.id] && mapping.templateFields[block.id].length > 0 && (
                             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                              Maps to: {mapping.templateFields[block.id]}
+                              Maps to: {mapping.templateFields[block.id].join(', ')}
                             </Typography>
                           )}
                         </Box>
