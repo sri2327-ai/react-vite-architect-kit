@@ -1,664 +1,390 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Typography,
   Card,
   CardContent,
+  Typography,
   Button,
+  Grid,
   Chip,
-  IconButton,
-  Alert,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
+  Alert,
   Stack,
-  Paper,
-  Container,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  ListItemButton,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   useTheme,
   useMediaQuery,
-  Grid
+  alpha,
+  Skeleton,
+  Pagination
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import {
+  Add as AddIcon,
   Search as SearchIcon,
-  FilterList as FilterIcon,
-  Download as ImportIcon,
-  CheckCircle as CheckIcon,
-  Schedule as ScheduleIcon,
-  Person as PersonIcon,
-  Note as NoteIcon,
-  Computer as EHRIcon,
-  Psychology as AIIcon,
-  AccessTime as TimeIcon,
-  Star as StarIcon,
-  Favorite as FavoriteIcon,
-  FavoriteBorder as FavoriteBorderIcon,
-  TrendingUp as TrendingIcon,
-  Category as CategoryIcon,
-  ExpandMore as ExpandMoreIcon,
-  AccountTree as WorkflowIcon,
+  CheckCircle as CheckCircleIcon,
+  TrendingUp as TrendingUpIcon,
   Assignment as AssignmentIcon,
-  Security as SecurityIcon,
-  Speed as SpeedIcon,
-  Analytics as AnalyticsIcon,
-  LocalHospital as HospitalIcon,
-  Business as BusinessIcon
+  Schedule as ScheduleIcon
 } from '@mui/icons-material';
-
-interface WorkflowBlock {
-  id: string;
-  type: string;
-  name: string;
-  description: string;
-  ehrField?: string;
-  isEditable: boolean;
-  config?: any;
-}
-
-interface Workflow {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  ehrSystem: string;
-  avgTimeSaved: string;
-  successRate: number;
-  trendingScore: number;
-  blocks: WorkflowBlock[];
-}
+import { bravoColors } from '@/theme/colors';
 
 interface WorkflowLibraryProps {
-  onImportWorkflow: (workflow: Workflow) => void;
+  onImportWorkflow: (workflow: any) => void;
 }
 
-const workflowData: Workflow[] = [
-  {
-    id: '1',
-    name: 'Standard Patient Visit',
-    description: 'Automated workflow for routine patient check-ups, including vitals, history, and assessment.',
-    category: 'General Medicine',
-    ehrSystem: 'Epic',
-    avgTimeSaved: '15-20 minutes',
-    successRate: 95,
-    trendingScore: 88,
-    blocks: [
-      {
-        id: '101',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '102',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '103',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '104',
-        type: 'note_entry',
-        name: 'Chief Complaint',
-        description: 'Enter patient chief complaint',
-        ehrField: 'chief_complaint',
-        isEditable: true
-      },
-      {
-        id: '105',
-        type: 'note_entry',
-        name: 'Subjective Note',
-        description: 'Enter HPI, ROS, and subjective findings',
-        ehrField: 'subjective',
-        isEditable: true
-      }
-    ]
-  },
-  {
-    id: '2',
-    name: 'Post-Op Follow-Up',
-    description: 'Streamlined workflow for post-operative evaluations and documentation.',
-    category: 'Surgery',
-    ehrSystem: 'Cerner',
-    avgTimeSaved: '10-15 minutes',
-    successRate: 92,
-    trendingScore: 79,
-    blocks: [
-      {
-        id: '201',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '202',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '203',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '204',
-        type: 'note_entry',
-        name: 'Incision Check',
-        description: 'Document incision appearance and healing',
-        ehrField: 'incision_check',
-        isEditable: true
-      },
-      {
-        id: '205',
-        type: 'note_entry',
-        name: 'Pain Level',
-        description: 'Assess and document patient pain level',
-        ehrField: 'pain_level',
-        isEditable: true
-      }
-    ]
-  },
-  {
-    id: '3',
-    name: 'Mental Health Assessment',
-    description: 'Comprehensive workflow for mental health evaluations and treatment planning.',
-    category: 'Mental Health',
-    ehrSystem: 'Athenahealth',
-    avgTimeSaved: '20-25 minutes',
-    successRate: 88,
-    trendingScore: 92,
-    blocks: [
-      {
-        id: '301',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '302',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '303',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '304',
-        type: 'note_entry',
-        name: 'Mood Assessment',
-        description: 'Evaluate and document patient mood and affect',
-        ehrField: 'mood_assessment',
-        isEditable: true
-      },
-      {
-        id: '305',
-        type: 'note_entry',
-        name: 'Risk Factors',
-        description: 'Identify and document potential risk factors',
-        ehrField: 'risk_factors',
-        isEditable: true
-      }
-    ]
-  },
-  {
-    id: '4',
-    name: 'Pediatric Vaccination Visit',
-    description: 'Efficient workflow for pediatric vaccination appointments and immunization records.',
-    category: 'Pediatrics',
-    ehrSystem: 'Allscripts',
-    avgTimeSaved: '12-18 minutes',
-    successRate: 90,
-    trendingScore: 85,
-    blocks: [
-      {
-        id: '401',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '402',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '403',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '404',
-        type: 'note_entry',
-        name: 'Vaccination Record',
-        description: 'Document vaccinations administered during visit',
-        ehrField: 'vaccination_record',
-        isEditable: true
-      },
-      {
-        id: '405',
-        type: 'note_entry',
-        name: 'Adverse Reactions',
-        description: 'Record any adverse reactions to vaccinations',
-        ehrField: 'adverse_reactions',
-        isEditable: true
-      }
-    ]
-  },
-  {
-    id: '5',
-    name: 'Cardiology Consultation',
-    description: 'Specialized workflow for cardiology consultations and cardiac risk assessments.',
-    category: 'Cardiology',
-    ehrSystem: 'NextGen',
-    avgTimeSaved: '25-30 minutes',
-    successRate: 93,
-    trendingScore: 81,
-    blocks: [
-      {
-        id: '501',
-        type: 'schedule',
-        name: 'View Schedule',
-        description: 'Access provider schedule with date and location filters',
-        isEditable: true
-      },
-      {
-        id: '502',
-        type: 'patient_select',
-        name: 'Select Patient',
-        description: 'Select patient from filtered schedule',
-        isEditable: false
-      },
-      {
-        id: '503',
-        type: 'encounter_open',
-        name: 'Open Encounter',
-        description: 'Open patient encounter for current date and choose note type',
-        isEditable: true
-      },
-      {
-        id: '504',
-        type: 'note_entry',
-        name: 'Cardiac History',
-        description: 'Record patient cardiac history and risk factors',
-        ehrField: 'cardiac_history',
-        isEditable: true
-      },
-      {
-        id: '505',
-        type: 'note_entry',
-        name: 'ECG Analysis',
-        description: 'Analyze and document ECG findings',
-        ehrField: 'ecg_analysis',
-        isEditable: true
-      }
-    ]
-  }
-];
-
 const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedEHR, setSelectedEHR] = useState('all');
-  const [hoveredWorkflow, setHoveredWorkflow] = useState<string | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  const [libraryWorkflows, setLibraryWorkflows] = useState([
+    {
+      id: 1,
+      name: "Patient Registration Automation",
+      description: "Streamline patient intake and registration process",
+      category: "Patient Management",
+      popularity: 95,
+      difficulty: "Beginner",
+      estimatedTime: "15 min",
+      tags: ["Registration", "Intake", "Automation"],
+      triggers: ["New patient form", "Insurance verification"],
+      actions: ["Create patient record", "Schedule appointment", "Send welcome email"]
+    },
+    {
+      id: 2,
+      name: "Lab Results Notification",
+      description: "Automatically notify providers when lab results are available",
+      category: "Clinical",
+      popularity: 88,
+      difficulty: "Intermediate",
+      estimatedTime: "20 min",
+      tags: ["Lab Results", "Notifications", "Clinical"],
+      triggers: ["Lab result received", "Critical value detected"],
+      actions: ["Notify primary provider", "Flag urgent results", "Update patient chart"]
+    }
+  ]);
 
-  const dynamicCategories = [...new Set(workflowData.map(workflow => workflow.category))];
-  const dynamicEHRSystems = [...new Set(workflowData.map(workflow => workflow.ehrSystem))];
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [importDialog, setImportDialog] = useState(false);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<any>(null);
 
-  const filteredWorkflows = workflowData.filter(workflow => {
-    const searchMatch = workflow.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        workflow.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const categoryMatch = selectedCategory === 'all' || workflow.category === selectedCategory;
-    const ehrMatch = selectedEHR === 'all' || workflow.ehrSystem === selectedEHR;
-    return searchMatch && categoryMatch && ehrMatch;
+  const workflowsPerPage = 6;
+  const categories = ['All', 'Patient Management', 'Clinical', 'Billing', 'Quality Assurance'];
+
+  const handleImport = (workflow: any) => {
+    setSelectedWorkflow(workflow);
+    setImportDialog(true);
+  };
+
+  const handleConfirmImport = () => {
+    if (selectedWorkflow) {
+      onImportWorkflow(selectedWorkflow);
+      setImportDialog(false);
+      setSelectedWorkflow(null);
+    }
+  };
+
+  const filteredWorkflows = libraryWorkflows.filter(workflow => {
+    const matchesSearch = workflow.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         workflow.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || workflow.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  const handleImport = (workflow: Workflow) => {
-    onImportWorkflow(workflow);
+  const totalPages = Math.ceil(filteredWorkflows.length / workflowsPerPage);
+  const paginatedWorkflows = filteredWorkflows.slice(
+    (currentPage - 1) * workflowsPerPage,
+    currentPage * workflowsPerPage
+  );
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Beginner':
+        return 'success';
+      case 'Intermediate':
+        return 'warning';
+      case 'Advanced':
+        return 'error';
+      default:
+        return 'default';
+    }
+  };
+
+  const getPopularityIcon = (popularity: number) => {
+    if (popularity >= 90) return <TrendingUpIcon sx={{ fontSize: 16, color: 'success.main' }} />;
+    if (popularity >= 70) return <AssignmentIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
+    return <ScheduleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />;
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
-      {/* Header Section */}
-      <Box sx={{ mb: { xs: 3, sm: 4 } }}>
-        <Typography 
-          variant={isMobile ? "h5" : "h4"} 
-          gutterBottom 
-          sx={{ 
-            fontWeight: 600, 
-            color: 'text.primary',
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
-          }}
-        >
-          Clinical Workflow Library
-        </Typography>
-        <Typography 
-          variant="h6" 
-          color="text.secondary" 
-          sx={{ 
-            mb: 2,
-            fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
-          }}
-        >
-          Pre-built automation workflows for common clinical tasks and EHR documentation
-        </Typography>
-        
-        <Alert 
-          severity="info" 
-          sx={{ 
-            mb: 3,
-            '& .MuiAlert-message': {
-              fontSize: { xs: '0.875rem', sm: '1rem' }
-            }
-          }}
-        >
-          <Typography variant="body1">
-            <strong>For Healthcare Teams:</strong> Import proven workflow templates to automate 
-            repetitive EHR tasks. Each workflow includes step-by-step automation for common clinical scenarios.
+    <Box>
+      {/* Header */}
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
+        <Box>
+          <Typography variant="h5" sx={{ color: bravoColors.primaryFlat, fontWeight: 700, mb: 1 }}>
+            Clinical Workflow Library
           </Typography>
-        </Alert>
-      </Box>
-
-      {/* Dynamic Search and Filter Controls */}
-      <Box sx={{ mb: { xs: 3, sm: 4 } }}>
-        <Box sx={{ 
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
-          mb: 2
-        }}>
-          <TextField
-            fullWidth
-            placeholder="Search workflows..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="small"
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
-            }}
-            sx={{
-              flex: { sm: 2 },
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: 'background.paper'
-              }
-            }}
-          />
-          <FormControl 
-            size="small" 
-            sx={{ 
-              minWidth: { xs: '100%', sm: 150 },
-              flex: { sm: 1 }
-            }}
-          >
-            <InputLabel>Category</InputLabel>
-            <Select
-              value={selectedCategory}
-              label="Category"
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              startAdornment={<CategoryIcon sx={{ mr: 1, color: 'text.secondary' }} />}
-            >
-              <MenuItem value="all">All Categories</MenuItem>
-              {dynamicCategories.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl 
-            size="small" 
-            sx={{ 
-              minWidth: { xs: '100%', sm: 150 },
-              flex: { sm: 1 }
-            }}
-          >
-            <InputLabel>EHR System</InputLabel>
-            <Select
-              value={selectedEHR}
-              label="EHR System"
-              onChange={(e) => setSelectedEHR(e.target.value)}
-              startAdornment={<EHRIcon sx={{ mr: 1, color: 'text.secondary' }} />}
-            >
-              <MenuItem value="all">All Systems</MenuItem>
-              {dynamicEHRSystems.map((ehr) => (
-                <MenuItem key={ehr} value={ehr}>
-                  {ehr}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Typography variant="body1" color="text.secondary">
+            Discover and import pre-built clinical workflows
+          </Typography>
         </Box>
       </Box>
 
-      {/* Workflow Cards Grid */}
-      <Box sx={{ 
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(auto-fit, minmax(350px, 1fr))',
-          md: 'repeat(auto-fit, minmax(400px, 1fr))',
-          lg: 'repeat(auto-fit, minmax(450px, 1fr))'
-        },
-        gap: { xs: 2, sm: 3 },
-        mb: 4
-      }}>
-        {filteredWorkflows.map((workflow) => (
-          <Card 
-            key={workflow.id}
-            sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: { xs: 2, sm: 3 },
-              transition: 'all 0.2s ease',
+      {/* Filters */}
+      <Box display="flex" gap={2} mb={3} flexDirection={isMobile ? 'column' : 'row'}>
+        <TextField
+          placeholder="Search workflows..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />,
+          }}
+          sx={{ flex: 1 }}
+        />
+        <FormControl sx={{ minWidth: 200 }}>
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={selectedCategory}
+            label="Category"
+            onChange={(e) => setSelectedCategory(e.target.value)}
+          >
+            {categories.map((category) => (
+              <MenuItem key={category} value={category}>
+                {category}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
+      {/* Workflows Grid */}
+      {isLoading ? (
+        <Grid container spacing={3}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Grid item xs={12} md={6} lg={4} key={index}>
+              <Card sx={{ borderRadius: 3 }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Skeleton variant="text" height={24} sx={{ mb: 1 }} />
+                  <Skeleton variant="text" height={20} width="80%" sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={60} sx={{ mb: 2 }} />
+                  <Skeleton variant="rectangular" height={40} />
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      ) : paginatedWorkflows.length > 0 ? (
+        <>
+          <Grid container spacing={3}>
+            {paginatedWorkflows.map((workflow) => (
+              <Grid item xs={12} md={6} lg={4} key={workflow.id}>
+                <Card 
+                  sx={{ 
+                    borderRadius: 3,
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+                    }
+                  }}
+                >
+                  <CardContent sx={{ p: 3, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Box display="flex" alignItems="flex-start" justifyContent="space-between" mb={2}>
+                      <Typography variant="h6" sx={{ fontWeight: 600, flex: 1 }}>
+                        {workflow.name}
+                      </Typography>
+                      {getPopularityIcon(workflow.popularity)}
+                    </Box>
+
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flex: 1 }}>
+                      {workflow.description}
+                    </Typography>
+
+                    <Box display="flex" alignItems="center" gap={1} mb={2}>
+                      <Chip 
+                        label={workflow.difficulty}
+                        size="small"
+                        color={getDifficultyColor(workflow.difficulty) as any}
+                        variant="outlined"
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        {workflow.estimatedTime}
+                      </Typography>
+                    </Box>
+
+                    <Box mb={2}>
+                      <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>
+                        Triggers:
+                      </Typography>
+                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        {workflow.triggers.slice(0, 2).map((trigger, index) => (
+                          <Chip 
+                            key={index}
+                            label={trigger}
+                            size="small"
+                            sx={{ 
+                              backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+                              color: bravoColors.primaryFlat,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        ))}
+                        {workflow.triggers.length > 2 && (
+                          <Chip 
+                            label={`+${workflow.triggers.length - 2} more`}
+                            size="small"
+                            variant="outlined"
+                            sx={{ fontSize: '0.75rem' }}
+                          />
+                        )}
+                      </Stack>
+                    </Box>
+
+                    <Box display="flex" alignItems="center" justifyContent="space-between" mt="auto">
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                        <Typography variant="body2" color="text.secondary">
+                          {workflow.popularity}% adoption
+                        </Typography>
+                      </Box>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        startIcon={<AddIcon />}
+                        onClick={() => handleImport(workflow)}
+                        sx={{
+                          backgroundColor: bravoColors.secondary,
+                          color: 'white',
+                          borderRadius: 2,
+                          px: 2,
+                          '&:hover': {
+                            backgroundColor: bravoColors.primaryFlat
+                          }
+                        }}
+                      >
+                        Import
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Box display="flex" justifyContent="center" mt={4}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={(event, value) => setCurrentPage(value)}
+                color="primary"
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    color: 'white',
+                    backgroundColor: bravoColors.primaryFlat,
+                    '&:hover': {
+                      backgroundColor: bravoColors.secondary,
+                    },
+                    '&.Mui-selected': {
+                      backgroundColor: bravoColors.secondary,
+                      color: 'white',
+                    },
+                  },
+                }}
+              />
+            </Box>
+          )}
+        </>
+      ) : (
+        <Card sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
+          <Typography variant="h6" gutterBottom color="text.secondary">
+            No workflows found
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {searchTerm || selectedCategory !== 'All'
+              ? 'Try adjusting your search or filter criteria'
+              : 'Browse available workflows in different categories'
+            }
+          </Typography>
+        </Card>
+      )}
+
+      {/* Import Confirmation Dialog */}
+      <Dialog open={importDialog} onClose={() => setImportDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            Import Workflow
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          {selectedWorkflow && (
+            <Box>
+              <Alert severity="info" sx={{ mb: 3 }}>
+                <Typography variant="body2">
+                  This will add "{selectedWorkflow.name}" to your workflows. You can customize it after importing.
+                </Typography>
+              </Alert>
+              
+              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                Workflow Details:
+              </Typography>
+              <Stack spacing={1} sx={{ mb: 2 }}>
+                <Typography variant="body2">
+                  <strong>Category:</strong> {selectedWorkflow.category}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Difficulty:</strong> {selectedWorkflow.difficulty}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Setup Time:</strong> {selectedWorkflow.estimatedTime}
+                </Typography>
+              </Stack>
+
+              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                Included Components:
+              </Typography>
+              <Stack spacing={1}>
+                <Typography variant="body2">
+                  • {selectedWorkflow.triggers.length} triggers
+                </Typography>
+                <Typography variant="body2">
+                  • {selectedWorkflow.actions.length} actions
+                </Typography>
+              </Stack>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setImportDialog(false)}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleConfirmImport} 
+            variant="contained"
+            sx={{
+              backgroundColor: bravoColors.primaryFlat,
               '&:hover': {
-                boxShadow: { xs: 3, sm: 6 },
-                transform: { xs: 'none', sm: 'translateY(-2px)' }
+                backgroundColor: bravoColors.secondary
               }
             }}
           >
-            <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-              {/* Header Section */}
-              <Box sx={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'flex-start', 
-                mb: { xs: 2, sm: 3 } 
-              }}>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography 
-                    variant="h6" 
-                    component="h3" 
-                    sx={{ 
-                      fontWeight: 600, 
-                      color: 'text.primary',
-                      fontSize: { xs: '1.125rem', sm: '1.25rem' }
-                    }}
-                  >
-                    {workflow.name}
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ 
-                      mb: 1, 
-                      fontSize: { xs: '0.875rem', sm: '1rem' },
-                      lineHeight: 1.6
-                    }}
-                  >
-                    {workflow.description}
-                  </Typography>
-                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
-                    <Chip 
-                      label={workflow.category} 
-                      size="small" 
-                      color="info" 
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
-                    />
-                    <Chip 
-                      label={workflow.ehrSystem} 
-                      size="small" 
-                      color="primary" 
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
-                    />
-                  </Stack>
-                </Box>
-              </Box>
-
-              {/* Workflow Highlights */}
-              <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-                <Typography 
-                  variant="subtitle2" 
-                  sx={{ 
-                    mb: 1, 
-                    fontWeight: 600,
-                    fontSize: { xs: '0.875rem', sm: '1rem' }
-                  }}
-                >
-                  Workflow Highlights
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TimeIcon sx={{ color: 'text.secondary', fontSize: '1rem' }} />
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
-                      Avg. Time Saved: {workflow.avgTimeSaved}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: '1rem' }} />
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
-                      Success Rate: {workflow.successRate}%
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TrendingIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
-                      Trending Score: {workflow.trendingScore}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-
-              {/* Workflow Steps Preview */}
-              <Box>
-                <Typography 
-                  variant="subtitle2" 
-                  sx={{ 
-                    mb: 1, 
-                    fontWeight: 600,
-                    fontSize: { xs: '0.875rem', sm: '1rem' }
-                  }}
-                >
-                  Workflow Steps
-                </Typography>
-                <List dense sx={{ py: 0 }}>
-                  {workflow.blocks.slice(0, 3).map((block) => (
-                    <ListItem key={block.id} disableGutters sx={{ py: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 'auto', mr: 1 }}>
-                        <AssignmentIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={block.name} 
-                        secondary={block.description}
-                        primaryTypographyProps={{
-                          fontSize: isMobile ? '0.875rem' : '1rem'
-                        }}
-                        secondaryTypographyProps={{
-                          fontSize: isMobile ? '0.75rem' : '0.875rem'
-                        }}
-                      />
-                    </ListItem>
-                  ))}
-                  {workflow.blocks.length > 3 && (
-                    <Typography 
-                      variant="caption" 
-                      color="text.secondary" 
-                      sx={{ 
-                        display: 'block', 
-                        textAlign: 'right',
-                        fontSize: { xs: '0.7rem', sm: '0.75rem' }
-                      }}
-                    >
-                      +{workflow.blocks.length - 3} more steps
-                    </Typography>
-                  )}
-                </List>
-              </Box>
-            </CardContent>
-            <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<ImportIcon />}
-                fullWidth
-                onClick={() => handleImport(workflow)}
-                sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-              >
-                Import Workflow
-              </Button>
-            </Box>
-          </Card>
-        ))}
-      </Box>
-
-      {filteredWorkflows.length === 0 && (
-        <Alert severity="warning" sx={{ mt: 3, fontSize: '1rem' }}>
-          No workflows match your search criteria. Please adjust your search or filters.
-        </Alert>
-      )}
-    </Container>
+            Import Workflow
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
   );
 };
 

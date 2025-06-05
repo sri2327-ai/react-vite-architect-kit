@@ -46,6 +46,7 @@ import TemplateEditor from './TemplateEditor';
 import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
 import TemplateLibraryTab from './TemplateLibraryTab';
 import { templateService } from '@/services/templateService';
+import TemplateDisplay from './TemplateDisplay';
 
 interface TemplateItem {
   id: string;
@@ -691,48 +692,28 @@ const TemplateBuilder: React.FC = () => {
       <Box display="flex" alignItems="center" mb={3}>
         <IconButton 
           onClick={handleBackToTemplates}
-          sx={{ mr: 2, color: bravoColors.primaryFlat }}
+          sx={{ 
+            mr: 2, 
+            backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+            '&:hover': { 
+              backgroundColor: alpha(bravoColors.primaryFlat, 0.2),
+              transform: 'scale(1.1)'
+            }
+          }}
         >
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h4" sx={{ color: bravoColors.primaryFlat, fontWeight: 600 }}>
-          Template: {viewingTemplate?.title}
+          Template Preview
         </Typography>
       </Box>
       
       {viewingTemplate && (
-        <Card sx={{ p: 3, borderRadius: 2 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            Template Content:
-          </Typography>
-          <Box sx={{ p: 3, backgroundColor: '#f5f5f5', borderRadius: 2 }}>
-            <Typography variant="body1" sx={{ whiteSpace: 'pre-line', lineHeight: 1.6 }}>
-              {viewingTemplate.content || 'No content available for this template.'}
-            </Typography>
-          </Box>
-          
-          <Box display="flex" gap={2} mt={3}>
-            <Button
-              variant="contained"
-              startIcon={<EditIcon />}
-              onClick={() => handleTemplateEdit(viewingTemplate)}
-              sx={{
-                backgroundColor: bravoColors.primaryFlat,
-                color: 'white',
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                '&:hover': {
-                  backgroundColor: bravoColors.secondary,
-                }
-              }}
-            >
-              EDIT TEMPLATE
-            </Button>
-          </Box>
-        </Card>
+        <TemplateDisplay
+          template={viewingTemplate}
+          onEdit={() => handleTemplateEdit(viewingTemplate)}
+          onClose={handleBackToTemplates}
+        />
       )}
     </Box>
   );
