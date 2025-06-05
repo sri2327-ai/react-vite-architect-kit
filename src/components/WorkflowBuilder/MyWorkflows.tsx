@@ -2,61 +2,71 @@ import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Button,
   Card,
   CardContent,
-  IconButton,
+  Button,
   Chip,
+  IconButton,
+  Menu,
+  MenuItem,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  FormControlLabel,
+  Checkbox,
+  Alert,
+  LinearProgress,
+  Stepper,
+  Step,
+  StepLabel,
+  Tabs,
+  Tab,
   List,
   ListItem,
   ListItemText,
-  ListItemIcon,
-  Grid,
-  Paper,
-  Alert,
-  useTheme,
-  useMediaQuery,
-  Container,
-  Stack,
+  ListItemSecondaryAction,
   Divider,
-  Switch,
-  FormControlLabel,
+  FormControl,
+  InputLabel,
+  Select,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Avatar,
-  Tooltip
+  Stack,
+  Paper,
+  useTheme,
+  useMediaQuery,
+  Container
 } from '@mui/material';
 import {
-  Add as AddIcon,
+  PlayArrow as PlayIcon,
+  MoreVert as MoreIcon,
+  Download as ImportIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  PlayArrow as PlayIcon,
-  Pause as PauseIcon,
+  CheckCircle as CheckIcon,
+  Error as ErrorIcon,
+  Warning as WarningIcon,
   Settings as SettingsIcon,
-  CheckCircle as CheckCircleIcon,
-  Schedule as ScheduleIcon,
+  Map as MapIcon,
   Assignment as AssignmentIcon,
   ExpandMore as ExpandMoreIcon,
+  AccountTree as WorkflowIcon,
+  Schedule as ScheduleIcon,
+  Person as PersonIcon,
+  LocationOn as LocationIcon,
+  Note as NoteIcon,
+  History as HistoryIcon,
+  Checklist as ChecklistIcon,
   Computer as EHRIcon,
+  AccessTime as TimeIcon,
+  LocalHospital as ClinicIcon,
   Psychology as AIIcon,
-  Bookmark as BookmarkIcon,
-  Timeline as TimelineIcon,
-  Speed as SpeedIcon,
-  TrendingUp as TrendingIcon,
-  Star as StarIcon,
-  AccessTime as TimeIcon
+  Security as SecurityIcon
 } from '@mui/icons-material';
-import { Workflow as WorkflowIcon } from 'lucide-react';
+import { templateBuilderService } from '../../services/templateBuilderService';
 
 interface WorkflowBlock {
   id: string;
@@ -394,7 +404,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active': return <CheckCircleIcon />;
+      case 'active': return <CheckIcon />;
       case 'configured': return <SettingsIcon />;
       case 'error': return <ErrorIcon />;
       default: return <WarningIcon />;

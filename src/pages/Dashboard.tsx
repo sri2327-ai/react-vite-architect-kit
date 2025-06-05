@@ -30,7 +30,8 @@ import {
   ChevronRight,
   Menu,
   X,
-  LogOut
+  LogOut,
+  Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { bravoColors } from '@/theme/colors';
@@ -414,7 +415,7 @@ export const Dashboard: React.FC = () => {
         </List>
       </Box>
 
-      {/* Enhanced Footer - Removed Settings icon from mobile */}
+      {/* Enhanced Footer */}
       <Box sx={{ 
         p: 2, 
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
@@ -424,6 +425,25 @@ export const Dashboard: React.FC = () => {
         {isMobile && (
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
+              <Tooltip title="Settings" arrow>
+                <IconButton
+                  sx={{
+                    flex: 1,
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    borderRadius: '12px',
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    py: 1.5,
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                      color: 'white',
+                      transform: 'translateY(-1px)'
+                    }
+                  }}
+                >
+                  <Settings size={18} />
+                </IconButton>
+              </Tooltip>
               <Tooltip title="Logout" arrow>
                 <IconButton
                   onClick={handleLogout}
