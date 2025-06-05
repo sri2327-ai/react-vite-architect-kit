@@ -17,27 +17,27 @@ export const components: Components<Omit<Theme, 'components'>> = {
         fontSize: '0.95rem',
         boxShadow: 'none',
         fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
-        background: '#6B7280',
+        background: bravoColors.button.gradient,
         color: bravoColors.text.white,
         '&:hover': {
-          background: '#4B5563',
+          background: bravoColors.button.hover,
           boxShadow: 'none',
         },
       },
       outlined: {
         background: 'transparent',
-        color: '#6B7280',
-        borderColor: '#6B7280',
+        color: bravoColors.primaryFlat,
+        borderColor: bravoColors.primaryFlat,
         '&:hover': {
-          background: '#F9FAFB',
-          borderColor: '#4B5563',
+          background: bravoColors.highlight.hover,
+          borderColor: bravoColors.primaryDark,
         },
       },
       text: {
         background: 'transparent',
-        color: '#6B7280',
+        color: bravoColors.primaryFlat,
         '&:hover': {
-          background: '#F9FAFB',
+          background: bravoColors.highlight.hover,
         },
       },
     },
@@ -55,14 +55,14 @@ export const components: Components<Omit<Theme, 'components'>> = {
           backgroundColor: bravoColors.background.white,
           fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
           '& fieldset': {
-            borderColor: '#D1D5DB',
+            borderColor: bravoColors.highlight.border,
             borderWidth: 1.5,
           },
           '&:hover fieldset': {
-            borderColor: '#9CA3AF',
+            borderColor: bravoColors.secondary,
           },
           '&.Mui-focused fieldset': {
-            borderColor: '#6B7280',
+            borderColor: bravoColors.primaryFlat,
             borderWidth: 2,
           },
         },
@@ -83,7 +83,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
       root: {
         borderRadius: 16,
         boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-        border: `1px solid #E5E7EB`,
+        border: `1px solid ${bravoColors.highlight.border}`,
         backgroundColor: bravoColors.background.white,
       },
     },
@@ -101,14 +101,14 @@ export const components: Components<Omit<Theme, 'components'>> = {
     styleOverrides: {
       paper: {
         backgroundColor: bravoColors.background.light,
-        borderRight: `1px solid #E5E7EB`,
+        borderRight: `1px solid ${bravoColors.highlight.border}`,
       },
     },
   },
   MuiAppBar: {
     styleOverrides: {
       root: {
-        backgroundColor: '#6B7280',
+        backgroundColor: bravoColors.primaryFlat,
         color: bravoColors.text.white,
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
       },
@@ -118,14 +118,14 @@ export const components: Components<Omit<Theme, 'components'>> = {
     styleOverrides: {
       root: {
         '&.Mui-selected': {
-          backgroundColor: '#F3F4F6',
-          color: '#374151',
+          backgroundColor: bravoColors.highlight.selected,
+          color: bravoColors.primaryFlat,
           '&:hover': {
-            backgroundColor: '#E5E7EB',
+            backgroundColor: bravoColors.highlight.hover,
           },
         },
         '&:hover': {
-          backgroundColor: '#F9FAFB',
+          backgroundColor: bravoColors.highlight.hover,
         },
       },
     },
@@ -152,9 +152,9 @@ export const components: Components<Omit<Theme, 'components'>> = {
     },
     styleOverrides: {
       root: {
-        color: '#9CA3AF',
+        color: bravoColors.icons.primary,
         '&.Mui-checked': {
-          color: '#6B7280',
+          color: bravoColors.primaryFlat,
         },
       },
     },
@@ -162,9 +162,9 @@ export const components: Components<Omit<Theme, 'components'>> = {
   MuiRadio: {
     styleOverrides: {
       root: {
-        color: '#9CA3AF',
+        color: bravoColors.icons.primary,
         '&.Mui-checked': {
-          color: '#6B7280',
+          color: bravoColors.primaryFlat,
         },
       },
     },
@@ -193,68 +193,19 @@ export const components: Components<Omit<Theme, 'components'>> = {
         fontWeight: 500,
         fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
       },
-      standardInfo: {
-        backgroundColor: '#F3F4F6',
-        color: '#374151',
-        '& .MuiAlert-icon': {
-          color: '#6B7280',
-        },
-      },
-      standardSuccess: {
-        backgroundColor: '#F3F4F6',
-        color: '#374151',
-        '& .MuiAlert-icon': {
-          color: '#6B7280',
-        },
-      },
-      standardWarning: {
-        backgroundColor: '#FEF3C7',
-        color: '#92400E',
-        '& .MuiAlert-icon': {
-          color: '#D97706',
-        },
-      },
-      standardError: {
-        backgroundColor: '#FEE2E2',
-        color: '#B91C1C',
-        '& .MuiAlert-icon': {
-          color: '#DC2626',
-        },
-      },
     },
   },
   MuiStep: {
     styleOverrides: {
       root: {
         '& .MuiStepIcon-root': {
-          color: '#D1D5DB',
+          color: bravoColors.highlight.border,
           '&.Mui-active': {
-            color: '#6B7280',
+            color: bravoColors.primaryFlat,
           },
           '&.Mui-completed': {
-            color: '#9CA3AF',
+            color: bravoColors.secondary,
           },
-        },
-      },
-    },
-  },
-  MuiChip: {
-    styleOverrides: {
-      root: {
-        fontFamily: '"Wix Madefor Text", "Roboto", "Helvetica", "Arial", sans-serif',
-      },
-      colorInfo: {
-        backgroundColor: '#F3F4F6',
-        color: '#374151',
-        '& .MuiChip-icon': {
-          color: '#6B7280',
-        },
-      },
-      colorSuccess: {
-        backgroundColor: '#F3F4F6',
-        color: '#374151',
-        '& .MuiChip-icon': {
-          color: '#6B7280',
         },
       },
     },
@@ -270,9 +221,9 @@ export const components: Components<Omit<Theme, 'components'>> = {
   MuiIconButton: {
     styleOverrides: {
       root: {
-        color: '#9CA3AF',
+        color: bravoColors.icons.primary,
         '&:hover': {
-          backgroundColor: '#F9FAFB',
+          backgroundColor: bravoColors.highlight.hover,
         },
       },
     },
@@ -280,7 +231,7 @@ export const components: Components<Omit<Theme, 'components'>> = {
   MuiToolbar: {
     styleOverrides: {
       root: {
-        backgroundColor: '#6B7280',
+        backgroundColor: bravoColors.primaryFlat,
         color: bravoColors.text.white,
       },
     },

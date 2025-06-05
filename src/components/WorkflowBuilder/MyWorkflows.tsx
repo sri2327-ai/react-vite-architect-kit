@@ -530,7 +530,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                       <Box sx={{ flexGrow: 1 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
-                          <EHRIcon sx={{ color: '#6B7280' }} />
+                          <EHRIcon color="primary" />
                           <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.primary' }}>
                             {workflow.name}
                           </Typography>
@@ -560,10 +560,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       <Chip 
                         label={workflow.ehrSystem} 
                         size="medium" 
-                        sx={{ 
-                          color: '#6B7280',
-                          borderColor: '#6B7280'
-                        }}
+                        color="primary" 
                         variant="outlined"
                         icon={<EHRIcon />}
                       />
@@ -571,10 +568,6 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         label={`${workflow.blocks.length} automation steps`} 
                         size="medium" 
                         variant="outlined"
-                        sx={{ 
-                          color: '#6B7280',
-                          borderColor: '#6B7280'
-                        }}
                         icon={<AIIcon />}
                       />
                     </Stack>
@@ -582,7 +575,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     {/* Clinical Workflow Steps */}
                     <Box sx={{ mb: 3 }}>
                       <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <ChecklistIcon sx={{ color: '#6B7280' }} />
+                        <ChecklistIcon color="primary" />
                         Clinical Automation Steps
                       </Typography>
                       
@@ -604,7 +597,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                                   minWidth: 24, 
                                   height: 24, 
                                   borderRadius: '50%', 
-                                  backgroundColor: '#6B7280', 
+                                  backgroundColor: 'primary.main', 
                                   color: 'white', 
                                   display: 'flex', 
                                   alignItems: 'center', 
@@ -651,7 +644,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     {/* Configuration Status */}
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body1" sx={{ fontWeight: 500, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <MapIcon sx={{ color: '#6B7280' }} />
+                        <MapIcon color="primary" />
                         Configuration Status
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -702,7 +695,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       )}
                       
                       {workflow.status === 'configured' && (
-                        <Alert severity="info" sx={{ fontSize: '0.875rem' }}>
+                        <Alert severity="success" sx={{ fontSize: '0.875rem' }}>
                           <strong>Ready to Use:</strong> Workflow configured and ready for EHR execution
                         </Alert>
                       )}
