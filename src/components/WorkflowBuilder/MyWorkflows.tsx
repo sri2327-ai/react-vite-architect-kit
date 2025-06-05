@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -34,7 +35,6 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Grid,
   Stack,
   Paper
 } from '@mui/material';
@@ -683,7 +683,17 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         size="medium"
                         startIcon={<SettingsIcon />}
                         onClick={() => handleConfigureWorkflow(workflow)}
-                        sx={{ flex: 1 }}
+                        sx={{ 
+                          flex: 1,
+                          borderColor: '#64B5F6',
+                          color: '#1976D2',
+                          backgroundColor: '#F3F9FF',
+                          '&:hover': {
+                            borderColor: '#42A5F5',
+                            backgroundColor: '#E3F2FD',
+                            color: '#1565C0'
+                          }
+                        }}
                       >
                         Configure
                       </Button>
