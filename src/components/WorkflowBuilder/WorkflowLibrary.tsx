@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -34,7 +33,7 @@ import {
   Stack,
   useTheme,
   useMediaQuery,
-  Grid
+  Grid2 as Grid
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -428,7 +427,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
       {/* Dynamic Search and Filter Controls */}
       <Box sx={{ mb: { xs: 3, sm: 4 } }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
+          <Grid xs={12} md={6}>
             <TextField
               fullWidth
               placeholder="Search workflows..."
@@ -445,7 +444,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
               }}
             />
           </Grid>
-          <Grid item xs={6} md={3}>
+          <Grid xs={6} md={3}>
             <FormControl fullWidth>
               <InputLabel>Category</InputLabel>
               <Select
@@ -464,7 +463,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} md={3}>
+          <Grid xs={6} md={3}>
             <FormControl fullWidth>
               <InputLabel>EHR System</InputLabel>
               <Select
