@@ -1,10 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
   Typography,
   Box,
   Card,
@@ -25,7 +20,8 @@ import {
   ListItemButton,
   Paper,
   Fade,
-  Slide
+  Slide,
+  Button
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -40,10 +36,18 @@ import {
   Check as CheckIcon,
   Psychology as PsychologyIcon,
   Healing as HealingIcon,
-  Visibility as VisibilityIcon
+  Visibility as VisibilityIcon,
+  Add as AddIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import { templateService } from '@/services/templateService';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 
 interface ImprovedTemplateCreationDialogProps {
   open: boolean;
@@ -236,11 +240,11 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
     }
     
     onCreateTemplate(templateData);
-    handleReset();
-    onClose();
+    handleStartNew();
   };
 
-  const handleReset = () => {
+  const handleStartNew = () => {
+    // Reset form but keep overlay open for creating another template
     setCurrentStep(0);
     setSelectedMethod(null);
     setSelectedLibraryTemplate(null);
@@ -252,6 +256,11 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
     setExistingTemplateContent('');
     setProcessedContent('');
     setAiSummary('');
+  };
+
+  const handleClose = () => {
+    handleStartNew();
+    onClose();
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -267,7 +276,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
     switch (step) {
       case 0: return 'Choose Creation Method';
       case 1: return selectedMethod?.id === 5 ? 'Select Template' : 'Configure Template Details';
-      case 2: return 'Review & Preview';
+      case 2: return 'Template Preview';
       default: return '';
     }
   };
@@ -299,17 +308,15 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
               {/* Scrollable container for template options */}
               <Box sx={{ 
-                maxHeight: '50vh',
+                maxHeight: '60vh',
                 overflowY: 'auto',
                 overflowX: 'hidden',
                 pr: 1
               }}>
                 <Box sx={{ 
                   display: 'grid', 
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
                   gap: 3,
-                  maxWidth: '900px',
-                  mx: 'auto',
                   pb: 2
                 }}>
                   {createTemplateOptions.map((option) => (
@@ -454,7 +461,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
               {/* Scrollable content area */}
               <Box sx={{ 
-                maxHeight: '40vh',
+                maxHeight: '55vh',
                 overflowY: 'auto',
                 pr: 1
               }}>
@@ -617,30 +624,17 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                 </Box>
               ) : (
                 <Box sx={{ 
-                  maxHeight: '50vh',
+                  maxHeight: '60vh',
                   overflowY: 'auto',
                   pr: 1
                 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                     <VisibilityIcon sx={{ color: bravoColors.primaryFlat, mr: 1 }} />
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                      Review & Preview Template
+                      Template Preview
                     </Typography>
                   </Box>
                   
-                  {selectedMethod?.id !== 5 && (
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={3}
-                      label="Template Description"
-                      value={templateDescription}
-                      onChange={(e) => setTemplateDescription(e.target.value)}
-                      placeholder="Describe when and how this template should be used..."
-                      sx={{ mb: 3 }}
-                    />
-                  )}
-
                   {/* Template Preview Section */}
                   <Paper 
                     variant="outlined" 
@@ -652,19 +646,12 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                       border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`
                     }}
                   >
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <VisibilityIcon sx={{ color: bravoColors.primaryFlat, mr: 1 }} />
-                      <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
-                        Template Preview
-                      </Typography>
-                    </Box>
-                    
                     <Box sx={{ 
                       p: 3, 
                       backgroundColor: 'white',
                       borderRadius: 2,
                       border: '1px solid #e0e0e0',
-                      maxHeight: 200,
+                      maxHeight: 400,
                       overflow: 'auto'
                     }}>
                       {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
@@ -698,42 +685,6 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                       </Typography>
                     </Alert>
                   )}
-
-                  {/* Summary */}
-                  <Box sx={{ 
-                    p: 3, 
-                    backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
-                    borderRadius: 2,
-                    border: `1px solid ${alpha(bravoColors.primaryFlat, 0.2)}`
-                  }}>
-                    <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
-                      Template Summary
-                    </Typography>
-                    <Stack spacing={1}>
-                      {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
-                        <>
-                          <Typography variant="body2">
-                            <strong>Name:</strong> {selectedLibraryTemplate.name}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Specialty:</strong> {selectedLibraryTemplate.specialty}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Type:</strong> {selectedLibraryTemplate.type}
-                          </Typography>
-                        </>
-                      ) : (
-                        <>
-                          <Typography variant="body2">
-                            <strong>Name:</strong> {templateName}
-                          </Typography>
-                          <Typography variant="body2">
-                            <strong>Creation Method:</strong> {selectedMethod?.title}
-                          </Typography>
-                        </>
-                      )}
-                    </Stack>
-                  </Box>
                 </Box>
               )}
             </Box>
@@ -762,147 +713,158 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose}
-      maxWidth="lg"
-      fullWidth
-      PaperProps={{
-        sx: { 
-          borderRadius: 4, 
-          height: '85vh',
-          maxHeight: '85vh',
-          boxShadow: '0 24px 48px rgba(0,0,0,0.2)'
-        }
-      }}
-    >
-      <DialogTitle sx={{ pb: 2, flexShrink: 0 }}>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box>
-            <Typography variant="h4" sx={{ 
-              color: bravoColors.primaryFlat, 
-              fontWeight: 700,
-              mb: 0.5
+    <Sheet open={open} onOpenChange={onClose}>
+      <SheetContent 
+        side="right" 
+        className="w-[90vw] max-w-[1200px] p-0 overflow-hidden"
+      >
+        <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+          {/* Header */}
+          <SheetHeader className="flex-shrink-0 p-6 border-b">
+            <Box display="flex" alignItems="center" justifyContent="between">
+              <Box>
+                <SheetTitle>
+                  <Typography variant="h4" sx={{ 
+                    color: bravoColors.primaryFlat, 
+                    fontWeight: 700,
+                    mb: 0.5
+                  }}>
+                    Create Clinical Template
+                  </Typography>
+                </SheetTitle>
+                <SheetDescription>
+                  <Typography variant="body1" color="text.secondary">
+                    Build efficient, standardized documentation for better patient care
+                  </Typography>
+                </SheetDescription>
+              </Box>
+            </Box>
+          </SheetHeader>
+
+          {/* Content */}
+          <Box sx={{ 
+            flex: 1, 
+            p: 4, 
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            {/* Horizontal Stepper */}
+            <Stepper activeStep={currentStep} sx={{ mt: 2, mb: 4, flexShrink: 0 }}>
+              {[0, 1, 2].map((step) => (
+                <Step key={step}>
+                  <StepLabel sx={{ 
+                    '& .MuiStepLabel-label': { 
+                      fontSize: '1rem', 
+                      fontWeight: 600 
+                    } 
+                  }}>
+                    {getStepTitle(step)}
+                  </StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+
+            {/* Step Content - Takes remaining space */}
+            <Box sx={{ 
+              flex: 1, 
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column'
             }}>
-              Create Clinical Template
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Build efficient, standardized documentation for better patient care
-            </Typography>
+              {renderStepContent(currentStep)}
+            </Box>
           </Box>
-          <IconButton 
-            onClick={onClose}
-            sx={{ 
-              bgcolor: alpha(bravoColors.primaryFlat, 0.1),
-              '&:hover': { bgcolor: alpha(bravoColors.primaryFlat, 0.2) }
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+
+          {/* Footer Actions */}
+          <Box sx={{ p: 4, pt: 2, gap: 2, flexShrink: 0, borderTop: '1px solid #e0e0e0' }}>
+            <Stack direction="row" spacing={2} justifyContent="space-between">
+              <Button 
+                onClick={handleClose} 
+                variant="outlined"
+                sx={{ 
+                  borderRadius: 2, 
+                  px: 3,
+                  textTransform: 'none',
+                  fontWeight: 600
+                }}
+              >
+                Close
+              </Button>
+              
+              <Stack direction="row" spacing={2}>
+                {currentStep > 0 && (
+                  <Button 
+                    onClick={handleBack}
+                    variant="outlined"
+                    startIcon={<NavigateBeforeIcon />}
+                    sx={{ 
+                      borderRadius: 2, 
+                      px: 3,
+                      textTransform: 'none',
+                      fontWeight: 600
+                    }}
+                  >
+                    Back
+                  </Button>
+                )}
+                
+                {currentStep < 2 ? (
+                  <Button 
+                    onClick={handleNext}
+                    variant="contained"
+                    disabled={!canProceed()}
+                    endIcon={<NavigateNextIcon />}
+                    sx={{ 
+                      borderRadius: 2, 
+                      px: 4,
+                      textTransform: 'none',
+                      fontWeight: 600
+                    }}
+                  >
+                    Next Step
+                  </Button>
+                ) : (
+                  <Stack direction="row" spacing={2}>
+                    <Button 
+                      onClick={handleCreate}
+                      variant="contained"
+                      disabled={!canProceed()}
+                      endIcon={<CheckIcon />}
+                      sx={{ 
+                        borderRadius: 2, 
+                        px: 4,
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        backgroundColor: bravoColors.secondary,
+                        '&:hover': {
+                          backgroundColor: bravoColors.primaryFlat
+                        }
+                      }}
+                    >
+                      Create Template
+                    </Button>
+                    <Button 
+                      onClick={handleStartNew}
+                      variant="outlined"
+                      startIcon={<AddIcon />}
+                      sx={{ 
+                        borderRadius: 2, 
+                        px: 3,
+                        textTransform: 'none',
+                        fontWeight: 600
+                      }}
+                    >
+                      Create Another
+                    </Button>
+                  </Stack>
+                )}
+              </Stack>
+            </Stack>
+          </Box>
         </Box>
-      </DialogTitle>
-
-      <DialogContent sx={{ 
-        flex: 1, 
-        px: 4, 
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column'
-      }}>
-        {/* Horizontal Stepper */}
-        <Stepper activeStep={currentStep} sx={{ mt: 2, mb: 4, flexShrink: 0 }}>
-          {[0, 1, 2].map((step) => (
-            <Step key={step}>
-              <StepLabel sx={{ 
-                '& .MuiStepLabel-label': { 
-                  fontSize: '1rem', 
-                  fontWeight: 600 
-                } 
-              }}>
-                {getStepTitle(step)}
-              </StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-
-        {/* Step Content - Takes remaining space */}
-        <Box sx={{ 
-          flex: 1, 
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          {renderStepContent(currentStep)}
-        </Box>
-      </DialogContent>
-
-      <DialogActions sx={{ p: 4, pt: 2, gap: 2, flexShrink: 0 }}>
-        <Button 
-          onClick={onClose} 
-          variant="outlined"
-          sx={{ 
-            borderRadius: 2, 
-            px: 3,
-            textTransform: 'none',
-            fontWeight: 600
-          }}
-        >
-          Cancel
-        </Button>
-        
-        {currentStep > 0 && (
-          <Button 
-            onClick={handleBack}
-            variant="outlined"
-            startIcon={<NavigateBeforeIcon />}
-            sx={{ 
-              borderRadius: 2, 
-              px: 3,
-              textTransform: 'none',
-              fontWeight: 600
-            }}
-          >
-            Back
-          </Button>
-        )}
-        
-        {currentStep < 2 ? (
-          <Button 
-            onClick={handleNext}
-            variant="contained"
-            disabled={!canProceed()}
-            endIcon={<NavigateNextIcon />}
-            sx={{ 
-              borderRadius: 2, 
-              px: 4,
-              textTransform: 'none',
-              fontWeight: 600
-            }}
-          >
-            Next Step
-          </Button>
-        ) : (
-          <Button 
-            onClick={handleCreate}
-            variant="contained"
-            disabled={!canProceed()}
-            endIcon={<CheckIcon />}
-            sx={{ 
-              borderRadius: 2, 
-              px: 4,
-              textTransform: 'none',
-              fontWeight: 600,
-              backgroundColor: bravoColors.secondary,
-              '&:hover': {
-                backgroundColor: bravoColors.primaryFlat
-              }
-            }}
-          >
-            Create Template
-          </Button>
-        )}
-      </DialogActions>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 
