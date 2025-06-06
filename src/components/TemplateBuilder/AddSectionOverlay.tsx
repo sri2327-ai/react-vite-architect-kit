@@ -189,574 +189,628 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
     return colors[category as keyof typeof colors] || bravoColors.primaryFlat;
   };
 
-  if (!open) return null;
-
   return (
-    <Fade in={open} timeout={300}>
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          backdropFilter: 'blur(8px)',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 2
-        }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
-      >
-        <Paper
-          elevation={24}
-          sx={{
-            width: '100%',
-            maxWidth: '1200px',
-            height: '85vh',
-            borderRadius: 4,
-            backgroundColor: '#ffffff',
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            boxShadow: '0 24px 60px rgba(0,0,0,0.25)'
-          }}
-        >
-          {/* Enhanced Header */}
-          <Box sx={{ 
-            p: 3,
-            background: `linear-gradient(135deg, ${bravoColors.primaryFlat} 0%, ${bravoColors.primary} 100%)`,
-            color: '#ffffff',
-            position: 'relative',
-            overflow: 'hidden'
-          }}>
-            <Box sx={{
-              position: 'absolute',
-              top: -20,
-              right: -20,
-              width: 100,
-              height: 100,
-              borderRadius: '50%',
-              background: alpha('#ffffff', 0.1),
-              zIndex: 1
-            }} />
-            <Box sx={{
-              position: 'absolute',
-              bottom: -30,
-              left: -30,
-              width: 80,
-              height: 80,
-              borderRadius: '50%',
-              background: alpha('#ffffff', 0.05),
-              zIndex: 1
-            }} />
-            
-            <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ position: 'relative', zIndex: 2 }}>
-              <Box display="flex" alignItems="center">
-                <Box sx={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 2,
-                  backgroundColor: alpha('#ffffff', 0.2),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mr: 2
-                }}>
-                  <AutoAwesomeIcon sx={{ fontSize: 24, color: '#ffffff' }} />
-                </Box>
-                <Box>
-                  <Typography variant="h4" sx={{ 
-                    fontWeight: 700,
-                    mb: 0.5,
-                    textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                  }}>
-                    Add Section
-                  </Typography>
-                  <Typography variant="body1" sx={{ opacity: 0.9 }}>
-                    Choose from our comprehensive library of medical documentation sections
-                  </Typography>
-                </Box>
-              </Box>
-              <IconButton 
-                onClick={onClose}
-                sx={{ 
-                  bgcolor: alpha('#ffffff', 0.15),
-                  color: '#ffffff',
-                  '&:hover': { 
-                    bgcolor: alpha('#ffffff', 0.25),
-                    transform: 'scale(1.1)'
-                  },
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <CloseIcon />
-              </IconButton>
-            </Box>
-          </Box>
-
-          {/* Enhanced Search and Filter Section */}
-          <Box sx={{ p: 3, bgcolor: alpha(bravoColors.primaryFlat, 0.02) }}>
-            <TextField
-              fullWidth
-              size="medium"
-              placeholder="Search sections by name or description..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: bravoColors.primaryFlat }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ 
-                mb: 3,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  fontSize: '1.1rem',
-                  backgroundColor: '#ffffff',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  '&:hover': {
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                  },
-                  '&.Mui-focused': {
-                    boxShadow: `0 4px 12px ${alpha(bravoColors.primaryFlat, 0.2)}`
-                  }
-                }
-              }}
-            />
-
-            {/* Enhanced Category Filter */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: bravoColors.primaryFlat }}>
-                Filter by Category
-              </Typography>
-              <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 1 }}>
-                {categories.map((category) => (
-                  <Chip
-                    key={category}
-                    label={category}
-                    onClick={() => setSelectedCategory(category)}
-                    variant={selectedCategory === category ? 'filled' : 'outlined'}
-                    sx={{
-                      borderRadius: 3,
-                      px: 2,
-                      py: 0.5,
-                      fontWeight: 600,
-                      fontSize: '0.9rem',
-                      bgcolor: selectedCategory === category ? getCategoryColor(category) : 'transparent',
-                      color: selectedCategory === category ? '#ffffff' : getCategoryColor(category),
-                      borderColor: getCategoryColor(category),
-                      boxShadow: selectedCategory === category ? `0 4px 12px ${alpha(getCategoryColor(category), 0.3)}` : 'none',
-                      '&:hover': {
-                        bgcolor: selectedCategory === category ? getCategoryColor(category) : alpha(getCategoryColor(category), 0.1),
-                        transform: 'translateY(-2px)',
-                        boxShadow: `0 4px 12px ${alpha(getCategoryColor(category), 0.2)}`
-                      },
-                      transition: 'all 0.2s ease'
-                    }}
-                  />
-                ))}
-              </Stack>
-            </Box>
-            
-            {/* Enhanced Custom Section Creator */}
-            <Paper 
-              elevation={0}
-              sx={{ 
-                p: 3, 
-                border: `2px dashed ${bravoColors.highlight.border}`, 
-                borderRadius: 3, 
-                background: `linear-gradient(135deg, ${alpha(bravoColors.primaryFlat, 0.02)} 0%, ${alpha(bravoColors.secondary, 0.02)} 100%)`,
-                position: 'relative',
-                overflow: 'hidden'
-              }}
-            >
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth={false}
+      fullScreen
+      sx={{
+        '& .MuiDialog-paper': {
+          margin: 0,
+          maxHeight: '100vh',
+          height: '100vh',
+          width: '100vw',
+          maxWidth: '100vw',
+          borderRadius: 0,
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          overflow: 'hidden'
+        },
+        '& .MuiBackdrop-root': {
+          backgroundColor: alpha('#000000', 0.8),
+          backdropFilter: 'blur(10px)'
+        }
+      }}
+    >
+      <DialogContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {/* Header with better gradient and positioning */}
+        <Box sx={{ 
+          background: `linear-gradient(135deg, ${bravoColors.primaryFlat} 0%, ${bravoColors.primary} 100%)`,
+          color: '#ffffff',
+          p: 4,
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+        }}>
+          {/* Decorative background elements */}
+          <Box sx={{
+            position: 'absolute',
+            top: -50,
+            right: -50,
+            width: 200,
+            height: 200,
+            borderRadius: '50%',
+            background: alpha('#ffffff', 0.05),
+            zIndex: 1
+          }} />
+          <Box sx={{
+            position: 'absolute',
+            bottom: -80,
+            left: -80,
+            width: 160,
+            height: 160,
+            borderRadius: '50%',
+            background: alpha('#ffffff', 0.03),
+            zIndex: 1
+          }} />
+          
+          <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ position: 'relative', zIndex: 2 }}>
+            <Box display="flex" alignItems="center">
               <Box sx={{
-                position: 'absolute',
-                top: -10,
-                right: -10,
-                width: 40,
-                height: 40,
-                borderRadius: '50%',
-                background: alpha(bravoColors.secondary, 0.1)
-              }} />
-              
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, position: 'relative', zIndex: 1 }}>
-                <Box sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 2,
-                  backgroundColor: bravoColors.secondary,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mr: 2
+                width: 64,
+                height: 64,
+                borderRadius: 3,
+                backgroundColor: alpha('#ffffff', 0.15),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mr: 3,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+              }}>
+                <AutoAwesomeIcon sx={{ fontSize: 32, color: '#ffffff' }} />
+              </Box>
+              <Box>
+                <Typography variant="h3" sx={{ 
+                  fontWeight: 800,
+                  mb: 1,
+                  textShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  letterSpacing: '-0.02em'
                 }}>
-                  <AddIcon sx={{ color: '#ffffff', fontSize: 18 }} />
-                </Box>
-                <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
-                  Create Custom Section
+                  Add Section
+                </Typography>
+                <Typography variant="h6" sx={{ 
+                  opacity: 0.9,
+                  fontWeight: 400,
+                  lineHeight: 1.4
+                }}>
+                  Choose from our comprehensive library of medical documentation sections
                 </Typography>
               </Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2, position: 'relative', zIndex: 1 }}>
-                Not finding what you need? Create a custom section tailored to your specific requirements.
-              </Typography>
-              
-              {!showCustomForm ? (
-                <Button
-                  variant="outlined"
-                  onClick={() => setShowCustomForm(true)}
-                  sx={{ 
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontWeight: 600,
-                    borderColor: bravoColors.secondary,
-                    color: bravoColors.secondary,
-                    '&:hover': {
-                      borderColor: bravoColors.primaryFlat,
-                      backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
-                      color: bravoColors.primaryFlat
-                    },
-                    position: 'relative',
-                    zIndex: 1
-                  }}
-                >
-                  Create Custom Section
-                </Button>
-              ) : (
-                <Box sx={{ position: 'relative', zIndex: 1 }}>
-                  <TextField
-                    fullWidth
-                    label="Section Name"
-                    value={customSectionName}
-                    onChange={(e) => setCustomSectionName(e.target.value)}
-                    placeholder="e.g., Medication Compliance Assessment"
-                    size="small"
-                    sx={{ mb: 2 }}
-                  />
-                  <Stack direction="row" spacing={2}>
-                    <Button 
-                      variant="contained" 
-                      onClick={handleAddCustomSection}
-                      disabled={!customSectionName.trim()}
-                      sx={{ 
-                        borderRadius: 2,
-                        backgroundColor: bravoColors.secondary,
-                        '&:hover': {
-                          backgroundColor: bravoColors.primaryFlat
-                        }
-                      }}
-                    >
-                      Add Section
-                    </Button>
-                    <Button 
-                      variant="outlined" 
-                      onClick={() => setShowCustomForm(false)}
-                      sx={{ borderRadius: 2 }}
-                    >
-                      Cancel
-                    </Button>
-                  </Stack>
-                </Box>
-              )}
-            </Paper>
+            </Box>
+            <IconButton 
+              onClick={onClose}
+              sx={{ 
+                bgcolor: alpha('#ffffff', 0.15),
+                color: '#ffffff',
+                width: 56,
+                height: 56,
+                '&:hover': { 
+                  bgcolor: alpha('#ffffff', 0.25),
+                  transform: 'scale(1.05)'
+                },
+                transition: 'all 0.2s ease',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
+              }}
+            >
+              <CloseIcon sx={{ fontSize: 28 }} />
+            </IconButton>
           </Box>
+        </Box>
 
-          {/* Enhanced Results Summary */}
-          <Box sx={{ px: 3, pb: 2 }}>
-            <Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              p: 2,
-              borderRadius: 2,
-              backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
-              border: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`
+        {/* Search and Filter Section */}
+        <Box sx={{ p: 4, bgcolor: alpha(bravoColors.primaryFlat, 0.02) }}>
+          <TextField
+            fullWidth
+            size="medium"
+            placeholder="Search sections by name or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: bravoColors.primaryFlat }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ 
+              mb: 4,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 4,
+                fontSize: '1.1rem',
+                backgroundColor: '#ffffff',
+                height: 56,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                border: 'none',
+                '&:hover': {
+                  boxShadow: '0 6px 24px rgba(0,0,0,0.12)'
+                },
+                '&.Mui-focused': {
+                  boxShadow: `0 6px 24px ${alpha(bravoColors.primaryFlat, 0.2)}`
+                },
+                '& fieldset': {
+                  border: 'none'
+                }
+              }
+            }}
+          />
+
+          {/* Category Filter */}
+          <Box sx={{ mb: 4 }}>
+            <Typography variant="h6" sx={{ 
+              mb: 3, 
+              fontWeight: 700, 
+              color: bravoColors.primaryFlat,
+              fontSize: '1.25rem'
             }}>
-              <Typography variant="body1" sx={{ fontWeight: 500, color: bravoColors.primaryFlat }}>
-                {filteredSections.length} sections available
-                {selectedCategory !== 'All' && ` in ${selectedCategory}`}
-                {searchTerm && ` matching "${searchTerm}"`}
-              </Typography>
-              {filteredSections.length > 0 && (
-                <Badge 
-                  badgeContent={filteredSections.length} 
-                  color="primary"
+              Filter by Category
+            </Typography>
+            <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
+              {categories.map((category) => (
+                <Chip
+                  key={category}
+                  label={category}
+                  onClick={() => setSelectedCategory(category)}
+                  variant={selectedCategory === category ? 'filled' : 'outlined'}
                   sx={{
-                    '& .MuiBadge-badge': {
-                      backgroundColor: bravoColors.secondary,
-                      color: '#ffffff'
+                    borderRadius: 4,
+                    px: 3,
+                    py: 1,
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    height: 44,
+                    bgcolor: selectedCategory === category ? getCategoryColor(category) : 'transparent',
+                    color: selectedCategory === category ? '#ffffff' : getCategoryColor(category),
+                    borderColor: getCategoryColor(category),
+                    borderWidth: 2,
+                    boxShadow: selectedCategory === category ? `0 6px 16px ${alpha(getCategoryColor(category), 0.3)}` : 'none',
+                    '&:hover': {
+                      bgcolor: selectedCategory === category ? getCategoryColor(category) : alpha(getCategoryColor(category), 0.08),
+                      transform: 'translateY(-2px)',
+                      boxShadow: `0 6px 16px ${alpha(getCategoryColor(category), 0.25)}`
+                    },
+                    transition: 'all 0.2s ease'
+                  }}
+                />
+              ))}
+            </Stack>
+          </Box>
+          
+          {/* Custom Section Creator */}
+          <Paper 
+            elevation={0}
+            sx={{ 
+              p: 4, 
+              border: `3px dashed ${bravoColors.highlight.border}`, 
+              borderRadius: 4, 
+              background: `linear-gradient(135deg, ${alpha(bravoColors.primaryFlat, 0.03)} 0%, ${alpha(bravoColors.secondary, 0.03)} 100%)`,
+              position: 'relative',
+              overflow: 'hidden'
+            }}
+          >
+            <Box sx={{
+              position: 'absolute',
+              top: -15,
+              right: -15,
+              width: 60,
+              height: 60,
+              borderRadius: '50%',
+              background: alpha(bravoColors.secondary, 0.08)
+            }} />
+            
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, position: 'relative', zIndex: 1 }}>
+              <Box sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 3,
+                backgroundColor: bravoColors.secondary,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mr: 3,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+              }}>
+                <AddIcon sx={{ color: '#ffffff', fontSize: 24 }} />
+              </Box>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: bravoColors.primaryFlat, mb: 0.5 }}>
+                  Create Custom Section
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Not finding what you need? Create a custom section tailored to your specific requirements.
+                </Typography>
+              </Box>
+            </Box>
+            
+            {!showCustomForm ? (
+              <Button
+                variant="outlined"
+                onClick={() => setShowCustomForm(true)}
+                sx={{ 
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  height: 48,
+                  px: 3,
+                  borderColor: bravoColors.secondary,
+                  color: bravoColors.secondary,
+                  borderWidth: 2,
+                  '&:hover': {
+                    borderColor: bravoColors.primaryFlat,
+                    backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
+                    color: bravoColors.primaryFlat,
+                    borderWidth: 2
+                  },
+                  position: 'relative',
+                  zIndex: 1
+                }}
+              >
+                Create Custom Section
+              </Button>
+            ) : (
+              <Box sx={{ position: 'relative', zIndex: 1 }}>
+                <TextField
+                  fullWidth
+                  label="Section Name"
+                  value={customSectionName}
+                  onChange={(e) => setCustomSectionName(e.target.value)}
+                  placeholder="e.g., Medication Compliance Assessment"
+                  size="medium"
+                  sx={{ 
+                    mb: 3,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 3,
+                      backgroundColor: '#ffffff'
                     }
                   }}
-                >
-                  <Box sx={{ width: 24, height: 24 }} />
-                </Badge>
-              )}
-            </Box>
-          </Box>
-
-          {/* Enhanced Sections Grid */}
-          <Box sx={{ 
-            flex: 1,
-            overflow: 'auto',
-            px: 3,
-            pb: 3
-          }}>
-            {selectedCategory === 'All' ? (
-              // Enhanced category groups
-              categories.slice(1).map((category) => {
-                const categorySections = filteredSections.filter(section => section.category === category);
-                if (categorySections.length === 0) return null;
-
-                return (
-                  <Box key={category} sx={{ mb: 4 }}>
-                    <Paper
-                      elevation={0}
-                      sx={{
-                        p: 2,
-                        mb: 3,
-                        borderRadius: 3,
-                        background: `linear-gradient(135deg, ${alpha(getCategoryColor(category), 0.1)} 0%, ${alpha(getCategoryColor(category), 0.05)} 100%)`,
-                        border: `2px solid ${alpha(getCategoryColor(category), 0.2)}`
-                      }}
-                    >
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'space-between'
-                      }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <Box sx={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: '50%',
-                            bgcolor: getCategoryColor(category),
-                            mr: 2,
-                            boxShadow: `0 2px 8px ${alpha(getCategoryColor(category), 0.3)}`
-                          }} />
-                          <Typography variant="h6" sx={{ 
-                            fontWeight: 700,
-                            color: getCategoryColor(category)
-                          }}>
-                            {category}
-                          </Typography>
-                        </Box>
-                        <Chip 
-                          label={`${categorySections.length} sections`}
-                          size="small"
-                          sx={{ 
-                            bgcolor: getCategoryColor(category),
-                            color: '#ffffff',
-                            fontWeight: 600
-                          }}
-                        />
-                      </Box>
-                    </Paper>
-                    
-                    <Box sx={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-                      gap: 2
-                    }}>
-                      {categorySections.map((section) => (
-                        <Card 
-                          key={section.id}
-                          sx={{ 
-                            cursor: 'pointer',
-                            borderRadius: 3,
-                            border: `2px solid transparent`,
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            background: '#ffffff',
-                            '&:hover': {
-                              transform: 'translateY(-6px)',
-                              boxShadow: `0 12px 30px ${alpha(getCategoryColor(category), 0.15)}`,
-                              borderColor: getCategoryColor(category),
-                              '& .section-emoji': {
-                                transform: 'scale(1.2) rotate(5deg)'
-                              }
-                            }
-                          }}
-                        >
-                          <CardActionArea 
-                            onClick={() => {
-                              onAddSection(section);
-                              onClose();
-                            }}
-                            sx={{ height: '100%', p: 3 }}
-                          >
-                            <CardContent sx={{ p: 0, height: '100%' }}>
-                              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                                <Box sx={{
-                                  width: 56,
-                                  height: 56,
-                                  borderRadius: 3,
-                                  background: `linear-gradient(135deg, ${alpha(getCategoryColor(category), 0.1)} 0%, ${alpha(getCategoryColor(category), 0.05)} 100%)`,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  mr: 2,
-                                  fontSize: '1.8rem',
-                                  border: `2px solid ${alpha(getCategoryColor(category), 0.1)}`
-                                }}>
-                                  <Box 
-                                    className="section-emoji"
-                                    sx={{ 
-                                      transition: 'transform 0.3s ease',
-                                      lineHeight: 1
-                                    }}
-                                  >
-                                    {section.emoji}
-                                  </Box>
-                                </Box>
-                                <Box sx={{ flex: 1, minWidth: 0 }}>
-                                  <Typography variant="h6" sx={{ 
-                                    fontWeight: 600, 
-                                    lineHeight: 1.3,
-                                    mb: 1,
-                                    color: getCategoryColor(category)
-                                  }}>
-                                    {section.name}
-                                  </Typography>
-                                  <Typography variant="body2" color="text.secondary" sx={{ 
-                                    lineHeight: 1.5,
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 3,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden'
-                                  }}>
-                                    {section.description}
-                                  </Typography>
-                                </Box>
-                              </Box>
-                            </CardContent>
-                          </CardActionArea>
-                        </Card>
-                      ))}
-                    </Box>
-                  </Box>
-                );
-              })
-            ) : (
-              // Enhanced single category view
-              <Box sx={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-                gap: 3
-              }}>
-                {filteredSections.map((section) => (
-                  <Card 
-                    key={section.id}
+                />
+                <Stack direction="row" spacing={2}>
+                  <Button 
+                    variant="contained" 
+                    onClick={handleAddCustomSection}
+                    disabled={!customSectionName.trim()}
                     sx={{ 
-                      cursor: 'pointer',
                       borderRadius: 3,
-                      border: `2px solid transparent`,
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      background: '#ffffff',
+                      height: 44,
+                      px: 3,
+                      backgroundColor: bravoColors.secondary,
                       '&:hover': {
-                        transform: 'translateY(-6px)',
-                        boxShadow: `0 12px 30px ${alpha(getCategoryColor(section.category), 0.15)}`,
-                        borderColor: getCategoryColor(section.category),
-                        '& .section-emoji': {
-                          transform: 'scale(1.2) rotate(5deg)'
-                        }
+                        backgroundColor: bravoColors.primaryFlat
                       }
                     }}
                   >
-                    <CardActionArea 
-                      onClick={() => {
-                        onAddSection(section);
-                        onClose();
-                      }}
-                      sx={{ height: '100%', p: 3 }}
-                    >
-                      <CardContent sx={{ p: 0, height: '100%' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                          <Box sx={{
-                            width: 56,
-                            height: 56,
-                            borderRadius: 3,
-                            background: `linear-gradient(135deg, ${alpha(getCategoryColor(section.category), 0.1)} 0%, ${alpha(getCategoryColor(section.category), 0.05)} 100%)`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            mr: 2,
-                            fontSize: '1.8rem',
-                            border: `2px solid ${alpha(getCategoryColor(section.category), 0.1)}`
-                          }}>
+                    Add Section
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    onClick={() => setShowCustomForm(false)}
+                    sx={{ 
+                      borderRadius: 3,
+                      height: 44,
+                      px: 3
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </Stack>
+              </Box>
+            )}
+          </Paper>
+        </Box>
+
+        {/* Results Summary */}
+        <Box sx={{ px: 4, pb: 3 }}>
+          <Paper sx={{
+            p: 3,
+            borderRadius: 3,
+            backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
+            border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
+              {filteredSections.length} sections available
+              {selectedCategory !== 'All' && ` in ${selectedCategory}`}
+              {searchTerm && ` matching "${searchTerm}"`}
+            </Typography>
+            {filteredSections.length > 0 && (
+              <Badge 
+                badgeContent={filteredSections.length} 
+                color="primary"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    backgroundColor: bravoColors.secondary,
+                    color: '#ffffff',
+                    fontSize: '0.9rem',
+                    height: 24,
+                    minWidth: 24
+                  }
+                }}
+              >
+                <Box sx={{ width: 32, height: 32 }} />
+              </Badge>
+            )}
+          </Paper>
+        </Box>
+
+        {/* Sections Grid */}
+        <Box sx={{ 
+          flex: 1,
+          overflow: 'auto',
+          px: 4,
+          pb: 4
+        }}>
+          {selectedCategory === 'All' ? (
+            // Category groups
+            categories.slice(1).map((category) => {
+              const categorySections = filteredSections.filter(section => section.category === category);
+              if (categorySections.length === 0) return null;
+
+              return (
+                <Box key={category} sx={{ mb: 5 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 3,
+                      mb: 4,
+                      borderRadius: 4,
+                      background: `linear-gradient(135deg, ${alpha(getCategoryColor(category), 0.08)} 0%, ${alpha(getCategoryColor(category), 0.03)} 100%)`,
+                      border: `2px solid ${alpha(getCategoryColor(category), 0.15)}`
+                    }}
+                  >
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between'
+                    }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box sx={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: '50%',
+                          bgcolor: getCategoryColor(category),
+                          mr: 3,
+                          boxShadow: `0 3px 12px ${alpha(getCategoryColor(category), 0.4)}`
+                        }} />
+                        <Typography variant="h5" sx={{ 
+                          fontWeight: 800,
+                          color: getCategoryColor(category),
+                          letterSpacing: '-0.01em'
+                        }}>
+                          {category}
+                        </Typography>
+                      </Box>
+                      <Chip 
+                        label={`${categorySections.length} sections`}
+                        size="medium"
+                        sx={{ 
+                          bgcolor: getCategoryColor(category),
+                          color: '#ffffff',
+                          fontWeight: 700,
+                          height: 32,
+                          fontSize: '0.9rem'
+                        }}
+                      />
+                    </Box>
+                  </Paper>
+                  
+                  <Box sx={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', 
+                    gap: 3
+                  }}>
+                    {categorySections.map((section) => (
+                      <Card 
+                        key={section.id}
+                        sx={{ 
+                          cursor: 'pointer',
+                          borderRadius: 4,
+                          border: `2px solid transparent`,
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          background: '#ffffff',
+                          overflow: 'hidden',
+                          '&:hover': {
+                            transform: 'translateY(-8px)',
+                            boxShadow: `0 16px 40px ${alpha(getCategoryColor(category), 0.15)}`,
+                            borderColor: getCategoryColor(category),
+                            '& .section-emoji': {
+                              transform: 'scale(1.3) rotate(10deg)'
+                            },
+                            '& .section-content': {
+                              transform: 'translateY(-2px)'
+                            }
+                          }
+                        }}
+                      >
+                        <CardActionArea 
+                          onClick={() => {
+                            onAddSection(section);
+                            onClose();
+                          }}
+                          sx={{ height: '100%', p: 3 }}
+                        >
+                          <CardContent sx={{ p: 0, height: '100%' }}>
                             <Box 
-                              className="section-emoji"
+                              className="section-content"
                               sx={{ 
-                                transition: 'transform 0.3s ease',
-                                lineHeight: 1
+                                display: 'flex', 
+                                alignItems: 'flex-start',
+                                transition: 'transform 0.3s ease'
                               }}
                             >
-                              {section.emoji}
+                              <Box sx={{
+                                width: 72,
+                                height: 72,
+                                borderRadius: 4,
+                                background: `linear-gradient(135deg, ${alpha(getCategoryColor(category), 0.1)} 0%, ${alpha(getCategoryColor(category), 0.05)} 100%)`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                mr: 3,
+                                fontSize: '2.2rem',
+                                border: `2px solid ${alpha(getCategoryColor(category), 0.15)}`,
+                                flexShrink: 0
+                              }}>
+                                <Box 
+                                  className="section-emoji"
+                                  sx={{ 
+                                    transition: 'transform 0.3s ease',
+                                    lineHeight: 1
+                                  }}
+                                >
+                                  {section.emoji}
+                                </Box>
+                              </Box>
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Typography variant="h6" sx={{ 
+                                  fontWeight: 700, 
+                                  lineHeight: 1.3,
+                                  mb: 2,
+                                  color: getCategoryColor(category),
+                                  fontSize: '1.2rem'
+                                }}>
+                                  {section.name}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ 
+                                  lineHeight: 1.6,
+                                  fontSize: '0.95rem'
+                                }}>
+                                  {section.description}
+                                </Typography>
+                              </Box>
                             </Box>
-                          </Box>
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography variant="h6" sx={{ 
-                              fontWeight: 600, 
-                              lineHeight: 1.3,
-                              mb: 1,
-                              color: getCategoryColor(section.category)
-                            }}>
-                              {section.name}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary" sx={{ 
-                              lineHeight: 1.5,
-                              display: '-webkit-box',
-                              WebkitLineClamp: 3,
-                              WebkitBoxOrient: 'vertical',
-                              overflow: 'hidden'
-                            }}>
-                              {section.description}
-                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    ))}
+                  </Box>
+                </Box>
+              );
+            })
+          ) : (
+            // Single category view
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', 
+              gap: 4
+            }}>
+              {filteredSections.map((section) => (
+                <Card 
+                  key={section.id}
+                  sx={{ 
+                    cursor: 'pointer',
+                    borderRadius: 4,
+                    border: `2px solid transparent`,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    background: '#ffffff',
+                    overflow: 'hidden',
+                    '&:hover': {
+                      transform: 'translateY(-8px)',
+                      boxShadow: `0 16px 40px ${alpha(getCategoryColor(section.category), 0.15)}`,
+                      borderColor: getCategoryColor(section.category),
+                      '& .section-emoji': {
+                        transform: 'scale(1.3) rotate(10deg)'
+                      },
+                      '& .section-content': {
+                        transform: 'translateY(-2px)'
+                      }
+                    }
+                  }}
+                >
+                  <CardActionArea 
+                    onClick={() => {
+                      onAddSection(section);
+                      onClose();
+                    }}
+                    sx={{ height: '100%', p: 3 }}
+                  >
+                    <CardContent sx={{ p: 0, height: '100%' }}>
+                      <Box 
+                        className="section-content"
+                        sx={{ 
+                          display: 'flex', 
+                          alignItems: 'flex-start',
+                          transition: 'transform 0.3s ease'
+                        }}
+                      >
+                        <Box sx={{
+                          width: 72,
+                          height: 72,
+                          borderRadius: 4,
+                          background: `linear-gradient(135deg, ${alpha(getCategoryColor(section.category), 0.1)} 0%, ${alpha(getCategoryColor(section.category), 0.05)} 100%)`,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mr: 3,
+                          fontSize: '2.2rem',
+                          border: `2px solid ${alpha(getCategoryColor(section.category), 0.15)}`,
+                          flexShrink: 0
+                        }}>
+                          <Box 
+                            className="section-emoji"
+                            sx={{ 
+                              transition: 'transform 0.3s ease',
+                              lineHeight: 1
+                            }}
+                          >
+                            {section.emoji}
                           </Box>
                         </Box>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                ))}
-              </Box>
-            )}
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography variant="h6" sx={{ 
+                            fontWeight: 700, 
+                            lineHeight: 1.3,
+                            mb: 2,
+                            color: getCategoryColor(section.category),
+                            fontSize: '1.2rem'
+                          }}>
+                            {section.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ 
+                            lineHeight: 1.6,
+                            fontSize: '0.95rem'
+                          }}>
+                            {section.description}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              ))}
+            </Box>
+          )}
 
-            {filteredSections.length === 0 && (
-              <Box sx={{ 
-                textAlign: 'center', 
-                py: 8,
-                color: 'text.secondary'
+          {filteredSections.length === 0 && (
+            <Box sx={{ 
+              textAlign: 'center', 
+              py: 12,
+              color: 'text.secondary'
+            }}>
+              <Box sx={{
+                width: 120,
+                height: 120,
+                borderRadius: '50%',
+                backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 4
               }}>
-                <Box sx={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: '50%',
-                  backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mx: 'auto',
-                  mb: 3
-                }}>
-                  <SearchIcon sx={{ fontSize: 40, opacity: 0.5 }} />
-                </Box>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                  No sections found
-                </Typography>
-                <Typography variant="body2">
-                  Try adjusting your search terms or create a custom section above.
-                </Typography>
+                <SearchIcon sx={{ fontSize: 60, opacity: 0.5 }} />
               </Box>
-            )}
-          </Box>
-        </Paper>
-      </Box>
-    </Fade>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
+                No sections found
+              </Typography>
+              <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+                Try adjusting your search terms or create a custom section above.
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };
 
