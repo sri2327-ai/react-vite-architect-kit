@@ -36,6 +36,7 @@ import {
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import { templateService } from '@/services/templateService';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface ImprovedTemplateCreationDialogProps {
   open: boolean;
@@ -152,6 +153,8 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   onClose,
   onCreateTemplate
 }) => {
+  const { isMobile, isTablet } = useResponsive();
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState<CreateTemplateOption | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -273,9 +276,14 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
     switch (step) {
       case 0:
         return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <Box sx={{ textAlign: 'center', mb: 3 }}>
-              <Typography variant="h4" sx={{ 
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            height: '100%',
+            overflow: 'auto'
+          }}>
+            <Box sx={{ textAlign: 'center', mb: { xs: 2, md: 3 }, px: 2 }}>
+              <Typography variant={isMobile ? "h5" : "h4"} sx={{ 
                 color: bravoColors.primaryFlat,
                 fontWeight: 600,
                 mb: 1
@@ -287,7 +295,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                 color: 'text.secondary',
                 maxWidth: 600,
                 mx: 'auto',
-                fontSize: '1rem'
+                fontSize: { xs: '0.875rem', md: '1rem' }
               }}>
                 Choose the method that best fits your workflow. Each option is designed to save you time and improve your documentation quality.
               </Typography>
@@ -295,9 +303,15 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
             <Box sx={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-              gap: 2,
-              flex: 1
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)',
+                lg: 'repeat(auto-fit, minmax(280px, 1fr))'
+              },
+              gap: { xs: 1.5, md: 2 },
+              px: { xs: 1, md: 2 },
+              pb: 2
             }}>
               {createTemplateOptions.map((option) => (
                 <Card 
@@ -317,15 +331,15 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                 >
                   <CardActionArea 
                     onClick={() => handleMethodSelect(option)}
-                    sx={{ height: '100%', p: 2 }}
+                    sx={{ height: '100%', p: { xs: 1.5, md: 2 } }}
                   >
                     <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
                       {/* Header */}
                       <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
                         <Box
                           sx={{
-                            width: 48,
-                            height: 48,
+                            width: { xs: 40, md: 48 },
+                            height: { xs: 40, md: 48 },
                             borderRadius: 2,
                             background: bravoColors.primary,
                             display: 'flex',
@@ -334,7 +348,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                             boxShadow: '0 4px 12px rgba(20,49,81,0.2)'
                           }}
                         >
-                          {React.cloneElement(option.icon, { sx: { color: 'white', fontSize: 24 } })}
+                          {React.cloneElement(option.icon, { sx: { color: 'white', fontSize: { xs: 20, md: 24 } } })}
                         </Box>
                         
                         <Box sx={{ textAlign: 'right' }}>
@@ -345,11 +359,14 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                               backgroundColor: getDifficultyColor(option.difficulty),
                               color: 'white',
                               fontWeight: 600,
-                              fontSize: '0.75rem',
+                              fontSize: { xs: '0.7rem', md: '0.75rem' },
                               mb: 0.5
                             }}
                           />
-                          <Typography variant="caption" display="block" color="text.secondary" sx={{ fontWeight: 500 }}>
+                          <Typography variant="caption" display="block" color="text.secondary" sx={{ 
+                            fontWeight: 500,
+                            fontSize: { xs: '0.7rem', md: '0.75rem' }
+                          }}>
                             {option.timeEstimate}
                           </Typography>
                         </Box>
@@ -360,7 +377,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                         fontWeight: 600,
                         color: bravoColors.primaryFlat,
                         mb: 1,
-                        fontSize: '1rem'
+                        fontSize: { xs: '0.9rem', md: '1rem' }
                       }}>
                         {option.title}
                       </Typography>
@@ -370,13 +387,13 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                         lineHeight: 1.4,
                         mb: 2,
                         flex: 1,
-                        fontSize: '0.875rem'
+                        fontSize: { xs: '0.8rem', md: '0.875rem' }
                       }}>
                         {option.description}
                       </Typography>
 
                       <Box sx={{ 
-                        p: 1.5, 
+                        p: { xs: 1, md: 1.5 }, 
                         backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
                         borderRadius: 1.5,
                         borderLeft: `3px solid ${bravoColors.primaryFlat}`
@@ -387,9 +404,9 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
-                          fontSize: '0.75rem'
+                          fontSize: { xs: '0.7rem', md: '0.75rem' }
                         }}>
-                          <HealingIcon sx={{ fontSize: 14 }} />
+                          <HealingIcon sx={{ fontSize: { xs: 12, md: 14 } }} />
                           {option.clinicalContext}
                         </Typography>
                       </Box>
@@ -403,21 +420,27 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
       case 1:
         return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            height: '100%',
+            overflow: 'auto'
+          }}>
             {/* Method Header */}
             <Box sx={{ 
               display: 'flex', 
               alignItems: 'center', 
-              mb: 3,
-              p: 2,
+              mb: { xs: 2, md: 3 },
+              p: { xs: 1.5, md: 2 },
               backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
               borderRadius: 2,
-              border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`
+              border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
+              mx: { xs: 1, md: 2 }
             }}>
               <Box
                 sx={{
-                  width: 48,
-                  height: 48,
+                  width: { xs: 40, md: 48 },
+                  height: { xs: 40, md: 48 },
                   borderRadius: 1.5,
                   background: bravoColors.primary,
                   display: 'flex',
@@ -426,31 +449,52 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                   mr: 2
                 }}
               >
-                {selectedMethod?.icon && React.cloneElement(selectedMethod.icon, { sx: { color: 'white', fontSize: 24 } })}
+                {selectedMethod?.icon && React.cloneElement(selectedMethod.icon, { sx: { color: 'white', fontSize: { xs: 20, md: 24 } } })}
               </Box>
               <Box>
-                <Typography variant="h5" sx={{ fontWeight: 600, color: bravoColors.primaryFlat, mb: 0.5 }}>
+                <Typography variant={isMobile ? "h6" : "h5"} sx={{ 
+                  fontWeight: 600, 
+                  color: bravoColors.primaryFlat, 
+                  mb: 0.5,
+                  fontSize: { xs: '1rem', md: '1.25rem' }
+                }}>
                   {selectedMethod?.title}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{
+                  fontSize: { xs: '0.8rem', md: '0.875rem' }
+                }}>
                   {selectedMethod?.description}
                 </Typography>
               </Box>
             </Box>
 
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ 
+              flex: 1, 
+              display: 'flex', 
+              flexDirection: 'column',
+              px: { xs: 1, md: 2 },
+              overflow: 'auto'
+            }}>
               {/* Browse Template Library */}
               {selectedMethod?.id === 5 ? (
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                  <Typography variant={isMobile ? "h6" : "h5"} gutterBottom sx={{ 
+                    fontWeight: 600, 
+                    mb: 2,
+                    fontSize: { xs: '1rem', md: '1.25rem' }
+                  }}>
                     Available Templates
                   </Typography>
                   
                   <Box sx={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-                    gap: 2,
-                    maxHeight: '60vh',
+                    gridTemplateColumns: {
+                      xs: '1fr',
+                      sm: 'repeat(2, 1fr)',
+                      lg: 'repeat(3, 1fr)'
+                    },
+                    gap: { xs: 1.5, md: 2 },
+                    maxHeight: { xs: '60vh', md: 'none' },
                     overflow: 'auto'
                   }}>
                     {templateLibrary.map((template) => (
@@ -468,14 +512,24 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                         }}
                         onClick={() => handleLibraryTemplateSelect(template)}
                       >
-                        <CardContent sx={{ p: 2 }}>
-                          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, color: bravoColors.primaryFlat }}>
+                        <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
+                          <Typography variant="h6" sx={{ 
+                            fontWeight: 600, 
+                            mb: 1, 
+                            color: bravoColors.primaryFlat,
+                            fontSize: { xs: '0.9rem', md: '1rem' }
+                          }}>
                             {template.name}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                          <Typography variant="body2" color="text.secondary" sx={{ 
+                            mb: 1,
+                            fontSize: { xs: '0.8rem', md: '0.875rem' }
+                          }}>
                             {template.specialty} • {template.type}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" color="text.secondary" sx={{
+                            fontSize: { xs: '0.8rem', md: '0.875rem' }
+                          }}>
                             {template.description}
                           </Typography>
                         </CardContent>
@@ -486,15 +540,19 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
               ) : (
                 // Other methods - show form fields
                 <Box sx={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: selectedMethod?.id === 2 ? '1fr 1fr' : '1fr',
-                  gap: 3,
+                  display: 'flex',
+                  flexDirection: { xs: 'column', lg: selectedMethod?.id === 2 ? 'row' : 'column' },
+                  gap: { xs: 2, md: 3 },
                   flex: 1,
                   height: '100%'
                 }}>
-                  {/* Left Column - Basic Information */}
-                  <Box>
-                    <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                  {/* Basic Information */}
+                  <Box sx={{ flex: { xs: 'none', lg: selectedMethod?.id === 2 ? 1 : 'none' } }}>
+                    <Typography variant={isMobile ? "h6" : "h5"} gutterBottom sx={{ 
+                      fontWeight: 600, 
+                      mb: 2,
+                      fontSize: { xs: '1rem', md: '1.25rem' }
+                    }}>
                       Template Information
                     </Typography>
                     <Stack spacing={2}>
@@ -520,17 +578,26 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     </Stack>
                   </Box>
 
-                  {/* Right Column - Method-specific content */}
-                  <Box sx={{ height: '100%' }}>
+                  {/* Method-specific content */}
+                  <Box sx={{ 
+                    flex: { xs: 'none', lg: selectedMethod?.id === 2 ? 1 : 'none' },
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column' 
+                  }}>
                     {selectedMethod?.id === 1 && (
                       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                        <Typography variant={isMobile ? "h6" : "h5"} gutterBottom sx={{ 
+                          fontWeight: 600, 
+                          mb: 2,
+                          fontSize: { xs: '1rem', md: '1.25rem' }
+                        }}>
                           Previous Notes to Convert
                         </Typography>
                         <TextField
                           fullWidth
                           multiline
-                          rows={10}
+                          rows={isMobile ? 6 : 10}
                           label="Paste your previous notes here"
                           value={previousNotes}
                           onChange={(e) => setPreviousNotes(e.target.value)}
@@ -546,13 +613,17 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
                     {selectedMethod?.id === 2 && (
                       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                        <Typography variant={isMobile ? "h6" : "h5"} gutterBottom sx={{ 
+                          fontWeight: 600, 
+                          mb: 2,
+                          fontSize: { xs: '1rem', md: '1.25rem' }
+                        }}>
                           AI Configuration
                         </Typography>
                         <TextField
                           fullWidth
                           multiline
-                          rows={8}
+                          rows={isMobile ? 6 : 8}
                           label="Clinical Context & Requirements"
                           value={clinicalContext}
                           onChange={(e) => setClinicalContext(e.target.value)}
@@ -561,7 +632,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                           sx={{ flex: 1 }}
                         />
                         <Alert severity="info" sx={{ mt: 2 }}>
-                          <Typography variant="body2">
+                          <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
                             The more specific you are, the better AI can tailor the template to your practice.
                           </Typography>
                         </Alert>
@@ -570,13 +641,17 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
                     {selectedMethod?.id === 4 && (
                       <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                        <Typography variant={isMobile ? "h6" : "h5"} gutterBottom sx={{ 
+                          fontWeight: 600, 
+                          mb: 2,
+                          fontSize: { xs: '1rem', md: '1.25rem' }
+                        }}>
                           Import Template Content
                         </Typography>
                         <TextField
                           fullWidth
                           multiline
-                          rows={10}
+                          rows={isMobile ? 6 : 10}
                           label="Paste existing template content"
                           value={existingTemplateContent}
                           onChange={(e) => setExistingTemplateContent(e.target.value)}
@@ -595,7 +670,13 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
       case 2:
         return (
-          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            height: '100%',
+            overflow: 'auto',
+            px: { xs: 1, md: 2 }
+          }}>
             {selectedMethod?.id === 2 && isProcessing ? (
               <Box sx={{ 
                 textAlign: 'center', 
@@ -603,22 +684,33 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                 display: 'flex', 
                 flexDirection: 'column', 
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
+                py: 4
               }}>
-                <PsychologyIcon sx={{ fontSize: 60, color: bravoColors.primaryFlat, mb: 2 }} />
-                <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                <PsychologyIcon sx={{ fontSize: { xs: 48, md: 60 }, color: bravoColors.primaryFlat, mb: 2 }} />
+                <Typography variant={isMobile ? "h5" : "h4"} gutterBottom sx={{ 
+                  fontWeight: 600, 
+                  mb: 2,
+                  fontSize: { xs: '1.25rem', md: '2rem' }
+                }}>
                   AI is crafting your template...
                 </Typography>
-                <LinearProgress sx={{ mb: 3, width: 400, height: 6, borderRadius: 3 }} />
-                <Typography variant="body1" color="text.secondary">
+                <LinearProgress sx={{ mb: 3, width: { xs: 280, md: 400 }, height: 6, borderRadius: 3 }} />
+                <Typography variant="body1" color="text.secondary" sx={{
+                  fontSize: { xs: '0.875rem', md: '1rem' }
+                }}>
                   Analyzing your requirements and generating optimized clinical sections
                 </Typography>
               </Box>
             ) : (
               <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <VisibilityIcon sx={{ color: bravoColors.primaryFlat, mr: 2, fontSize: 28 }} />
-                  <Typography variant="h4" sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
+                  <VisibilityIcon sx={{ color: bravoColors.primaryFlat, mr: 2, fontSize: { xs: 24, md: 28 } }} />
+                  <Typography variant={isMobile ? "h5" : "h4"} sx={{ 
+                    fontWeight: 600, 
+                    color: bravoColors.primaryFlat,
+                    fontSize: { xs: '1.25rem', md: '2rem' }
+                  }}>
                     Template Preview
                   </Typography>
                 </Box>
@@ -632,23 +724,24 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     backgroundColor: alpha(bravoColors.primaryFlat, 0.02),
                     border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
+                    minHeight: { xs: '300px', md: '400px' }
                   }}
                 >
                   <Box sx={{ 
                     flex: 1,
-                    p: 3, 
+                    p: { xs: 2, md: 3 }, 
                     backgroundColor: 'white',
                     borderRadius: 1.5,
                     border: '1px solid #e0e0e0',
-                    m: 2,
+                    m: { xs: 1, md: 2 },
                     overflow: 'auto'
                   }}>
                     {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
                       <Typography variant="body2" sx={{ 
                         whiteSpace: 'pre-line', 
                         fontFamily: 'monospace',
-                        fontSize: '0.875rem',
+                        fontSize: { xs: '0.8rem', md: '0.875rem' },
                         lineHeight: 1.6
                       }}>
                         {templateService.generateTemplateContent(selectedLibraryTemplate.type)}
@@ -657,7 +750,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                       <Typography variant="body2" sx={{ 
                         whiteSpace: 'pre-line', 
                         fontFamily: 'monospace',
-                        fontSize: '0.875rem',
+                        fontSize: { xs: '0.8rem', md: '0.875rem' },
                         lineHeight: 1.6
                       }}>
                         {processedContent}
@@ -670,7 +763,11 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                         height: '100%',
                         flexDirection: 'column'
                       }}>
-                        <Typography variant="h6" color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center' }}>
+                        <Typography variant="h6" color="text.secondary" sx={{ 
+                          fontStyle: 'italic', 
+                          textAlign: 'center',
+                          fontSize: { xs: '1rem', md: '1.25rem' }
+                        }}>
                           Template preview will be generated based on your configuration...
                         </Typography>
                       </Box>
@@ -680,7 +777,10 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
                 {selectedMethod?.id === 2 && processedContent && (
                   <Alert severity="success" sx={{ mt: 2 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    <Typography variant="body2" sx={{ 
+                      fontWeight: 500,
+                      fontSize: { xs: '0.8rem', md: '0.875rem' }
+                    }}>
                       ✅ {aiSummary}
                     </Typography>
                   </Alert>
@@ -732,21 +832,24 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
       >
         {/* Header */}
         <Box sx={{ 
-          p: 2, 
+          p: { xs: 1.5, md: 2 }, 
           borderBottom: '1px solid #e0e0e0',
           flexShrink: 0,
           backgroundColor: 'white'
         }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <Box>
-              <Typography variant="h4" sx={{ 
+              <Typography variant={isMobile ? "h5" : "h4"} sx={{ 
                 color: bravoColors.primaryFlat, 
                 fontWeight: 600,
-                mb: 0.5
+                mb: 0.5,
+                fontSize: { xs: '1.25rem', md: '2rem' }
               }}>
                 Create Clinical Template
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{
+                fontSize: { xs: '0.8rem', md: '0.875rem' }
+              }}>
                 Build efficient, standardized documentation for better patient care
               </Typography>
             </Box>
@@ -758,7 +861,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                 '&:hover': { bgcolor: alpha(bravoColors.primaryFlat, 0.2) }
               }}
             >
-              <CloseIcon sx={{ fontSize: 20 }} />
+              <CloseIcon sx={{ fontSize: { xs: 18, md: 20 } }} />
             </IconButton>
           </Box>
         </Box>
@@ -766,18 +869,19 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
         {/* Content */}
         <Box sx={{ 
           flex: 1, 
-          p: 2, 
+          p: { xs: 1, md: 2 }, 
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          minHeight: 0
         }}>
           {/* Horizontal Stepper */}
-          <Stepper activeStep={currentStep} sx={{ mb: 3, flexShrink: 0 }}>
+          <Stepper activeStep={currentStep} sx={{ mb: { xs: 2, md: 3 }, flexShrink: 0 }}>
             {[0, 1, 2].map((step) => (
               <Step key={step}>
                 <StepLabel sx={{ 
                   '& .MuiStepLabel-label': { 
-                    fontSize: '0.9rem', 
+                    fontSize: { xs: '0.8rem', md: '0.9rem' }, 
                     fontWeight: 600 
                   } 
                 }}>
@@ -792,7 +896,8 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
             flex: 1, 
             overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            minHeight: 0
           }}>
             {renderStepContent(currentStep)}
           </Box>
@@ -800,24 +905,30 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
         {/* Footer Actions */}
         <Box sx={{ 
-          p: 2, 
+          p: { xs: 1.5, md: 2 }, 
           flexShrink: 0, 
           borderTop: '1px solid #e0e0e0',
           backgroundColor: 'white'
         }}>
-          <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
+          <Stack 
+            direction="row" 
+            spacing={2} 
+            justifyContent="space-between" 
+            alignItems="center"
+            sx={{ flexWrap: { xs: 'wrap', sm: 'nowrap' }, gap: { xs: 1, sm: 2 } }}
+          >
             <Box /> {/* Spacer */}
             
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', justifyContent: 'flex-end' }}>
               {currentStep > 0 && (
                 <Button 
                   onClick={handleBack}
                   variant="outlined"
                   startIcon={<NavigateBeforeIcon />}
-                  size="medium"
+                  size={isMobile ? "small" : "medium"}
                   sx={{ 
                     borderRadius: 2, 
-                    px: 3,
+                    px: { xs: 2, md: 3 },
                     py: 1
                   }}
                 >
@@ -831,26 +942,26 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                   variant="contained"
                   disabled={!canProceed()}
                   endIcon={<NavigateNextIcon />}
-                  size="medium"
+                  size={isMobile ? "small" : "medium"}
                   sx={{ 
                     borderRadius: 2, 
-                    px: 4,
+                    px: { xs: 3, md: 4 },
                     py: 1
                   }}
                 >
                   Next Step
                 </Button>
               ) : (
-                <Stack direction="row" spacing={2}>
+                <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }}>
                   <Button 
                     onClick={handleCreate}
                     variant="contained"
                     disabled={!canProceed()}
                     endIcon={<CheckIcon />}
-                    size="medium"
+                    size={isMobile ? "small" : "medium"}
                     sx={{ 
                       borderRadius: 2, 
-                      px: 4,
+                      px: { xs: 3, md: 4 },
                       py: 1,
                       backgroundColor: bravoColors.secondary,
                       '&:hover': {
@@ -864,10 +975,10 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     onClick={handleStartNew}
                     variant="outlined"
                     startIcon={<AddIcon />}
-                    size="medium"
+                    size={isMobile ? "small" : "medium"}
                     sx={{ 
                       borderRadius: 2, 
-                      px: 3,
+                      px: { xs: 2, md: 3 },
                       py: 1
                     }}
                   >
