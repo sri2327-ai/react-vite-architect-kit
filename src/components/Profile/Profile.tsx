@@ -6,7 +6,7 @@ import {
   Button,
   Card,
   CardContent,
-  Grid2 as Grid,
+  Grid,
   Switch,
   FormControlLabel,
   Divider,
@@ -240,7 +240,7 @@ const Profile: React.FC = () => {
 
         <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
           {/* Personal Information */}
-          <Grid xs={12} lg={8}>
+          <Grid item xs={12} lg={8}>
             <Card sx={{ 
               mb: { xs: 2, md: 3 }, 
               borderRadius: 2,
@@ -272,7 +272,7 @@ const Profile: React.FC = () => {
                 </Box>
 
                 <Grid container spacing={{ xs: 2, md: 3 }}>
-                  <Grid xs={12} md={6}>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="First Name"
@@ -285,7 +285,7 @@ const Profile: React.FC = () => {
                       }}
                     />
                   </Grid>
-                  <Grid xs={12} md={6}>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Last Name"
@@ -298,7 +298,7 @@ const Profile: React.FC = () => {
                       }}
                     />
                   </Grid>
-                  <Grid xs={12} md={6}>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Email"
@@ -312,7 +312,7 @@ const Profile: React.FC = () => {
                       }}
                     />
                   </Grid>
-                  <Grid xs={12} md={6}>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Phone"
@@ -325,7 +325,7 @@ const Profile: React.FC = () => {
                       }}
                     />
                   </Grid>
-                  <Grid xs={12} md={6}>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Company"
@@ -338,7 +338,7 @@ const Profile: React.FC = () => {
                       }}
                     />
                   </Grid>
-                  <Grid xs={12} md={6}>
+                  <Grid item xs={12} md={6}>
                     <TextField
                       fullWidth
                       label="Address"
@@ -415,7 +415,7 @@ const Profile: React.FC = () => {
           </Grid>
 
           {/* Right Column - Subscription & Security */}
-          <Grid xs={12} lg={4}>
+          <Grid item xs={12} lg={4}>
             {/* Subscription Info */}
             <Card sx={{ 
               mb: { xs: 2, md: 3 }, 
