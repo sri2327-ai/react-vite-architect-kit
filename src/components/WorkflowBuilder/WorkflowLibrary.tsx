@@ -355,46 +355,6 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
 
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
-      {/* Header Section */}
-      <Box sx={{ mb: { xs: 3, sm: 4 } }}>
-        <Typography 
-          variant={isMobile ? "h5" : "h4"} 
-          gutterBottom 
-          sx={{ 
-            fontWeight: 600, 
-            color: 'text.primary',
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
-          }}
-        >
-          Clinical Workflow Library
-        </Typography>
-        <Typography 
-          variant="h6" 
-          color="text.secondary" 
-          sx={{ 
-            mb: 2,
-            fontSize: { xs: '1rem', sm: '1.125rem', md: '1.25rem' }
-          }}
-        >
-          Pre-built automation workflows for common clinical tasks and EHR documentation
-        </Typography>
-        
-        <Alert 
-          severity="info" 
-          sx={{ 
-            mb: 3,
-            '& .MuiAlert-message': {
-              fontSize: { xs: '0.875rem', sm: '1rem' }
-            }
-          }}
-        >
-          <Typography variant="body1">
-            <strong>For Healthcare Teams:</strong> Import proven workflow templates to automate 
-            repetitive EHR tasks. Each workflow includes step-by-step automation for common clinical scenarios.
-          </Typography>
-        </Alert>
-      </Box>
-
       {/* Dynamic Search and Filter Controls */}
       <Box sx={{ mb: { xs: 3, sm: 4 } }}>
         <Box sx={{ 

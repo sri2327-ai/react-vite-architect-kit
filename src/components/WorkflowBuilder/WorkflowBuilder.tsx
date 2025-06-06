@@ -124,49 +124,8 @@ const WorkflowBuilder: React.FC = () => {
             >
               EHR Workflow Builder
             </Typography>
-            <Typography 
-              variant={isSmallMobile ? "body2" : "h6"} 
-              sx={{ 
-                fontWeight: 400, 
-                color: theme.palette.text.secondary,
-                opacity: 0.9,
-                fontSize: { xs: '0.875rem', sm: '1rem', md: '1.25rem' }
-              }}
-            >
-              Automate your clinical workflows with AI-powered efficiency
-            </Typography>
           </Box>
         </Box>
-        
-        <Alert 
-          icon={<InfoIcon />}
-          severity="info" 
-          sx={{ 
-            mb: { xs: 2, sm: 3, md: 4 },
-            borderRadius: { xs: 2, md: 3 },
-            backgroundColor: theme.palette.info.light + '10',
-            border: `1px solid ${theme.palette.info.light}`,
-            '& .MuiAlert-message': {
-              fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
-              lineHeight: 1.6
-            },
-            '& .MuiAlert-icon': {
-              color: theme.palette.info.main,
-              fontSize: { xs: '1rem', sm: '1.25rem' }
-            }
-          }}
-        >
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              lineHeight: 1.6,
-              fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' }
-            }}
-          >
-            <strong>Streamline Your EHR Tasks:</strong> Build automated workflows for your daily clinical activities. 
-            Connect your templates, configure settings, and let AI handle repetitive EHR tasks while you focus on patient care.
-          </Typography>
-        </Alert>
       </Box>
 
       <Paper 
