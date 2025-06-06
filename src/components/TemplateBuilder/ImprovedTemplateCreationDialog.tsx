@@ -232,6 +232,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
         templateType: selectedLibraryTemplate.type,
         content: templateService.generateTemplateContent(selectedLibraryTemplate.type),
         method: selectedMethod.title,
+        redirectToEditor: true // Add flag to indicate editor redirect
       };
     } else {
       // Other methods - use form data
@@ -241,11 +242,13 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
         content: selectedMethod?.id === 2 ? processedContent : existingTemplateContent,
         previousNotes: selectedMethod?.id === 1 ? previousNotes : undefined,
         aiSummary: selectedMethod?.id === 2 ? aiSummary : undefined,
+        redirectToEditor: true // Add flag to indicate editor redirect
       };
     }
     
     onCreateTemplate(templateData);
     handleStartNew();
+    onClose(); // Close the dialog after creating template
   };
 
   const handleStartNew = () => {
