@@ -799,7 +799,7 @@ const TemplateBuilder: React.FC = () => {
             }
           }}
         >
-          <Tab label="TEMPLATE" />
+          <Tab label="My Templates" />
           <Tab label="TEMPLATE LIBRARY" />
         </Tabs>
       </Box>
