@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -20,7 +21,9 @@ import {
   useTheme,
   useMediaQuery,
   Collapse,
-  Button
+  Button,
+  Grid,
+  Container
 } from '@mui/material';
 import {
   Receipt as ReceiptIcon,
@@ -60,15 +63,11 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const isSmallTablet = useMediaQuery(theme.breakpoints.down('lg'));
   
-  // Calculate available width based on sidebar state
-  const sidebarWidth = sidebarCollapsed ? 72 : 280;
-  const availableWidth = `calc(100vw - ${sidebarWidth}px)`;
-  
-  // More accurate responsive breakpoints considering sidebar
-  const effectiveWidth = window.innerWidth - sidebarWidth;
-  const useCardView = effectiveWidth < 900 || isMobile;
-  const useCompactGrid = effectiveWidth < 1200;
+  // Adaptive layout decisions
+  const useCardView = isMobile || isTablet;
+  const useCompactSummary = isMobile;
 
   // Mock invoice data
   const invoices: Invoice[] = [
@@ -149,7 +148,11 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
         size="small"
         icon={config.icon}
         variant="filled"
-        sx={{ fontWeight: 600 }}
+        sx={{ 
+          fontWeight: 600,
+          fontSize: { xs: '0.7rem', sm: '0.75rem' },
+          height: { xs: 24, sm: 28 }
+        }}
       />
     );
   };
@@ -326,111 +329,107 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
 
   return (
     <Box sx={{ 
-      width: availableWidth,
+      width: '100%',
       maxWidth: '100%',
-      height: '100vh',
+      minHeight: '100vh',
       overflow: 'hidden',
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <Box sx={{
+      <Container maxWidth="xl" sx={{
         flex: 1,
         overflow: 'auto',
-        p: { xs: 1, sm: 2, md: useCompactGrid ? 1.5 : 3 }
+        p: { xs: 1, sm: 2, md: 3 }
       }}>
         <Typography 
-          variant={isMobile ? "h5" : "h4"} 
+          variant={isMobile ? "h5" : isTablet ? "h5" : "h4"} 
           gutterBottom 
           sx={{ 
             fontWeight: 600, 
             mb: { xs: 2, md: 3 },
             textAlign: { xs: 'center', md: 'left' },
             fontSize: { 
-              xs: '1.25rem', 
-              sm: '1.5rem', 
-              md: useCompactGrid ? '1.75rem' : '2rem' 
+              xs: '1.5rem', 
+              sm: '1.75rem', 
+              md: '2rem' 
             }
           }}
         >
           Billing & Subscription
         </Typography>
 
-        {/* Summary Cards - Adaptive grid based on available space */}
-        <Box sx={{ 
-          display: 'grid', 
-          gridTemplateColumns: { 
-            xs: 'repeat(2, 1fr)', 
-            sm: useCompactGrid ? 'repeat(2, 1fr)' : 'repeat(2, 1fr)',
-            md: useCompactGrid ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'
-          }, 
-          gap: { xs: 1, sm: useCompactGrid ? 1 : 1.5, md: useCompactGrid ? 1.5 : 2 }, 
-          mb: { xs: 3, md: 4 }
-        }}>
+        {/* Summary Cards - Responsive Grid */}
+        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: { xs: 3, md: 4 } }}>
           {summaryStats.map((stat, index) => (
-            <Card key={index} sx={{ 
-              height: '100%',
-              borderRadius: 2,
-              transition: 'all 0.2s ease-in-out',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: 4
-              }
-            }}>
-              <CardContent sx={{ 
-                p: { 
-                  xs: 1, 
-                  sm: useCompactGrid ? 1 : 1.5, 
-                  md: useCompactGrid ? 1.5 : 2 
-                } 
+            <Grid item xs={6} sm={6} md={3} key={index}>
+              <Card sx={{ 
+                height: '100%',
+                borderRadius: 2,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: 4
+                }
               }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, flexWrap: 'wrap' }}>
-                  <Box sx={{ color: stat.color, mr: 1, flexShrink: 0 }}>
-                    {stat.icon}
+                <CardContent sx={{ 
+                  p: { xs: 1.5, sm: 2, md: 2.5 },
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    mb: 1, 
+                    gap: { xs: 0.5, sm: 1 }
+                  }}>
+                    <Box sx={{ 
+                      color: stat.color, 
+                      flexShrink: 0,
+                      '& svg': {
+                        fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                      }
+                    }}>
+                      {stat.icon}
+                    </Box>
+                    <Typography 
+                      variant="subtitle2" 
+                      fontWeight={600}
+                      sx={{ 
+                        fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                        lineHeight: 1.2,
+                        wordBreak: 'break-word'
+                      }}
+                    >
+                      {stat.title}
+                    </Typography>
                   </Box>
                   <Typography 
-                    variant={isMobile ? "caption" : "h6"} 
-                    fontWeight={600}
+                    variant="h5" 
                     sx={{ 
-                      fontSize: { 
-                        xs: '0.65rem', 
-                        sm: '0.75rem', 
-                        md: useCompactGrid ? '0.75rem' : '1.1rem'
-                      },
-                      lineHeight: { xs: 1.2, md: 1.4 },
-                      wordBreak: 'break-word'
+                      color: stat.color, 
+                      fontWeight: 700,
+                      fontSize: { xs: '1.1rem', sm: '1.4rem', md: '1.8rem' },
+                      mb: 0.5
                     }}
                   >
-                    {stat.title}
+                    {stat.value}
                   </Typography>
-                </Box>
-                <Typography 
-                  variant={isMobile ? "h6" : "h4"} 
-                  sx={{ 
-                    color: stat.color, 
-                    fontWeight: 700,
-                    fontSize: { 
-                      xs: '0.9rem', 
-                      sm: '1.1rem', 
-                      md: useCompactGrid ? '1.25rem' : '2rem'
-                    }
-                  }}
-                >
-                  {stat.value}
-                </Typography>
-                <Typography 
-                  variant="caption" 
-                  color="text.secondary"
-                  sx={{ 
-                    fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' },
-                    lineHeight: 1.2
-                  }}
-                >
-                  {stat.subtitle}
-                </Typography>
-              </CardContent>
-            </Card>
+                  <Typography 
+                    variant="caption" 
+                    color="text.secondary"
+                    sx={{ 
+                      fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                      lineHeight: 1.2
+                    }}
+                  >
+                    {stat.subtitle}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
           ))}
-        </Box>
+        </Grid>
 
         {/* Invoice History */}
         <Paper elevation={2} sx={{ 
@@ -440,11 +439,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
           minWidth: 0
         }}>
           <Box sx={{ 
-            p: { 
-              xs: 1.5, 
-              sm: 2, 
-              md: useCompactGrid ? 2 : 3 
-            }, 
+            p: { xs: 2, sm: 2.5, md: 3 }, 
             borderBottom: '1px solid', 
             borderColor: 'divider' 
           }}>
@@ -452,11 +447,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
               display: 'flex', 
               alignItems: 'center', 
               gap: 1,
-              fontSize: { 
-                xs: '1rem', 
-                sm: '1.1rem', 
-                md: useCompactGrid ? '1.1rem' : '1.25rem' 
-              }
+              fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
             }}>
               <CreditCardIcon color="primary" />
               Payment History
@@ -474,14 +465,14 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
           </Box>
 
           {useCardView ? (
-            // Card View for narrow screens
-            <Box sx={{ p: { xs: 1, sm: 2 } }}>
+            // Card View for mobile and tablet
+            <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
               {paginatedInvoices.map((invoice) => (
                 <MobileInvoiceCard key={invoice.id} invoice={invoice} />
               ))}
             </Box>
           ) : (
-            // Desktop Table View only when there's enough space
+            // Desktop Table View
             <Box sx={{ width: '100%', overflow: 'hidden' }}>
               <TableContainer sx={{ maxHeight: '60vh', width: '100%' }}>
                 <Table stickyHeader size="small">
@@ -631,7 +622,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
             </Typography>
           </Alert>
         )}
-      </Box>
+      </Container>
     </Box>
   );
 };
