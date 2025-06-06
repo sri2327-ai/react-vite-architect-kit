@@ -141,6 +141,192 @@ const SortableItem: React.FC<SortableItemProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  const renderSectionContent = () => {
+    if (item.type === 'bulleted-list') {
+      return (
+        <Box>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: theme.palette.text.secondary,
+              lineHeight: 1.6,
+              mb: 2,
+              fontStyle: 'italic'
+            }}
+          >
+            Instructions: {item.content}
+          </Typography>
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              color: theme.palette.text.disabled,
+              display: 'block'
+            }}
+          >
+            AI will generate bulleted content based on these instructions
+          </Typography>
+        </Box>
+      );
+    }
+
+    if (item.type === 'exam-list') {
+      return (
+        <Box>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: theme.palette.text.secondary,
+              lineHeight: 1.6,
+              mb: 2
+            }}
+          >
+            {item.content}
+          </Typography>
+          
+          {item.items && item.items.length > 0 && (
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                Exam Subsections:
+              </Typography>
+              {item.items.map((subItem, idx) => (
+                <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
+                  <Box 
+                    sx={{ 
+                      width: 6, 
+                      height: 6, 
+                      borderRadius: '50%', 
+                      backgroundColor: getTypeColor(item.type),
+                      mt: 1,
+                      flexShrink: 0
+                    }} 
+                  />
+                  <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 600, color: theme.palette.text.primary }}>
+                      {subItem.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: theme.palette.text.secondary, fontSize: '0.875rem' }}>
+                      {subItem.content}
+                    </Typography>
+                    {subItem.withinNormalLimitsText && (
+                      <Typography variant="caption" sx={{ color: theme.palette.text.disabled, display: 'block', mt: 0.5 }}>
+                        Normal limits: {subItem.withinNormalLimitsText}
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
+              ))}
+            </Box>
+          )}
+
+          {(item.itemNotDiscussedBehavior || item.itemWithinNormalLimitsBehavior) && (
+            <Box sx={{ mt: 2, p: 2, backgroundColor: alpha(theme.palette.info.main, 0.05), borderRadius: 1 }}>
+              <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 1 }}>
+                Settings:
+              </Typography>
+              {item.itemNotDiscussedBehavior && (
+                <Typography variant="caption" sx={{ display: 'block', color: theme.palette.text.secondary }}>
+                  Not discussed: {item.itemNotDiscussedBehavior}
+                </Typography>
+              )}
+              {item.itemWithinNormalLimitsBehavior && (
+                <Typography variant="caption" sx={{ display: 'block', color: theme.palette.text.secondary }}>
+                  Normal limits: {item.itemWithinNormalLimitsBehavior}
+                </Typography>
+              )}
+            </Box>
+          )}
+        </Box>
+      );
+    }
+
+    if (item.type === 'checklist') {
+      return (
+        <Box>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: theme.palette.text.secondary,
+              lineHeight: 1.6,
+              mb: 2
+            }}
+          >
+            {item.content}
+          </Typography>
+          
+          {item.items && item.items.length > 0 && (
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
+                Checklist Buttons:
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {item.items.map((checkItem, idx) => (
+                  <Button
+                    key={idx}
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      borderColor: getTypeColor(item.type),
+                      color: getTypeColor(item.type),
+                      '&:hover': {
+                        backgroundColor: alpha(getTypeColor(item.type), 0.04),
+                        borderColor: getTypeColor(item.type)
+                      }
+                    }}
+                  >
+                    {checkItem.name}
+                  </Button>
+                ))}
+              </Box>
+              <Typography variant="caption" sx={{ color: theme.palette.text.disabled, display: 'block', mt: 1 }}>
+                Click buttons to insert corresponding text during documentation
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      );
+    }
+
+    // Default content for other types
+    return (
+      <Box>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            color: theme.palette.text.secondary,
+            lineHeight: 1.6,
+            mb: item.items && item.items.length > 0 ? 2 : 0
+          }}
+        >
+          {item.content}
+        </Typography>
+        
+        {item.items && item.items.length > 0 && (
+          <Box>
+            {item.items.map((subItem, idx) => (
+              <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1 }}>
+                <Box 
+                  sx={{ 
+                    width: 6, 
+                    height: 6, 
+                    borderRadius: '50%', 
+                    backgroundColor: getTypeColor(item.type),
+                    mt: 1,
+                    flexShrink: 0
+                  }} 
+                />
+                <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+                  {subItem.name && <strong>{subItem.name}: </strong>}{subItem.content}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        )}
+      </Box>
+    );
+  };
+
   return (
     <div ref={setNodeRef} style={style}>
       <Fade in={true} timeout={300}>
@@ -320,69 +506,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   borderRadius: 2
                 }}
               >
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: theme.palette.text.secondary,
-                    lineHeight: 1.6,
-                    mb: item.items && item.items.length > 0 ? 2 : 0
-                  }}
-                >
-                  {item.content}
-                </Typography>
-                
-                {item.items && item.items.length > 0 && (
-                  <Box>
-                    {item.items.map((subItem, idx) => (
-                      <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1 }}>
-                        <Box 
-                          sx={{ 
-                            width: 6, 
-                            height: 6, 
-                            borderRadius: '50%', 
-                            backgroundColor: getTypeColor(item.type),
-                            mt: 1,
-                            flexShrink: 0
-                          }} 
-                        />
-                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
-                          {subItem.name && <strong>{subItem.name}: </strong>}{subItem.content}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
-
-                {/* Special formatting for exam-list and checklist */}
-                {(item.type === 'exam-list' || item.type === 'checklist') && !item.items && (
-                  <Box sx={{ mt: 2 }}>
-                    {[
-                      'General Appearance: Recap the patient\'s general appearance, including level of alertness and any acute distress.',
-                      'Cardiovascular: Recap findings related to heart sounds, rate, rhythm, and any murmurs.',
-                      'Respiratory: Recap findings regarding breath sounds, rate, and effort of breathing.',
-                      'Neurological: Recap findings related to mental status, motor and sensory function, and reflexes.',
-                      'Gastrointestinal: Recap findings related to abdominal examination, including palpation, bowel sounds, and any tenderness.',
-                      'Musculoskeletal: Recap findings regarding joint function, muscle strength, and any deformities.',
-                      'Skin: Recap findings on skin condition, including rashes, lesions, or color changes.'
-                    ].map((bullet, idx) => (
-                      <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 1.5 }}>
-                        <Box 
-                          sx={{ 
-                            width: 6, 
-                            height: 6, 
-                            borderRadius: '50%', 
-                            backgroundColor: getTypeColor(item.type),
-                            mt: 1,
-                            flexShrink: 0
-                          }} 
-                        />
-                        <Typography variant="body2" sx={{ color: theme.palette.text.secondary, lineHeight: 1.6 }}>
-                          {bullet}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
-                )}
+                {renderSectionContent()}
               </Paper>
             </Box>
 
