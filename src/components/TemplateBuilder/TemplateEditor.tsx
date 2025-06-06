@@ -23,16 +23,16 @@ interface TemplateEditorProps {
   initialItems?: TemplateItem[];
   onSave?: (items: TemplateItem[]) => void;
   onAddSection?: (section: any) => void;
-  onNavigateToEditor?: () => void;
   createdTemplateData?: any;
+  showEditor?: boolean;
 }
 
 const TemplateEditor: React.FC<TemplateEditorProps> = ({ 
   initialItems = [], 
   onSave,
   onAddSection,
-  onNavigateToEditor,
-  createdTemplateData
+  createdTemplateData,
+  showEditor = false
 }) => {
   const [currentItems, setCurrentItems] = useState<TemplateItem[]>(
     initialItems.length > 0 ? initialItems : [
@@ -58,49 +58,25 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     ]
   );
 
-  // Handle navigation when a template is created
+  // Handle template creation data
   useEffect(() => {
-    if (createdTemplateData && createdTemplateData.redirectToEditor) {
-      // Convert created template data to template items
-      const newItems: TemplateItem[] = [];
+    if (createdTemplateData) {
+      console.log('Template creation data received:', createdTemplateData);
       
-      if (createdTemplateData.content) {
-        // Parse content and create template items
-        const sections = createdTemplateData.content.split('\n\n').filter(section => section.trim());
-        sections.forEach((section, index) => {
-          const lines = section.split('\n');
-          const name = lines[0].replace(':', '').trim();
-          const content = lines.slice(1).join('\n').trim() || 'AI will generate content based on the instructions below.';
-          
-          newItems.push({
-            id: `${Date.now()}-${index}`,
-            name: name || `Section ${index + 1}`,
-            type: 'paragraph',
-            content: content,
-            description: 'A.I. will write content following the guidelines below.'
-          });
-        });
-      }
-      
-      // If no sections were parsed, create a default structure
-      if (newItems.length === 0) {
-        newItems.push({
+      // Create a simple default item for any created template
+      const newItems: TemplateItem[] = [
+        {
           id: Date.now().toString(),
           name: createdTemplateData.name || 'New Template Section',
           type: 'paragraph',
-          content: 'AI will generate content based on the instructions below.',
+          content: 'Document the primary information here',
           description: 'A.I. will write content following the guidelines below.'
-        });
-      }
+        }
+      ];
       
       setCurrentItems(newItems);
-      
-      // Navigate to editor if callback provided
-      if (onNavigateToEditor) {
-        onNavigateToEditor();
-      }
     }
-  }, [createdTemplateData, onNavigateToEditor]);
+  }, [createdTemplateData]);
 
   const handleSave = useCallback((items: TemplateItem[]) => {
     setCurrentItems(items);
