@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -103,9 +102,9 @@ const WorkflowBuilder: React.FC = () => {
           gap: { xs: 1, sm: 2 }, 
           mb: 2,
           flexDirection: { xs: 'column', sm: 'row' },
-          textAlign: { xs: 'center', sm: 'center', md: 'left' }
+          textAlign: 'center'
         }}>
-          <Box>
+          <Box sx={{ width: '100%' }}>
             <Typography 
               variant={isSmallMobile ? "h5" : isMobile ? "h4" : "h3"} 
               sx={{ 
