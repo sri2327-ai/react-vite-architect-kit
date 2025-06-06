@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -22,7 +21,6 @@ import {
   useMediaQuery,
   Collapse,
   Button,
-  Grid,
   Container
 } from '@mui/material';
 import {
@@ -359,77 +357,84 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
         </Typography>
 
         {/* Summary Cards - Responsive Grid */}
-        <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: { xs: 3, md: 4 } }}>
+        <Box sx={{ 
+          display: 'grid',
+          gridTemplateColumns: { 
+            xs: 'repeat(2, 1fr)', 
+            sm: 'repeat(2, 1fr)', 
+            md: 'repeat(4, 1fr)' 
+          },
+          gap: { xs: 1.5, sm: 2, md: 3 },
+          mb: { xs: 3, md: 4 }
+        }}>
           {summaryStats.map((stat, index) => (
-            <Grid item xs={6} sm={6} md={3} key={index}>
-              <Card sx={{ 
+            <Card key={index} sx={{ 
+              height: '100%',
+              borderRadius: 2,
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 4
+              }
+            }}>
+              <CardContent sx={{ 
+                p: { xs: 1.5, sm: 2, md: 2.5 },
                 height: '100%',
-                borderRadius: 2,
-                transition: 'all 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: 4
-                }
+                display: 'flex',
+                flexDirection: 'column'
               }}>
-                <CardContent sx={{ 
-                  p: { xs: 1.5, sm: 2, md: 2.5 },
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column'
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  mb: 1, 
+                  gap: { xs: 0.5, sm: 1 }
                 }}>
                   <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    mb: 1, 
-                    gap: { xs: 0.5, sm: 1 }
+                    color: stat.color, 
+                    flexShrink: 0,
+                    '& svg': {
+                      fontSize: { xs: '1.2rem', sm: '1.5rem' }
+                    }
                   }}>
-                    <Box sx={{ 
-                      color: stat.color, 
-                      flexShrink: 0,
-                      '& svg': {
-                        fontSize: { xs: '1.2rem', sm: '1.5rem' }
-                      }
-                    }}>
-                      {stat.icon}
-                    </Box>
-                    <Typography 
-                      variant="subtitle2" 
-                      fontWeight={600}
-                      sx={{ 
-                        fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
-                        lineHeight: 1.2,
-                        wordBreak: 'break-word'
-                      }}
-                    >
-                      {stat.title}
-                    </Typography>
+                    {stat.icon}
                   </Box>
                   <Typography 
-                    variant="h5" 
+                    variant="subtitle2" 
+                    fontWeight={600}
                     sx={{ 
-                      color: stat.color, 
-                      fontWeight: 700,
-                      fontSize: { xs: '1.1rem', sm: '1.4rem', md: '1.8rem' },
-                      mb: 0.5
+                      fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
+                      lineHeight: 1.2,
+                      wordBreak: 'break-word'
                     }}
                   >
-                    {stat.value}
+                    {stat.title}
                   </Typography>
-                  <Typography 
-                    variant="caption" 
-                    color="text.secondary"
-                    sx={{ 
-                      fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
-                      lineHeight: 1.2
-                    }}
-                  >
-                    {stat.subtitle}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+                </Box>
+                <Typography 
+                  variant="h5" 
+                  sx={{ 
+                    color: stat.color, 
+                    fontWeight: 700,
+                    fontSize: { xs: '1.1rem', sm: '1.4rem', md: '1.8rem' },
+                    mb: 0.5
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+                <Typography 
+                  variant="caption" 
+                  color="text.secondary"
+                  sx={{ 
+                    fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                    lineHeight: 1.2
+                  }}
+                >
+                  {stat.subtitle}
+                </Typography>
+              </CardContent>
+            </Card>
           ))}
-        </Grid>
+        </Box>
 
         {/* Invoice History */}
         <Paper elevation={2} sx={{ 

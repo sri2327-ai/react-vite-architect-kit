@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -25,8 +24,7 @@ import {
   CircularProgress,
   Switch,
   FormControlLabel,
-  TextField,
-  Grid
+  TextField
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -345,8 +343,12 @@ const Profile: React.FC = () => {
         My Profile
       </Typography>
 
-      <Grid container spacing={{ xs: 2, sm: 3 }}>
-        <Grid item xs={12} lg={8}>
+      <Box sx={{ 
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' },
+        gap: { xs: 2, sm: 3 }
+      }}>
+        <Box>
           {/* Personal Information */}
           <Paper sx={{ 
             p: { xs: 2, sm: 3 }, 
@@ -364,66 +366,58 @@ const Profile: React.FC = () => {
               Personal Information
             </Typography>
 
-            <Grid container spacing={{ xs: 0, md: 2 }}>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<EmailIcon />}
-                  label="Email Address"
-                  value={profile.email}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<PhoneIcon />}
-                  label="Phone Number"
-                  value={profile.phoneNumber}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<PersonIcon />}
-                  label="First Name"
-                  value={profile.firstName}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<PersonIcon />}
-                  label="Last Name"
-                  value={profile.lastName}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <ProfileField
-                  icon={<BusinessIcon />}
-                  label="Medical Specialty"
-                  value={profile.specialty}
-                />
-              </Grid>
+            <Box sx={{ 
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              gap: { xs: 0, md: 2 }
+            }}>
+              <ProfileField
+                icon={<EmailIcon />}
+                label="Email Address"
+                value={profile.email}
+              />
+              <ProfileField
+                icon={<PhoneIcon />}
+                label="Phone Number"
+                value={profile.phoneNumber}
+              />
+              <ProfileField
+                icon={<PersonIcon />}
+                label="First Name"
+                value={profile.firstName}
+              />
+              <ProfileField
+                icon={<PersonIcon />}
+                label="Last Name"
+                value={profile.lastName}
+              />
+              <ProfileField
+                icon={<BusinessIcon />}
+                label="Medical Specialty"
+                value={profile.specialty}
+              />
               
               {/* Only show EHR Integration Status if ehrMode is true */}
               {profile.ehrMode && (
                 <>
-                  <Grid item xs={12} md={6}>
-                    <ProfileField
-                      icon={<SettingsIcon />}
-                      label="EHR Integration Status"
-                      value={profile.ehrMode}
-                      chip
-                    />
-                  </Grid>
+                  <ProfileField
+                    icon={<SettingsIcon />}
+                    label="EHR Integration Status"
+                    value={profile.ehrMode}
+                    chip
+                  />
                   {profile.ehrName && (
-                    <Grid item xs={12}>
+                    <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' } }}>
                       <ProfileField
                         icon={<StorageIcon />}
                         label="Connected EHR System"
                         value={profile.ehrName}
                       />
-                    </Grid>
+                    </Box>
                   )}
                 </>
               )}
-            </Grid>
+            </Box>
 
             {/* Show EHR disabled message if ehrMode is false */}
             {!profile.ehrMode && (
@@ -619,9 +613,9 @@ const Profile: React.FC = () => {
               </Typography>
             </Box>
           </Paper>
-        </Grid>
+        </Box>
 
-        <Grid item xs={12} lg={4}>
+        <Box>
           {/* Quick Access */}
           <Paper sx={{ 
             p: { xs: 2, sm: 3 }, 
@@ -639,34 +633,32 @@ const Profile: React.FC = () => {
               Quick Access
             </Typography>
             
-            <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-              <Grid item xs={12}>
-                <QuickLinkCard
-                  href="https://chrome.google.com/webstore/detail/s10ai-crush-extension"
-                  icon={<ExtensionIcon />}
-                  title="Chrome Extension"
-                  description="Install S10.AI browser extension"
-                />
-              </Grid>
+            <Box sx={{ 
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: { xs: 1.5, sm: 2 }
+            }}>
+              <QuickLinkCard
+                href="https://chrome.google.com/webstore/detail/s10ai-crush-extension"
+                icon={<ExtensionIcon />}
+                title="Chrome Extension"
+                description="Install S10.AI browser extension"
+              />
               
-              <Grid item xs={12}>
-                <QuickLinkCard
-                  href="https://app.s10.ai/login"
-                  icon={<LoginIcon />}
-                  title="Main Application"
-                  description="Access full S10.AI platform"
-                />
-              </Grid>
+              <QuickLinkCard
+                href="https://app.s10.ai/login"
+                icon={<LoginIcon />}
+                title="Main Application"
+                description="Access full S10.AI platform"
+              />
               
-              <Grid item xs={12}>
-                <QuickLinkCard
-                  href="https://play.google.com/store/apps/details?id=com.s10ai.mobile"
-                  icon={<MobileIcon />}
-                  title="Mobile App"
-                  description="Download for iOS/Android"
-                />
-              </Grid>
-            </Grid>
+              <QuickLinkCard
+                href="https://play.google.com/store/apps/details?id=com.s10ai.mobile"
+                icon={<MobileIcon />}
+                title="Mobile App"
+                description="Download for iOS/Android"
+              />
+            </Box>
           </Paper>
 
           {/* Account Actions */}
@@ -763,8 +755,8 @@ const Profile: React.FC = () => {
               You can reactivate anytime without data loss.
             </Typography>
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* MFA Setup Dialog */}
       <Dialog 
