@@ -1427,11 +1427,10 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                   <Box sx={{ 
                     display: 'flex', 
-                    alignItems: 'center', 
+                    alignItems: { xs: 'flex-start', sm: 'center' }, 
                     gap: { xs: 1, sm: 2 }, 
                     width: '100%',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    alignItems: { xs: 'flex-start', sm: 'center' }
+                    flexDirection: { xs: 'column', sm: 'row' }
                   }}>
                     <Typography 
                       variant="h6"
