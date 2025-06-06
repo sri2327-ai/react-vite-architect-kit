@@ -228,23 +228,12 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
         }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
             <Box display="flex" alignItems="center">
-              <Box sx={{
-                width: { xs: 32, sm: 40 },
-                height: { xs: 32, sm: 40 },
-                borderRadius: 1.5,
-                backgroundColor: alpha('#ffffff', 0.15),
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mr: { xs: 1.5, sm: 2 }
-              }}>
-                <AutoAwesomeIcon sx={{ fontSize: { xs: 18, sm: 22 }, color: '#ffffff' }} />
-              </Box>
               <Box>
                 <Typography variant={isMobile ? "h6" : "h5"} sx={{ 
                   fontWeight: 700,
                   fontSize: { xs: '1.1rem', sm: '1.25rem' },
-                  lineHeight: 1.2
+                  lineHeight: 1.2,
+                  color: '#ffffff'
                 }}>
                   Add Section
                 </Typography>
@@ -252,7 +241,8 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                   <Typography variant="body2" sx={{ 
                     opacity: 0.9,
                     fontSize: '0.875rem',
-                    mt: 0.25
+                    mt: 0.25,
+                    color: '#ffffff'
                   }}>
                     Choose from medical documentation sections
                   </Typography>
