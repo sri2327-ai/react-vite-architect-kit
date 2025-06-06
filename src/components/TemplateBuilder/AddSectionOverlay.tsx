@@ -219,7 +219,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
             maxWidth: '1200px',
             height: '85vh',
             borderRadius: 4,
-            backgroundColor: 'white',
+            backgroundColor: '#ffffff',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
@@ -230,7 +230,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
           <Box sx={{ 
             p: 3,
             background: `linear-gradient(135deg, ${bravoColors.primaryFlat} 0%, ${bravoColors.primary} 100%)`,
-            color: 'white',
+            color: '#ffffff',
             position: 'relative',
             overflow: 'hidden'
           }}>
@@ -241,7 +241,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
               width: 100,
               height: 100,
               borderRadius: '50%',
-              background: alpha('white', 0.1),
+              background: alpha('#ffffff', 0.1),
               zIndex: 1
             }} />
             <Box sx={{
@@ -251,7 +251,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
               width: 80,
               height: 80,
               borderRadius: '50%',
-              background: alpha('white', 0.05),
+              background: alpha('#ffffff', 0.05),
               zIndex: 1
             }} />
             
@@ -261,13 +261,13 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                   width: 48,
                   height: 48,
                   borderRadius: 2,
-                  backgroundColor: alpha('white', 0.2),
+                  backgroundColor: alpha('#ffffff', 0.2),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   mr: 2
                 }}>
-                  <AutoAwesomeIcon sx={{ fontSize: 24, color: 'white' }} />
+                  <AutoAwesomeIcon sx={{ fontSize: 24, color: '#ffffff' }} />
                 </Box>
                 <Box>
                   <Typography variant="h4" sx={{ 
@@ -285,10 +285,10 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
               <IconButton 
                 onClick={onClose}
                 sx={{ 
-                  bgcolor: alpha('white', 0.15),
-                  color: 'white',
+                  bgcolor: alpha('#ffffff', 0.15),
+                  color: '#ffffff',
                   '&:hover': { 
-                    bgcolor: alpha('white', 0.25),
+                    bgcolor: alpha('#ffffff', 0.25),
                     transform: 'scale(1.1)'
                   },
                   transition: 'all 0.2s ease'
@@ -319,7 +319,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 3,
                   fontSize: '1.1rem',
-                  backgroundColor: 'white',
+                  backgroundColor: '#ffffff',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
                   '&:hover': {
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
@@ -350,7 +350,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                       fontWeight: 600,
                       fontSize: '0.9rem',
                       bgcolor: selectedCategory === category ? getCategoryColor(category) : 'transparent',
-                      color: selectedCategory === category ? 'white' : getCategoryColor(category),
+                      color: selectedCategory === category ? '#ffffff' : getCategoryColor(category),
                       borderColor: getCategoryColor(category),
                       boxShadow: selectedCategory === category ? `0 4px 12px ${alpha(getCategoryColor(category), 0.3)}` : 'none',
                       '&:hover': {
@@ -398,7 +398,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                   justifyContent: 'center',
                   mr: 2
                 }}>
-                  <AddIcon sx={{ color: 'white', fontSize: 18 }} />
+                  <AddIcon sx={{ color: '#ffffff', fontSize: 18 }} />
                 </Box>
                 <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
                   Create Custom Section
@@ -491,7 +491,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                   sx={{
                     '& .MuiBadge-badge': {
                       backgroundColor: bravoColors.secondary,
-                      color: 'white'
+                      color: '#ffffff'
                     }
                   }}
                 >
@@ -552,7 +552,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                           size="small"
                           sx={{ 
                             bgcolor: getCategoryColor(category),
-                            color: 'white',
+                            color: '#ffffff',
                             fontWeight: 600
                           }}
                         />
@@ -572,7 +572,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                             borderRadius: 3,
                             border: `2px solid transparent`,
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            background: 'white',
+                            background: '#ffffff',
                             '&:hover': {
                               transform: 'translateY(-6px)',
                               boxShadow: `0 12px 30px ${alpha(getCategoryColor(category), 0.15)}`,
@@ -657,7 +657,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                       borderRadius: 3,
                       border: `2px solid transparent`,
                       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      background: 'white',
+                      background: '#ffffff',
                       '&:hover': {
                         transform: 'translateY(-6px)',
                         boxShadow: `0 12px 30px ${alpha(getCategoryColor(section.category), 0.15)}`,
