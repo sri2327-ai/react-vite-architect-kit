@@ -579,23 +579,23 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
               },
               '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
                 fontSize: { xs: '0.75rem', sm: '0.875rem', md: '1rem' },
-                color: '#FFFFFF',
+                color: '#000000',
                 margin: { xs: '4px 0', md: 0 }
               },
               '& .MuiTablePagination-select': {
-                color: '#FFFFFF',
+                color: '#000000',
                 fontSize: { xs: '0.75rem', sm: '0.875rem' }
               },
               '& .MuiTablePagination-actions': {
-                color: '#FFFFFF',
+                color: '#000000',
                 ml: { xs: 0, md: 1 }
               },
               '& .MuiIconButton-root': {
-                color: '#FFFFFF',
+                color: '#000000',
                 padding: { xs: '4px', md: '8px' }
               },
               '& .MuiSelect-root': {
-                color: '#FFFFFF'
+                color: '#000000'
               }
             }}
           />
