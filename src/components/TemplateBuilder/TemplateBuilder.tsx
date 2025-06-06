@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -42,7 +41,8 @@ import {
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
   LibraryBooks as LibraryBooksIcon,
-  Folder as FolderIcon
+  Folder as FolderIcon,
+  Visibility as VisibilityIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
@@ -518,7 +518,7 @@ const TemplateBuilder: React.FC = () => {
     </Box>
   );
 
-  // Render Templates Screen with edit/delete functionality
+  // Render Templates Screen with edit/delete functionality and improved hover buttons
   const renderTemplates = () => (
     <Box>
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
@@ -605,7 +605,17 @@ const TemplateBuilder: React.FC = () => {
           <List sx={{ p: 0 }}>
             {paginatedTemplates.map((template, index) => (
               <React.Fragment key={template.id}>
-                <ListItem disablePadding>
+                <ListItem 
+                  disablePadding
+                  sx={{
+                    '&:hover': {
+                      '& .template-action-buttons': {
+                        opacity: 1,
+                        transform: 'translateX(0)'
+                      }
+                    }
+                  }}
+                >
                   <ListItemButton 
                     onClick={() => handleTemplateView(template)}
                     sx={{
@@ -632,7 +642,41 @@ const TemplateBuilder: React.FC = () => {
                           {template.specialty} • {template.type}
                         </Typography>
                       </Box>
-                      <Box display="flex" alignItems="center" gap={1}>
+                      <Box 
+                        className="template-action-buttons"
+                        display="flex" 
+                        alignItems="center" 
+                        gap={1}
+                        sx={{
+                          opacity: 0,
+                          transform: 'translateX(10px)',
+                          transition: 'all 0.2s ease-in-out'
+                        }}
+                      >
+                        <Button 
+                          variant="outlined"
+                          size="small"
+                          startIcon={<VisibilityIcon />}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTemplateView(template);
+                          }}
+                          sx={{
+                            borderColor: bravoColors.secondary,
+                            color: bravoColors.secondary,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            borderRadius: 2,
+                            px: 2,
+                            '&:hover': {
+                              borderColor: bravoColors.primaryFlat,
+                              backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+                              color: bravoColors.primaryFlat
+                            }
+                          }}
+                        >
+                          Preview
+                        </Button>
                         <Button 
                           variant="contained"
                           size="small"
@@ -646,12 +690,14 @@ const TemplateBuilder: React.FC = () => {
                             color: 'white',
                             textTransform: 'none',
                             fontWeight: 600,
+                            borderRadius: 2,
+                            px: 2,
                             '&:hover': {
                               backgroundColor: bravoColors.primaryDark
                             }
                           }}
                         >
-                          Edit Template
+                          Edit
                         </Button>
                         <IconButton
                           onClick={(e) => handleTemplateMenuClick(e, template)}
@@ -694,6 +740,27 @@ const TemplateBuilder: React.FC = () => {
             Create Template
           </Button>
         </Card>
+      )}
+
+      {totalPages > 1 && (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(event, page) => setCurrentPage(page)}
+            color="primary"
+            size="large"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                fontSize: '1rem',
+                '&.Mui-selected': {
+                  backgroundColor: bravoColors.primaryFlat,
+                  color: 'white'
+                }
+              }
+            }}
+          />
+        </Box>
       )}
     </Box>
   );
