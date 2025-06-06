@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -111,7 +112,8 @@ const WorkflowBuilder: React.FC = () => {
                 fontWeight: 700, 
                 color: '#000000',
                 mb: 0.5,
-                fontSize: { xs: '1.25rem', sm: '1.75rem', md: '2.5rem' }
+                fontSize: { xs: '1.25rem', sm: '1.75rem', md: '2.5rem' },
+                textAlign: { xs: 'center', sm: 'center', md: 'left' }
               }}
             >
               EHR Workflow Builder
