@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -28,8 +29,7 @@ import {
   Menu,
   MenuItem,
   Divider,
-  Paper,
-  Grid
+  Paper
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -42,8 +42,7 @@ import {
   Delete as DeleteIcon,
   MoreVert as MoreVertIcon,
   LibraryBooks as LibraryBooksIcon,
-  Folder as FolderIcon,
-  Visibility as VisibilityIcon
+  Folder as FolderIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
@@ -591,240 +590,86 @@ const TemplateBuilder: React.FC = () => {
       />
 
       {isLoading ? (
-        <Grid container spacing={3}>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card sx={{ borderRadius: 3, height: 280 }}>
-                <CardContent sx={{ p: 3 }}>
-                  <Skeleton variant="text" height={28} sx={{ mb: 1 }} />
-                  <Skeleton variant="text" height={20} width="60%" sx={{ mb: 2 }} />
-                  <Skeleton variant="rectangular" height={60} sx={{ mb: 2, borderRadius: 1 }} />
-                  <Skeleton variant="text" height={16} width="40%" sx={{ mb: 1 }} />
-                  <Skeleton variant="text" height={16} width="30%" />
-                </CardContent>
-              </Card>
-            </Grid>
+        <Box>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} sx={{ mb: 2, borderRadius: 2 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Skeleton variant="text" height={24} sx={{ mb: 1 }} />
+                <Skeleton variant="text" height={20} width="60%" />
+              </CardContent>
+            </Card>
           ))}
-        </Grid>
+        </Box>
       ) : paginatedTemplates.length > 0 ? (
-        <Grid container spacing={3}>
-          {paginatedTemplates.map((template) => (
-            <Grid item xs={12} sm={6} md={4} key={template.id}>
-              <Card
-                sx={{
-                  height: '100%',
-                  borderRadius: 3,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  position: 'relative',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  '&:hover': {
-                    borderColor: bravoColors.primaryFlat,
-                    boxShadow: '0 8px 25px rgba(20, 49, 81, 0.15)',
-                    transform: 'translateY(-4px)',
-                    '& .template-actions': {
-                      opacity: 1,
-                      transform: 'translateY(0)'
-                    }
-                  }
-                }}
-              >
-                {/* Template Type Badge */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 16,
-                    right: 16,
-                    zIndex: 2
-                  }}
-                >
-                  <Chip
-                    label={template.type}
-                    size="small"
+        <Paper elevation={1} sx={{ borderRadius: 3 }}>
+          <List sx={{ p: 0 }}>
+            {paginatedTemplates.map((template, index) => (
+              <React.Fragment key={template.id}>
+                <ListItem disablePadding>
+                  <ListItemButton 
+                    onClick={() => handleTemplateView(template)}
                     sx={{
-                      backgroundColor: bravoColors.secondary,
-                      color: 'white',
-                      fontWeight: 600,
-                      fontSize: '0.7rem'
-                    }}
-                  />
-                </Box>
-
-                <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  {/* Header */}
-                  <Box sx={{ mb: 2, pr: 6 }}>
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: bravoColors.primaryFlat,
-                        fontSize: '1.1rem',
-                        lineHeight: 1.3,
-                        mb: 0.5
-                      }}
-                    >
-                      {template.title}
-                    </Typography>
-                    
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'text.secondary',
-                        fontSize: '0.875rem'
-                      }}
-                    >
-                      {template.specialty}
-                    </Typography>
-                  </Box>
-
-                  {/* Tags */}
-                  {template.tags && template.tags.length > 0 && (
-                    <Box sx={{ mb: 2 }}>
-                      <Stack direction="row" spacing={0.5} flexWrap="wrap">
-                        {template.tags.slice(0, 2).map((tag, index) => (
-                          <Chip
-                            key={index}
-                            label={tag}
-                            size="small"
-                            variant="outlined"
-                            sx={{
-                              fontSize: '0.65rem',
-                              height: 20,
-                              borderColor: alpha(bravoColors.primaryFlat, 0.3),
-                              color: bravoColors.primaryFlat,
-                              mb: 0.5
-                            }}
-                          />
-                        ))}
-                        {template.tags.length > 2 && (
-                          <Chip
-                            label={`+${template.tags.length - 2}`}
-                            size="small"
-                            variant="outlined"
-                            sx={{
-                              fontSize: '0.65rem',
-                              height: 20,
-                              borderColor: 'text.secondary',
-                              color: 'text.secondary'
-                            }}
-                          />
-                        )}
-                      </Stack>
-                    </Box>
-                  )}
-
-                  {/* Stats */}
-                  <Box sx={{ mb: 2, flexGrow: 1 }}>
-                    <Stack direction="row" spacing={2} sx={{ mb: 1 }}>
-                      <Box display="flex" alignItems="center" gap={0.5}>
-                        <AssignmentIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-                          {template.fields?.length || 0} sections
-                        </Typography>
-                      </Box>
-                      {template.usageCount !== undefined && (
-                        <Box display="flex" alignItems="center" gap={0.5}>
-                          <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
-                            Used {template.usageCount}x
-                          </Typography>
-                        </Box>
-                      )}
-                    </Stack>
-                    
-                    {template.lastUsed && (
-                      <Box display="flex" alignItems="center" gap={0.5}>
-                        <ScheduleIcon sx={{ fontSize: 12, color: 'text.secondary' }} />
-                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                          Last used {template.lastUsed}
-                        </Typography>
-                      </Box>
-                    )}
-                  </Box>
-
-                  {/* Action Buttons */}
-                  <Box
-                    className="template-actions"
-                    sx={{
-                      opacity: 0,
-                      transform: 'translateY(8px)',
-                      transition: 'all 0.3s ease',
-                      display: 'flex',
-                      gap: 1,
-                      mt: 'auto'
+                      py: 2,
+                      px: 3,
+                      '&:hover': {
+                        backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
+                      }
                     }}
                   >
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      startIcon={<VisibilityIcon />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTemplateView(template);
-                      }}
-                      sx={{
-                        flex: 1,
-                        borderColor: bravoColors.primaryFlat,
-                        color: bravoColors.primaryFlat,
-                        fontWeight: 600,
-                        textTransform: 'none',
-                        borderRadius: 2,
-                        fontSize: '0.75rem',
-                        py: 0.5,
-                        '&:hover': {
-                          borderColor: bravoColors.primaryFlat,
-                          backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
-                        }
-                      }}
-                    >
-                      View
-                    </Button>
-                    
-                    <Button
-                      variant="contained"
-                      size="small"
-                      startIcon={<EditIcon />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleTemplateEdit(template);
-                      }}
-                      sx={{
-                        flex: 1,
-                        backgroundColor: bravoColors.primaryFlat,
-                        color: 'white',
-                        fontWeight: 600,
-                        textTransform: 'none',
-                        borderRadius: 2,
-                        fontSize: '0.75rem',
-                        py: 0.5,
-                        '&:hover': {
-                          backgroundColor: bravoColors.secondary
-                        }
-                      }}
-                    >
-                      Edit
-                    </Button>
-
-                    <IconButton
-                      size="small"
-                      onClick={(e) => handleTemplateMenuClick(e, template)}
-                      sx={{
-                        backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
-                        color: bravoColors.primaryFlat,
-                        '&:hover': {
-                          backgroundColor: alpha(bravoColors.primaryFlat, 0.2)
-                        }
-                      }}
-                    >
-                      <MoreVertIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                    <Box display="flex" alignItems="center" gap={2} sx={{ flex: 1 }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            color: bravoColors.primaryFlat,
+                            fontSize: '1.1rem'
+                          }}
+                        >
+                          {template.title}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                          {template.specialty} • {template.type}
+                        </Typography>
+                      </Box>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <Button 
+                          variant="contained"
+                          size="small"
+                          startIcon={<EditIcon />}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTemplateEdit(template);
+                          }}
+                          sx={{
+                            backgroundColor: bravoColors.primaryFlat,
+                            color: 'white',
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            '&:hover': {
+                              backgroundColor: bravoColors.primaryDark
+                            }
+                          }}
+                        >
+                          Edit Template
+                        </Button>
+                        <IconButton
+                          onClick={(e) => handleTemplateMenuClick(e, template)}
+                          sx={{ color: bravoColors.primaryFlat }}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  </ListItemButton>
+                </ListItem>
+                {index < paginatedTemplates.length - 1 && (
+                  <Divider sx={{ mx: 3 }} />
+                )}
+              </React.Fragment>
+            ))}
+          </List>
+        </Paper>
       ) : (
         <Card sx={{ p: 6, textAlign: 'center', borderRadius: 3 }}>
           <Typography variant="h6" gutterBottom color="text.secondary">
@@ -849,25 +694,6 @@ const TemplateBuilder: React.FC = () => {
             Create Template
           </Button>
         </Card>
-      )}
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(event, value) => setCurrentPage(value)}
-            color="primary"
-            size="large"
-            sx={{
-              '& .MuiPaginationItem-root': {
-                borderRadius: 2,
-                fontWeight: 600
-              }
-            }}
-          />
-        </Box>
       )}
     </Box>
   );
