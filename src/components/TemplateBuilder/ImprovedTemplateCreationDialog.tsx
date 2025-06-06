@@ -277,14 +277,14 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
             flexDirection: 'column', 
             height: '100%',
             overflow: 'auto',
-            p: 2
+            p: { xs: 2, sm: 3 }
           }}>
-            <Box sx={{ textAlign: 'center', mb: 3 }}>
+            <Box sx={{ textAlign: 'center', mb: { xs: 3, sm: 4 } }}>
               <Typography variant="h5" sx={{ 
                 color: bravoColors.primaryFlat,
                 fontWeight: 600,
-                mb: 1,
-                fontSize: { xs: '1.2rem', md: '1.5rem' }
+                mb: 1.5,
+                fontSize: { xs: '1.25rem', sm: '1.5rem' }
               }}>
                 How would you like to create your template?
               </Typography>
@@ -293,7 +293,8 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                 color: 'text.secondary',
                 maxWidth: 600,
                 mx: 'auto',
-                fontSize: { xs: '0.875rem', md: '1rem' }
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                lineHeight: 1.5
               }}>
                 Choose the method that best fits your workflow. Each option is designed to save you time and improve your documentation quality.
               </Typography>
@@ -304,52 +305,65 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
               gridTemplateColumns: {
                 xs: '1fr',
                 sm: 'repeat(2, 1fr)',
-                md: 'repeat(3, 1fr)',
-                lg: 'repeat(auto-fit, minmax(250px, 1fr))'
+                lg: 'repeat(3, 1fr)'
               },
-              gap: 2,
-              maxHeight: { xs: '60vh', md: 'none' },
-              overflow: 'auto'
+              gap: { xs: 2, sm: 2.5, md: 3 },
+              maxHeight: { xs: 'none', md: '60vh' },
+              overflow: 'auto',
+              alignItems: 'start'
             }}>
               {createTemplateOptions.map((option) => (
                 <Card 
                   key={option.id}
                   sx={{ 
                     cursor: 'pointer',
-                    borderRadius: 2,
+                    borderRadius: 3,
                     border: '2px solid transparent',
                     transition: 'all 0.2s ease',
                     height: 'fit-content',
+                    backgroundColor: '#ffffff',
                     '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(0,0,0,0.1)',
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
                       borderColor: bravoColors.primaryFlat
                     }
                   }}
                 >
                   <CardActionArea 
                     onClick={() => handleMethodSelect(option)}
-                    sx={{ height: '100%', p: 2 }}
+                    sx={{ height: '100%' }}
                   >
-                    <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      {/* Header */}
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                    <CardContent sx={{ 
+                      p: { xs: 2, sm: 2.5 }, 
+                      height: '100%', 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      gap: 2
+                    }}>
+                      {/* Header Row */}
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'flex-start', 
+                        justifyContent: 'space-between',
+                        gap: 2
+                      }}>
                         <Box
                           sx={{
-                            width: 40,
-                            height: 40,
+                            width: { xs: 36, sm: 40 },
+                            height: { xs: 36, sm: 40 },
                             borderRadius: 2,
                             background: bravoColors.primary,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            flexShrink: 0,
                             boxShadow: '0 4px 12px rgba(20,49,81,0.2)'
                           }}
                         >
-                          {React.cloneElement(option.icon, { sx: { color: 'white', fontSize: 20 } })}
+                          {React.cloneElement(option.icon, { sx: { color: 'white', fontSize: { xs: 18, sm: 20 } } })}
                         </Box>
                         
-                        <Box sx={{ textAlign: 'right' }}>
+                        <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
                           <Chip
                             label={option.difficulty}
                             size="small"
@@ -357,44 +371,48 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                               backgroundColor: getDifficultyColor(option.difficulty),
                               color: 'white',
                               fontWeight: 600,
-                              fontSize: '0.7rem',
+                              fontSize: { xs: '0.65rem', sm: '0.7rem' },
+                              height: { xs: 20, sm: 22 },
                               mb: 0.5
                             }}
                           />
                           <Typography variant="caption" display="block" color="text.secondary" sx={{ 
                             fontWeight: 500,
-                            fontSize: '0.7rem'
+                            fontSize: { xs: '0.65rem', sm: '0.7rem' }
                           }}>
                             {option.timeEstimate}
                           </Typography>
                         </Box>
                       </Box>
 
-                      {/* Content */}
-                      <Typography variant="h6" gutterBottom sx={{ 
+                      {/* Title */}
+                      <Typography variant="h6" sx={{ 
                         fontWeight: 600,
                         color: bravoColors.primaryFlat,
-                        mb: 1,
-                        fontSize: '0.9rem'
+                        fontSize: { xs: '0.95rem', sm: '1rem' },
+                        lineHeight: 1.3,
+                        mb: 0
                       }}>
                         {option.title}
                       </Typography>
                       
+                      {/* Description */}
                       <Typography variant="body2" sx={{
                         color: 'text.primary',
                         lineHeight: 1.4,
-                        mb: 2,
-                        flex: 1,
-                        fontSize: '0.8rem'
+                        fontSize: { xs: '0.8rem', sm: '0.85rem' },
+                        flex: 1
                       }}>
                         {option.description}
                       </Typography>
 
+                      {/* Clinical Context */}
                       <Box sx={{ 
-                        p: 1, 
+                        p: { xs: 1, sm: 1.5 }, 
                         backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
-                        borderRadius: 1.5,
-                        borderLeft: `3px solid ${bravoColors.primaryFlat}`
+                        borderRadius: 2,
+                        borderLeft: `3px solid ${bravoColors.primaryFlat}`,
+                        mt: 'auto'
                       }}>
                         <Typography variant="caption" sx={{ 
                           color: bravoColors.primaryFlat,
@@ -402,9 +420,10 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
-                          fontSize: '0.7rem'
+                          fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                          lineHeight: 1.3
                         }}>
-                          <HealingIcon sx={{ fontSize: 12 }} />
+                          <HealingIcon sx={{ fontSize: { xs: 10, sm: 12 } }} />
                           {option.clinicalContext}
                         </Typography>
                       </Box>
