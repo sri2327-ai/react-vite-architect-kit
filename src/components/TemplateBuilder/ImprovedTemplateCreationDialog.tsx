@@ -30,7 +30,10 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemButton
+  ListItemButton,
+  Paper,
+  Fade,
+  Slide
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -45,7 +48,8 @@ import {
   Check as CheckIcon,
   Psychology as PsychologyIcon,
   Healing as HealingIcon,
-  LocalHospital as LocalHospitalIcon
+  LocalHospital as LocalHospitalIcon,
+  Visibility as VisibilityIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import { templateService } from '@/services/templateService';
@@ -268,411 +272,461 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
     }
   };
 
+  const getStepTitle = (step: number) => {
+    switch (step) {
+      case 0: return 'Choose Creation Method';
+      case 1: return selectedMethod?.id === 5 ? 'Select Template' : 'Configure Template Details';
+      case 2: return 'Review & Preview';
+      default: return '';
+    }
+  };
+
   const renderStepContent = (step: number) => {
     switch (step) {
       case 0:
         return (
-          <Box sx={{ py: 2 }}>
-            <Typography variant="h5" gutterBottom sx={{ 
-              mb: 3, 
-              textAlign: 'center',
-              color: bravoColors.primaryFlat,
-              fontWeight: 700
-            }}>
-              How would you like to create your template?
-            </Typography>
-            
-            <Typography variant="body1" sx={{ 
-              textAlign: 'center', 
-              mb: 4, 
-              color: 'text.secondary',
-              maxWidth: 600,
-              mx: 'auto'
-            }}>
-              Choose the method that best fits your workflow. Each option is designed to save you time and improve your documentation quality.
-            </Typography>
+          <Fade in={currentStep === 0} timeout={300}>
+            <Box sx={{ py: 2 }}>
+              <Typography variant="h5" gutterBottom sx={{ 
+                mb: 3, 
+                textAlign: 'center',
+                color: bravoColors.primaryFlat,
+                fontWeight: 700
+              }}>
+                How would you like to create your template?
+              </Typography>
+              
+              <Typography variant="body1" sx={{ 
+                textAlign: 'center', 
+                mb: 4, 
+                color: 'text.secondary',
+                maxWidth: 600,
+                mx: 'auto'
+              }}>
+                Choose the method that best fits your workflow. Each option is designed to save you time and improve your documentation quality.
+              </Typography>
 
-            <Box sx={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
-              gap: 3,
-              maxWidth: '1000px',
-              mx: 'auto'
-            }}>
-              {createTemplateOptions.map((option) => (
-                <Card 
-                  key={option.id}
-                  sx={{ 
-                    height: '100%',
-                    cursor: 'pointer',
-                    borderRadius: 3,
-                    border: '2px solid transparent',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
-                      borderColor: bravoColors.primaryFlat
-                    }
-                  }}
-                >
-                  <CardActionArea 
-                    onClick={() => handleMethodSelect(option)}
-                    sx={{ height: '100%', p: 3 }}
+              <Box sx={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+                gap: 3,
+                maxWidth: '1000px',
+                mx: 'auto'
+              }}>
+                {createTemplateOptions.map((option) => (
+                  <Card 
+                    key={option.id}
+                    sx={{ 
+                      height: '100%',
+                      cursor: 'pointer',
+                      borderRadius: 3,
+                      border: '2px solid transparent',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                        boxShadow: '0 16px 40px rgba(0,0,0,0.12)',
+                        borderColor: bravoColors.primaryFlat
+                      }
+                    }}
                   >
-                    <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      {/* Header */}
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
-                        <Box
-                          sx={{
-                            width: 56,
-                            height: 56,
-                            borderRadius: 3,
-                            background: bravoColors.primary,
+                    <CardActionArea 
+                      onClick={() => handleMethodSelect(option)}
+                      sx={{ height: '100%', p: 3 }}
+                    >
+                      <CardContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                        {/* Header */}
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+                          <Box
+                            sx={{
+                              width: 56,
+                              height: 56,
+                              borderRadius: 3,
+                              background: bravoColors.primary,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: '0 8px 20px rgba(20,49,81,0.3)'
+                            }}
+                          >
+                            {React.cloneElement(option.icon, { sx: { color: 'white', fontSize: 28 } })}
+                          </Box>
+                          
+                          <Box sx={{ textAlign: 'right' }}>
+                            <Chip
+                              label={option.difficulty}
+                              size="small"
+                              sx={{
+                                backgroundColor: getDifficultyColor(option.difficulty),
+                                color: 'white',
+                                fontWeight: 600,
+                                fontSize: '0.7rem',
+                                mb: 0.5
+                              }}
+                            />
+                            <Typography variant="caption" display="block" color="text.secondary">
+                              {option.timeEstimate}
+                            </Typography>
+                          </Box>
+                        </Box>
+
+                        {/* Content */}
+                        <Typography variant="h6" gutterBottom sx={{ 
+                          fontWeight: 700,
+                          color: bravoColors.primaryFlat,
+                          mb: 1,
+                          fontSize: '1.1rem'
+                        }}>
+                          {option.title}
+                        </Typography>
+                        
+                        <Typography variant="body2" sx={{
+                          color: 'text.primary',
+                          lineHeight: 1.5,
+                          mb: 2,
+                          flex: 1
+                        }}>
+                          {option.description}
+                        </Typography>
+
+                        <Box sx={{ 
+                          p: 2, 
+                          backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
+                          borderRadius: 2,
+                          borderLeft: `4px solid ${bravoColors.primaryFlat}`
+                        }}>
+                          <Typography variant="caption" sx={{ 
+                            color: bravoColors.primaryFlat,
+                            fontWeight: 600,
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 8px 20px rgba(20,49,81,0.3)'
-                          }}
-                        >
-                          {React.cloneElement(option.icon, { sx: { color: 'white', fontSize: 28 } })}
-                        </Box>
-                        
-                        <Box sx={{ textAlign: 'right' }}>
-                          <Chip
-                            label={option.difficulty}
-                            size="small"
-                            sx={{
-                              backgroundColor: getDifficultyColor(option.difficulty),
-                              color: 'white',
-                              fontWeight: 600,
-                              fontSize: '0.7rem',
-                              mb: 0.5
-                            }}
-                          />
-                          <Typography variant="caption" display="block" color="text.secondary">
-                            {option.timeEstimate}
+                            gap: 0.5
+                          }}>
+                            <HealingIcon sx={{ fontSize: 14 }} />
+                            {option.clinicalContext}
                           </Typography>
                         </Box>
-                      </Box>
-
-                      {/* Content */}
-                      <Typography variant="h6" gutterBottom sx={{ 
-                        fontWeight: 700,
-                        color: bravoColors.primaryFlat,
-                        mb: 1,
-                        fontSize: '1.1rem'
-                      }}>
-                        {option.title}
-                      </Typography>
-                      
-                      <Typography variant="body2" sx={{
-                        color: 'text.primary',
-                        lineHeight: 1.5,
-                        mb: 2,
-                        flex: 1
-                      }}>
-                        {option.description}
-                      </Typography>
-
-                      <Box sx={{ 
-                        p: 2, 
-                        backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
-                        borderRadius: 2,
-                        borderLeft: `4px solid ${bravoColors.primaryFlat}`
-                      }}>
-                        <Typography variant="caption" sx={{ 
-                          color: bravoColors.primaryFlat,
-                          fontWeight: 600,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5
-                        }}>
-                          <HealingIcon sx={{ fontSize: 14 }} />
-                          {option.clinicalContext}
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              ))}
+                      </CardContent>
+                    </CardActionArea>
+                  </Card>
+                ))}
+              </Box>
             </Box>
-          </Box>
+          </Fade>
         );
 
       case 1:
         return (
-          <Box>
-            {/* Method Header */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              mb: 4,
-              p: 3,
-              backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
-              borderRadius: 3,
-              border: `1px solid ${alpha(bravoColors.primaryFlat, 0.2)}`
-            }}>
-              <Box
-                sx={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 2,
-                  background: bravoColors.primary,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mr: 2
-                }}
-              >
-                {selectedMethod?.icon && React.cloneElement(selectedMethod.icon, { sx: { color: 'white', fontSize: 24 } })}
+          <Slide direction="left" in={currentStep === 1} timeout={300}>
+            <Box>
+              {/* Method Header */}
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mb: 4,
+                p: 3,
+                backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
+                borderRadius: 3,
+                border: `1px solid ${alpha(bravoColors.primaryFlat, 0.2)}`
+              }}>
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 2,
+                    background: bravoColors.primary,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mr: 2
+                  }}
+                >
+                  {selectedMethod?.icon && React.cloneElement(selectedMethod.icon, { sx: { color: 'white', fontSize: 24 } })}
+                </Box>
+                <Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
+                    {selectedMethod?.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {selectedMethod?.description}
+                  </Typography>
+                </Box>
               </Box>
-              <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
-                  {selectedMethod?.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {selectedMethod?.description}
-                </Typography>
-              </Box>
-            </Box>
 
-            {/* Browse Template Library - Just show templates */}
-            {selectedMethod?.id === 5 ? (
-              <Box>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                  Available Templates
-                </Typography>
-                
-                <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
-                  {templateLibrary.map((template, index) => (
-                    <React.Fragment key={template.id}>
-                      <ListItem disablePadding>
-                        <ListItemButton 
-                          onClick={() => handleLibraryTemplateSelect(template)}
-                          selected={selectedLibraryTemplate?.id === template.id}
-                          sx={{
-                            py: 2,
-                            px: 3,
-                            '&:hover': {
-                              backgroundColor: bravoColors.highlight.hover
-                            },
-                            '&.Mui-selected': {
-                              backgroundColor: bravoColors.highlight.selected,
+              {/* Browse Template Library - Just show templates */}
+              {selectedMethod?.id === 5 ? (
+                <Box>
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
+                    Available Templates
+                  </Typography>
+                  
+                  <List sx={{ bgcolor: 'background.paper', borderRadius: 2 }}>
+                    {templateLibrary.map((template, index) => (
+                      <React.Fragment key={template.id}>
+                        <ListItem disablePadding>
+                          <ListItemButton 
+                            onClick={() => handleLibraryTemplateSelect(template)}
+                            selected={selectedLibraryTemplate?.id === template.id}
+                            sx={{
+                              py: 2,
+                              px: 3,
                               '&:hover': {
                                 backgroundColor: bravoColors.highlight.hover
+                              },
+                              '&.Mui-selected': {
+                                backgroundColor: bravoColors.highlight.selected,
+                                '&:hover': {
+                                  backgroundColor: bravoColors.highlight.hover
+                                }
                               }
-                            }
-                          }}
-                        >
-                          <ListItemText
-                            primary={
-                              <Typography
-                                variant="subtitle1"
-                                sx={{
-                                  fontWeight: 600,
-                                  color: selectedLibraryTemplate?.id === template.id ? bravoColors.primaryFlat : 'text.primary'
-                                }}
-                              >
-                                {template.name}
-                              </Typography>
-                            }
-                            secondary={
-                              <Typography variant="body2" color="text.secondary">
-                                {template.specialty} • {template.type}
-                              </Typography>
-                            }
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                      {index < templateLibrary.length - 1 && (
-                        <Box sx={{ px: 3 }}>
-                          <Box sx={{ borderBottom: '1px solid', borderColor: 'divider' }} />
-                        </Box>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </List>
-              </Box>
-            ) : (
-              // Other methods - show simplified form fields
-              <Stack spacing={3}>
-                {/* Basic Information */}
-                <Box>
-                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
-                    Template Information
-                  </Typography>
-                  <Stack spacing={2}>
-                    <TextField
-                      fullWidth
-                      label="Template Name *"
-                      value={templateName}
-                      onChange={(e) => setTemplateName(e.target.value)}
-                      placeholder="e.g., Cardiology Consultation Note"
-                    />
-                  </Stack>
+                            }}
+                          >
+                            <ListItemText
+                              primary={
+                                <Typography
+                                  variant="subtitle1"
+                                  sx={{
+                                    fontWeight: 600,
+                                    color: selectedLibraryTemplate?.id === template.id ? bravoColors.primaryFlat : 'text.primary'
+                                  }}
+                                >
+                                  {template.name}
+                                </Typography>
+                              }
+                              secondary={
+                                <Typography variant="body2" color="text.secondary">
+                                  {template.specialty} • {template.type}
+                                </Typography>
+                              }
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                        {index < templateLibrary.length - 1 && (
+                          <Box sx={{ px: 3 }}>
+                            <Box sx={{ borderBottom: '1px solid', borderColor: 'divider' }} />
+                          </Box>
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </List>
                 </Box>
-
-                {/* Method-specific content */}
-                {selectedMethod?.id === 1 && (
+              ) : (
+                // Other methods - show simplified form fields
+                <Stack spacing={3}>
+                  {/* Basic Information */}
                   <Box>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      Previous Notes to Convert
+                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+                      Template Information
                     </Typography>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={6}
-                      label="Paste your previous notes here"
-                      value={previousNotes}
-                      onChange={(e) => setPreviousNotes(e.target.value)}
-                      placeholder="Copy and paste a representative note that you'd like to turn into a template..."
-                    />
-                    <Alert severity="info" sx={{ mt: 1 }}>
-                      AI will analyze your note structure and create reusable template sections.
-                    </Alert>
+                    <Stack spacing={2}>
+                      <TextField
+                        fullWidth
+                        label="Template Name *"
+                        value={templateName}
+                        onChange={(e) => setTemplateName(e.target.value)}
+                        placeholder="e.g., Cardiology Consultation Note"
+                      />
+                    </Stack>
                   </Box>
-                )}
 
-                {selectedMethod?.id === 2 && (
-                  <Box>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      AI Configuration
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={4}
-                      label="Clinical Context & Requirements"
-                      value={clinicalContext}
-                      onChange={(e) => setClinicalContext(e.target.value)}
-                      placeholder="Describe your typical patients, common conditions, or specific documentation requirements..."
-                    />
-                    <Alert severity="info" sx={{ mt: 1 }}>
-                      <Typography variant="body2">
-                        The more specific you are, the better AI can tailor the template to your practice.
+                  {/* Method-specific content */}
+                  {selectedMethod?.id === 1 && (
+                    <Box>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                        Previous Notes to Convert
                       </Typography>
-                    </Alert>
-                  </Box>
-                )}
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={6}
+                        label="Paste your previous notes here"
+                        value={previousNotes}
+                        onChange={(e) => setPreviousNotes(e.target.value)}
+                        placeholder="Copy and paste a representative note that you'd like to turn into a template..."
+                      />
+                      <Alert severity="info" sx={{ mt: 1 }}>
+                        AI will analyze your note structure and create reusable template sections.
+                      </Alert>
+                    </Box>
+                  )}
 
-                {selectedMethod?.id === 4 && (
-                  <Box>
-                    <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                      Import Template Content
-                    </Typography>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={8}
-                      label="Paste existing template content"
-                      value={existingTemplateContent}
-                      onChange={(e) => setExistingTemplateContent(e.target.value)}
-                      placeholder="Copy and paste template content from another system, colleague, or document..."
-                    />
-                  </Box>
-                )}
-              </Stack>
-            )}
-          </Box>
+                  {selectedMethod?.id === 2 && (
+                    <Box>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                        AI Configuration
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="Clinical Context & Requirements"
+                        value={clinicalContext}
+                        onChange={(e) => setClinicalContext(e.target.value)}
+                        placeholder="Describe your typical patients, common conditions, or specific documentation requirements..."
+                      />
+                      <Alert severity="info" sx={{ mt: 1 }}>
+                        <Typography variant="body2">
+                          The more specific you are, the better AI can tailor the template to your practice.
+                        </Typography>
+                      </Alert>
+                    </Box>
+                  )}
+
+                  {selectedMethod?.id === 4 && (
+                    <Box>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                        Import Template Content
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={8}
+                        label="Paste existing template content"
+                        value={existingTemplateContent}
+                        onChange={(e) => setExistingTemplateContent(e.target.value)}
+                        placeholder="Copy and paste template content from another system, colleague, or document..."
+                      />
+                    </Box>
+                  )}
+                </Stack>
+              )}
+            </Box>
+          </Slide>
         );
 
       case 2:
         return (
-          <Box>
-            {selectedMethod?.id === 2 && isProcessing ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
-                <PsychologyIcon sx={{ fontSize: 64, color: bravoColors.primaryFlat, mb: 2 }} />
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                  AI is crafting your template...
-                </Typography>
-                <LinearProgress sx={{ mb: 2, maxWidth: 400, mx: 'auto' }} />
-                <Typography variant="body2" color="text.secondary">
-                  Analyzing your requirements and generating optimized clinical sections
-                </Typography>
-              </Box>
-            ) : (
-              <Box>
-                <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-                  Final Review & Description
-                </Typography>
-                
-                {selectedMethod?.id !== 5 && (
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={3}
-                    label="Template Description"
-                    value={templateDescription}
-                    onChange={(e) => setTemplateDescription(e.target.value)}
-                    placeholder="Describe when and how this template should be used..."
-                    sx={{ mb: 3 }}
-                  />
-                )}
+          <Slide direction="left" in={currentStep === 2} timeout={300}>
+            <Box>
+              {selectedMethod?.id === 2 && isProcessing ? (
+                <Box sx={{ textAlign: 'center', py: 4 }}>
+                  <PsychologyIcon sx={{ fontSize: 64, color: bravoColors.primaryFlat, mb: 2 }} />
+                  <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                    AI is crafting your template...
+                  </Typography>
+                  <LinearProgress sx={{ mb: 2, maxWidth: 400, mx: 'auto' }} />
+                  <Typography variant="body2" color="text.secondary">
+                    Analyzing your requirements and generating optimized clinical sections
+                  </Typography>
+                </Box>
+              ) : (
+                <Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <VisibilityIcon sx={{ color: bravoColors.primaryFlat, mr: 1 }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      Review & Preview Template
+                    </Typography>
+                  </Box>
+                  
+                  {selectedMethod?.id !== 5 && (
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={3}
+                      label="Template Description"
+                      value={templateDescription}
+                      onChange={(e) => setTemplateDescription(e.target.value)}
+                      placeholder="Describe when and how this template should be used..."
+                      sx={{ mb: 3 }}
+                    />
+                  )}
 
-                {selectedMethod?.id === 2 && processedContent && (
-                  <Box>
-                    <Alert severity="success" sx={{ mb: 2 }}>
+                  {/* Template Preview Section */}
+                  <Paper 
+                    variant="outlined" 
+                    sx={{ 
+                      p: 3, 
+                      mb: 3,
+                      borderRadius: 3,
+                      backgroundColor: alpha(bravoColors.primaryFlat, 0.02),
+                      border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <VisibilityIcon sx={{ color: bravoColors.primaryFlat, mr: 1 }} />
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
+                        Template Preview
+                      </Typography>
+                    </Box>
+                    
+                    <Box sx={{ 
+                      p: 3, 
+                      backgroundColor: 'white',
+                      borderRadius: 2,
+                      border: '1px solid #e0e0e0',
+                      maxHeight: 300,
+                      overflow: 'auto'
+                    }}>
+                      {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
+                        <Typography variant="body2" sx={{ 
+                          whiteSpace: 'pre-line', 
+                          fontFamily: 'monospace',
+                          fontSize: '0.875rem'
+                        }}>
+                          {templateService.generateTemplateContent(selectedLibraryTemplate.type)}
+                        </Typography>
+                      ) : selectedMethod?.id === 2 && processedContent ? (
+                        <Typography variant="body2" sx={{ 
+                          whiteSpace: 'pre-line', 
+                          fontFamily: 'monospace',
+                          fontSize: '0.875rem'
+                        }}>
+                          {processedContent}
+                        </Typography>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                          Template preview will be generated based on your configuration...
+                        </Typography>
+                      )}
+                    </Box>
+                  </Paper>
+
+                  {selectedMethod?.id === 2 && processedContent && (
+                    <Alert severity="success" sx={{ mb: 3 }}>
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
                         ✅ {aiSummary}
                       </Typography>
                     </Alert>
-                    
-                    <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
-                      Generated Template Preview:
-                    </Typography>
-                    <Box sx={{ 
-                      p: 3, 
-                      border: '1px solid #e0e0e0', 
-                      borderRadius: 2, 
-                      backgroundColor: '#f8f9fa',
-                      maxHeight: 300,
-                      overflow: 'auto'
-                    }}>
-                      <Typography variant="body2" sx={{ 
-                        whiteSpace: 'pre-line', 
-                        fontFamily: 'monospace',
-                        fontSize: '0.875rem'
-                      }}>
-                        {processedContent}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )}
+                  )}
 
-                {/* Summary */}
-                <Box sx={{ 
-                  mt: 3, 
-                  p: 3, 
-                  backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
-                  borderRadius: 2,
-                  border: `1px solid ${alpha(bravoColors.primaryFlat, 0.2)}`
-                }}>
-                  <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
-                    Template Summary
-                  </Typography>
-                  <Stack spacing={1}>
-                    {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
-                      <>
-                        <Typography variant="body2">
-                          <strong>Name:</strong> {selectedLibraryTemplate.name}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Specialty:</strong> {selectedLibraryTemplate.specialty}
-                        </Typography>
-                        <Typography variant="body2">
-                          <strong>Type:</strong> {selectedLibraryTemplate.type}
-                        </Typography>
-                      </>
-                    ) : (
-                      <Typography variant="body2">
-                        <strong>Name:</strong> {templateName}
-                      </Typography>
-                    )}
-                  </Stack>
+                  {/* Summary */}
+                  <Box sx={{ 
+                    p: 3, 
+                    backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
+                    borderRadius: 2,
+                    border: `1px solid ${alpha(bravoColors.primaryFlat, 0.2)}`
+                  }}>
+                    <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 600 }}>
+                      Template Summary
+                    </Typography>
+                    <Stack spacing={1}>
+                      {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
+                        <>
+                          <Typography variant="body2">
+                            <strong>Name:</strong> {selectedLibraryTemplate.name}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Specialty:</strong> {selectedLibraryTemplate.specialty}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Type:</strong> {selectedLibraryTemplate.type}
+                          </Typography>
+                        </>
+                      ) : (
+                        <>
+                          <Typography variant="body2">
+                            <strong>Name:</strong> {templateName}
+                          </Typography>
+                          <Typography variant="body2">
+                            <strong>Creation Method:</strong> {selectedMethod?.title}
+                          </Typography>
+                        </>
+                      )}
+                    </Stack>
+                  </Box>
                 </Box>
-              </Box>
-            )}
-          </Box>
+              )}
+            </Box>
+          </Slide>
         );
 
       default:
@@ -737,50 +791,27 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ minHeight: 500, px: 4 }}>
-        <Stepper activeStep={currentStep} orientation="vertical" sx={{ mt: 2 }}>
-          <Step>
-            <StepLabel sx={{ 
-              '& .MuiStepLabel-label': { 
-                fontSize: '1.1rem', 
-                fontWeight: 600 
-              } 
-            }}>
-              Choose Creation Method
-            </StepLabel>
-            <StepContent>
-              {renderStepContent(0)}
-            </StepContent>
-          </Step>
-          
-          <Step>
-            <StepLabel sx={{ 
-              '& .MuiStepLabel-label': { 
-                fontSize: '1.1rem', 
-                fontWeight: 600 
-              } 
-            }}>
-              {selectedMethod?.id === 5 ? 'Select Template' : 'Configure Template Details'}
-            </StepLabel>
-            <StepContent>
-              {renderStepContent(1)}
-            </StepContent>
-          </Step>
-          
-          <Step>
-            <StepLabel sx={{ 
-              '& .MuiStepLabel-label': { 
-                fontSize: '1.1rem', 
-                fontWeight: 600 
-              } 
-            }}>
-              Review & Finalize
-            </StepLabel>
-            <StepContent>
-              {renderStepContent(2)}
-            </StepContent>
-          </Step>
+      <DialogContent sx={{ minHeight: 500, px: 4, overflow: 'hidden' }}>
+        {/* Horizontal Stepper */}
+        <Stepper activeStep={currentStep} sx={{ mt: 2, mb: 4 }}>
+          {[0, 1, 2].map((step) => (
+            <Step key={step}>
+              <StepLabel sx={{ 
+                '& .MuiStepLabel-label': { 
+                  fontSize: '1rem', 
+                  fontWeight: 600 
+                } 
+              }}>
+                {getStepTitle(step)}
+              </StepLabel>
+            </Step>
+          ))}
         </Stepper>
+
+        {/* Step Content */}
+        <Box sx={{ minHeight: 400, position: 'relative', overflow: 'hidden' }}>
+          {renderStepContent(currentStep)}
+        </Box>
       </DialogContent>
 
       <DialogActions sx={{ p: 4, pt: 2, gap: 2 }}>
