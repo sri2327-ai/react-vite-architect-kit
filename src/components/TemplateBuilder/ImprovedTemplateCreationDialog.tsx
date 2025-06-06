@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Typography,
@@ -175,20 +174,6 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
   const handleMethodSelect = (method: CreateTemplateOption) => {
     setSelectedMethod(method);
-    
-    // Custom Template Builder goes directly to editor, skip preview
-    if (method.id === 3) {
-      const templateData = {
-        name: 'New Custom Template',
-        method: method.title,
-        content: '', // Empty content for custom builder
-        skipPreview: true
-      };
-      onCreateTemplate(templateData);
-      handleStartNew();
-      return;
-    }
-    
     setCurrentStep(1);
   };
 
@@ -197,19 +182,36 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   };
 
   const handleNext = () => {
-    if (currentStep === 1 && selectedMethod?.id === 2) {
-      // AI processing
-      setIsProcessing(true);
-      setTimeout(() => {
-        const generatedContent = templateService.generateTemplateContent('SOAP', {
-          clinicalContext,
-          previousNotes
-        });
-        setProcessedContent(generatedContent);
-        setAiSummary(`AI has created a template with ${clinicalContext ? 'specialized sections' : 'standard sections'}.`);
-        setIsProcessing(false);
+    if (currentStep === 1) {
+      // Custom Template Builder - go directly to editor with name
+      if (selectedMethod?.id === 3) {
+        const templateData = {
+          name: templateName || 'New Custom Template',
+          method: selectedMethod.title,
+          content: '', // Empty content for custom builder
+          skipPreview: true
+        };
+        onCreateTemplate(templateData);
+        handleStartNew();
+        return;
+      }
+      
+      // AI processing for method 2
+      if (selectedMethod?.id === 2) {
+        setIsProcessing(true);
+        setTimeout(() => {
+          const generatedContent = templateService.generateTemplateContent('SOAP', {
+            clinicalContext,
+            previousNotes
+          });
+          setProcessedContent(generatedContent);
+          setAiSummary(`AI has created a template with ${clinicalContext ? 'specialized sections' : 'standard sections'}.`);
+          setIsProcessing(false);
+          setCurrentStep(2);
+        }, 2500);
+      } else {
         setCurrentStep(2);
-      }, 2500);
+      }
     } else {
       setCurrentStep(prev => prev + 1);
     }
@@ -277,7 +279,10 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   const getStepTitle = (step: number) => {
     switch (step) {
       case 0: return 'Choose Creation Method';
-      case 1: return selectedMethod?.id === 5 ? 'Select Template' : 'Configure Template Details';
+      case 1: 
+        if (selectedMethod?.id === 5) return 'Select Template';
+        if (selectedMethod?.id === 3) return 'Template Name';
+        return 'Configure Template Details';
       case 2: return 'Template Preview';
       default: return '';
     }
@@ -319,14 +324,13 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
               display: 'grid', 
               gridTemplateColumns: {
                 xs: '1fr',
-                sm: '1fr 1fr',
-                md: '1fr 1fr',
-                lg: '1fr 1fr 1fr'
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)'
               },
-              gap: { xs: 1.5, sm: 2, md: 2.5 },
-              maxHeight: { xs: 'none', md: '65vh' },
-              overflow: 'auto',
-              alignItems: 'stretch'
+              gap: { xs: 2, sm: 3, md: 4 },
+              maxWidth: '1200px',
+              mx: 'auto',
+              width: '100%'
             }}>
               {createTemplateOptions.map((option) => (
                 <Card 
@@ -338,7 +342,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     borderColor: 'divider',
                     transition: 'all 0.2s ease',
                     height: 'auto',
-                    minHeight: { xs: 'auto', sm: '200px', md: '220px' },
+                    minHeight: { xs: '200px', sm: '220px', md: '240px' },
                     backgroundColor: '#ffffff',
                     display: 'flex',
                     flexDirection: 'column',
@@ -360,11 +364,11 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     }}
                   >
                     <CardContent sx={{ 
-                      p: { xs: 1.5, sm: 2, md: 2.5 }, 
+                      p: { xs: 2, sm: 2.5, md: 3 }, 
                       height: '100%', 
                       display: 'flex', 
                       flexDirection: 'column',
-                      gap: { xs: 1, sm: 1.5, md: 2 },
+                      gap: { xs: 1.5, sm: 2 },
                       flex: 1
                     }}>
                       {/* Header Row */}
@@ -373,13 +377,13 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                         alignItems: 'flex-start', 
                         justifyContent: 'space-between',
                         gap: 1,
-                        mb: { xs: 0.5, sm: 1 }
+                        mb: 1
                       }}>
                         <Box
                           sx={{
-                            width: { xs: 32, sm: 36, md: 40 },
-                            height: { xs: 32, sm: 36, md: 40 },
-                            borderRadius: 1.5,
+                            width: { xs: 40, sm: 44, md: 48 },
+                            height: { xs: 40, sm: 44, md: 48 },
+                            borderRadius: 2,
                             background: bravoColors.primary,
                             display: 'flex',
                             alignItems: 'center',
@@ -391,7 +395,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                           {React.cloneElement(option.icon, { 
                             sx: { 
                               color: 'white', 
-                              fontSize: { xs: 16, sm: 18, md: 20 } 
+                              fontSize: { xs: 20, sm: 22, md: 24 } 
                             } 
                           })}
                         </Box>
@@ -404,14 +408,14 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                               backgroundColor: getDifficultyColor(option.difficulty),
                               color: 'white',
                               fontWeight: 600,
-                              fontSize: { xs: '0.625rem', sm: '0.65rem', md: '0.7rem' },
-                              height: { xs: 18, sm: 20, md: 22 },
-                              mb: 0.25
+                              fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                              height: { xs: 20, sm: 22 },
+                              mb: 0.5
                             }}
                           />
                           <Typography variant="caption" display="block" color="text.secondary" sx={{ 
                             fontWeight: 500,
-                            fontSize: { xs: '0.625rem', sm: '0.65rem', md: '0.7rem' }
+                            fontSize: { xs: '0.7rem', sm: '0.75rem' }
                           }}>
                             {option.timeEstimate}
                           </Typography>
@@ -422,9 +426,9 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                       <Typography variant="h6" sx={{ 
                         fontWeight: 600,
                         color: bravoColors.primaryFlat,
-                        fontSize: { xs: '0.875rem', sm: '0.95rem', md: '1rem' },
+                        fontSize: { xs: '1rem', sm: '1.1rem' },
                         lineHeight: 1.2,
-                        mb: 0
+                        mb: 1
                       }}>
                         {option.title}
                       </Typography>
@@ -432,8 +436,8 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                       {/* Description */}
                       <Typography variant="body2" sx={{
                         color: 'text.primary',
-                        lineHeight: 1.3,
-                        fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.85rem' },
+                        lineHeight: 1.4,
+                        fontSize: { xs: '0.85rem', sm: '0.9rem' },
                         flex: 1
                       }}>
                         {option.description}
@@ -441,7 +445,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
                       {/* Clinical Context */}
                       <Box sx={{ 
-                        p: { xs: 0.75, sm: 1, md: 1.25 }, 
+                        p: { xs: 1, sm: 1.25 }, 
                         backgroundColor: alpha(bravoColors.primaryFlat, 0.04),
                         borderRadius: 1.5,
                         borderLeft: `2px solid ${bravoColors.primaryFlat}`,
@@ -453,10 +457,10 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                           display: 'flex',
                           alignItems: 'center',
                           gap: 0.5,
-                          fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
-                          lineHeight: 1.2
+                          fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                          lineHeight: 1.3
                         }}>
-                          <HealingIcon sx={{ fontSize: { xs: 8, sm: 10, md: 12 } }} />
+                          <HealingIcon sx={{ fontSize: { xs: 10, sm: 12 } }} />
                           {option.clinicalContext}
                         </Typography>
                       </Box>
@@ -524,8 +528,54 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
               flexDirection: 'column',
               overflow: 'auto'
             }}>
-              {/* Browse Template Library */}
-              {selectedMethod?.id === 5 ? (
+              {/* Custom Template Builder - Just ask for name */}
+              {selectedMethod?.id === 3 ? (
+                <Box sx={{ 
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 3,
+                  flex: 1,
+                  justifyContent: 'center',
+                  maxWidth: 500,
+                  mx: 'auto'
+                }}>
+                  <Box sx={{ textAlign: 'center', mb: 2 }}>
+                    <Typography variant="h5" sx={{ 
+                      fontWeight: 600, 
+                      mb: 1,
+                      color: bravoColors.primaryFlat
+                    }}>
+                      Name Your Template
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Give your custom template a descriptive name to help you find it later.
+                    </Typography>
+                  </Box>
+                  
+                  <TextField
+                    fullWidth
+                    label="Template Name"
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="e.g., Cardiology Consultation Template"
+                    required
+                    size="small"
+                    autoFocus
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        fontSize: '1.1rem',
+                        py: 1
+                      }
+                    }}
+                  />
+                  
+                  <Alert severity="info" sx={{ mt: 2 }}>
+                    <Typography variant="body2">
+                      You'll be taken directly to the template editor where you can add sections and customize your template using our building blocks.
+                    </Typography>
+                  </Alert>
+                </Box>
+              ) : selectedMethod?.id === 5 ? (
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="h6" gutterBottom sx={{ 
                     fontWeight: 600, 
@@ -587,7 +637,6 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                   </Box>
                 </Box>
               ) : (
-                // Other methods - show form fields
                 <Box sx={{ 
                   display: 'flex',
                   flexDirection: 'column',
@@ -837,6 +886,9 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
       if (selectedMethod?.id === 5) {
         return selectedLibraryTemplate !== null;
       }
+      if (selectedMethod?.id === 3) {
+        return templateName.trim().length > 0;
+      }
       const hasBasicInfo = templateName.trim();
       if (selectedMethod?.id === 1) return hasBasicInfo && previousNotes.trim();
       if (selectedMethod?.id === 2) return hasBasicInfo;
@@ -983,7 +1035,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     py: 1
                   }}
                 >
-                  Next Step
+                  {selectedMethod?.id === 3 ? 'Create Template' : 'Next Step'}
                 </Button>
               ) : (
                 <Stack direction="row" spacing={2}>
