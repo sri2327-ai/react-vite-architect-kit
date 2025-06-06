@@ -335,7 +335,7 @@ const Profile: React.FC = () => {
         sx={{ 
           fontWeight: 600, 
           mb: { xs: 2, sm: 3 },
-          textAlign: { xs: 'center', sm: 'left' },
+          textAlign: { xs: 'center', sm: 'center', md: 'left' },
           fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
           px: { xs: 1, sm: 0 }
         }}

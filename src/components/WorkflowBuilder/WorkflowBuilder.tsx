@@ -103,7 +103,7 @@ const WorkflowBuilder: React.FC = () => {
           gap: { xs: 1, sm: 2 }, 
           mb: 2,
           flexDirection: { xs: 'column', sm: 'row' },
-          textAlign: { xs: 'center', sm: 'left' }
+          textAlign: { xs: 'center', sm: 'center', md: 'left' }
         }}>
           <WorkflowIcon 
             size={isSmallMobile ? 28 : isMobile ? 32 : 40}
