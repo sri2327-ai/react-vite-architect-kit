@@ -631,7 +631,10 @@ const TemplateBuilder: React.FC = () => {
                         </Typography>
                       </Box>
                       <Box display="flex" alignItems="center" gap={1}>
-                        <IconButton 
+                        <Button 
+                          variant="contained"
+                          size="small"
+                          startIcon={<EditIcon />}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleTemplateEdit(template);
@@ -639,13 +642,15 @@ const TemplateBuilder: React.FC = () => {
                           sx={{
                             backgroundColor: bravoColors.primaryFlat,
                             color: 'white',
+                            textTransform: 'none',
+                            fontWeight: 600,
                             '&:hover': {
                               backgroundColor: bravoColors.primaryDark
                             }
                           }}
                         >
-                          <EditIcon />
-                        </IconButton>
+                          Edit Template
+                        </Button>
                         <IconButton
                           onClick={(e) => handleTemplateMenuClick(e, template)}
                           sx={{ color: bravoColors.primaryFlat }}
@@ -676,8 +681,13 @@ const TemplateBuilder: React.FC = () => {
           </Typography>
           <Button 
             variant="contained" 
+            startIcon={<AddIcon />}
             onClick={() => setOpenCreateTemplate(true)}
-            sx={{ borderRadius: 2 }}
+            sx={{ 
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600
+            }}
           >
             Create Template
           </Button>
