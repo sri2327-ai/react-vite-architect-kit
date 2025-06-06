@@ -13,7 +13,8 @@ import {
 } from '@mui/material';
 import {
   LibraryBooks as LibraryBooksIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  AccountTree as AccountTreeIcon
 } from '@mui/icons-material';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
@@ -163,7 +164,7 @@ const WorkflowBuilder: React.FC = () => {
             }}
           >
             <Tab 
-              icon={<WorkflowIcon size={isSmallMobile ? 16 : 20} style={{ marginBottom: '4px' }} />}
+              icon={<AccountTreeIcon sx={{ mb: 0.5, fontSize: { xs: '1rem', sm: '1.25rem' } }} />}
               iconPosition="start"
               label={
                 <Box sx={{ 
