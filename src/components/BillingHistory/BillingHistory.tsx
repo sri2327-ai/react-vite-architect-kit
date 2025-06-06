@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -22,7 +21,7 @@ import {
   useMediaQuery,
   Collapse,
   Button,
-  Grid,
+  Grid2 as Grid,
   Container
 } from '@mui/material';
 import {
@@ -361,7 +360,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({ sidebarCollapsed = fals
         {/* Summary Cards - Responsive Grid */}
         <Grid container spacing={{ xs: 1.5, sm: 2, md: 3 }} sx={{ mb: { xs: 3, md: 4 } }}>
           {summaryStats.map((stat, index) => (
-            <Grid item xs={6} sm={6} md={3} key={index}>
+            <Grid xs={6} sm={6} md={3} key={index}>
               <Card sx={{ 
                 height: '100%',
                 borderRadius: 2,
