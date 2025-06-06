@@ -40,7 +40,9 @@ import {
   Assignment as AssignmentIcon,
   Schedule as ScheduleIcon,
   Delete as DeleteIcon,
-  MoreVert as MoreVertIcon
+  MoreVert as MoreVertIcon,
+  LibraryBooks as LibraryBooksIcon,
+  Folder as FolderIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import TemplateEditor from './TemplateEditor';
@@ -824,8 +826,16 @@ const TemplateBuilder: React.FC = () => {
             }
           }}
         >
-          <Tab label="My Templates" />
-          <Tab label="TEMPLATE LIBRARY" />
+          <Tab 
+            icon={<FolderIcon sx={{ fontSize: 20 }} />}
+            iconPosition="start"
+            label="My Templates" 
+          />
+          <Tab 
+            icon={<LibraryBooksIcon sx={{ fontSize: 20 }} />}
+            iconPosition="start"
+            label="Template Library" 
+          />
         </Tabs>
       </Box>
 
