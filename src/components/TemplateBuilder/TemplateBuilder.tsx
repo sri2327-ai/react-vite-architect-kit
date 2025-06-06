@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -775,6 +776,19 @@ const TemplateBuilder: React.FC = () => {
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
+      {/* Main Heading */}
+      <Typography 
+        variant="h3" 
+        sx={{ 
+          color: bravoColors.primaryFlat, 
+          fontWeight: 700, 
+          mb: 4,
+          textAlign: 'left'
+        }}
+      >
+        Template Builder
+      </Typography>
+
       {/* Tab Navigation */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
         <Tabs 
