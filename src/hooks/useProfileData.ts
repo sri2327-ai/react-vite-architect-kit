@@ -12,9 +12,6 @@ interface UserProfile {
   ehrName?: string;
   notesRetentionDuration: number;
   mfaEnabled: boolean;
-  phone: string;
-  company: string;
-  address: string;
 }
 
 export const useProfileData = (useApi: boolean = false) => {
@@ -27,10 +24,7 @@ export const useProfileData = (useApi: boolean = false) => {
     ehrMode: true,
     ehrName: 'Epic',
     notesRetentionDuration: 12,
-    mfaEnabled: false,
-    phone: '+1 (555) 123-4567',
-    company: 'Medical Center',
-    address: '123 Medical Drive, City, State 12345'
+    mfaEnabled: false
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
