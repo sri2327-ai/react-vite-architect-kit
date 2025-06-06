@@ -783,7 +783,7 @@ const TemplateBuilder: React.FC = () => {
           color: bravoColors.primaryFlat, 
           fontWeight: 700, 
           mb: 4,
-          textAlign: 'left'
+          textAlign: { xs: 'center', md: 'left' }
         }}
       >
         Template Builder
