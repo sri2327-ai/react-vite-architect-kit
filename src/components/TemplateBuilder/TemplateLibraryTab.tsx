@@ -1,6 +1,5 @@
 
-
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   Box,
   Typography,
@@ -25,7 +24,10 @@ import {
   ListItemText,
   Paper,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Skeleton,
+  Fade,
+  Grow
 } from '@mui/material';
 import {
   Close as CloseIcon
@@ -177,45 +179,71 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
   const [visitTypeDialog, setVisitTypeDialog] = useState(false);
   const [selectedVisitType, setSelectedVisitType] = useState('');
   const [templateToAdd, setTemplateToAdd] = useState<LibraryTemplate | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
 
   const specialties = ['', 'cardiologist', 'pyschologist', 'Dermatology'];
   const noteTypes = ['', 'SOAP', 'DPD'];
 
-  const filteredTemplates = libraryTemplates.filter(template => {
-    const matchesSpecialty = !selectedSpecialty || template.specialty === selectedSpecialty;
-    const matchesNoteType = !selectedNoteType || template.noteType === selectedNoteType;
-    return matchesSpecialty && matchesNoteType;
-  });
+  // Memoize filtered templates for better performance
+  const filteredTemplates = useMemo(() => {
+    return libraryTemplates.filter(template => {
+      const matchesSpecialty = !selectedSpecialty || template.specialty === selectedSpecialty;
+      const matchesNoteType = !selectedNoteType || template.noteType === selectedNoteType;
+      return matchesSpecialty && matchesNoteType;
+    });
+  }, [selectedSpecialty, selectedNoteType]);
 
-  const handleTemplateClick = (template: LibraryTemplate) => {
-    setPreviewTemplate(template);
-  };
+  // Use useCallback for better performance and prevent unnecessary re-renders
+  const handleTemplateClick = useCallback((template: LibraryTemplate) => {
+    setIsLoadingPreview(true);
+    // Simulate slight loading to improve perceived performance
+    setTimeout(() => {
+      setPreviewTemplate(template);
+      setIsLoadingPreview(false);
+    }, 100);
+  }, []);
 
-  const handleClosePreview = () => {
+  const handleClosePreview = useCallback(() => {
     setPreviewTemplate(null);
     setPreviewTab(0);
-  };
+  }, []);
 
-  const handleAddToLibrary = () => {
+  const handleAddToLibrary = useCallback(() => {
     setTemplateToAdd(previewTemplate);
     setVisitTypeDialog(true);
     handleClosePreview();
-  };
+  }, [previewTemplate, handleClosePreview]);
 
-  const handleVisitTypeSelect = () => {
+  const handleVisitTypeSelect = useCallback(() => {
     if (templateToAdd && selectedVisitType && onAddTemplate) {
       onAddTemplate(templateToAdd, selectedVisitType);
       setVisitTypeDialog(false);
       setSelectedVisitType('');
       setTemplateToAdd(null);
     }
-  };
+  }, [templateToAdd, selectedVisitType, onAddTemplate]);
 
-  const handleCloseVisitTypeDialog = () => {
+  const handleCloseVisitTypeDialog = useCallback(() => {
     setVisitTypeDialog(false);
     setSelectedVisitType('');
     setTemplateToAdd(null);
-  };
+  }, []);
+
+  const handleSpecialtyChange = useCallback((e: any) => {
+    setSelectedSpecialty(e.target.value);
+  }, []);
+
+  const handleNoteTypeChange = useCallback((e: any) => {
+    setSelectedNoteType(e.target.value);
+  }, []);
+
+  const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
+    setPreviewTab(newValue);
+  }, []);
+
+  const handleVisitTypeButtonClick = useCallback((visitType: string) => {
+    setSelectedVisitType(visitType);
+  }, []);
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
@@ -238,8 +266,9 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
           <Select
             value={selectedSpecialty}
             label="Specialty"
-            onChange={(e) => setSelectedSpecialty(e.target.value)}
+            onChange={handleSpecialtyChange}
             size="small"
+            aria-label="Filter by specialty"
           >
             <MenuItem value="">All</MenuItem>
             {specialties.filter(s => s).map((specialty) => (
@@ -255,8 +284,9 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
           <Select
             value={selectedNoteType}
             label="Select"
-            onChange={(e) => setSelectedNoteType(e.target.value)}
+            onChange={handleNoteTypeChange}
             size="small"
+            aria-label="Filter by note type"
           >
             <MenuItem value="">All</MenuItem>
             {noteTypes.filter(n => n).map((noteType) => (
@@ -277,67 +307,84 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
         },
         gap: 3
       }}>
-        {filteredTemplates.map((template) => (
-          <Box key={template.id}>
-            <Card 
-              sx={{ 
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                border: `1px solid ${bravoColors.primaryFlat}20`,
-                borderRadius: 3,
-                height: '100%',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: `0 8px 25px ${bravoColors.primaryFlat}30`,
-                  borderColor: bravoColors.primaryFlat
-                }
-              }}
-              onClick={() => handleTemplateClick(template)}
-            >
-              <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h6" sx={{ 
-                  fontWeight: 600,
-                  mb: 2,
-                  color: bravoColors.primaryFlat,
-                  flexGrow: 1
-                }}>
-                  {template.title}
-                </Typography>
-                
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <Chip 
-                    label={`Specialty: ${template.specialty}`}
-                    size="small"
-                    sx={{
-                      backgroundColor: `${bravoColors.secondary}20`,
-                      color: bravoColors.secondary,
-                      fontWeight: 600,
-                      alignSelf: 'flex-start'
-                    }}
-                  />
-                  <Chip 
-                    label={`Note Type: ${template.noteType}`}
-                    size="small"
-                    sx={{
-                      backgroundColor: `${bravoColors.primaryFlat}20`,
-                      color: bravoColors.primaryFlat,
-                      fontWeight: 600,
-                      alignSelf: 'flex-start'
-                    }}
-                  />
-                </Box>
-              </CardContent>
-            </Card>
-          </Box>
+        {filteredTemplates.map((template, index) => (
+          <Grow key={template.id} in={true} timeout={300 + (index * 100)}>
+            <Box>
+              <Card 
+                sx={{ 
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  border: `1px solid ${bravoColors.primaryFlat}20`,
+                  borderRadius: 3,
+                  height: '100%',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: `0 8px 25px ${bravoColors.primaryFlat}30`,
+                    borderColor: bravoColors.primaryFlat
+                  },
+                  '&:focus-visible': {
+                    outline: `2px solid ${bravoColors.primaryFlat}`,
+                    outlineOffset: '2px'
+                  }
+                }}
+                onClick={() => handleTemplateClick(template)}
+                role="button"
+                tabIndex={0}
+                aria-label={`Preview template: ${template.title}`}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleTemplateClick(template);
+                  }
+                }}
+              >
+                <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 600,
+                    mb: 2,
+                    color: bravoColors.primaryFlat,
+                    flexGrow: 1
+                  }}>
+                    {template.title}
+                  </Typography>
+                  
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Chip 
+                      label={`Specialty: ${template.specialty}`}
+                      size="small"
+                      sx={{
+                        backgroundColor: `${bravoColors.secondary}20`,
+                        color: bravoColors.secondary,
+                        fontWeight: 600,
+                        alignSelf: 'flex-start'
+                      }}
+                    />
+                    <Chip 
+                      label={`Note Type: ${template.noteType}`}
+                      size="small"
+                      sx={{
+                        backgroundColor: `${bravoColors.primaryFlat}20`,
+                        color: bravoColors.primaryFlat,
+                        fontWeight: 600,
+                        alignSelf: 'flex-start'
+                      }}
+                    />
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
+          </Grow>
         ))}
       </Box>
 
       {/* Enhanced Template Preview Dialog */}
       <Dialog 
-        open={!!previewTemplate} 
+        open={!!previewTemplate || isLoadingPreview} 
         onClose={handleClosePreview}
         maxWidth="lg" 
         fullWidth
+        TransitionComponent={Fade}
+        transitionDuration={300}
         PaperProps={{
           sx: { 
             height: { xs: '90vh', md: '80vh' },
@@ -345,6 +392,7 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
             m: { xs: 1, md: 2 }
           }
         }}
+        aria-labelledby="template-preview-title"
       >
         <DialogTitle sx={{ 
           display: 'flex', 
@@ -353,125 +401,149 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
           pb: 1,
           px: { xs: 2, md: 3 }
         }}>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
+          <Typography 
+            id="template-preview-title"
+            variant="h5" 
+            sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}
+          >
             Template Preview
           </Typography>
-          <IconButton onClick={handleClosePreview} sx={{ color: bravoColors.primaryFlat }}>
+          <IconButton 
+            onClick={handleClosePreview} 
+            sx={{ color: bravoColors.primaryFlat }}
+            aria-label="Close preview"
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
         
         <DialogContent sx={{ p: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs 
-              value={previewTab} 
-              onChange={(_, newValue) => setPreviewTab(newValue)}
-              sx={{ 
-                px: { xs: 2, md: 3 },
-                '& .MuiTab-root': {
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  fontSize: { xs: '0.9rem', md: '1rem' },
-                  '&.Mui-selected': {
-                    color: bravoColors.primaryFlat
-                  }
-                }
-              }}
-              variant={isMobile ? "fullWidth" : "standard"}
-            >
-              <Tab label="Template Preview" />
-              <Tab label="Example Note" />
-            </Tabs>
-          </Box>
-
-          <Box sx={{ 
-            flex: 1, 
-            overflow: 'auto',
-            p: { xs: 2, md: 3 }
-          }}>
-            {previewTab === 0 && previewTemplate && (
-              <Paper 
-                variant="outlined" 
-                sx={{ 
-                  p: { xs: 2, md: 3 },
-                  borderRadius: 2,
-                  backgroundColor: 'grey.50'
-                }}
-              >
-                <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                  {previewTemplate.title}
-                </Typography>
-                <Typography 
-                  variant="body1" 
+          {isLoadingPreview ? (
+            <Box sx={{ p: { xs: 2, md: 3 } }}>
+              <Skeleton variant="text" width="60%" height={40} />
+              <Skeleton variant="rectangular" width="100%" height={200} sx={{ mt: 2 }} />
+            </Box>
+          ) : (
+            <>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs 
+                  value={previewTab} 
+                  onChange={handleTabChange}
                   sx={{ 
-                    whiteSpace: 'pre-line',
-                    lineHeight: 1.6,
-                    fontFamily: 'monospace',
-                    fontSize: { xs: '0.875rem', md: '1rem' }
+                    px: { xs: 2, md: 3 },
+                    '& .MuiTab-root': {
+                      textTransform: 'none',
+                      fontWeight: 600,
+                      fontSize: { xs: '0.9rem', md: '1rem' },
+                      '&.Mui-selected': {
+                        color: bravoColors.primaryFlat
+                      }
+                    }
                   }}
+                  variant={isMobile ? "fullWidth" : "standard"}
+                  aria-label="Template content tabs"
                 >
-                  {previewTemplate.content}
-                </Typography>
-              </Paper>
-            )}
+                  <Tab label="Template Preview" />
+                  <Tab label="Example Note" />
+                </Tabs>
+              </Box>
 
-            {previewTab === 1 && (
-              <Paper 
-                variant="outlined" 
-                sx={{ 
-                  p: { xs: 2, md: 3 },
-                  borderRadius: 2,
-                  backgroundColor: 'grey.50'
-                }}
-              >
-                <Typography variant="body1" color="text.secondary">
-                  Example note content would be displayed here. This would show how the template 
-                  appears when filled out with sample patient data.
-                </Typography>
-              </Paper>
-            )}
-          </Box>
+              <Box sx={{ 
+                flex: 1, 
+                overflow: 'auto',
+                p: { xs: 2, md: 3 }
+              }}>
+                {previewTab === 0 && previewTemplate && (
+                  <Fade in={previewTab === 0} timeout={200}>
+                    <Paper 
+                      variant="outlined" 
+                      sx={{ 
+                        p: { xs: 2, md: 3 },
+                        borderRadius: 2,
+                        backgroundColor: 'grey.50'
+                      }}
+                    >
+                      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                        {previewTemplate.title}
+                      </Typography>
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          whiteSpace: 'pre-line',
+                          lineHeight: 1.6,
+                          fontFamily: 'monospace',
+                          fontSize: { xs: '0.875rem', md: '1rem' }
+                        }}
+                      >
+                        {previewTemplate.content}
+                      </Typography>
+                    </Paper>
+                  </Fade>
+                )}
+
+                {previewTab === 1 && (
+                  <Fade in={previewTab === 1} timeout={200}>
+                    <Paper 
+                      variant="outlined" 
+                      sx={{ 
+                        p: { xs: 2, md: 3 },
+                        borderRadius: 2,
+                        backgroundColor: 'grey.50'
+                      }}
+                    >
+                      <Typography variant="body1" color="text.secondary">
+                        Example note content would be displayed here. This would show how the template 
+                        appears when filled out with sample patient data.
+                      </Typography>
+                    </Paper>
+                  </Fade>
+                )}
+              </Box>
+            </>
+          )}
         </DialogContent>
 
-        <DialogActions sx={{ 
-          p: { xs: 2, md: 3 }, 
-          pt: 0,
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: { xs: 1, sm: 0 }
-        }}>
-          <Button 
-            onClick={handleClosePreview}
-            variant="outlined"
-            fullWidth={isMobile}
-            sx={{ 
-              textTransform: 'none',
-              borderColor: bravoColors.primaryFlat,
-              color: bravoColors.primaryFlat,
-              borderRadius: 2,
-              px: 3,
-              py: 1
-            }}
-          >
-            CANCEL
-          </Button>
-          <Button 
-            onClick={handleAddToLibrary}
-            variant="contained"
-            fullWidth={isMobile}
-            sx={{ 
-              textTransform: 'none',
-              backgroundColor: bravoColors.primaryFlat,
-              borderRadius: 2,
-              px: 3,
-              py: 1,
-              '&:hover': {
-                backgroundColor: bravoColors.secondary
-              }
-            }}
-          >
-            ADD TO LIBRARY
-          </Button>
-        </DialogActions>
+        {!isLoadingPreview && (
+          <DialogActions sx={{ 
+            p: { xs: 2, md: 3 }, 
+            pt: 0,
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 0 }
+          }}>
+            <Button 
+              onClick={handleClosePreview}
+              variant="outlined"
+              fullWidth={isMobile}
+              sx={{ 
+                textTransform: 'none',
+                borderColor: bravoColors.primaryFlat,
+                color: bravoColors.primaryFlat,
+                borderRadius: 2,
+                px: 3,
+                py: 1
+              }}
+            >
+              CANCEL
+            </Button>
+            <Button 
+              onClick={handleAddToLibrary}
+              variant="contained"
+              fullWidth={isMobile}
+              sx={{ 
+                textTransform: 'none',
+                backgroundColor: bravoColors.primaryFlat,
+                borderRadius: 2,
+                px: 3,
+                py: 1,
+                '&:hover': {
+                  backgroundColor: bravoColors.secondary
+                }
+              }}
+            >
+              ADD TO LIBRARY
+            </Button>
+          </DialogActions>
+        )}
       </Dialog>
 
       {/* Enhanced Visit Type Selection Dialog */}
@@ -480,6 +552,8 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
         onClose={handleCloseVisitTypeDialog}
         maxWidth="sm" 
         fullWidth
+        TransitionComponent={Fade}
+        transitionDuration={300}
         PaperProps={{
           sx: { 
             borderRadius: 3,
@@ -487,9 +561,14 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
             minHeight: '300px'
           }
         }}
+        aria-labelledby="visit-type-dialog-title"
       >
         <DialogTitle sx={{ pb: 1 }}>
-          <Typography variant="h5" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
+          <Typography 
+            id="visit-type-dialog-title"
+            variant="h5" 
+            sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}
+          >
             Select Visit Type
           </Typography>
         </DialogTitle>
@@ -506,12 +585,12 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
               overflow: 'hidden'
             }}
           >
-            <List sx={{ p: 0 }}>
+            <List sx={{ p: 0 }} role="radiogroup" aria-label="Visit type selection">
               {visitTypes.map((visitType, index) => (
                 <React.Fragment key={visitType}>
                   <ListItem disablePadding>
                     <ListItemButton 
-                      onClick={() => setSelectedVisitType(visitType)}
+                      onClick={() => handleVisitTypeButtonClick(visitType)}
                       selected={selectedVisitType === visitType}
                       sx={{
                         py: 2,
@@ -523,6 +602,9 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
                           }
                         }
                       }}
+                      role="radio"
+                      aria-checked={selectedVisitType === visitType}
+                      aria-label={`Select ${visitType} visit type`}
                     >
                       <ListItemText
                         primary={
@@ -595,4 +677,3 @@ const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({
 };
 
 export default TemplateLibraryTab;
-
