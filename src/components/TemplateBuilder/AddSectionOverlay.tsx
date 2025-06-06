@@ -17,7 +17,9 @@ import {
   alpha,
   Fade,
   Paper,
-  Badge
+  Badge,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -145,6 +147,10 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
   onClose,
   onAddSection
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [customSectionName, setCustomSectionName] = useState('');
   const [showCustomForm, setShowCustomForm] = useState(false);
@@ -204,7 +210,9 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
           maxWidth: '100vw',
           borderRadius: 0,
           background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
         },
         '& .MuiBackdrop-root': {
           backgroundColor: alpha('#000000', 0.8),
@@ -212,67 +220,61 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
         }
       }}
     >
-      <DialogContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* Header with better gradient and positioning */}
+      <DialogContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Header */}
         <Box sx={{ 
-          background: `linear-gradient(135deg, ${bravoColors.primaryFlat} 0%, ${bravoColors.primary} 100%)`,
+          background: `linear-gradient(135deg, ${bravoColors.primaryFlat} 0%, ${bravoColors.secondary} 100%)`,
           color: '#ffffff',
-          p: 4,
+          p: { xs: 2, sm: 3, md: 4 },
           position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+          boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+          flexShrink: 0
         }}>
-          {/* Decorative background elements */}
           <Box sx={{
             position: 'absolute',
-            top: -50,
-            right: -50,
-            width: 200,
-            height: 200,
+            top: -30,
+            right: -30,
+            width: { xs: 100, md: 200 },
+            height: { xs: 100, md: 200 },
             borderRadius: '50%',
             background: alpha('#ffffff', 0.05),
-            zIndex: 1
-          }} />
-          <Box sx={{
-            position: 'absolute',
-            bottom: -80,
-            left: -80,
-            width: 160,
-            height: 160,
-            borderRadius: '50%',
-            background: alpha('#ffffff', 0.03),
             zIndex: 1
           }} />
           
           <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ position: 'relative', zIndex: 2 }}>
             <Box display="flex" alignItems="center">
               <Box sx={{
-                width: 64,
-                height: 64,
-                borderRadius: 3,
+                width: { xs: 40, sm: 48, md: 64 },
+                height: { xs: 40, sm: 48, md: 64 },
+                borderRadius: 2,
                 backgroundColor: alpha('#ffffff', 0.15),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                mr: 3,
+                mr: { xs: 2, sm: 3 },
                 boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
               }}>
-                <AutoAwesomeIcon sx={{ fontSize: 32, color: '#ffffff' }} />
+                <AutoAwesomeIcon sx={{ fontSize: { xs: 20, sm: 24, md: 32 }, color: '#ffffff' }} />
               </Box>
               <Box>
-                <Typography variant="h3" sx={{ 
+                <Typography variant={isMobile ? "h4" : "h3"} sx={{ 
                   fontWeight: 800,
-                  mb: 1,
+                  mb: 0.5,
                   textShadow: '0 2px 8px rgba(0,0,0,0.1)',
                   letterSpacing: '-0.02em'
                 }}>
                   Add Section
                 </Typography>
-                <Typography variant="h6" sx={{ 
-                  opacity: 0.9,
-                  fontWeight: 400,
-                  lineHeight: 1.4
-                }}>
+                <Typography 
+                  variant={isMobile ? "body1" : "h6"} 
+                  sx={{ 
+                    opacity: 0.9,
+                    fontWeight: 400,
+                    lineHeight: 1.4,
+                    display: { xs: 'none', sm: 'block' }
+                  }}
+                >
                   Choose from our comprehensive library of medical documentation sections
                 </Typography>
               </Box>
@@ -282,8 +284,8 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
               sx={{ 
                 bgcolor: alpha('#ffffff', 0.15),
                 color: '#ffffff',
-                width: 56,
-                height: 56,
+                width: { xs: 40, sm: 48, md: 56 },
+                height: { xs: 40, sm: 48, md: 56 },
                 '&:hover': { 
                   bgcolor: alpha('#ffffff', 0.25),
                   transform: 'scale(1.05)'
@@ -292,16 +294,20 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                 boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
               }}
             >
-              <CloseIcon sx={{ fontSize: 28 }} />
+              <CloseIcon sx={{ fontSize: { xs: 20, sm: 24, md: 28 } }} />
             </IconButton>
           </Box>
         </Box>
 
         {/* Search and Filter Section */}
-        <Box sx={{ p: 4, bgcolor: alpha(bravoColors.primaryFlat, 0.02) }}>
+        <Box sx={{ 
+          p: { xs: 2, sm: 3, md: 4 }, 
+          bgcolor: alpha(bravoColors.primaryFlat, 0.02),
+          flexShrink: 0
+        }}>
           <TextField
             fullWidth
-            size="medium"
+            size={isMobile ? "small" : "medium"}
             placeholder="Search sections by name or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -313,12 +319,12 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
               ),
             }}
             sx={{ 
-              mb: 4,
+              mb: { xs: 2, sm: 3, md: 4 },
               '& .MuiOutlinedInput-root': {
-                borderRadius: 4,
-                fontSize: '1.1rem',
+                borderRadius: 3,
+                fontSize: { xs: '1rem', md: '1.1rem' },
                 backgroundColor: '#ffffff',
-                height: 56,
+                height: { xs: 48, md: 56 },
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 border: 'none',
                 '&:hover': {
@@ -335,16 +341,26 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
           />
 
           {/* Category Filter */}
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" sx={{ 
-              mb: 3, 
+          <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
+            <Typography variant={isMobile ? "subtitle1" : "h6"} sx={{ 
+              mb: { xs: 1.5, sm: 2, md: 3 }, 
               fontWeight: 700, 
               color: bravoColors.primaryFlat,
-              fontSize: '1.25rem'
+              fontSize: { xs: '1.1rem', md: '1.25rem' }
             }}>
               Filter by Category
             </Typography>
-            <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
+            <Stack 
+              direction="row" 
+              spacing={1} 
+              sx={{ 
+                flexWrap: 'wrap', 
+                gap: { xs: 1, sm: 1.5, md: 2 },
+                '& > *': {
+                  flexShrink: 0
+                }
+              }}
+            >
               {categories.map((category) => (
                 <Chip
                   key={category}
@@ -352,12 +368,12 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                   onClick={() => setSelectedCategory(category)}
                   variant={selectedCategory === category ? 'filled' : 'outlined'}
                   sx={{
-                    borderRadius: 4,
-                    px: 3,
-                    py: 1,
+                    borderRadius: 3,
+                    px: { xs: 1.5, sm: 2, md: 3 },
+                    py: 0.5,
                     fontWeight: 600,
-                    fontSize: '1rem',
-                    height: 44,
+                    fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
+                    height: { xs: 36, sm: 40, md: 44 },
                     bgcolor: selectedCategory === category ? getCategoryColor(category) : 'transparent',
                     color: selectedCategory === category ? '#ffffff' : getCategoryColor(category),
                     borderColor: getCategoryColor(category),
@@ -365,7 +381,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                     boxShadow: selectedCategory === category ? `0 6px 16px ${alpha(getCategoryColor(category), 0.3)}` : 'none',
                     '&:hover': {
                       bgcolor: selectedCategory === category ? getCategoryColor(category) : alpha(getCategoryColor(category), 0.08),
-                      transform: 'translateY(-2px)',
+                      transform: 'translateY(-1px)',
                       boxShadow: `0 6px 16px ${alpha(getCategoryColor(category), 0.25)}`
                     },
                     transition: 'all 0.2s ease'
@@ -379,43 +395,33 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
           <Paper 
             elevation={0}
             sx={{ 
-              p: 4, 
-              border: `3px dashed ${bravoColors.highlight.border}`, 
-              borderRadius: 4, 
+              p: { xs: 2, sm: 3, md: 4 }, 
+              border: `2px dashed ${bravoColors.highlight.border}`, 
+              borderRadius: 3, 
               background: `linear-gradient(135deg, ${alpha(bravoColors.primaryFlat, 0.03)} 0%, ${alpha(bravoColors.secondary, 0.03)} 100%)`,
               position: 'relative',
               overflow: 'hidden'
             }}
           >
-            <Box sx={{
-              position: 'absolute',
-              top: -15,
-              right: -15,
-              width: 60,
-              height: 60,
-              borderRadius: '50%',
-              background: alpha(bravoColors.secondary, 0.08)
-            }} />
-            
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, position: 'relative', zIndex: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 2, md: 3 }, position: 'relative', zIndex: 1 }}>
               <Box sx={{
-                width: 48,
-                height: 48,
-                borderRadius: 3,
+                width: { xs: 40, md: 48 },
+                height: { xs: 40, md: 48 },
+                borderRadius: 2,
                 backgroundColor: bravoColors.secondary,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                mr: 3,
+                mr: { xs: 2, md: 3 },
                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
               }}>
-                <AddIcon sx={{ color: '#ffffff', fontSize: 24 }} />
+                <AddIcon sx={{ color: '#ffffff', fontSize: { xs: 20, md: 24 } }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: bravoColors.primaryFlat, mb: 0.5 }}>
+                <Typography variant={isMobile ? "subtitle1" : "h6"} sx={{ fontWeight: 700, color: bravoColors.primaryFlat, mb: 0.5 }}>
                   Create Custom Section
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
                   Not finding what you need? Create a custom section tailored to your specific requirements.
                 </Typography>
               </Box>
@@ -426,14 +432,15 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                 variant="outlined"
                 onClick={() => setShowCustomForm(true)}
                 sx={{ 
-                  borderRadius: 3,
+                  borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600,
-                  height: 48,
-                  px: 3,
+                  height: { xs: 40, md: 48 },
+                  px: { xs: 2, md: 3 },
                   borderColor: bravoColors.secondary,
                   color: bravoColors.secondary,
                   borderWidth: 2,
+                  fontSize: { xs: '0.875rem', md: '1rem' },
                   '&:hover': {
                     borderColor: bravoColors.primaryFlat,
                     backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
@@ -454,11 +461,11 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                   value={customSectionName}
                   onChange={(e) => setCustomSectionName(e.target.value)}
                   placeholder="e.g., Medication Compliance Assessment"
-                  size="medium"
+                  size={isMobile ? "small" : "medium"}
                   sx={{ 
-                    mb: 3,
+                    mb: { xs: 2, md: 3 },
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 3,
+                      borderRadius: 2,
                       backgroundColor: '#ffffff'
                     }
                   }}
@@ -469,10 +476,11 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                     onClick={handleAddCustomSection}
                     disabled={!customSectionName.trim()}
                     sx={{ 
-                      borderRadius: 3,
-                      height: 44,
-                      px: 3,
+                      borderRadius: 2,
+                      height: { xs: 40, md: 44 },
+                      px: { xs: 2, md: 3 },
                       backgroundColor: bravoColors.secondary,
+                      fontSize: { xs: '0.875rem', md: '1rem' },
                       '&:hover': {
                         backgroundColor: bravoColors.primaryFlat
                       }
@@ -484,9 +492,10 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                     variant="outlined" 
                     onClick={() => setShowCustomForm(false)}
                     sx={{ 
-                      borderRadius: 3,
-                      height: 44,
-                      px: 3
+                      borderRadius: 2,
+                      height: { xs: 40, md: 44 },
+                      px: { xs: 2, md: 3 },
+                      fontSize: { xs: '0.875rem', md: '1rem' }
                     }}
                   >
                     Cancel
@@ -498,17 +507,21 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
         </Box>
 
         {/* Results Summary */}
-        <Box sx={{ px: 4, pb: 3 }}>
+        <Box sx={{ px: { xs: 2, sm: 3, md: 4 }, pb: { xs: 1, sm: 2, md: 3 }, flexShrink: 0 }}>
           <Paper sx={{
-            p: 3,
-            borderRadius: 3,
+            p: { xs: 2, sm: 2.5, md: 3 },
+            borderRadius: 2,
             backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
             border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
-            <Typography variant="h6" sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
+            <Typography variant={isMobile ? "body1" : "h6"} sx={{ 
+              fontWeight: 600, 
+              color: bravoColors.primaryFlat,
+              fontSize: { xs: '1rem', md: '1.25rem' }
+            }}>
               {filteredSections.length} sections available
               {selectedCategory !== 'All' && ` in ${selectedCategory}`}
               {searchTerm && ` matching "${searchTerm}"`}
@@ -521,13 +534,13 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                   '& .MuiBadge-badge': {
                     backgroundColor: bravoColors.secondary,
                     color: '#ffffff',
-                    fontSize: '0.9rem',
-                    height: 24,
-                    minWidth: 24
+                    fontSize: { xs: '0.75rem', md: '0.9rem' },
+                    height: { xs: 20, md: 24 },
+                    minWidth: { xs: 20, md: 24 }
                   }
                 }}
               >
-                <Box sx={{ width: 32, height: 32 }} />
+                <Box sx={{ width: { xs: 24, md: 32 }, height: { xs: 24, md: 32 } }} />
               </Badge>
             )}
           </Paper>
@@ -537,8 +550,8 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
         <Box sx={{ 
           flex: 1,
           overflow: 'auto',
-          px: 4,
-          pb: 4
+          px: { xs: 2, sm: 3, md: 4 },
+          pb: { xs: 2, sm: 3, md: 4 }
         }}>
           {selectedCategory === 'All' ? (
             // Category groups
@@ -547,13 +560,13 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
               if (categorySections.length === 0) return null;
 
               return (
-                <Box key={category} sx={{ mb: 5 }}>
+                <Box key={category} sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
                   <Paper
                     elevation={0}
                     sx={{
-                      p: 3,
-                      mb: 4,
-                      borderRadius: 4,
+                      p: { xs: 2, sm: 2.5, md: 3 },
+                      mb: { xs: 2, sm: 3, md: 4 },
+                      borderRadius: 3,
                       background: `linear-gradient(135deg, ${alpha(getCategoryColor(category), 0.08)} 0%, ${alpha(getCategoryColor(category), 0.03)} 100%)`,
                       border: `2px solid ${alpha(getCategoryColor(category), 0.15)}`
                     }}
@@ -561,34 +574,37 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                     <Box sx={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      justifyContent: 'space-between'
+                      justifyContent: 'space-between',
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      gap: { xs: 1, sm: 0 }
                     }}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Box sx={{
-                          width: 16,
-                          height: 16,
+                          width: { xs: 12, md: 16 },
+                          height: { xs: 12, md: 16 },
                           borderRadius: '50%',
                           bgcolor: getCategoryColor(category),
-                          mr: 3,
+                          mr: { xs: 2, md: 3 },
                           boxShadow: `0 3px 12px ${alpha(getCategoryColor(category), 0.4)}`
                         }} />
-                        <Typography variant="h5" sx={{ 
+                        <Typography variant={isMobile ? "h6" : "h5"} sx={{ 
                           fontWeight: 800,
                           color: getCategoryColor(category),
-                          letterSpacing: '-0.01em'
+                          letterSpacing: '-0.01em',
+                          fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' }
                         }}>
                           {category}
                         </Typography>
                       </Box>
                       <Chip 
                         label={`${categorySections.length} sections`}
-                        size="medium"
+                        size={isMobile ? "small" : "medium"}
                         sx={{ 
                           bgcolor: getCategoryColor(category),
                           color: '#ffffff',
                           fontWeight: 700,
-                          height: 32,
-                          fontSize: '0.9rem'
+                          height: { xs: 28, md: 32 },
+                          fontSize: { xs: '0.75rem', md: '0.9rem' }
                         }}
                       />
                     </Box>
@@ -596,28 +612,33 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                   
                   <Box sx={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', 
-                    gap: 3
+                    gridTemplateColumns: { 
+                      xs: '1fr', 
+                      sm: 'repeat(auto-fit, minmax(280px, 1fr))', 
+                      md: 'repeat(auto-fill, minmax(320px, 1fr))',
+                      lg: 'repeat(auto-fill, minmax(380px, 1fr))'
+                    }, 
+                    gap: { xs: 2, sm: 2.5, md: 3 }
                   }}>
                     {categorySections.map((section) => (
                       <Card 
                         key={section.id}
                         sx={{ 
                           cursor: 'pointer',
-                          borderRadius: 4,
+                          borderRadius: 3,
                           border: `2px solid transparent`,
                           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                           background: '#ffffff',
                           overflow: 'hidden',
                           '&:hover': {
-                            transform: 'translateY(-8px)',
-                            boxShadow: `0 16px 40px ${alpha(getCategoryColor(category), 0.15)}`,
+                            transform: { xs: 'translateY(-2px)', md: 'translateY(-4px)' },
+                            boxShadow: `0 ${isMobile ? '8px 24px' : '16px 40px'} ${alpha(getCategoryColor(category), 0.15)}`,
                             borderColor: getCategoryColor(category),
                             '& .section-emoji': {
-                              transform: 'scale(1.3) rotate(10deg)'
+                              transform: { xs: 'scale(1.1)', md: 'scale(1.3) rotate(10deg)' }
                             },
                             '& .section-content': {
-                              transform: 'translateY(-2px)'
+                              transform: 'translateY(-1px)'
                             }
                           }
                         }}
@@ -627,7 +648,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                             onAddSection(section);
                             onClose();
                           }}
-                          sx={{ height: '100%', p: 3 }}
+                          sx={{ height: '100%', p: { xs: 2, sm: 2.5, md: 3 } }}
                         >
                           <CardContent sx={{ p: 0, height: '100%' }}>
                             <Box 
@@ -639,15 +660,15 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                               }}
                             >
                               <Box sx={{
-                                width: 72,
-                                height: 72,
-                                borderRadius: 4,
+                                width: { xs: 56, sm: 64, md: 72 },
+                                height: { xs: 56, sm: 64, md: 72 },
+                                borderRadius: 3,
                                 background: `linear-gradient(135deg, ${alpha(getCategoryColor(category), 0.1)} 0%, ${alpha(getCategoryColor(category), 0.05)} 100%)`,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                mr: 3,
-                                fontSize: '2.2rem',
+                                mr: { xs: 2, sm: 2.5, md: 3 },
+                                fontSize: { xs: '1.8rem', sm: '2rem', md: '2.2rem' },
                                 border: `2px solid ${alpha(getCategoryColor(category), 0.15)}`,
                                 flexShrink: 0
                               }}>
@@ -662,18 +683,18 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                                 </Box>
                               </Box>
                               <Box sx={{ flex: 1, minWidth: 0 }}>
-                                <Typography variant="h6" sx={{ 
+                                <Typography variant={isMobile ? "subtitle1" : "h6"} sx={{ 
                                   fontWeight: 700, 
                                   lineHeight: 1.3,
-                                  mb: 2,
+                                  mb: { xs: 1, md: 2 },
                                   color: getCategoryColor(category),
-                                  fontSize: '1.2rem'
+                                  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' }
                                 }}>
                                   {section.name}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary" sx={{ 
                                   lineHeight: 1.6,
-                                  fontSize: '0.95rem'
+                                  fontSize: { xs: '0.875rem', md: '0.95rem' }
                                 }}>
                                   {section.description}
                                 </Typography>
@@ -691,28 +712,33 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
             // Single category view
             <Box sx={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', 
-              gap: 4
+              gridTemplateColumns: { 
+                xs: '1fr', 
+                sm: 'repeat(auto-fit, minmax(280px, 1fr))', 
+                md: 'repeat(auto-fill, minmax(320px, 1fr))',
+                lg: 'repeat(auto-fill, minmax(380px, 1fr))'
+              }, 
+              gap: { xs: 2, sm: 3, md: 4 }
             }}>
               {filteredSections.map((section) => (
                 <Card 
                   key={section.id}
                   sx={{ 
                     cursor: 'pointer',
-                    borderRadius: 4,
+                    borderRadius: 3,
                     border: `2px solid transparent`,
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     background: '#ffffff',
                     overflow: 'hidden',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: `0 16px 40px ${alpha(getCategoryColor(section.category), 0.15)}`,
+                      transform: { xs: 'translateY(-2px)', md: 'translateY(-4px)' },
+                      boxShadow: `0 ${isMobile ? '8px 24px' : '16px 40px'} ${alpha(getCategoryColor(section.category), 0.15)}`,
                       borderColor: getCategoryColor(section.category),
                       '& .section-emoji': {
-                        transform: 'scale(1.3) rotate(10deg)'
+                        transform: { xs: 'scale(1.1)', md: 'scale(1.3) rotate(10deg)' }
                       },
                       '& .section-content': {
-                        transform: 'translateY(-2px)'
+                        transform: 'translateY(-1px)'
                       }
                     }
                   }}
@@ -722,7 +748,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                       onAddSection(section);
                       onClose();
                     }}
-                    sx={{ height: '100%', p: 3 }}
+                    sx={{ height: '100%', p: { xs: 2, sm: 2.5, md: 3 } }}
                   >
                     <CardContent sx={{ p: 0, height: '100%' }}>
                       <Box 
@@ -734,15 +760,15 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                         }}
                       >
                         <Box sx={{
-                          width: 72,
-                          height: 72,
-                          borderRadius: 4,
+                          width: { xs: 56, sm: 64, md: 72 },
+                          height: { xs: 56, sm: 64, md: 72 },
+                          borderRadius: 3,
                           background: `linear-gradient(135deg, ${alpha(getCategoryColor(section.category), 0.1)} 0%, ${alpha(getCategoryColor(section.category), 0.05)} 100%)`,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          mr: 3,
-                          fontSize: '2.2rem',
+                          mr: { xs: 2, sm: 2.5, md: 3 },
+                          fontSize: { xs: '1.8rem', sm: '2rem', md: '2.2rem' },
                           border: `2px solid ${alpha(getCategoryColor(section.category), 0.15)}`,
                           flexShrink: 0
                         }}>
@@ -757,18 +783,18 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
                           </Box>
                         </Box>
                         <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography variant="h6" sx={{ 
+                          <Typography variant={isMobile ? "subtitle1" : "h6"} sx={{ 
                             fontWeight: 700, 
                             lineHeight: 1.3,
-                            mb: 2,
+                            mb: { xs: 1, md: 2 },
                             color: getCategoryColor(section.category),
-                            fontSize: '1.2rem'
+                            fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' }
                           }}>
                             {section.name}
                           </Typography>
                           <Typography variant="body2" color="text.secondary" sx={{ 
                             lineHeight: 1.6,
-                            fontSize: '0.95rem'
+                            fontSize: { xs: '0.875rem', md: '0.95rem' }
                           }}>
                             {section.description}
                           </Typography>
@@ -784,26 +810,26 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
           {filteredSections.length === 0 && (
             <Box sx={{ 
               textAlign: 'center', 
-              py: 12,
+              py: { xs: 6, sm: 8, md: 12 },
               color: 'text.secondary'
             }}>
               <Box sx={{
-                width: 120,
-                height: 120,
+                width: { xs: 80, sm: 100, md: 120 },
+                height: { xs: 80, sm: 100, md: 120 },
                 borderRadius: '50%',
                 backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 mx: 'auto',
-                mb: 4
+                mb: { xs: 2, sm: 3, md: 4 }
               }}>
-                <SearchIcon sx={{ fontSize: 60, opacity: 0.5 }} />
+                <SearchIcon sx={{ fontSize: { xs: 40, sm: 50, md: 60 }, opacity: 0.5 }} />
               </Box>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
+              <Typography variant={isMobile ? "h6" : "h5"} gutterBottom sx={{ fontWeight: 700, mb: 2 }}>
                 No sections found
               </Typography>
-              <Typography variant="body1" sx={{ fontSize: '1.1rem' }}>
+              <Typography variant="body1" sx={{ fontSize: { xs: '1rem', md: '1.1rem' } }}>
                 Try adjusting your search terms or create a custom section above.
               </Typography>
             </Box>
