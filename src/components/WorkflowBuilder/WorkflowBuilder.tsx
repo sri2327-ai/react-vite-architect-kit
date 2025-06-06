@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -16,7 +15,6 @@ import {
   LibraryBooks as LibraryBooksIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
-import { Workflow as WorkflowIcon } from 'lucide-react';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
 import { templateBuilderService } from '../../services/templateBuilderService';
@@ -105,13 +103,6 @@ const WorkflowBuilder: React.FC = () => {
           flexDirection: { xs: 'column', sm: 'row' },
           textAlign: { xs: 'center', sm: 'center', md: 'left' }
         }}>
-          <WorkflowIcon 
-            size={isSmallMobile ? 28 : isMobile ? 32 : 40}
-            color="black"
-            style={{ 
-              display: isSmallMobile ? 'none' : 'block'
-            }} 
-          />
           <Box>
             <Typography 
               variant={isSmallMobile ? "h5" : isMobile ? "h4" : "h3"} 
