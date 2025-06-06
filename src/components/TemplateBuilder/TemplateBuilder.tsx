@@ -735,12 +735,13 @@ const TemplateBuilder: React.FC = () => {
                 py: 1.5,
                 fontSize: '0.9rem',
                 fontWeight: 600,
+                textTransform: 'none',
                 '&:hover': {
                   backgroundColor: bravoColors.secondary,
                 }
               }}
             >
-              EDIT TEMPLATE
+              Edit Template
             </Button>
           </Box>
         </Card>
