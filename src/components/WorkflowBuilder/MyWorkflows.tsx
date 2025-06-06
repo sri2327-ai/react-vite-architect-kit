@@ -29,25 +29,16 @@ import {
   useMediaQuery,
   Grid,
   Dialog,
-  DialogTitle,
-  DialogContent,
   DialogActions,
-  Stepper,
-  Step,
-  StepLabel,
-  StepContent,
-  Checkbox,
-  FormControlLabel,
-  Tooltip
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
   Search as SearchIcon,
   FilterList as FilterIcon,
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Play as PlayIcon,
+  Download as ImportIcon,
   CheckCircle as CheckCircleIcon,
   Schedule as ScheduleIcon,
   Person as PersonIcon,
@@ -68,16 +59,11 @@ import {
   Analytics as AnalyticsIcon,
   LocalHospital as HospitalIcon,
   Business as BusinessIcon,
-  Settings as SettingsIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
   Save as SaveIcon,
-  Cancel as CancelIcon,
-  Info as InfoIcon,
-  Warning as WarningIcon,
-  Error as ErrorIcon,
-  CheckBox as CheckBoxIcon,
-  CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon
+  Cancel as CancelIcon
 } from '@mui/icons-material';
-import { templateBuilderService } from '../../services/templateBuilderService';
 
 interface WorkflowBlock {
   id: string;
@@ -106,7 +92,7 @@ interface ImportedWorkflow {
   name: string;
   description: string;
   ehrSystem: string;
-  status: 'draft' | 'active' | 'paused';
+  status: 'draft' | 'active' | 'archived';
   blocks: WorkflowBlock[];
   availableVisitTypes: string[];
   visitTypeMappings: VisitTypeMapping[];
@@ -130,18 +116,16 @@ interface MyWorkflowsProps {
 const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImportedWorkflows }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [expandedWorkflowId, setExpandedWorkflowId] = useState<string | null>(null);
-  const [isConfiguring, setIsConfiguring] = useState(false);
-  const [configuringWorkflow, setConfiguringWorkflow] = useState<ImportedWorkflow | null>(null);
-  const [activeStep, setActiveStep] = useState(0);
-  const [selectedVisitTypes, setSelectedVisitTypes] = useState<string[]>([]);
-  const [isVisitTypeConfigured, setIsVisitTypeConfigured] = useState(false);
-  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [workflowToDelete, setWorkflowToDelete] = useState<string | null>(null);
+  const [hoveredWorkflow, setHoveredWorkflow] = useState<string | null>(null);
+  const [editingWorkflowId, setEditingWorkflowId] = useState<string | null>(null);
+  const [editedWorkflowName, setEditedWorkflowName] = useState('');
+  const [editedWorkflowDescription, setEditedWorkflowDescription] = useState('');
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
+  const [workflowToDeleteId, setWorkflowToDeleteId] = useState<string | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const workflowStatusOptions = ['draft', 'active', 'paused'];
+  const workflowStatuses = ['draft', 'active', 'archived'];
 
   const filteredWorkflows = importedWorkflows.filter(workflow => {
     const searchMatch = workflow.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -150,89 +134,46 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImporte
     return searchMatch && statusMatch;
   });
 
-  const handleWorkflowToggle = (workflowId: string) => {
-    setExpandedWorkflowId(prevId => (prevId === workflowId ? null : workflowId));
+  const handleEditWorkflow = (workflowId: string) => {
+    const workflowToEdit = importedWorkflows.find(workflow => workflow.id === workflowId);
+    if (workflowToEdit) {
+      setEditingWorkflowId(workflowId);
+      setEditedWorkflowName(workflowToEdit.name);
+      setEditedWorkflowDescription(workflowToEdit.description);
+    }
   };
 
-  const handleConfigureWorkflow = (workflow: ImportedWorkflow) => {
-    setConfiguringWorkflow(workflow);
-    setIsConfiguring(true);
-    setActiveStep(0);
-
-    // Initialize selected visit types based on existing configuration
-    const configuredVisitTypes = workflow.visitTypeMappings
-      .filter(mapping => mapping.isConfigured)
-      .map(mapping => mapping.visitType);
-    setSelectedVisitTypes(configuredVisitTypes);
-  };
-
-  const handleNext = () => {
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
-  };
-
-  const handleVisitTypeToggle = (visitType: string) => {
-    setSelectedVisitTypes(prev =>
-      prev.includes(visitType) ? prev.filter(vt => vt !== visitType) : [...prev, visitType]
+  const handleSaveEdit = () => {
+    setImportedWorkflows(prevWorkflows =>
+      prevWorkflows.map(workflow =>
+        workflow.id === editingWorkflowId
+          ? { ...workflow, name: editedWorkflowName, description: editedWorkflowDescription }
+          : workflow
+      )
     );
+    setEditingWorkflowId(null);
   };
 
-  const handleSaveConfiguration = () => {
-    if (!configuringWorkflow) return;
+  const handleCancelEdit = () => {
+    setEditingWorkflowId(null);
+  };
 
-    // Update visit type mappings based on selected visit types
-    const updatedVisitTypeMappings = configuringWorkflow.visitTypeMappings.map(mapping => ({
-      ...mapping,
-      isConfigured: selectedVisitTypes.includes(mapping.visitType)
-    }));
+  const handleDeleteWorkflow = (workflowId: string) => {
+    setWorkflowToDeleteId(workflowId);
+    setDeleteConfirmationOpen(true);
+  };
 
-    // Update the workflow with the new visit type mappings
-    const updatedWorkflows = importedWorkflows.map(wf =>
-      wf.id === configuringWorkflow.id
-        ? { ...configuringWorkflow, visitTypeMappings: updatedVisitTypeMappings }
-        : wf
+  const confirmDeleteWorkflow = () => {
+    setImportedWorkflows(prevWorkflows =>
+      prevWorkflows.filter(workflow => workflow.id !== workflowToDeleteId)
     );
-
-    setImportedWorkflows(updatedWorkflows);
-    setIsConfiguring(false);
-    setConfiguringWorkflow(null);
-    setSelectedVisitTypes([]);
-    setActiveStep(0);
+    setDeleteConfirmationOpen(false);
+    setWorkflowToDeleteId(null);
   };
 
-  const handleCancelConfiguration = () => {
-    setIsConfiguring(false);
-    setConfiguringWorkflow(null);
-    setSelectedVisitTypes([]);
-    setActiveStep(0);
-  };
-
-  const handleDeleteConfirmation = (workflowId: string) => {
-    setWorkflowToDelete(workflowId);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteWorkflow = () => {
-    if (!workflowToDelete) return;
-    const updatedWorkflows = importedWorkflows.filter(wf => wf.id !== workflowToDelete);
-    setImportedWorkflows(updatedWorkflows);
-    setDeleteDialogOpen(false);
-    setWorkflowToDelete(null);
-  };
-
-  const handleCancelDelete = () => {
-    setDeleteDialogOpen(false);
-    setWorkflowToDelete(null);
-  };
-
-  const handleStatusChange = (workflowId: string, newStatus: string) => {
-    const updatedWorkflows = importedWorkflows.map(wf =>
-      wf.id === workflowId ? { ...wf, status: newStatus as 'draft' | 'active' | 'paused' } : wf
-    );
-    setImportedWorkflows(updatedWorkflows);
+  const closeDeleteConfirmation = () => {
+    setDeleteConfirmationOpen(false);
+    setWorkflowToDeleteId(null);
   };
 
   return (
@@ -273,18 +214,19 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImporte
               value={selectedStatus}
               label="Status"
               onChange={(e) => setSelectedStatus(e.target.value)}
-              startAdornment={<FilterIcon sx={{ mr: 1, color: 'text.secondary' }} />}
             >
-              <MenuItem value="all">All Status</MenuItem>
-              <MenuItem value="draft">Draft</MenuItem>
-              <MenuItem value="active">Active</MenuItem>
-              <MenuItem value="paused">Paused</MenuItem>
+              <MenuItem value="all">All Statuses</MenuItem>
+              {workflowStatuses.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
       </Box>
 
-      {/* Workflow Cards */}
+      {/* Workflow Cards Grid */}
       <Box sx={{ 
         display: 'grid',
         gridTemplateColumns: {
@@ -322,63 +264,63 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImporte
                 mb: { xs: 2, sm: 3 } 
               }}>
                 <Box sx={{ flexGrow: 1 }}>
-                  <Typography 
-                    variant="h6" 
-                    component="h3" 
-                    sx={{ 
-                      fontWeight: 600, 
-                      color: 'text.primary',
-                      fontSize: { xs: '1.125rem', sm: '1.25rem' }
-                    }}
-                  >
-                    {workflow.name}
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ 
-                      mb: 1, 
-                      fontSize: { xs: '0.875rem', sm: '1rem' },
-                      lineHeight: 1.6
-                    }}
-                  >
-                    {workflow.description}
-                  </Typography>
-                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
-                    <Chip 
-                      label={workflow.ehrSystem} 
-                      size="small" 
-                      color="primary" 
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
+                  {editingWorkflowId === workflow.id ? (
+                    <TextField
+                      fullWidth
+                      label="Workflow Name"
+                      value={editedWorkflowName}
+                      onChange={(e) => setEditedWorkflowName(e.target.value)}
+                      size="small"
+                      sx={{ mb: 1 }}
                     />
-                    <Chip 
-                      label={workflow.status} 
-                      size="small" 
-                      color="secondary" 
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
+                  ) : (
+                    <Typography 
+                      variant="h6" 
+                      component="h3" 
+                      sx={{ 
+                        fontWeight: 600, 
+                        color: 'text.primary',
+                        fontSize: { xs: '1.125rem', sm: '1.25rem' }
+                      }}
+                    >
+                      {workflow.name}
+                    </Typography>
+                  )}
+                  {editingWorkflowId === workflow.id ? (
+                    <TextField
+                      fullWidth
+                      label="Workflow Description"
+                      value={editedWorkflowDescription}
+                      onChange={(e) => setEditedWorkflowDescription(e.target.value)}
+                      multiline
+                      rows={2}
+                      size="small"
+                      sx={{ mb: 2 }}
                     />
-                  </Stack>
+                  ) : (
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ 
+                        mb: 1, 
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        lineHeight: 1.6
+                      }}
+                    >
+                      {workflow.description}
+                    </Typography>
+                  )}
+                  <Chip 
+                    label={workflow.status} 
+                    size="small" 
+                    color="default"
+                    sx={{ fontSize: '0.75rem' }}
+                  />
                 </Box>
-                <FormControl size="small" sx={{ minWidth: 100 }}>
-                  <InputLabel id="status-select-label">Status</InputLabel>
-                  <Select
-                    labelId="status-select-label"
-                    id="status-select"
-                    value={workflow.status}
-                    label="Status"
-                    onChange={(e) => handleStatusChange(workflow.id, e.target.value)}
-                  >
-                    {workflowStatusOptions.map((status) => (
-                      <MenuItem key={status} value={status}>{status}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
               </Box>
 
-              {/* Workflow Highlights */}
-              <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+              {/* Workflow Steps Preview */}
+              <Box>
                 <Typography 
                   variant="subtitle2" 
                   sx={{ 
@@ -423,27 +365,54 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImporte
                 </List>
               </Box>
             </CardContent>
-            <Box sx={{ p: { xs: 1.5, sm: 2 }, display: 'flex', gap: 2 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<SettingsIcon />}
-                fullWidth
-                onClick={() => handleConfigureWorkflow(workflow)}
-                sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-              >
-                Configure
-              </Button>
-              <Button
-                variant="outlined"
-                color="error"
-                startIcon={<DeleteIcon />}
-                fullWidth
-                onClick={() => handleDeleteConfirmation(workflow.id)}
-                sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-              >
-                Delete
-              </Button>
+            <Box sx={{ p: { xs: 1.5, sm: 2 }, display: 'flex', gap: 1 }}>
+              {editingWorkflowId === workflow.id ? (
+                <>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    startIcon={<SaveIcon />}
+                    fullWidth
+                    onClick={handleSaveEdit}
+                    sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<CancelIcon />}
+                    fullWidth
+                    onClick={handleCancelEdit}
+                    sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<EditIcon />}
+                    fullWidth
+                    onClick={() => handleEditWorkflow(workflow.id)}
+                    sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                    fullWidth
+                    onClick={() => handleDeleteWorkflow(workflow.id)}
+                    sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  >
+                    Delete
+                  </Button>
+                </>
+              )}
             </Box>
           </Card>
         ))}
@@ -455,148 +424,24 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({ importedWorkflows, setImporte
         </Alert>
       )}
 
-      {/* Configuration Dialog */}
-      <Dialog
-        open={isConfiguring}
-        onClose={handleCancelConfiguration}
-        fullWidth
-        maxWidth="md"
-      >
-        <DialogTitle>Configure Workflow</DialogTitle>
-        <DialogContent>
-          <Stepper activeStep={activeStep} orientation="vertical">
-            <Step key={1}>
-              <StepLabel>
-                Select Visit Types
-              </StepLabel>
-              <StepContent>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Choose the visit types this workflow should apply to.
-                </Typography>
-                <List>
-                  {configuringWorkflow?.availableVisitTypes.map((visitType) => (
-                    <ListItem key={visitType}>
-                      <ListItemButton onClick={() => handleVisitTypeToggle(visitType)}>
-                        <ListItemIcon>
-                          <Checkbox
-                            checked={selectedVisitTypes.includes(visitType)}
-                            edge="start"
-                            disableRipple
-                          />
-                        </ListItemIcon>
-                        <ListItemText primary={visitType} />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-                <Box sx={{ mb: 2 }}>
-                  <Button
-                    variant="contained"
-                    onClick={handleNext}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    Continue
-                  </Button>
-                  <Button
-                    disabled={activeStep === 0}
-                    onClick={handleBack}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    Back
-                  </Button>
-                </Box>
-              </StepContent>
-            </Step>
-            <Step key={2}>
-              <StepLabel>
-                Configure Template Fields
-              </StepLabel>
-              <StepContent>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Map template fields to the workflow steps for automated data entry.
-                </Typography>
-                <Alert severity="info" sx={{ mb: 2 }}>
-                  This feature is under development and will be available soon.
-                </Alert>
-                <Box sx={{ mb: 2 }}>
-                  <Button
-                    disabled
-                    variant="contained"
-                    onClick={handleNext}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    Continue
-                  </Button>
-                  <Button
-                    onClick={handleBack}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    Back
-                  </Button>
-                </Box>
-              </StepContent>
-            </Step>
-            <Step key={3}>
-              <StepLabel>
-                Schedule Configuration
-              </StepLabel>
-              <StepContent>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  Set up scheduling parameters for automated workflow activation.
-                </Typography>
-                <Alert severity="info" sx={{ mb: 2 }}>
-                  This feature is under development and will be available soon.
-                </Alert>
-                <Box sx={{ mb: 2 }}>
-                  <Button
-                    disabled
-                    variant="contained"
-                    onClick={handleNext}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    Continue
-                  </Button>
-                  <Button
-                    onClick={handleBack}
-                    sx={{ mt: 1, mr: 1 }}
-                  >
-                    Back
-                  </Button>
-                </Box>
-              </StepContent>
-            </Step>
-          </Stepper>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelConfiguration} startIcon={<CancelIcon />} color="error">
-            Cancel
-          </Button>
-          <Button onClick={handleSaveConfiguration} startIcon={<SaveIcon />} color="success" variant="contained">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-
       {/* Delete Confirmation Dialog */}
       <Dialog
-        open={isDeleteDialogOpen}
-        onClose={handleCancelDelete}
+        open={deleteConfirmationOpen}
+        onClose={closeDeleteConfirmation}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Delete Workflow?"}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Confirm Delete Workflow?"}</DialogTitle>
         <DialogContent>
-          <Typography variant="body1">
+          <DialogContentText id="alert-dialog-description">
             Are you sure you want to delete this workflow? This action cannot be undone.
-          </Typography>
+          </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCancelDelete} color="primary">
+          <Button onClick={closeDeleteConfirmation} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDeleteWorkflow} color="error" autoFocus>
+          <Button onClick={confirmDeleteWorkflow} color="error" autoFocus>
             Delete
           </Button>
         </DialogActions>
