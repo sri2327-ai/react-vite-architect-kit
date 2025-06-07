@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
 
@@ -74,173 +73,203 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     ]
   );
 
-  // Use useRef to track if we've already processed the created template data
-  const processedTemplateRef = useRef<any>(null);
+  // Track if we've already processed and navigated for this template
+  const hasNavigatedRef = useRef(false);
+  const processedTemplateIdRef = useRef<string | null>(null);
 
   // Handle navigation when a template is created - only process once per unique template
   useEffect(() => {
-    // Only process if we have createdTemplateData, it has redirectToEditor flag, 
-    // and we haven't processed this exact template data before
-    if (createdTemplateData && 
-        createdTemplateData.redirectToEditor && 
-        processedTemplateRef.current !== createdTemplateData) {
-      
-      // Mark this template data as processed
-      processedTemplateRef.current = createdTemplateData;
-      
-      // Convert created template data to template items based on method
-      const newItems: TemplateItem[] = [];
-      
-      // Method 1: Smart Copy from Previous - Parse existing notes
-      if (createdTemplateData.method === 'Smart Copy from Previous' && createdTemplateData.content) {
-        const sections = createdTemplateData.content.split('\n\n').filter(section => section.trim());
-        sections.forEach((section, index) => {
-          const lines = section.split('\n');
-          const name = lines[0].replace(':', '').trim() || `Section ${index + 1}`;
-          const content = lines.slice(1).join('\n').trim() || 'AI will generate content based on the instructions below.';
-          
-          newItems.push({
-            id: `${Date.now()}-${index}`,
-            name: name,
-            type: 'paragraph',
-            content: content,
-            description: 'A.I. will write content following the guidelines below.'
-          });
-        });
-      }
-      // Method 2: AI-Assisted Creation - Use generated content
-      else if (createdTemplateData.method === 'AI-Assisted Creation' && createdTemplateData.content) {
-        const sections = createdTemplateData.content.split('\n\n').filter(section => section.trim());
-        sections.forEach((section, index) => {
-          const lines = section.split('\n');
-          const name = lines[0].replace(':', '').trim() || `AI Section ${index + 1}`;
-          const content = lines.slice(1).join('\n').trim() || 'AI will generate content based on your specifications.';
-          
-          newItems.push({
-            id: `${Date.now()}-${index}`,
-            name: name,
-            type: 'paragraph',
-            content: content,
-            description: 'A.I. will write content following the guidelines below.'
-          });
-        });
-      }
-      // Method 3: Custom Template Builder - Start with basic structure
-      else if (createdTemplateData.method === 'Custom Template Builder') {
+    // Add logging to debug the issue
+    console.log('TemplateEditor useEffect triggered:', {
+      hasCreatedTemplateData: !!createdTemplateData,
+      hasRedirectFlag: createdTemplateData?.redirectToEditor,
+      hasNavigated: hasNavigatedRef.current,
+      processedId: processedTemplateIdRef.current,
+      currentTemplateId: createdTemplateData?.id || createdTemplateData?.name
+    });
+
+    // Only process if we have valid template data that should redirect
+    if (!createdTemplateData || !createdTemplateData.redirectToEditor) {
+      return;
+    }
+
+    // Create a unique identifier for this template
+    const templateId = createdTemplateData.id || createdTemplateData.name || JSON.stringify(createdTemplateData);
+    
+    // Skip if we've already processed this exact template and navigated
+    if (hasNavigatedRef.current && processedTemplateIdRef.current === templateId) {
+      console.log('Skipping - already processed and navigated for this template');
+      return;
+    }
+
+    // Mark as processed for this template
+    processedTemplateIdRef.current = templateId;
+    
+    console.log('Processing template creation data:', createdTemplateData);
+    
+    // Convert created template data to template items based on method
+    const newItems: TemplateItem[] = [];
+    
+    // Method 1: Smart Copy from Previous - Parse existing notes
+    if (createdTemplateData.method === 'Smart Copy from Previous' && createdTemplateData.content) {
+      const sections = createdTemplateData.content.split('\n\n').filter(section => section.trim());
+      sections.forEach((section, index) => {
+        const lines = section.split('\n');
+        const name = lines[0].replace(':', '').trim() || `Section ${index + 1}`;
+        const content = lines.slice(1).join('\n').trim() || 'AI will generate content based on the instructions below.';
+        
         newItems.push({
-          id: Date.now().toString(),
-          name: 'Chief Complaint',
+          id: `${Date.now()}-${index}`,
+          name: name,
           type: 'paragraph',
-          content: 'Document the primary reason for the patient visit',
-          description: 'A.I. will write a descriptive block of text following the guidelines below.'
-        });
-      }
-      // Method 4: Import Existing Template - Parse imported content
-      else if (createdTemplateData.method === 'Import Existing Template' && createdTemplateData.content) {
-        const sections = createdTemplateData.content.split('\n\n').filter(section => section.trim());
-        sections.forEach((section, index) => {
-          const lines = section.split('\n');
-          const name = lines[0].replace(':', '').trim() || `Imported Section ${index + 1}`;
-          const content = lines.slice(1).join('\n').trim() || 'Content from imported template.';
-          
-          newItems.push({
-            id: `${Date.now()}-${index}`,
-            name: name,
-            type: 'paragraph',
-            content: content,
-            description: 'A.I. will write content following the guidelines below.'
-          });
-        });
-      }
-      // Method 5: Browse Template Library - Use library template structure
-      else if (createdTemplateData.method === 'Browse Template Library') {
-        if (createdTemplateData.templateType === 'SOAP') {
-          newItems.push(
-            {
-              id: `${Date.now()}-1`,
-              name: 'Subjective',
-              type: 'paragraph',
-              content: 'Patient-reported symptoms and history',
-              description: 'A.I. will write content following the guidelines below.'
-            },
-            {
-              id: `${Date.now()}-2`,
-              name: 'Objective',
-              type: 'paragraph',
-              content: 'Physical examination findings and vital signs',
-              description: 'A.I. will write content following the guidelines below.'
-            },
-            {
-              id: `${Date.now()}-3`,
-              name: 'Assessment',
-              type: 'paragraph',
-              content: 'Clinical impression and diagnosis',
-              description: 'A.I. will write content following the guidelines below.'
-            },
-            {
-              id: `${Date.now()}-4`,
-              name: 'Plan',
-              type: 'bulleted_list',
-              content: 'Treatment plan and follow-up instructions',
-              description: 'A.I. will create a bulleted list based on the instructions provided',
-              items: [
-                { content: 'Diagnostic tests ordered' },
-                { content: 'Medications prescribed' },
-                { content: 'Follow-up appointments' }
-              ]
-            }
-          );
-        } else if (createdTemplateData.templateType === 'DPD') {
-          newItems.push(
-            {
-              id: `${Date.now()}-1`,
-              name: 'Data',
-              type: 'paragraph',
-              content: 'Objective clinical data and findings',
-              description: 'A.I. will write content following the guidelines below.'
-            },
-            {
-              id: `${Date.now()}-2`,
-              name: 'Problem',
-              type: 'paragraph',
-              content: 'Identified clinical problems',
-              description: 'A.I. will write content following the guidelines below.'
-            },
-            {
-              id: `${Date.now()}-3`,
-              name: 'Decision',
-              type: 'bulleted_list',
-              content: 'Clinical decisions and actions taken',
-              description: 'A.I. will create a bulleted list based on the instructions provided',
-              items: [
-                { content: 'Treatment decisions' },
-                { content: 'Referrals made' },
-                { content: 'Monitoring plan' }
-              ]
-            }
-          );
-        }
-      }
-      
-      // If no sections were created, provide a default starting point
-      if (newItems.length === 0) {
-        newItems.push({
-          id: Date.now().toString(),
-          name: createdTemplateData.name || 'New Template Section',
-          type: 'paragraph',
-          content: 'AI will generate content based on the instructions below.',
+          content: content,
           description: 'A.I. will write content following the guidelines below.'
         });
-      }
-      
-      setCurrentItems(newItems);
-      
-      // Navigate to editor if callback provided
-      if (onNavigateToEditor) {
-        onNavigateToEditor();
+      });
+    }
+    // Method 2: AI-Assisted Creation - Use generated content
+    else if (createdTemplateData.method === 'AI-Assisted Creation' && createdTemplateData.content) {
+      const sections = createdTemplateData.content.split('\n\n').filter(section => section.trim());
+      sections.forEach((section, index) => {
+        const lines = section.split('\n');
+        const name = lines[0].replace(':', '').trim() || `AI Section ${index + 1}`;
+        const content = lines.slice(1).join('\n').trim() || 'AI will generate content based on your specifications.';
+        
+        newItems.push({
+          id: `${Date.now()}-${index}`,
+          name: name,
+          type: 'paragraph',
+          content: content,
+          description: 'A.I. will write content following the guidelines below.'
+        });
+      });
+    }
+    // Method 3: Custom Template Builder - Start with basic structure
+    else if (createdTemplateData.method === 'Custom Template Builder') {
+      newItems.push({
+        id: Date.now().toString(),
+        name: 'Chief Complaint',
+        type: 'paragraph',
+        content: 'Document the primary reason for the patient visit',
+        description: 'A.I. will write a descriptive block of text following the guidelines below.'
+      });
+    }
+    // Method 4: Import Existing Template - Parse imported content
+    else if (createdTemplateData.method === 'Import Existing Template' && createdTemplateData.content) {
+      const sections = createdTemplateData.content.split('\n\n').filter(section => section.trim());
+      sections.forEach((section, index) => {
+        const lines = section.split('\n');
+        const name = lines[0].replace(':', '').trim() || `Imported Section ${index + 1}`;
+        const content = lines.slice(1).join('\n').trim() || 'Content from imported template.';
+        
+        newItems.push({
+          id: `${Date.now()}-${index}`,
+          name: name,
+          type: 'paragraph',
+          content: content,
+          description: 'A.I. will write content following the guidelines below.'
+        });
+      });
+    }
+    // Method 5: Browse Template Library - Use library template structure
+    else if (createdTemplateData.method === 'Browse Template Library') {
+      if (createdTemplateData.templateType === 'SOAP') {
+        newItems.push(
+          {
+            id: `${Date.now()}-1`,
+            name: 'Subjective',
+            type: 'paragraph',
+            content: 'Patient-reported symptoms and history',
+            description: 'A.I. will write content following the guidelines below.'
+          },
+          {
+            id: `${Date.now()}-2`,
+            name: 'Objective',
+            type: 'paragraph',
+            content: 'Physical examination findings and vital signs',
+            description: 'A.I. will write content following the guidelines below.'
+          },
+          {
+            id: `${Date.now()}-3`,
+            name: 'Assessment',
+            type: 'paragraph',
+            content: 'Clinical impression and diagnosis',
+            description: 'A.I. will write content following the guidelines below.'
+          },
+          {
+            id: `${Date.now()}-4`,
+            name: 'Plan',
+            type: 'bulleted_list',
+            content: 'Treatment plan and follow-up instructions',
+            description: 'A.I. will create a bulleted list based on the instructions provided',
+            items: [
+              { content: 'Diagnostic tests ordered' },
+              { content: 'Medications prescribed' },
+              { content: 'Follow-up appointments' }
+            ]
+          }
+        );
+      } else if (createdTemplateData.templateType === 'DPD') {
+        newItems.push(
+          {
+            id: `${Date.now()}-1`,
+            name: 'Data',
+            type: 'paragraph',
+            content: 'Objective clinical data and findings',
+            description: 'A.I. will write content following the guidelines below.'
+          },
+          {
+            id: `${Date.now()}-2`,
+            name: 'Problem',
+            type: 'paragraph',
+            content: 'Identified clinical problems',
+            description: 'A.I. will write content following the guidelines below.'
+          },
+          {
+            id: `${Date.now()}-3`,
+            name: 'Decision',
+            type: 'bulleted_list',
+            content: 'Clinical decisions and actions taken',
+            description: 'A.I. will create a bulleted list based on the instructions provided',
+            items: [
+              { content: 'Treatment decisions' },
+              { content: 'Referrals made' },
+              { content: 'Monitoring plan' }
+            ]
+          }
+        );
       }
     }
+    
+    // If no sections were created, provide a default starting point
+    if (newItems.length === 0) {
+      newItems.push({
+        id: Date.now().toString(),
+        name: createdTemplateData.name || 'New Template Section',
+        type: 'paragraph',
+        content: 'AI will generate content based on the instructions below.',
+        description: 'A.I. will write content following the guidelines below.'
+      });
+    }
+    
+    setCurrentItems(newItems);
+    
+    // Only navigate if we haven't already navigated
+    if (!hasNavigatedRef.current && onNavigateToEditor) {
+      console.log('Navigating to editor');
+      hasNavigatedRef.current = true;
+      onNavigateToEditor();
+    }
   }, [createdTemplateData, onNavigateToEditor]);
+
+  // Reset navigation flag when createdTemplateData becomes null/undefined
+  useEffect(() => {
+    if (!createdTemplateData) {
+      hasNavigatedRef.current = false;
+      processedTemplateIdRef.current = null;
+      console.log('Reset navigation flags - no template data');
+    }
+  }, [createdTemplateData]);
 
   const handleSave = useCallback((items: TemplateItem[]) => {
     setCurrentItems(items);
