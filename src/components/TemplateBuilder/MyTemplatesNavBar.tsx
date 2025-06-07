@@ -189,13 +189,24 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
                   startIcon={<ArrowBackIcon />}
                   onClick={onBackToVisitTypes}
                   size="small"
+                  variant="outlined"
                   sx={{
-                    color: bravoColors.primaryFlat,
+                    borderColor: '#000000',
+                    color: '#FFFFFF',
+                    backgroundColor: '#000000',
                     textTransform: 'none',
                     fontWeight: 500,
                     minWidth: 'auto',
-                    px: 0.5,
-                    fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                    px: 1,
+                    py: 0.5,
+                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                    borderWidth: 1,
+                    '&:hover': {
+                      borderColor: '#333333',
+                      backgroundColor: '#333333',
+                      color: '#FFFFFF'
+                    },
+                    transition: 'all 0.2s ease'
                   }}
                 >
                   Back
