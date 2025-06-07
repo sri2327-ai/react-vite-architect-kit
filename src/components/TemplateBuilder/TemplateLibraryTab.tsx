@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -225,7 +226,10 @@ const TemplateLibraryTab: React.FC = () => {
           <Grid 
             item
             key={template.id}
-            size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+            xs={12}
+            sm={6}
+            md={4}
+            lg={3}
           >
             <Card 
               sx={{ 
@@ -381,3 +385,4 @@ const TemplateLibraryTab: React.FC = () => {
 };
 
 export default TemplateLibraryTab;
+
