@@ -588,22 +588,16 @@ const TemplateLibraryTab: React.FC = () => {
         spacing={{ xs: 2, sm: 3, md: 4 }}
         sx={{
           width: '100%',
-          margin: 0,
-          '& .MuiGrid-item': {
-            paddingLeft: { xs: '8px', sm: '12px', md: '16px' },
-            paddingTop: { xs: '8px', sm: '12px', md: '16px' }
-          }
+          margin: 0
         }}
       >
         {filteredTemplates.map((template) => (
           <Grid 
             key={template.id}
-            size={{
-              xs: 12,
-              sm: 6,
-              md: 4,
-              lg: 3
-            }}
+            xs={12}
+            sm={6}
+            md={4}
+            lg={3}
             sx={{
               display: 'flex',
               width: '100%'
