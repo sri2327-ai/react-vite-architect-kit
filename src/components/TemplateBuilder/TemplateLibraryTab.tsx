@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -21,7 +22,9 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Tabs,
+  Tab
 } from '@mui/material';
 import { 
   Search as SearchIcon, 
@@ -29,11 +32,13 @@ import {
   Visibility as ViewIcon,
   GetApp as GetAppIcon,
   Star as StarIcon,
-  StarBorder as StarBorderIcon
+  StarBorder as StarBorderIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import { useResponsive } from '@/hooks/useResponsive';
 import { SelectField } from '@/components/form';
+import { templateBuilderService } from '@/services/templateBuilderService';
 
 interface Template {
   id: string;
@@ -51,71 +56,104 @@ interface ImportDialogProps {
   open: boolean;
   template: Template | null;
   onClose: () => void;
-  onConfirm: (templateType: string) => void;
+  onConfirm: (visitType: string) => void;
+}
+
+interface PreviewDialogProps {
+  open: boolean;
+  template: Template | null;
+  onClose: () => void;
 }
 
 const ImportDialog: React.FC<ImportDialogProps> = ({ open, template, onClose, onConfirm }) => {
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedVisitType, setSelectedVisitType] = useState('');
+  const { isMobile } = useResponsive();
   
-  const templateTypes = [
-    { value: 'SOAP', label: 'SOAP Note' },
-    { value: 'Progress', label: 'Progress Note' },
-    { value: 'Consultation', label: 'Consultation Note' },
-    { value: 'Discharge', label: 'Discharge Summary' },
-    { value: 'History', label: 'History & Physical' },
-    { value: 'Procedure', label: 'Procedure Note' }
-  ];
+  const visitTypes = templateBuilderService.getAllVisitTypeNames();
 
   const handleConfirm = () => {
-    if (selectedType && template) {
-      onConfirm(selectedType);
-      setSelectedType('');
+    if (selectedVisitType && template) {
+      onConfirm(selectedVisitType);
+      setSelectedVisitType('');
       onClose();
     }
   };
 
   const handleClose = () => {
-    setSelectedType('');
+    setSelectedVisitType('');
     onClose();
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      maxWidth="sm" 
+      fullWidth
+      fullScreen={isMobile}
+      PaperProps={{
+        sx: {
+          borderRadius: isMobile ? 0 : 2,
+          m: isMobile ? 0 : 2
+        }
+      }}
+    >
+      <DialogTitle sx={{ 
+        fontSize: { xs: '1.1rem', sm: '1.25rem' },
+        pb: { xs: 1, sm: 2 }
+      }}>
         Import Template: {template?.name}
       </DialogTitle>
-      <DialogContent>
-        <Box sx={{ mt: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Select the type of template you want to import this as:
+      <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>
+        <Box sx={{ mt: { xs: 1, sm: 2 } }}>
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            sx={{ 
+              mb: { xs: 2, sm: 3 },
+              fontSize: { xs: '0.85rem', sm: '0.875rem' }
+            }}
+          >
+            Select the visit type for this template:
           </Typography>
           
           <FormControl fullWidth size="small">
-            <InputLabel>Template Type</InputLabel>
+            <InputLabel>Visit Type</InputLabel>
             <Select
-              value={selectedType}
-              label="Template Type"
-              onChange={(e) => setSelectedType(e.target.value)}
+              value={selectedVisitType}
+              label="Visit Type"
+              onChange={(e) => setSelectedVisitType(e.target.value)}
             >
-              {templateTypes.map((type) => (
-                <MenuItem key={type.value} value={type.value}>
-                  {type.label}
+              {visitTypes.map((visitType) => (
+                <MenuItem key={visitType} value={visitType}>
+                  {visitType}
                 </MenuItem>
               ))}
             </Select>
           </FormControl>
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="inherit">
+      <DialogActions sx={{ 
+        p: { xs: 2, sm: 3 },
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: 1, sm: 0 }
+      }}>
+        <Button 
+          onClick={handleClose} 
+          color="inherit"
+          fullWidth={isMobile}
+          sx={{ order: { xs: 2, sm: 1 } }}
+        >
           Cancel
         </Button>
         <Button 
           onClick={handleConfirm} 
           variant="contained" 
-          disabled={!selectedType}
+          disabled={!selectedVisitType}
+          fullWidth={isMobile}
           sx={{
             backgroundColor: bravoColors.primaryFlat,
+            order: { xs: 1, sm: 2 },
             '&:hover': {
               backgroundColor: bravoColors.secondary
             }
@@ -124,6 +162,194 @@ const ImportDialog: React.FC<ImportDialogProps> = ({ open, template, onClose, on
           Import Template
         </Button>
       </DialogActions>
+    </Dialog>
+  );
+};
+
+const PreviewDialog: React.FC<PreviewDialogProps> = ({ open, template, onClose }) => {
+  const [activeTab, setActiveTab] = useState(0);
+  const { isMobile } = useResponsive();
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
+  const sampleNoteContent = `
+CHIEF COMPLAINT:
+Follow-up visit for hypertension and diabetes management.
+
+HISTORY OF PRESENT ILLNESS:
+Patient reports feeling well overall. Blood pressure has been stable on current medications. Blood glucose levels have been within target range with current regimen.
+
+PHYSICAL EXAMINATION:
+Vital Signs: BP 128/78, HR 72, Temp 98.6°F
+General: Alert, oriented, no acute distress
+Cardiovascular: Regular rate and rhythm, no murmurs
+Respiratory: Clear to auscultation bilaterally
+
+ASSESSMENT:
+1. Hypertension - well controlled
+2. Type 2 Diabetes - good glycemic control
+
+PLAN:
+1. Continue current antihypertensive regimen
+2. Continue metformin 1000mg BID
+3. Follow up in 3 months
+4. Patient to monitor BP at home
+5. HbA1c in 3 months
+  `;
+
+  const sampleTemplateContent = `
+[CHIEF COMPLAINT]
+Brief description of patient's main concern
+
+[HISTORY OF PRESENT ILLNESS]
+Detailed history of the presenting problem including:
+- Onset, duration, characteristics
+- Associated symptoms
+- Aggravating/alleviating factors
+- Previous treatments tried
+
+[PHYSICAL EXAMINATION]
+- Vital Signs: BP ___, HR ___, Temp ___, RR ___
+- General Appearance: 
+- Cardiovascular: 
+- Respiratory: 
+- Other relevant systems: 
+
+[ASSESSMENT]
+1. Primary diagnosis
+2. Secondary diagnoses
+3. Rule out considerations
+
+[PLAN]
+1. Diagnostic tests/labs if needed
+2. Treatment recommendations
+3. Follow-up instructions
+4. Patient education provided
+  `;
+
+  return (
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="lg" 
+      fullWidth
+      fullScreen={isMobile}
+      PaperProps={{
+        sx: {
+          borderRadius: isMobile ? 0 : 2,
+          m: isMobile ? 0 : 1,
+          height: isMobile ? '100vh' : '90vh'
+        }
+      }}
+    >
+      <DialogTitle sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        borderBottom: 1,
+        borderColor: 'divider',
+        px: { xs: 2, sm: 3 },
+        py: { xs: 1.5, sm: 2 }
+      }}>
+        <Typography variant="h6" sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
+          Preview: {template?.name}
+        </Typography>
+        <Button 
+          onClick={onClose}
+          color="inherit"
+          size="small"
+          sx={{ minWidth: 'auto', p: 1 }}
+        >
+          <CloseIcon />
+        </Button>
+      </DialogTitle>
+      
+      <DialogContent sx={{ p: 0, overflow: 'hidden' }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange}
+            sx={{ px: { xs: 2, sm: 3 } }}
+          >
+            <Tab 
+              label="Sample Note" 
+              sx={{ 
+                textTransform: 'none',
+                fontSize: { xs: '0.875rem', sm: '1rem' }
+              }} 
+            />
+            <Tab 
+              label="Template Structure" 
+              sx={{ 
+                textTransform: 'none',
+                fontSize: { xs: '0.875rem', sm: '1rem' }
+              }} 
+            />
+          </Tabs>
+        </Box>
+        
+        <Box sx={{ 
+          p: { xs: 2, sm: 3 }, 
+          height: 'calc(100% - 48px)', 
+          overflow: 'auto' 
+        }}>
+          {activeTab === 0 && (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 2, color: bravoColors.primaryFlat }}>
+                Sample Note using this template:
+              </Typography>
+              <Box sx={{ 
+                backgroundColor: 'grey.50', 
+                p: { xs: 2, sm: 3 }, 
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider'
+              }}>
+                <Typography 
+                  component="pre" 
+                  sx={{ 
+                    whiteSpace: 'pre-wrap',
+                    fontFamily: 'monospace',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    lineHeight: 1.5
+                  }}
+                >
+                  {sampleNoteContent}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          
+          {activeTab === 1 && (
+            <Box>
+              <Typography variant="h6" sx={{ mb: 2, color: bravoColors.primaryFlat }}>
+                Template Structure:
+              </Typography>
+              <Box sx={{ 
+                backgroundColor: 'grey.50', 
+                p: { xs: 2, sm: 3 }, 
+                borderRadius: 2,
+                border: '1px solid',
+                borderColor: 'divider'
+              }}>
+                <Typography 
+                  component="pre" 
+                  sx={{ 
+                    whiteSpace: 'pre-wrap',
+                    fontFamily: 'monospace',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    lineHeight: 1.5
+                  }}
+                >
+                  {sampleTemplateContent}
+                </Typography>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </DialogContent>
     </Dialog>
   );
 };
@@ -181,6 +407,7 @@ const TemplateLibraryTab: React.FC = () => {
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [selectedType, setSelectedType] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
   const specialties = Array.from(new Set(libraryTemplates.map(t => t.specialty)));
@@ -197,7 +424,8 @@ const TemplateLibraryTab: React.FC = () => {
   });
 
   const handlePreviewTemplate = (template: Template) => {
-    console.log('Preview template:', template);
+    setSelectedTemplate(template);
+    setPreviewDialogOpen(true);
   };
 
   const handleImportTemplate = (template: Template) => {
@@ -205,27 +433,21 @@ const TemplateLibraryTab: React.FC = () => {
     setImportDialogOpen(true);
   };
 
-  const handleConfirmImport = (templateType: string) => {
+  const handleConfirmImport = (visitType: string) => {
     if (selectedTemplate) {
-      console.log('Importing template:', selectedTemplate, 'as type:', templateType);
+      console.log('Importing template:', selectedTemplate, 'for visit type:', visitType);
       // Here you would implement the actual import logic
-      // This could involve calling an API or updating local state
     }
-  };
-
-  const getGridColumns = () => {
-    if (isMobile) return 12;
-    if (isTablet) return 6;
-    return 4;
   };
 
   return (
     <Container 
-      maxWidth="xl" 
+      maxWidth={false}
       sx={{ 
         py: { xs: 2, sm: 3, md: 4 }, 
         px: { xs: 1, sm: 2, md: 3 },
-        width: '100%'
+        width: '100%',
+        maxWidth: '100%'
       }}
     >
       <Box sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
@@ -235,7 +457,8 @@ const TemplateLibraryTab: React.FC = () => {
             color: bravoColors.primaryFlat, 
             fontWeight: 700,
             mb: { xs: 2, sm: 3 },
-            textAlign: { xs: 'center', sm: 'left' }
+            textAlign: { xs: 'center', sm: 'left' },
+            fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' }
           }}
         >
           Template Library
@@ -477,6 +700,12 @@ const TemplateLibraryTab: React.FC = () => {
         template={selectedTemplate}
         onClose={() => setImportDialogOpen(false)}
         onConfirm={handleConfirmImport}
+      />
+
+      <PreviewDialog
+        open={previewDialogOpen}
+        template={selectedTemplate}
+        onClose={() => setPreviewDialogOpen(false)}
       />
     </Container>
   );
