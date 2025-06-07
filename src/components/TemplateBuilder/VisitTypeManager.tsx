@@ -12,6 +12,7 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Button,
   useTheme,
   useMediaQuery
 } from '@mui/material';
