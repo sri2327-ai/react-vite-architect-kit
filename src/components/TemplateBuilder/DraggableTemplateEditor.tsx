@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
@@ -53,6 +52,7 @@ import {
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import AddSectionOverlay from './AddSectionOverlay';
+import HelpDialog from './HelpDialog';
 
 interface TemplateItem {
   id: string;
@@ -443,6 +443,8 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [showAddSection, setShowAddSection] = useState(false);
   const [editingItem, setEditingItem] = useState<TemplateItem | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
+  const [helpItemName, setHelpItemName] = useState<string>('');
 
   // Update items when initialItems changes
   useEffect(() => {
@@ -584,9 +586,10 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   }, []);
 
   const handleHelp = useCallback((id: string) => {
-    console.log('Help for item:', id);
-    // TODO: Implement help functionality
-  }, []);
+    const item = items.find(item => item.id === id);
+    setHelpItemName(item?.name || '');
+    setShowHelpDialog(true);
+  }, [items]);
 
   const handleSaveTemplate = useCallback(() => {
     if (onSave) {
@@ -791,6 +794,13 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Help Dialog */}
+      <HelpDialog
+        open={showHelpDialog}
+        onClose={() => setShowHelpDialog(false)}
+        itemName={helpItemName}
+      />
     </Box>
   );
 };
