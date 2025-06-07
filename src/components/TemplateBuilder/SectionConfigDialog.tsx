@@ -199,18 +199,18 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   const getBulletedListGuidance = () => (
     <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
       <Box>
-        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
+        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
           💡 How Bulleted Lists Work
         </Typography>
-        <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+        <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
           Tell the A.I. what information you want it to generate in a bulleted list format.
         </Typography>
         
-        <Box sx={{ bgcolor: 'grey.50', p: 2, borderRadius: 1, border: '1px solid', borderColor: 'grey.200' }}>
-          <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+        <Box sx={{ bgcolor: 'grey.50', p: { xs: 1.5, sm: 2 }, borderRadius: 1, border: '1px solid', borderColor: 'grey.200' }}>
+          <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
             EXAMPLE
           </Typography>
-          <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>
+          <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
             "Create a bullet for each medication that was discussed. Each bullet should follow this format: {'{Medication Name}'} - {'{Dosage}'}, {'{Frequency}'}"
           </Typography>
         </Box>
@@ -221,22 +221,22 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   const getExamListGuidance = () => (
     <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
       <Box>
-        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2', display: 'flex', alignItems: 'center', gap: 1, fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
           🔍 How Exam Lists Work
         </Typography>
         <Box component="ul" sx={{ pl: 2, mb: 0, '& li': { mb: 1 } }}>
           <li>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
               <strong>Structured Output:</strong> Each subsection has its own instruction for AI generation
             </Typography>
           </li>
           <li>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
               <strong>Customizable Sections:</strong> Add, remove, or edit sections as needed
             </Typography>
           </li>
           <li>
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
               <strong>Normal Limits:</strong> Set default text and behavior for normal findings
             </Typography>
           </li>
@@ -248,10 +248,10 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   const getChecklistGuidance = () => (
     <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
       <Box>
-        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
+        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2', fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
           ✅ How Checklists Work
         </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
           Create clickable buttons that insert predefined text into your notes. Each button click adds the exact corresponding text - no AI generation involved.
         </Typography>
       </Box>
@@ -267,14 +267,14 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         '& .MuiAlert-message': { width: '100%' }
       }}
     >
-      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, fontSize: { xs: '0.85rem', sm: '0.9rem' } }}>
         💡 How AI Instructions Work
       </Typography>
       <Box component="ul" sx={{ pl: 2, mb: 0, '& li': { mb: 1 } }}>
-        <li><strong>Natural Language:</strong> Write instructions as you would explain to a colleague</li>
-        <li><strong>Placeholders:</strong> Use {'{variable}'} for dynamic content</li>
-        <li><strong>Exact Text:</strong> Use "quotes" for text that must appear exactly</li>
-        <li><strong>Hidden Notes:</strong> Use (parentheses) for AI-only instructions</li>
+        <li><Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}><strong>Natural Language:</strong> Write instructions as you would explain to a colleague</Typography></li>
+        <li><Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}><strong>Placeholders:</strong> Use {'{variable}'} for dynamic content</Typography></li>
+        <li><Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}><strong>Exact Text:</strong> Use "quotes" for text that must appear exactly</Typography></li>
+        <li><Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}><strong>Hidden Notes:</strong> Use (parentheses) for AI-only instructions</Typography></li>
       </Box>
     </Alert>
   );
@@ -289,11 +289,11 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         sx: { 
           borderRadius: 3, 
           maxHeight: '90vh',
-          m: { xs: 1, sm: 2 }
+          m: { xs: 0.5, sm: 2 }
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2, px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>
+      <DialogTitle sx={{ pb: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 }, pt: { xs: 1.5, sm: 3 } }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1 }}>
             {onBack && (
@@ -314,7 +314,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 variant="h6" 
                 sx={{ 
                   fontWeight: 600,
-                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                  fontSize: { xs: '0.95rem', sm: '1.25rem' }
                 }}
               >
                 {isBulletedList ? 'Edit Bulleted List' : 
@@ -329,7 +329,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                   variant="outlined"
                   sx={{ 
                     mt: 0.5,
-                    fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                    fontSize: { xs: '0.65rem', sm: '0.75rem' }
                   }}
                 />
               )}
@@ -341,13 +341,13 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pb: 2, px: { xs: 2, sm: 3 } }}>
+      <DialogContent sx={{ pb: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 } }}>
         {isBulletedList && getBulletedListGuidance()}
         {isExamList && getExamListGuidance()}
         {isChecklist && getChecklistGuidance()}
         {!isBulletedList && !isExamList && !isChecklist && getGeneralGuidance()}
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 3 } }}>
           <TextField
             fullWidth
             label="Section Title"
@@ -357,22 +357,27 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             size="small"
             required
             helperText="This will appear as the section header in your template"
+            sx={{
+              '& .MuiFormHelperText-root': {
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
+              }
+            }}
           />
           
           {isExamList && (
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: { xs: 2, sm: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: { xs: 1.5, sm: 3 } }}>
                 <Typography 
                   variant="h6" 
                   sx={{ 
                     fontWeight: 600,
-                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                    fontSize: { xs: '0.9rem', sm: '1.25rem' }
                   }}
                 >
                   Exam Sections
                 </Typography>
                 <Tooltip title="Define what specific aspects of the exam the AI should report on">
-                  <InfoIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: 'text.secondary' }} />
+                  <InfoIcon sx={{ fontSize: { xs: 14, sm: 18 }, color: 'text.secondary' }} />
                 </Tooltip>
               </Box>
               
@@ -380,22 +385,22 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 <Card 
                   key={item.id} 
                   sx={{ 
-                    mb: 2, 
+                    mb: { xs: 1.5, sm: 2 }, 
                     border: '2px solid', 
                     borderColor: 'grey.200',
                     '&:hover': { borderColor: 'primary.light' },
                     transition: 'border-color 0.2s'
                   }}
                 >
-                  <CardContent sx={{ '&:last-child': { pb: 2 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                  <CardContent sx={{ '&:last-child': { pb: { xs: 1.5, sm: 2 } }, p: { xs: 1.5, sm: 2 } }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 1.5, sm: 2 }, flexWrap: 'wrap', gap: 1 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                         <Chip 
                           label={`Section ${index + 1}`} 
                           size="small" 
                           color="primary" 
                           variant="outlined"
-                          sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                          sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' } }}
                         />
                         {item.title && (
                           <Typography 
@@ -403,7 +408,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                             sx={{ 
                               color: 'text.secondary', 
                               fontWeight: 500,
-                              fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
                             }}
                           >
                             {item.title}
@@ -426,7 +431,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                       )}
                     </Box>
                     
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 } }}>
                       <TextField
                         fullWidth
                         label="Subsection Title"
@@ -443,7 +448,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         value={item.instructions}
                         onChange={(e) => updateExamItem(item.id, 'instructions', e.target.value)}
                         multiline
-                        rows={2}
+                        rows={isMobile ? 2 : 2}
                         variant="outlined"
                         size="small"
                         placeholder="Tell the AI what to focus on for this section..."
@@ -469,39 +474,39 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 variant="outlined"
                 fullWidth={isMobile}
                 sx={{ 
-                  mb: 4, 
+                  mb: { xs: 2, sm: 4 }, 
                   textTransform: 'none',
                   borderStyle: 'dashed',
                   '&:hover': { borderStyle: 'solid' },
-                  fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
                 }}
               >
                 Add Another Exam Section
               </Button>
               
-              <Divider sx={{ my: 4 }} />
+              <Divider sx={{ my: { xs: 2, sm: 4 } }} />
               
               <Accordion defaultExpanded sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200' }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: { xs: 1, sm: 2 } }}>
                   <Typography 
                     variant="h6" 
                     sx={{ 
                       fontWeight: 600,
-                      fontSize: { xs: '1rem', sm: '1.25rem' }
+                      fontSize: { xs: '0.9rem', sm: '1.25rem' }
                     }}
                   >
                     Normal Limits Settings
                   </Typography>
                 </AccordionSummary>
-                <AccordionDetails>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <AccordionDetails sx={{ p: { xs: 1, sm: 2 } }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
                     <FormControl component="fieldset">
                       <FormLabel 
                         component="legend" 
                         sx={{ 
-                          mb: 2, 
+                          mb: { xs: 1, sm: 2 }, 
                           fontWeight: 600,
-                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                          fontSize: { xs: '0.8rem', sm: '0.9rem' }
                         }}
                       >
                         When an exam section is not discussed:
@@ -515,8 +520,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Leave it blank</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Section won't appear in the final output</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Leave it blank</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>Section won't appear in the final output</Typography>
                             </Box>
                           }
                         />
@@ -525,8 +530,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Default to "Within Normal Limits"</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Use standard normal findings text</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Default to "Within Normal Limits"</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>Use standard normal findings text</Typography>
                             </Box>
                           }
                         />
@@ -535,8 +540,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Alert provider to discuss this item</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Add a reminder note for missing sections</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Alert provider to discuss this item</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>Add a reminder note for missing sections</Typography>
                             </Box>
                           }
                         />
@@ -547,9 +552,9 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                       <FormLabel 
                         component="legend" 
                         sx={{ 
-                          mb: 2, 
+                          mb: { xs: 1, sm: 2 }, 
                           fontWeight: 600,
-                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                          fontSize: { xs: '0.8rem', sm: '0.9rem' }
                         }}
                       >
                         When findings are within normal limits:
@@ -563,8 +568,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Summarize the discussion</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>AI generates summary of normal findings</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Summarize the discussion</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>AI generates summary of normal findings</Typography>
                             </Box>
                           }
                         />
@@ -573,8 +578,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Use specified "Normal Limits" text</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Use the text you defined above</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Use specified "Normal Limits" text</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>Use the text you defined above</Typography>
                             </Box>
                           }
                         />
@@ -583,8 +588,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Highlight abnormal findings only</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Focus on what's not normal</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Highlight abnormal findings only</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>Focus on what's not normal</Typography>
                             </Box>
                           }
                         />
@@ -602,8 +607,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         }
                         label={
                           <Box>
-                            <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Hide empty sections</Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Don't show sections with no content</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Hide empty sections</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>Don't show sections with no content</Typography>
                           </Box>
                         }
                       />
@@ -619,23 +624,23 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               <Typography 
                 variant="body1" 
                 sx={{ 
-                  mb: 2, 
+                  mb: { xs: 1.5, sm: 2 }, 
                   fontWeight: 500,
-                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                  fontSize: { xs: '0.85rem', sm: '1rem' }
                 }}
               >
                 What buttons do you want to include?
               </Typography>
               
               {checklistItems.map((item, index) => (
-                <Card key={item.id} sx={{ mb: 2, border: '1px solid', borderColor: 'grey.300' }}>
-                  <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                <Card key={item.id} sx={{ mb: { xs: 1.5, sm: 2 }, border: '1px solid', borderColor: 'grey.300' }}>
+                  <CardContent sx={{ p: { xs: 1.5, sm: 3 } }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 1.5, sm: 2 }, flexWrap: 'wrap', gap: 1 }}>
                       <Typography 
                         variant="subtitle2" 
                         sx={{ 
                           fontWeight: 600,
-                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                          fontSize: { xs: '0.8rem', sm: '0.9rem' }
                         }}
                       >
                         Item {index + 1}
@@ -670,7 +675,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                       </Box>
                     </Box>
                     
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 } }}>
                       <TextField
                         fullWidth
                         label="Button Name"
@@ -686,7 +691,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         value={item.text}
                         onChange={(e) => updateChecklistItem(item.id, 'text', e.target.value)}
                         multiline
-                        rows={3}
+                        rows={isMobile ? 2 : 3}
                         variant="outlined"
                         size="small"
                       />
@@ -700,9 +705,9 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 onClick={addChecklistItem}
                 fullWidth={isMobile}
                 sx={{ 
-                  mb: 3, 
+                  mb: { xs: 2, sm: 3 }, 
                   textTransform: 'none',
-                  fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
                 }}
               >
                 Add Another Item
@@ -717,7 +722,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               multiline
-              rows={6}
+              rows={isMobile ? 4 : 6}
               placeholder="Describe what information should be included in each bullet point..."
               variant="outlined"
             />
@@ -730,7 +735,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               multiline
-              rows={6}
+              rows={isMobile ? 4 : 6}
               placeholder={`Provide detailed instructions for how the AI should generate the ${sectionName} section...`}
               variant="outlined"
             />
@@ -738,12 +743,12 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, gap: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
+      <DialogActions sx={{ p: { xs: 1.5, sm: 3 }, pt: { xs: 1, sm: 1 }, gap: { xs: 1, sm: 1 }, flexDirection: { xs: 'column', sm: 'row' } }}>
         <Button 
           onClick={onClose} 
           variant="outlined"
           fullWidth={isMobile}
-          sx={{ fontSize: { xs: '0.85rem', sm: '0.9rem' } }}
+          sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
         >
           Cancel
         </Button>
@@ -754,7 +759,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
           fullWidth={isMobile}
           sx={{ 
             minWidth: 120,
-            fontSize: { xs: '0.85rem', sm: '0.9rem' }
+            fontSize: { xs: '0.8rem', sm: '0.9rem' }
           }}
         >
           Continue

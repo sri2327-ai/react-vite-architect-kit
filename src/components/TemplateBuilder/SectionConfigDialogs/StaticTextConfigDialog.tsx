@@ -110,13 +110,13 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
           borderRadius: 3,
           maxHeight: '90vh',
           boxShadow: '0 24px 56px rgba(0,0,0,0.15)',
-          m: { xs: 1, sm: 2 }
+          m: { xs: 0.5, sm: 2 }
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2, px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>
+      <DialogTitle sx={{ pb: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 }, pt: { xs: 1.5, sm: 3 } }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
+          <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 2 }}>
             <IconButton 
               onClick={onBack}
               size="small"
@@ -127,17 +127,17 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
             >
               <ArrowBackIcon fontSize="small" />
             </IconButton>
-            <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 1.5 }}>
+            <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1.5 }}>
               <Box 
                 sx={{
                   backgroundColor: alpha('#ff9800', 0.1),
-                  p: { xs: 0.75, sm: 1 },
+                  p: { xs: 0.5, sm: 1 },
                   borderRadius: 2,
                   display: 'flex',
                   alignItems: 'center'
                 }}
               >
-                <TextSnippetIcon sx={{ fontSize: { xs: 18, sm: 20 }, color: '#f57c00' }} />
+                <TextSnippetIcon sx={{ fontSize: { xs: 16, sm: 20 }, color: '#f57c00' }} />
               </Box>
               <Box>
                 <Typography 
@@ -145,7 +145,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
                   sx={{ 
                     fontWeight: 700, 
                     mb: 0.5, 
-                    fontSize: { xs: '1rem', sm: '1.1rem' }
+                    fontSize: { xs: '0.95rem', sm: '1.1rem' }
                   }}
                 >
                   Configure Static Text Section
@@ -153,7 +153,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
                 <Typography 
                   variant="body2" 
                   color="text.secondary" 
-                  sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                  sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
                 >
                   Fixed text that appears in every note
                 </Typography>
@@ -175,14 +175,14 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
 
       <Divider />
 
-      <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
-        <Stack spacing={{ xs: 2, sm: 3 }}>
+      <DialogContent sx={{ p: { xs: 1.5, sm: 3 } }}>
+        <Stack spacing={{ xs: 1.5, sm: 3 }}>
           <Alert 
             severity="info" 
             icon={<TextSnippetIcon />}
             sx={{ 
               borderRadius: 2,
-              '& .MuiAlert-message': { fontSize: { xs: '0.8rem', sm: '0.875rem' } }
+              '& .MuiAlert-message': { fontSize: { xs: '0.75rem', sm: '0.875rem' } }
             }}
           >
             <Typography 
@@ -190,14 +190,14 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
               sx={{ 
                 mb: 1, 
                 fontWeight: 600,
-                fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                fontSize: { xs: '0.8rem', sm: '0.9rem' }
               }}
             >
               How Static Text Works
             </Typography>
             <Typography 
               variant="body2"
-              sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+              sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
             >
               Whatever you enter here will appear exactly as-is in your generated note. Use this for fixed text that should remain the same across all notes.
             </Typography>
@@ -207,18 +207,18 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
             <Typography 
               variant="subtitle1" 
               sx={{ 
-                mb: 2, 
+                mb: { xs: 1.5, sm: 2 }, 
                 fontWeight: 600, 
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: 1,
-                fontSize: { xs: '0.9rem', sm: '1rem' }
+                fontSize: { xs: '0.85rem', sm: '1rem' }
               }}
             >
-              <LightbulbIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: 'warning.main' }} />
+              <LightbulbIcon sx={{ fontSize: { xs: 14, sm: 18 }, color: 'warning.main' }} />
               Quick Start Templates
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.5, sm: 1 }, mb: { xs: 2, sm: 3 } }}>
               {exampleTemplates.map((example) => (
                 <Chip
                   key={example.label}
@@ -228,7 +228,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
                   onClick={() => handleExampleClick(example)}
                   sx={{
                     borderRadius: 2,
-                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                    fontSize: { xs: '0.65rem', sm: '0.75rem' },
                     '&:hover': {
                       backgroundColor: alpha('#ff9800', 0.05),
                       borderColor: '#ff9800'
@@ -255,6 +255,9 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
+              },
+              '& .MuiFormHelperText-root': {
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
               }
             }}
           />
@@ -263,7 +266,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
             fullWidth
             label="What fixed text do you want included in all notes?"
             multiline
-            rows={isMobile ? 6 : 8}
+            rows={isMobile ? 4 : 8}
             value={content}
             onChange={(e) => {
               setContent(e.target.value);
@@ -277,31 +280,34 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
+              },
+              '& .MuiFormHelperText-root': {
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
               }
             }}
           />
 
           <Accordion sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200', borderRadius: 2 }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: { xs: 1, sm: 2 } }}>
               <Typography 
                 variant="subtitle2" 
                 sx={{ 
                   fontWeight: 600,
-                  fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                  fontSize: { xs: '0.8rem', sm: '0.9rem' }
                 }}
               >
                 💡 Common Use Cases
               </Typography>
             </AccordionSummary>
-            <AccordionDetails>
-              <Stack spacing={2}>
-                <Paper sx={{ p: 2, backgroundColor: alpha('#4caf50', 0.05), border: `1px solid ${alpha('#4caf50', 0.2)}` }}>
+            <AccordionDetails sx={{ p: { xs: 1, sm: 2 } }}>
+              <Stack spacing={{ xs: 1.5, sm: 2 }}>
+                <Paper sx={{ p: { xs: 1.5, sm: 2 }, backgroundColor: alpha('#4caf50', 0.05), border: `1px solid ${alpha('#4caf50', 0.2)}` }}>
                   <Typography 
                     variant="caption" 
                     sx={{ 
                       fontWeight: 600, 
                       color: '#388e3c',
-                      fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                      fontSize: { xs: '0.65rem', sm: '0.75rem' }
                     }}
                   >
                     📄 DISCLAIMERS
@@ -309,19 +315,19 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
                   <Typography 
                     variant="body2" 
                     color="text.secondary"
-                    sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+                    sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
                   >
                     Standard legal text or medical disclaimers
                   </Typography>
                 </Paper>
                 
-                <Paper sx={{ p: 2, backgroundColor: alpha('#2196f3', 0.05), border: `1px solid ${alpha('#2196f3', 0.2)}` }}>
+                <Paper sx={{ p: { xs: 1.5, sm: 2 }, backgroundColor: alpha('#2196f3', 0.05), border: `1px solid ${alpha('#2196f3', 0.2)}` }}>
                   <Typography 
                     variant="caption" 
                     sx={{ 
                       fontWeight: 600, 
                       color: '#1976d2',
-                      fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                      fontSize: { xs: '0.65rem', sm: '0.75rem' }
                     }}
                   >
                     🏥 PRACTICE INFO
@@ -329,19 +335,19 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
                   <Typography 
                     variant="body2" 
                     color="text.secondary"
-                    sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+                    sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
                   >
                     Contact details or practice information
                   </Typography>
                 </Paper>
                 
-                <Paper sx={{ p: 2, backgroundColor: alpha('#9c27b0', 0.05), border: `1px solid ${alpha('#9c27b0', 0.2)}` }}>
+                <Paper sx={{ p: { xs: 1.5, sm: 2 }, backgroundColor: alpha('#9c27b0', 0.05), border: `1px solid ${alpha('#9c27b0', 0.2)}` }}>
                   <Typography 
                     variant="caption" 
                     sx={{ 
                       fontWeight: 600, 
                       color: '#7b1fa2',
-                      fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                      fontSize: { xs: '0.65rem', sm: '0.75rem' }
                     }}
                   >
                     📋 INSTRUCTIONS
@@ -349,7 +355,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
                   <Typography 
                     variant="body2" 
                     color="text.secondary"
-                    sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+                    sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
                   >
                     Standard instructions that appear in every note
                   </Typography>
@@ -362,7 +368,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
 
       <Divider />
 
-      <DialogActions sx={{ p: { xs: 2, sm: 3 }, gap: { xs: 1, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}>
+      <DialogActions sx={{ p: { xs: 1.5, sm: 3 }, gap: { xs: 1, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}>
         <Button 
           onClick={onBack}
           variant="outlined"
@@ -373,7 +379,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
             textTransform: 'none',
             fontWeight: 600,
             px: 3,
-            fontSize: { xs: '0.85rem', sm: '0.9rem' }
+            fontSize: { xs: '0.8rem', sm: '0.9rem' }
           }}
         >
           Back
@@ -398,7 +404,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
               boxShadow: 'none'
             },
             transition: 'all 0.3s ease',
-            fontSize: { xs: '0.85rem', sm: '0.9rem' }
+            fontSize: { xs: '0.8rem', sm: '0.9rem' }
           }}
         >
           Continue to Placement

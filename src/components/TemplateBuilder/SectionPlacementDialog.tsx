@@ -133,8 +133,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           setSelectedPosition(position);
         }}
         sx={{
-          p: { xs: 2, sm: 3 },
-          mb: { xs: 2, sm: 3 },
+          p: { xs: 1.5, sm: 3 },
+          mb: { xs: 1.5, sm: 3 },
           cursor: 'pointer',
           borderRadius: 4,
           border: `3px solid ${isSelected ? theme.palette.primary.main : 'transparent'}`,
@@ -171,15 +171,15 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           }
         }}
       >
-        <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 2, sm: 3 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 1.5, sm: 3 }}>
           <Box
             className="placement-icon"
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: { xs: 48, sm: 56 },
-              height: { xs: 48, sm: 56 },
+              width: { xs: 40, sm: 56 },
+              height: { xs: 40, sm: 56 },
               borderRadius: '50%',
               backgroundColor: isSelected 
                 ? theme.palette.primary.main
@@ -202,7 +202,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               }
             }}
           >
-            <IconComponent className={isSpecial ? "" : "placement-arrow"} sx={{ fontSize: { xs: 24, sm: 28 } }} />
+            <IconComponent className={isSpecial ? "" : "placement-arrow"} sx={{ fontSize: { xs: 20, sm: 28 } }} />
           </Box>
           
           <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
@@ -211,7 +211,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               sx={{ 
                 fontWeight: 700,
                 color: isSelected ? theme.palette.primary.main : theme.palette.text.primary,
-                fontSize: { xs: '1rem', sm: '1.2rem' },
+                fontSize: { xs: '0.9rem', sm: '1.2rem' },
                 mb: 0.5,
                 transition: 'color 0.3s ease'
               }}
@@ -222,7 +222,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               variant="body2" 
               sx={{ 
                 color: theme.palette.text.secondary,
-                fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                fontSize: { xs: '0.75rem', sm: '0.9rem' },
                 fontWeight: 500,
                 lineHeight: 1.4
               }}
@@ -234,8 +234,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           {isSelected && (
             <Box
               sx={{
-                width: { xs: 28, sm: 32 },
-                height: { xs: 28, sm: 32 },
+                width: { xs: 24, sm: 32 },
+                height: { xs: 24, sm: 32 },
                 borderRadius: '50%',
                 backgroundColor: theme.palette.success.main,
                 display: 'flex',
@@ -245,7 +245,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 order: { xs: -1, sm: 0 }
               }}
             >
-              <CheckCircleIcon sx={{ color: 'white', fontSize: { xs: 18, sm: 20 } }} />
+              <CheckCircleIcon sx={{ color: 'white', fontSize: { xs: 16, sm: 20 } }} />
             </Box>
           )}
         </Stack>
@@ -257,8 +257,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
     <Paper
       elevation={2}
       sx={{
-        p: { xs: 2, sm: 3 },
-        mb: { xs: 2, sm: 3 },
+        p: { xs: 1.5, sm: 3 },
+        mb: { xs: 1.5, sm: 3 },
         borderRadius: 3,
         backgroundColor: alpha(theme.palette.grey[50], 0.8),
         border: `2px solid ${alpha(theme.palette.divider, 0.1)}`,
@@ -270,21 +270,21 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
         }
       }}
     >
-      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 2, sm: 3 }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 1.5, sm: 3 }}>
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: { xs: 40, sm: 48 },
-            height: { xs: 40, sm: 48 },
+            width: { xs: 32, sm: 48 },
+            height: { xs: 32, sm: 48 },
             borderRadius: 3,
             backgroundColor: alpha(theme.palette.grey[400], 0.15),
             color: theme.palette.grey[600],
             border: `2px solid ${alpha(theme.palette.grey[400], 0.2)}`
           }}
         >
-          <DragIndicatorIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
+          <DragIndicatorIcon sx={{ fontSize: { xs: 16, sm: 24 } }} />
         </Box>
         
         <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
@@ -295,7 +295,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               sx={{ 
                 fontWeight: 700,
                 color: theme.palette.text.primary,
-                fontSize: { xs: '0.95rem', sm: '1.1rem' }
+                fontSize: { xs: '0.85rem', sm: '1.1rem' }
               }}
             >
               {section.name}
@@ -304,8 +304,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               label={getTypeLabel(section.type)}
               size="small"
               sx={{
-                height: { xs: 22, sm: 24 },
-                fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                height: { xs: 20, sm: 24 },
+                fontSize: { xs: '0.65rem', sm: '0.75rem' },
                 fontWeight: 600,
                 backgroundColor: alpha(theme.palette.primary.main, 0.12),
                 color: theme.palette.primary.main,
@@ -318,7 +318,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
             sx={{ 
               color: theme.palette.text.secondary,
               fontStyle: 'italic',
-              fontSize: { xs: '0.75rem', sm: '0.8rem' }
+              fontSize: { xs: '0.7rem', sm: '0.8rem' }
             }}
           >
             Position {index + 1} • Existing section
@@ -338,13 +338,13 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
         sx: { 
           borderRadius: 4,
           maxHeight: '85vh',
-          m: { xs: 1, sm: 2 }
+          m: { xs: 0.5, sm: 2 }
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2, px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>
+      <DialogTitle sx={{ pb: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 }, pt: { xs: 1.5, sm: 3 } }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
+          <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 2 }}>
             {onBack && (
               <IconButton 
                 onClick={handleBackClick}
@@ -367,7 +367,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 sx={{ 
                   fontWeight: 800, 
                   mb: 0.5, 
-                  fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.75rem' },
+                  fontSize: { xs: '1.1rem', sm: '1.5rem', md: '1.75rem' },
                   background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, 
                   backgroundClip: 'text', 
                   WebkitBackgroundClip: 'text', 
@@ -381,7 +381,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 color="text.secondary" 
                 sx={{ 
                   fontWeight: 500,
-                  fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' }
+                  fontSize: { xs: '0.8rem', sm: '0.95rem', md: '1rem' }
                 }}
               >
                 Select where you'd like to place your new section in the template
@@ -406,12 +406,12 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>
-        <Box sx={{ mb: 3 }}>
+      <DialogContent sx={{ px: { xs: 1.5, sm: 3 } }}>
+        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
           <Paper
             elevation={0}
             sx={{
-              p: { xs: 2, sm: 3 },
+              p: { xs: 1.5, sm: 3 },
               borderRadius: 3,
               background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)}, ${alpha(theme.palette.primary.main, 0.05)})`,
               border: `2px solid ${alpha(theme.palette.info.main, 0.2)}`
@@ -426,7 +426,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: 1,
-                fontSize: { xs: '0.95rem', sm: '1.1rem' }
+                fontSize: { xs: '0.9rem', sm: '1.1rem' }
               }}
             >
               💡 Quick Tip
@@ -437,7 +437,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 color: theme.palette.info.main, 
                 fontWeight: 500, 
                 lineHeight: 1.6,
-                fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                fontSize: { xs: '0.75rem', sm: '0.875rem' }
               }}
             >
               Click on any placement zone to position your new section. You can place it at the beginning, end, or between any existing sections.
@@ -488,7 +488,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               elevation={0}
               sx={{
                 textAlign: 'center',
-                py: { xs: 6, sm: 8 },
+                py: { xs: 4, sm: 8 },
                 borderRadius: 4,
                 border: `3px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
                 backgroundColor: alpha(theme.palette.primary.main, 0.02)
@@ -500,7 +500,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                   color: theme.palette.text.secondary, 
                   mb: 2, 
                   fontWeight: 600,
-                  fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
                 }}
               >
                 This will be your first section
@@ -509,7 +509,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 variant="body1" 
                 sx={{ 
                   color: theme.palette.text.secondary,
-                  fontSize: { xs: '0.85rem', sm: '0.95rem' }
+                  fontSize: { xs: '0.8rem', sm: '0.95rem' }
                 }}
               >
                 Click "Place at Beginning" above to add your first template section
@@ -521,11 +521,11 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
 
       <Divider />
 
-      <DialogActions sx={{ p: { xs: 2, sm: 3 }, gap: { xs: 1, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}>
+      <DialogActions sx={{ p: { xs: 1.5, sm: 3 }, gap: { xs: 1, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}>
         <Button 
           onClick={onClose} 
           variant="outlined"
-          size="large"
+          size="medium"
           fullWidth={isMobile}
           sx={{
             borderRadius: 3,
@@ -537,7 +537,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               borderWidth: 2,
               transform: 'translateY(-1px)'
             },
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            fontSize: { xs: '0.8rem', sm: '0.9rem' }
           }}
         >
           Cancel
@@ -545,7 +546,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
         <Button 
           onClick={handlePlacement}
           variant="contained"
-          size="large"
+          size="medium"
           disabled={selectedPosition === null}
           fullWidth={isMobile}
           sx={{
@@ -554,7 +555,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
             fontWeight: 700,
             px: 5,
             py: 1.5,
-            fontSize: '1rem',
+            fontSize: { xs: '0.85rem', sm: '1rem' },
             background: selectedPosition !== null 
               ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
               : theme.palette.action.disabledBackground,
