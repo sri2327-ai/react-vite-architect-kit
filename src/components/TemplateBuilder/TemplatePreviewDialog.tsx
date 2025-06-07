@@ -3,7 +3,6 @@ import React from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   Box,
   Typography,
@@ -82,7 +81,7 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
         }
       }}
     >
-      <DialogHeader sx={{ p: 3, pb: 1 }}>
+      <Box sx={{ p: 3, pb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box>
             <DialogTitle sx={{ p: 0, fontSize: '1.5rem', fontWeight: 700, color: bravoColors.primaryFlat }}>
@@ -98,7 +97,7 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
             <CloseIcon />
           </IconButton>
         </Box>
-      </DialogHeader>
+      </Box>
 
       <DialogContent sx={{ p: 3, pt: 2 }}>
         {/* Template Info */}
