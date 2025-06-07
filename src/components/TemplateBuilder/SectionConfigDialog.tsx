@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -42,7 +41,7 @@ import {
 interface SectionConfigDialogProps {
   open: boolean;
   onClose: () => void;
-  onContinue: () => void;
+  onContinue: (sectionData?: any) => void;
   onBack?: () => void;
   sectionType: string;
   sectionName: string;
@@ -94,17 +93,29 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   }, [open, sectionName]);
 
   const handleContinue = () => {
-    console.log('Section configuration completed:', { 
-      title, 
-      instructions, 
-      sectionType,
-      examItems,
-      checklistItems,
-      notDiscussedBehavior,
-      normalLimitsBehavior,
-      hideEmptyItems
-    });
-    onContinue();
+    const sectionData = {
+      id: Date.now().toString(),
+      name: title,
+      type: sectionType,
+      content: instructions || 'AI will generate content based on the instructions below.',
+      description: 'A.I. will write content following the guidelines below.',
+      // Include specific configuration based on section type
+      ...(isExamList && {
+        examItems: examItems,
+        notDiscussedBehavior,
+        normalLimitsBehavior,
+        hideEmptyItems
+      }),
+      ...(isChecklist && {
+        checklistItems: checklistItems
+      }),
+      ...(isBulletedList && {
+        instructions: instructions
+      })
+    };
+
+    console.log('Section configuration completed:', sectionData);
+    onContinue(sectionData);
   };
 
   const handleBack = () => {
@@ -116,6 +127,11 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
 
   // Debug log to see what sectionType we're receiving
   console.log('SectionConfigDialog - sectionType:', sectionType);
+
+  // Check if this is an exam list type (handle different possible values)
+  const isExamList = sectionType === 'exam_list' || sectionType === 'exam-list' || sectionType === 'examlist' || sectionType.toLowerCase().includes('exam');
+  const isBulletedList = sectionType === 'bulleted_list' || sectionType === 'bulleted-list' || sectionType === 'bulletedlist' || sectionType.toLowerCase().includes('bullet');
+  const isChecklist = sectionType === 'checklist' || sectionType === 'check-list' || sectionType.toLowerCase().includes('checklist');
 
   // Exam items functions
   const addExamItem = () => {
@@ -259,11 +275,6 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       </Box>
     </Alert>
   );
-
-  // Check if this is an exam list type (handle different possible values)
-  const isExamList = sectionType === 'exam_list' || sectionType === 'exam-list' || sectionType === 'examlist' || sectionType.toLowerCase().includes('exam');
-  const isBulletedList = sectionType === 'bulleted_list' || sectionType === 'bulleted-list' || sectionType === 'bulletedlist' || sectionType.toLowerCase().includes('bullet');
-  const isChecklist = sectionType === 'checklist' || sectionType === 'check-list' || sectionType.toLowerCase().includes('checklist');
 
   return (
     <Dialog

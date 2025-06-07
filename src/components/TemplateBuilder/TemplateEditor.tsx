@@ -17,6 +17,22 @@ interface TemplateItem {
     content: string;
     name?: string;
   }>;
+  // Add additional fields for different section types
+  examItems?: Array<{
+    id: string;
+    title: string;
+    instructions: string;
+    normalText: string;
+  }>;
+  checklistItems?: Array<{
+    id: string;
+    buttonName: string;
+    text: string;
+  }>;
+  notDiscussedBehavior?: string;
+  normalLimitsBehavior?: string;
+  hideEmptyItems?: boolean;
+  instructions?: string;
 }
 
 interface TemplateEditorProps {
@@ -223,13 +239,28 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     console.log('Template saved:', items);
   }, [onSave]);
 
-  const handleAddSectionToTemplate = useCallback((section: any) => {
+  const handleAddSectionToTemplate = useCallback((sectionOrFunction: any) => {
+    // If it's a function, store it for later use
+    if (typeof sectionOrFunction === 'function') {
+      // This is the callback function from SectionConfigDialog
+      return;
+    }
+
+    // If it's section data from the configuration dialog
+    const section = sectionOrFunction;
     const newItem: TemplateItem = {
-      id: Date.now().toString(),
+      id: section.id || Date.now().toString(),
       name: section.name || section.label || 'New Section',
       type: section.type || 'paragraph',
       content: section.content || section.description || 'AI will generate content based on the instructions below.',
-      description: 'A.I. will write content following the guidelines below.'
+      description: section.description || 'A.I. will write content following the guidelines below.',
+      // Include additional configuration data
+      ...(section.examItems && { examItems: section.examItems }),
+      ...(section.checklistItems && { checklistItems: section.checklistItems }),
+      ...(section.notDiscussedBehavior && { notDiscussedBehavior: section.notDiscussedBehavior }),
+      ...(section.normalLimitsBehavior && { normalLimitsBehavior: section.normalLimitsBehavior }),
+      ...(section.hideEmptyItems !== undefined && { hideEmptyItems: section.hideEmptyItems }),
+      ...(section.instructions && { instructions: section.instructions })
     };
     
     const updatedItems = [...currentItems, newItem];
