@@ -95,21 +95,41 @@ export const useTemplateData = (useApi: boolean = false) => {
   };
 
   const updateTemplate = async (id: string, updates: Partial<Template>) => {
+    console.log('useTemplateData: updateTemplate called with id:', id, 'updates:', updates);
+    
     if (useApi) {
       try {
         setLoading(true);
         const updatedTemplate = await apiService.put<Template>(`/templates/${id}`, updates);
         setTemplates(prev => prev.map(t => t.id === id ? updatedTemplate : t));
+        console.log('useTemplateData: Template updated via API:', updatedTemplate);
         return updatedTemplate;
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to update template');
+        console.error('useTemplateData: Update error:', err);
         throw err;
       } finally {
         setLoading(false);
       }
     } else {
-      const updatedTemplate = { ...templates.find(t => t.id === id)!, ...updates, lastModified: new Date().toISOString() };
-      setTemplates(prev => prev.map(t => t.id === id ? updatedTemplate : t));
+      const existingTemplate = templates.find(t => t.id === id);
+      if (!existingTemplate) {
+        console.error('useTemplateData: Template not found for update:', id);
+        return null;
+      }
+      
+      const updatedTemplate = { 
+        ...existingTemplate, 
+        ...updates, 
+        lastModified: new Date().toISOString() 
+      };
+      
+      setTemplates(prev => {
+        const updated = prev.map(t => t.id === id ? updatedTemplate : t);
+        console.log('useTemplateData: Template updated locally:', updatedTemplate);
+        console.log('useTemplateData: Updated templates list:', updated);
+        return updated;
+      });
       return updatedTemplate;
     }
   };

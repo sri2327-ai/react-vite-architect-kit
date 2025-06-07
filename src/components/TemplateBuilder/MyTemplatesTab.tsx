@@ -120,16 +120,27 @@ const MyTemplatesTab: React.FC = () => {
     }
   };
 
-  const handleSaveTemplate = (templateData: any) => {
+  const handleSaveTemplate = (sections: any[]) => {
+    console.log('MyTemplatesTab: handleSaveTemplate called with sections:', sections);
+    
     if (selectedTemplate) {
       const updatedTemplate = {
         ...selectedTemplate,
-        sections: templateData,
+        sections: sections, // sections is already an array of template items
         lastModified: new Date().toISOString()
       };
-      updateTemplate(selectedTemplate.id, updatedTemplate);
-      setSelectedTemplate(updatedTemplate);
-      console.log('Template saved successfully:', updatedTemplate);
+      
+      console.log('MyTemplatesTab: Updating template with sections:', updatedTemplate);
+      
+      try {
+        updateTemplate(selectedTemplate.id, updatedTemplate);
+        setSelectedTemplate(updatedTemplate);
+        console.log('MyTemplatesTab: Template saved successfully:', updatedTemplate);
+      } catch (error) {
+        console.error('MyTemplatesTab: Error saving template:', error);
+      }
+    } else {
+      console.error('MyTemplatesTab: No selected template to save');
     }
   };
 
