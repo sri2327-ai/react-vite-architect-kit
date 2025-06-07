@@ -16,8 +16,20 @@ const TemplateBuilder: React.FC<TemplateBuilderProps> = ({ activeTab = 'my-templ
   }, [activeTab]);
 
   return (
-    <Container maxWidth="xl" sx={{ height: '100vh', p: 0 }}>
-      <Box sx={{ height: '100%', overflow: 'auto' }}>
+    <Container 
+      maxWidth="xl" 
+      sx={{ 
+        height: '100vh', 
+        p: { xs: 0, sm: 1, md: 2 },
+        width: '100%',
+        maxWidth: { xs: '100%', sm: '100%', md: '100%', lg: '100%', xl: '100%' }
+      }}
+    >
+      <Box sx={{ 
+        height: '100%', 
+        overflow: 'auto',
+        width: '100%'
+      }}>
         {currentTab === 'my-templates' && <MyTemplatesTab />}
         {currentTab === 'template-library' && <TemplateLibraryTab />}
       </Box>

@@ -1,678 +1,385 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
+  Button,
+  useTheme,
+  useMediaQuery,
+  Container,
+  Grid,
   Card,
   CardContent,
+  CardActions,
   Chip,
+  TextField,
+  InputAdornment,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Tab,
-  Tabs,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Paper,
-  useTheme,
-  useMediaQuery,
-  Skeleton,
-  Fade,
-  Grow
+  Stack
 } from '@mui/material';
-import {
-  Close as CloseIcon
+import { 
+  Search as SearchIcon, 
+  FilterList as FilterIcon,
+  Visibility as ViewIcon,
+  GetApp as GetAppIcon,
+  Star as StarIcon,
+  StarBorder as StarBorderIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
+import { useResponsive } from '@/hooks/useResponsive';
 
-interface LibraryTemplate {
+interface Template {
   id: string;
-  title: string;
+  name: string;
+  description: string;
   specialty: string;
-  noteType: string;
-  content: string;
+  type: string;
+  tags: string[];
+  isPopular?: boolean;
+  downloads?: number;
+  rating?: number;
 }
 
-interface TemplateLibraryTabProps {
-  visitTypes?: string[];
-  onAddTemplate?: (template: LibraryTemplate, visitType: string) => void;
-}
-
-const libraryTemplates: LibraryTemplate[] = [
+const libraryTemplates: Template[] = [
   {
-    id: '1',
-    title: 'CLINICAL INTERVIEW1',
-    specialty: 'cardiologist',
-    noteType: 'SOAP',
-    content: `History of Present Illness
-Provide a comprehensive narrative of the patient's current condition. Include details about the onset, duration, and characteristics of the present illness. Note any associated symptoms, and incorporate relevant background information such as lifestyle factors and family medical history. Be sure to structure the narrative in a chronological manner, emphasizing the progression of the condition over time.
-
-Allergies
-List any known allergies the patient has, including reactions to medications, foods, or other substances. If there are no known allergies, indicate this as well.
-• Create a bullet for each known allergy, specifying the substance and the type of reaction.
-• Include a bullet to indicate if there are no known allergies.
-
-Family Health History
-Summarize the known family health history, focusing on immediate family members and highlighting relevant hereditary conditions.
-• Include a bullet for each immediate family member (parents, siblings, children) and mention their known health conditions.
-• For each individual mentioned, specify hereditary conditions that may be relevant to the patient's health.`
+    id: 'lib-1',
+    name: 'Primary Care Visit - SOAP',
+    description: 'Complete SOAP note template for primary care visits with comprehensive sections.',
+    specialty: 'Primary Care',
+    type: 'SOAP',
+    tags: ['General', 'Primary Care', 'SOAP'],
+    isPopular: true,
+    downloads: 1250,
+    rating: 4.8
   },
   {
-    id: '2',
-    title: 'CLINICAL INTERVIEW2',
-    specialty: 'pyschologist',
-    noteType: 'SOAP',
-    content: `Chief Complaint
-Document the primary reason for the patient's visit in their own words.
-
-History of Present Illness
-Detailed chronological account of the current condition including onset, duration, severity, and associated symptoms.
-
-Review of Systems
-Systematic review of body systems to identify additional symptoms not covered in the HPI.
-
-Physical Examination
-Comprehensive physical examination findings organized by body systems.
-
-Assessment and Plan
-Clinical impression and treatment plan for each identified problem.`
+    id: 'lib-2',
+    name: 'Cardiology Consultation',
+    description: 'Specialized template for cardiology consultations with cardiac-specific assessments.',
+    specialty: 'Cardiology',
+    type: 'Consultation',
+    tags: ['Cardiology', 'Specialist', 'Consultation'],
+    isPopular: true,
+    downloads: 890,
+    rating: 4.9
   },
   {
-    id: '3',
-    title: 'CLINICAL INTERVIEW3',
-    specialty: 'cardiologist',
-    noteType: 'DPD',
-    content: `Discharge Diagnosis
-Primary and secondary diagnoses at the time of discharge.
-
-Hospital Course
-Summary of the patient's stay including procedures, treatments, and clinical progress.
-
-Discharge Medications
-Complete list of medications prescribed at discharge with dosing instructions.
-
-Follow-up Instructions
-Specific instructions for follow-up care including appointments and monitoring.
-
-Discharge Condition
-Patient's condition and functional status at the time of discharge.`
+    id: 'lib-3',
+    name: 'Emergency Department Note',
+    description: 'Fast-track template for emergency department documentation.',
+    specialty: 'Emergency Medicine',
+    type: 'Emergency',
+    tags: ['Emergency', 'Fast-track', 'Acute Care'],
+    downloads: 2100,
+    rating: 4.7
   },
   {
-    id: '4',
-    title: 'Dermatology Intake',
-    specialty: 'Dermatology',
-    noteType: 'SOAP',
-    content: `Chief Complaint
-Primary skin concern or dermatological issue.
-
-Dermatological History
-History of skin conditions, previous treatments, and family history of skin disorders.
-
-Skin Examination
-Systematic examination of skin, hair, and nails with detailed descriptions of lesions.
-
-Dermatological Assessment
-Clinical impression of skin findings and differential diagnoses.
-
-Treatment Plan
-Recommended treatments, medications, and follow-up care for skin conditions.`
-  },
-  {
-    id: '5',
-    title: 'Neurology Followup',
-    specialty: 'pyschologist',
-    noteType: 'SOAP',
-    content: `Neurological Review
-Assessment of current neurological symptoms and changes since last visit.
-
-Neurological Examination
-Detailed neurological examination including mental status, cranial nerves, motor, sensory, and coordination testing.
-
-Medication Review
-Review of current neurological medications, effectiveness, and side effects.
-
-Plan
-Adjustments to treatment plan and recommendations for continued care.`
-  },
-  {
-    id: '6',
-    title: 'Dermatology Intake1',
-    specialty: 'cardiologist',
-    noteType: 'DPD',
-    content: `Initial Dermatological Assessment
-Comprehensive evaluation of skin, hair, and nail concerns.
-
-Skin History
-Detailed history of skin conditions, exposures, and treatments.
-
-Physical Examination
-Complete skin examination with photodocumentation when appropriate.
-
-Diagnostic Plan
-Recommended tests, biopsies, or additional evaluations.
-
-Treatment Recommendations
-Initial treatment plan and patient education.`
+    id: 'lib-4',
+    name: 'Pediatric Well-Child Visit',
+    description: 'Age-appropriate template for pediatric wellness examinations.',
+    specialty: 'Pediatrics',
+    type: 'Well-Child',
+    tags: ['Pediatrics', 'Wellness', 'Preventive'],
+    downloads: 675,
+    rating: 4.6
   }
 ];
 
-const TemplateLibraryTab: React.FC<TemplateLibraryTabProps> = ({ 
-  visitTypes = [],
-  onAddTemplate 
-}) => {
+const TemplateLibraryTab: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile, isTablet, isDesktop } = useResponsive();
   
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
-  const [selectedNoteType, setSelectedNoteType] = useState('');
-  const [previewTemplate, setPreviewTemplate] = useState<LibraryTemplate | null>(null);
-  const [previewTab, setPreviewTab] = useState(0);
-  const [visitTypeDialog, setVisitTypeDialog] = useState(false);
-  const [selectedVisitType, setSelectedVisitType] = useState('');
-  const [templateToAdd, setTemplateToAdd] = useState<LibraryTemplate | null>(null);
-  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [selectedType, setSelectedType] = useState('');
 
-  const specialties = ['', 'cardiologist', 'pyschologist', 'Dermatology'];
-  const noteTypes = ['', 'SOAP', 'DPD'];
+  const specialties = Array.from(new Set(libraryTemplates.map(t => t.specialty)));
+  const types = Array.from(new Set(libraryTemplates.map(t => t.type)));
 
-  // Memoize filtered templates for better performance
-  const filteredTemplates = useMemo(() => {
-    return libraryTemplates.filter(template => {
-      const matchesSpecialty = !selectedSpecialty || template.specialty === selectedSpecialty;
-      const matchesNoteType = !selectedNoteType || template.noteType === selectedNoteType;
-      return matchesSpecialty && matchesNoteType;
-    });
-  }, [selectedSpecialty, selectedNoteType]);
+  const filteredTemplates = libraryTemplates.filter(template => {
+    const matchesSearch = !searchTerm || 
+      template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      template.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSpecialty = !selectedSpecialty || template.specialty === selectedSpecialty;
+    const matchesType = !selectedType || template.type === selectedType;
+    
+    return matchesSearch && matchesSpecialty && matchesType;
+  });
 
-  // Use useCallback for better performance and prevent unnecessary re-renders
-  const handleTemplateClick = useCallback((template: LibraryTemplate) => {
-    setIsLoadingPreview(true);
-    // Simulate slight loading to improve perceived performance
-    setTimeout(() => {
-      setPreviewTemplate(template);
-      setIsLoadingPreview(false);
-    }, 100);
-  }, []);
+  const handlePreviewTemplate = (template: Template) => {
+    console.log('Preview template:', template);
+  };
 
-  const handleClosePreview = useCallback(() => {
-    setPreviewTemplate(null);
-    setPreviewTab(0);
-  }, []);
+  const handleImportTemplate = (template: Template) => {
+    console.log('Import template:', template);
+  };
 
-  const handleAddToLibrary = useCallback(() => {
-    setTemplateToAdd(previewTemplate);
-    setVisitTypeDialog(true);
-    handleClosePreview();
-  }, [previewTemplate, handleClosePreview]);
-
-  const handleVisitTypeSelect = useCallback(() => {
-    if (templateToAdd && selectedVisitType && onAddTemplate) {
-      onAddTemplate(templateToAdd, selectedVisitType);
-      setVisitTypeDialog(false);
-      setSelectedVisitType('');
-      setTemplateToAdd(null);
-    }
-  }, [templateToAdd, selectedVisitType, onAddTemplate]);
-
-  const handleCloseVisitTypeDialog = useCallback(() => {
-    setVisitTypeDialog(false);
-    setSelectedVisitType('');
-    setTemplateToAdd(null);
-  }, []);
-
-  const handleSpecialtyChange = useCallback((e: any) => {
-    setSelectedSpecialty(e.target.value);
-  }, []);
-
-  const handleNoteTypeChange = useCallback((e: any) => {
-    setSelectedNoteType(e.target.value);
-  }, []);
-
-  const handleTabChange = useCallback((event: React.SyntheticEvent, newValue: number) => {
-    setPreviewTab(newValue);
-  }, []);
-
-  const handleVisitTypeButtonClick = useCallback((visitType: string) => {
-    setSelectedVisitType(visitType);
-  }, []);
+  const getGridColumns = () => {
+    if (isMobile) return 12;
+    if (isTablet) return 6;
+    return 4;
+  };
 
   return (
-    <Box sx={{ p: { xs: 2, md: 4 } }}>
-      <Typography variant="h4" sx={{ 
-        color: bravoColors.primaryFlat, 
-        fontWeight: 700,
-        mb: 1
-      }}>
-        Template Library
-      </Typography>
-      
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
-        gap: 2, 
-        mb: 4 
-      }}>
-        <FormControl sx={{ minWidth: { xs: '100%', sm: 150 } }}>
-          <InputLabel>Specialty</InputLabel>
-          <Select
-            value={selectedSpecialty}
-            label="Specialty"
-            onChange={handleSpecialtyChange}
+    <Container 
+      maxWidth="xl" 
+      sx={{ 
+        py: { xs: 2, sm: 3, md: 4 }, 
+        px: { xs: 1, sm: 2, md: 3 },
+        width: '100%'
+      }}
+    >
+      <Box sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
+        <Typography 
+          variant={isMobile ? "h5" : "h4"} 
+          sx={{ 
+            color: bravoColors.primaryFlat, 
+            fontWeight: 700,
+            mb: { xs: 2, sm: 3 },
+            textAlign: { xs: 'center', sm: 'left' }
+          }}
+        >
+          Template Library
+        </Typography>
+        <Typography 
+          variant="body1" 
+          color="text.secondary"
+          sx={{ 
+            mb: { xs: 3, sm: 4 },
+            textAlign: { xs: 'center', sm: 'left' },
+            fontSize: { xs: '0.9rem', sm: '1rem' }
+          }}
+        >
+          Browse and import professionally designed templates for your practice
+        </Typography>
+
+        {/* Filters */}
+        <Stack 
+          direction={{ xs: 'column', sm: 'row' }} 
+          spacing={{ xs: 2, sm: 3 }}
+          sx={{ mb: { xs: 3, sm: 4 } }}
+        >
+          <TextField
+            fullWidth
             size="small"
-            aria-label="Filter by specialty"
-          >
-            <MenuItem value="">All</MenuItem>
-            {specialties.filter(s => s).map((specialty) => (
-              <MenuItem key={specialty} value={specialty}>
-                {specialty}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl sx={{ minWidth: { xs: '100%', sm: 120 } }}>
-          <InputLabel>Select</InputLabel>
-          <Select
-            value={selectedNoteType}
-            label="Select"
-            onChange={handleNoteTypeChange}
-            size="small"
-            aria-label="Filter by note type"
-          >
-            <MenuItem value="">All</MenuItem>
-            {noteTypes.filter(n => n).map((noteType) => (
-              <MenuItem key={noteType} value={noteType}>
-                {noteType}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-      <Box sx={{ 
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(2, 1fr)',
-          md: 'repeat(3, 1fr)'
-        },
-        gap: 3
-      }}>
-        {filteredTemplates.map((template, index) => (
-          <Grow key={template.id} in={true} timeout={300 + (index * 100)}>
-            <Box>
-              <Card 
-                sx={{ 
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  border: `1px solid ${bravoColors.primaryFlat}20`,
-                  borderRadius: 3,
-                  height: '100%',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 8px 25px ${bravoColors.primaryFlat}30`,
-                    borderColor: bravoColors.primaryFlat
-                  },
-                  '&:focus-visible': {
-                    outline: `2px solid ${bravoColors.primaryFlat}`,
-                    outlineOffset: '2px'
-                  }
-                }}
-                onClick={() => handleTemplateClick(template)}
-                role="button"
-                tabIndex={0}
-                aria-label={`Preview template: ${template.title}`}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleTemplateClick(template);
-                  }
-                }}
-              >
-                <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant="h6" sx={{ 
-                    fontWeight: 600,
-                    mb: 2,
-                    color: bravoColors.primaryFlat,
-                    flexGrow: 1
-                  }}>
-                    {template.title}
-                  </Typography>
-                  
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                    <Chip 
-                      label={`Specialty: ${template.specialty}`}
-                      size="small"
-                      sx={{
-                        backgroundColor: `${bravoColors.secondary}20`,
-                        color: bravoColors.secondary,
-                        fontWeight: 600,
-                        alignSelf: 'flex-start'
-                      }}
-                    />
-                    <Chip 
-                      label={`Note Type: ${template.noteType}`}
-                      size="small"
-                      sx={{
-                        backgroundColor: `${bravoColors.primaryFlat}20`,
-                        color: bravoColors.primaryFlat,
-                        fontWeight: 600,
-                        alignSelf: 'flex-start'
-                      }}
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Box>
-          </Grow>
-        ))}
-      </Box>
-
-      {/* Enhanced Template Preview Dialog */}
-      <Dialog 
-        open={!!previewTemplate || isLoadingPreview} 
-        onClose={handleClosePreview}
-        maxWidth="lg" 
-        fullWidth
-        TransitionComponent={Fade}
-        transitionDuration={300}
-        PaperProps={{
-          sx: { 
-            height: { xs: '90vh', md: '80vh' },
-            borderRadius: 3,
-            m: { xs: 1, md: 2 }
-          }
-        }}
-        aria-labelledby="template-preview-title"
-      >
-        <DialogTitle sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          pb: 1,
-          px: { xs: 2, md: 3 }
-        }}>
-          <Typography 
-            id="template-preview-title"
-            variant="h5" 
-            sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}
-          >
-            Template Preview
-          </Typography>
-          <IconButton 
-            onClick={handleClosePreview} 
-            sx={{ color: bravoColors.primaryFlat }}
-            aria-label="Close preview"
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        
-        <DialogContent sx={{ p: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          {isLoadingPreview ? (
-            <Box sx={{ p: { xs: 2, md: 3 } }}>
-              <Skeleton variant="text" width="60%" height={40} />
-              <Skeleton variant="rectangular" width="100%" height={200} sx={{ mt: 2 }} />
-            </Box>
-          ) : (
-            <>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                <Tabs 
-                  value={previewTab} 
-                  onChange={handleTabChange}
-                  sx={{ 
-                    px: { xs: 2, md: 3 },
-                    '& .MuiTab-root': {
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      fontSize: { xs: '0.9rem', md: '1rem' },
-                      '&.Mui-selected': {
-                        color: bravoColors.primaryFlat
-                      }
-                    }
-                  }}
-                  variant={isMobile ? "fullWidth" : "standard"}
-                  aria-label="Template content tabs"
-                >
-                  <Tab label="Template Preview" />
-                  <Tab label="Example Note" />
-                </Tabs>
-              </Box>
-
-              <Box sx={{ 
-                flex: 1, 
-                overflow: 'auto',
-                p: { xs: 2, md: 3 }
-              }}>
-                {previewTab === 0 && previewTemplate && (
-                  <Fade in={previewTab === 0} timeout={200}>
-                    <Paper 
-                      variant="outlined" 
-                      sx={{ 
-                        p: { xs: 2, md: 3 },
-                        borderRadius: 2,
-                        backgroundColor: 'grey.50'
-                      }}
-                    >
-                      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                        {previewTemplate.title}
-                      </Typography>
-                      <Typography 
-                        variant="body1" 
-                        sx={{ 
-                          whiteSpace: 'pre-line',
-                          lineHeight: 1.6,
-                          fontFamily: 'monospace',
-                          fontSize: { xs: '0.875rem', md: '1rem' }
-                        }}
-                      >
-                        {previewTemplate.content}
-                      </Typography>
-                    </Paper>
-                  </Fade>
-                )}
-
-                {previewTab === 1 && (
-                  <Fade in={previewTab === 1} timeout={200}>
-                    <Paper 
-                      variant="outlined" 
-                      sx={{ 
-                        p: { xs: 2, md: 3 },
-                        borderRadius: 2,
-                        backgroundColor: 'grey.50'
-                      }}
-                    >
-                      <Typography variant="body1" color="text.secondary">
-                        Example note content would be displayed here. This would show how the template 
-                        appears when filled out with sample patient data.
-                      </Typography>
-                    </Paper>
-                  </Fade>
-                )}
-              </Box>
-            </>
-          )}
-        </DialogContent>
-
-        {!isLoadingPreview && (
-          <DialogActions sx={{ 
-            p: { xs: 2, md: 3 }, 
-            pt: 0,
-            flexDirection: { xs: 'column', sm: 'row' },
-            gap: { xs: 1, sm: 0 }
-          }}>
-            <Button 
-              onClick={handleClosePreview}
-              variant="outlined"
-              fullWidth={isMobile}
-              sx={{ 
-                textTransform: 'none',
-                borderColor: bravoColors.primaryFlat,
-                color: bravoColors.primaryFlat,
-                borderRadius: 2,
-                px: 3,
-                py: 1
-              }}
+            placeholder="Search templates..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              maxWidth: { sm: 300 },
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2
+              }
+            }}
+          />
+          
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 150 } }}>
+            <InputLabel>Specialty</InputLabel>
+            <Select
+              value={selectedSpecialty}
+              label="Specialty"
+              onChange={(e) => setSelectedSpecialty(e.target.value)}
+              sx={{ borderRadius: 2 }}
             >
-              CANCEL
-            </Button>
-            <Button 
-              onClick={handleAddToLibrary}
-              variant="contained"
-              fullWidth={isMobile}
+              <MenuItem value="">All Specialties</MenuItem>
+              {specialties.map((specialty) => (
+                <MenuItem key={specialty} value={specialty}>
+                  {specialty}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 120 } }}>
+            <InputLabel>Type</InputLabel>
+            <Select
+              value={selectedType}
+              label="Type"
+              onChange={(e) => setSelectedType(e.target.value)}
+              sx={{ borderRadius: 2 }}
+            >
+              <MenuItem value="">All Types</MenuItem>
+              {types.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
+      </Box>
+
+      {/* Templates Grid */}
+      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+        {filteredTemplates.map((template) => (
+          <Grid 
+            item 
+            xs={12} 
+            sm={6} 
+            md={4} 
+            lg={3}
+            key={template.id}
+          >
+            <Card 
               sx={{ 
-                textTransform: 'none',
-                backgroundColor: bravoColors.primaryFlat,
-                borderRadius: 2,
-                px: 3,
-                py: 1,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'divider',
+                transition: 'all 0.3s ease',
                 '&:hover': {
-                  backgroundColor: bravoColors.secondary
+                  transform: 'translateY(-4px)',
+                  boxShadow: theme.shadows[8],
+                  borderColor: bravoColors.primaryFlat
                 }
               }}
             >
-              ADD TO LIBRARY
-            </Button>
-          </DialogActions>
-        )}
-      </Dialog>
-
-      {/* Enhanced Visit Type Selection Dialog */}
-      <Dialog 
-        open={visitTypeDialog} 
-        onClose={handleCloseVisitTypeDialog}
-        maxWidth="sm" 
-        fullWidth
-        TransitionComponent={Fade}
-        transitionDuration={300}
-        PaperProps={{
-          sx: { 
-            borderRadius: 3,
-            m: { xs: 1, md: 2 },
-            minHeight: '300px'
-          }
-        }}
-        aria-labelledby="visit-type-dialog-title"
-      >
-        <DialogTitle sx={{ pb: 1 }}>
-          <Typography 
-            id="visit-type-dialog-title"
-            variant="h5" 
-            sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}
-          >
-            Select Visit Type
-          </Typography>
-        </DialogTitle>
-        
-        <DialogContent sx={{ py: 2 }}>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Choose which visit type this template should be added to:
-          </Typography>
-          
-          <Paper 
-            variant="outlined" 
-            sx={{ 
-              borderRadius: 2,
-              overflow: 'hidden'
-            }}
-          >
-            <List sx={{ p: 0 }} role="radiogroup" aria-label="Visit type selection">
-              {visitTypes.map((visitType, index) => (
-                <React.Fragment key={visitType}>
-                  <ListItem disablePadding>
-                    <ListItemButton 
-                      onClick={() => handleVisitTypeButtonClick(visitType)}
-                      selected={selectedVisitType === visitType}
-                      sx={{
-                        py: 2,
-                        px: 3,
-                        '&.Mui-selected': {
-                          backgroundColor: `${bravoColors.primaryFlat}15`,
-                          '&:hover': {
-                            backgroundColor: `${bravoColors.primaryFlat}20`
-                          }
-                        }
+              <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        fontWeight: 600,
+                        mb: 1,
+                        fontSize: { xs: '1rem', sm: '1.1rem' },
+                        lineHeight: 1.3
                       }}
-                      role="radio"
-                      aria-checked={selectedVisitType === visitType}
-                      aria-label={`Select ${visitType} visit type`}
                     >
-                      <ListItemText
-                        primary={
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: selectedVisitType === visitType ? 600 : 400,
-                              color: selectedVisitType === visitType ? bravoColors.primaryFlat : 'text.primary'
-                            }}
-                          >
-                            {visitType}
-                          </Typography>
-                        }
+                      {template.name}
+                    </Typography>
+                    {template.isPopular && (
+                      <Chip 
+                        label="Popular" 
+                        size="small" 
+                        sx={{ 
+                          backgroundColor: `${bravoColors.primaryFlat}20`,
+                          color: bravoColors.primaryFlat,
+                          fontSize: '0.75rem'
+                        }} 
                       />
-                    </ListItemButton>
-                  </ListItem>
-                  {index < visitTypes.length - 1 && (
-                    <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', mx: 2 }} />
-                  )}
-                </React.Fragment>
-              ))}
-            </List>
-          </Paper>
-        </DialogContent>
+                    )}
+                  </Box>
+                </Box>
 
-        <DialogActions sx={{ 
-          p: 3, 
-          pt: 1,
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: { xs: 1, sm: 0 }
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ 
+                    mb: 2,
+                    fontSize: { xs: '0.85rem', sm: '0.875rem' },
+                    lineHeight: 1.4
+                  }}
+                >
+                  {template.description}
+                </Typography>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography 
+                    variant="caption" 
+                    color="text.secondary" 
+                    sx={{ display: 'block', mb: 1 }}
+                  >
+                    Specialty: {template.specialty}
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {template.tags.slice(0, 3).map((tag) => (
+                      <Chip 
+                        key={tag} 
+                        label={tag} 
+                        size="small" 
+                        variant="outlined"
+                        sx={{ 
+                          fontSize: '0.7rem',
+                          height: 24
+                        }} 
+                      />
+                    ))}
+                  </Box>
+                </Box>
+
+                {template.rating && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <StarIcon sx={{ fontSize: 16, color: '#ffa726' }} />
+                    <Typography variant="caption">
+                      {template.rating} ({template.downloads} downloads)
+                    </Typography>
+                  </Box>
+                )}
+              </CardContent>
+
+              <CardActions sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
+                <Stack 
+                  direction={{ xs: 'column', sm: 'row' }} 
+                  spacing={1} 
+                  sx={{ width: '100%' }}
+                >
+                  <Button
+                    variant="outlined"
+                    startIcon={<ViewIcon />}
+                    onClick={() => handlePreviewTemplate(template)}
+                    size="small"
+                    sx={{
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      flex: { xs: 'none', sm: 1 },
+                      fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                    }}
+                  >
+                    Preview
+                  </Button>
+                  <Button
+                    variant="contained"
+                    startIcon={<GetAppIcon />}
+                    onClick={() => handleImportTemplate(template)}
+                    size="small"
+                    sx={{
+                      backgroundColor: bravoColors.primaryFlat,
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      flex: { xs: 'none', sm: 1 },
+                      fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                      '&:hover': {
+                        backgroundColor: bravoColors.secondary
+                      }
+                    }}
+                  >
+                    Import
+                  </Button>
+                </Stack>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {filteredTemplates.length === 0 && (
+        <Box sx={{
+          textAlign: 'center',
+          py: { xs: 6, sm: 8 },
+          color: 'text.secondary'
         }}>
-          <Button 
-            onClick={handleCloseVisitTypeDialog}
-            variant="outlined"
-            fullWidth={isMobile}
-            sx={{ 
-              textTransform: 'none',
-              borderColor: bravoColors.primaryFlat,
-              color: bravoColors.primaryFlat,
-              borderRadius: 2,
-              px: 3
-            }}
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleVisitTypeSelect}
-            variant="contained"
-            disabled={!selectedVisitType}
-            fullWidth={isMobile}
-            sx={{ 
-              textTransform: 'none',
-              backgroundColor: bravoColors.primaryFlat,
-              borderRadius: 2,
-              px: 3,
-              '&:hover': {
-                backgroundColor: bravoColors.secondary
-              },
-              '&:disabled': {
-                backgroundColor: 'grey.300'
-              }
-            }}
-          >
-            Add Template
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+          <Typography variant="h6" sx={{ mb: 2, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
+            No templates found
+          </Typography>
+          <Typography variant="body2" sx={{ fontSize: { xs: '0.85rem', sm: '0.875rem' } }}>
+            Try adjusting your search criteria to find more templates.
+          </Typography>
+        </Box>
+      )}
+    </Container>
   );
 };
 
