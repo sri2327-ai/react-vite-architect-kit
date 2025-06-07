@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Card, Grid } from '@mui/material';
+import { Box, Typography, Card, Grid2 as Grid } from '@mui/material';
 import { AccountTree, Schedule, Assignment, Sync } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
@@ -24,7 +24,7 @@ const WorkflowIntroStep: React.FC = () => {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ p: 3, height: '100%' }}>
             <Schedule sx={{ fontSize: 40, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom>
@@ -36,7 +36,7 @@ const WorkflowIntroStep: React.FC = () => {
           </Card>
         </Grid>
         
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ p: 3, height: '100%' }}>
             <Assignment sx={{ fontSize: 40, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom>
@@ -48,7 +48,7 @@ const WorkflowIntroStep: React.FC = () => {
           </Card>
         </Grid>
         
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ p: 3, height: '100%' }}>
             <Sync sx={{ fontSize: 40, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom>
@@ -60,7 +60,7 @@ const WorkflowIntroStep: React.FC = () => {
           </Card>
         </Grid>
         
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ p: 3, height: '100%' }}>
             <AccountTree sx={{ fontSize: 40, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" gutterBottom>

@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Card, Grid } from '@mui/material';
-import { Template as TemplateIcon, AccountTree as WorkflowIcon, Star as StarIcon } from '@mui/icons-material';
+import { Box, Typography, Card, Grid2 as Grid } from '@mui/material';
+import { Description as TemplateIcon, AccountTree as WorkflowIcon, Star as StarIcon } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
 const WelcomeStep: React.FC = () => {
@@ -30,7 +30,7 @@ const WelcomeStep: React.FC = () => {
           </Typography>
 
           <Grid container spacing={3} sx={{ maxWidth: 800, mx: 'auto' }}>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <TemplateIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -42,7 +42,7 @@ const WelcomeStep: React.FC = () => {
               </Card>
             </Grid>
             
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <WorkflowIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -54,7 +54,7 @@ const WelcomeStep: React.FC = () => {
               </Card>
             </Grid>
             
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <StarIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -75,7 +75,7 @@ const WelcomeStep: React.FC = () => {
           </Typography>
 
           <Grid container spacing={3} sx={{ maxWidth: 600, mx: 'auto' }}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <TemplateIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -87,7 +87,7 @@ const WelcomeStep: React.FC = () => {
               </Card>
             </Grid>
             
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <StarIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>

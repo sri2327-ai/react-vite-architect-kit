@@ -3,7 +3,6 @@ import React from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
   Box,
   Stepper,
@@ -109,16 +108,14 @@ const GuideModal: React.FC = () => {
         }
       }}
     >
-      <DialogHeader sx={{ pb: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <DialogTitle sx={{ p: 0, fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
-            Implementation Guide
-          </DialogTitle>
-          <IconButton onClick={skipGuide} size="small">
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      </DialogHeader>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 3, pb: 1 }}>
+        <DialogTitle sx={{ p: 0, fontSize: { xs: '1.25rem', md: '1.5rem' } }}>
+          Implementation Guide
+        </DialogTitle>
+        <IconButton onClick={skipGuide} size="small">
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
       <DialogContent sx={{ px: { xs: 2, md: 3 }, py: 2 }}>
         {/* Progress Indicator */}
