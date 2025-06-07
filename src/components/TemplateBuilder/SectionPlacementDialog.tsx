@@ -102,213 +102,207 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
     const isActive = isSelected || isHovered;
 
     return (
-      <Zoom in={true} timeout={300} style={{ transitionDelay: `${position * 50}ms` }}>
-        <Paper
-          elevation={isActive ? 12 : 3}
-          onMouseEnter={() => setHoveredPosition(position)}
-          onMouseLeave={() => setHoveredPosition(null)}
-          onClick={() => setSelectedPosition(position)}
-          sx={{
-            p: 3,
-            mb: 3,
-            cursor: 'pointer',
-            borderRadius: 4,
-            border: `3px solid ${isSelected ? theme.palette.primary.main : 'transparent'}`,
-            backgroundColor: isSelected 
-              ? alpha(theme.palette.primary.main, 0.12)
-              : isHovered 
-                ? alpha(theme.palette.primary.main, 0.06)
-                : 'white',
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-            transform: isActive ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
-            boxShadow: isActive 
-              ? `0 12px 40px ${alpha(theme.palette.primary.main, 0.3)}`
-              : `0 4px 12px ${alpha(theme.palette.grey[500], 0.15)}`,
-            '&:hover': {
-              '& .placement-icon': {
-                transform: 'scale(1.15) rotate(5deg)',
-                color: theme.palette.primary.main
-              },
-              '& .placement-arrow': {
-                animation: 'bounce 1s infinite'
-              }
-            },
-            position: 'relative',
-            overflow: 'hidden',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 4,
-              background: isSelected ? theme.palette.primary.main : 'transparent',
-              transition: 'all 0.3s ease'
-            }
-          }}
-        >
-          <Stack direction="row" alignItems="center" spacing={3}>
-            <Box
-              className="placement-icon"
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 56,
-                height: 56,
-                borderRadius: '50%',
-                backgroundColor: isSelected 
-                  ? theme.palette.primary.main
-                  : alpha(theme.palette.primary.main, 0.12),
-                color: isSelected ? 'white' : theme.palette.primary.main,
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                border: `3px solid ${isSelected ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.3)}`,
-                position: 'relative',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  inset: -4,
-                  borderRadius: '50%',
-                  padding: 2,
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  maskComposite: 'xor',
-                  opacity: isSelected ? 1 : 0,
-                  transition: 'opacity 0.3s ease'
-                }
-              }}
-            >
-              {isFirst ? (
-                <AddIcon sx={{ fontSize: 28 }} />
-              ) : (
-                <ArrowDownwardIcon className="placement-arrow" sx={{ fontSize: 28 }} />
-              )}
-            </Box>
-            
-            <Box sx={{ flex: 1 }}>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  fontWeight: 700,
-                  color: isSelected ? theme.palette.primary.main : theme.palette.text.primary,
-                  fontSize: '1.2rem',
-                  mb: 0.5,
-                  transition: 'color 0.3s ease'
-                }}
-              >
-                {label}
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: theme.palette.text.secondary,
-                  fontSize: '0.9rem',
-                  fontWeight: 500
-                }}
-              >
-                {isFirst ? 'Your new section will appear at the very top' : 'Your new section will be placed here'}
-              </Typography>
-            </Box>
-
-            {isSelected && (
-              <Zoom in={true} timeout={200}>
-                <Box
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    backgroundColor: theme.palette.success.main,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: `0 4px 12px ${alpha(theme.palette.success.main, 0.4)}`
-                  }}
-                >
-                  <CheckCircleIcon sx={{ color: 'white', fontSize: 20 }} />
-                </Box>
-              </Zoom>
-            )}
-          </Stack>
-        </Paper>
-      </Zoom>
-    );
-  };
-
-  const ExistingSection = ({ section, index }: { section: { id: string; name: string; type?: string }; index: number }) => (
-    <Fade in={true} timeout={400} style={{ transitionDelay: `${index * 100}ms` }}>
       <Paper
-        elevation={2}
+        elevation={isActive ? 12 : 3}
+        onMouseEnter={() => setHoveredPosition(position)}
+        onMouseLeave={() => setHoveredPosition(null)}
+        onClick={() => setSelectedPosition(position)}
         sx={{
           p: 3,
           mb: 3,
-          borderRadius: 3,
-          backgroundColor: alpha(theme.palette.grey[50], 0.8),
-          border: `2px solid ${alpha(theme.palette.divider, 0.1)}`,
-          transition: 'all 0.3s ease',
+          cursor: 'pointer',
+          borderRadius: 4,
+          border: `3px solid ${isSelected ? theme.palette.primary.main : 'transparent'}`,
+          backgroundColor: isSelected 
+            ? alpha(theme.palette.primary.main, 0.12)
+            : isHovered 
+              ? alpha(theme.palette.primary.main, 0.06)
+              : 'white',
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          transform: isActive ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
+          boxShadow: isActive 
+            ? `0 12px 40px ${alpha(theme.palette.primary.main, 0.3)}`
+            : `0 4px 12px ${alpha(theme.palette.grey[500], 0.15)}`,
           '&:hover': {
-            backgroundColor: alpha(theme.palette.grey[100], 0.8),
-            transform: 'translateY(-1px)',
-            boxShadow: `0 6px 20px ${alpha(theme.palette.grey[500], 0.15)}`
+            '& .placement-icon': {
+              transform: 'scale(1.15) rotate(5deg)',
+              color: theme.palette.primary.main
+            },
+            '& .placement-arrow': {
+              animation: 'bounce 1s infinite'
+            }
+          },
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 4,
+            background: isSelected ? theme.palette.primary.main : 'transparent',
+            transition: 'all 0.3s ease'
           }
         }}
       >
         <Stack direction="row" alignItems="center" spacing={3}>
           <Box
+            className="placement-icon"
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 48,
-              height: 48,
-              borderRadius: 3,
-              backgroundColor: alpha(theme.palette.grey[400], 0.15),
-              color: theme.palette.grey[600],
-              border: `2px solid ${alpha(theme.palette.grey[400], 0.2)}`
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              backgroundColor: isSelected 
+                ? theme.palette.primary.main
+                : alpha(theme.palette.primary.main, 0.12),
+              color: isSelected ? 'white' : theme.palette.primary.main,
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              border: `3px solid ${isSelected ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.3)}`,
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                inset: -4,
+                borderRadius: '50%',
+                padding: 2,
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                maskComposite: 'xor',
+                opacity: isSelected ? 1 : 0,
+                transition: 'opacity 0.3s ease'
+              }
             }}
           >
-            <DragIndicatorIcon />
+            {isFirst ? (
+              <AddIcon sx={{ fontSize: 28 }} />
+            ) : (
+              <ArrowDownwardIcon className="placement-arrow" sx={{ fontSize: 28 }} />
+            )}
           </Box>
           
           <Box sx={{ flex: 1 }}>
-            <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
-              {getTypeIcon(section.type)}
-              <Typography 
-                variant="subtitle1" 
-                sx={{ 
-                  fontWeight: 700,
-                  color: theme.palette.text.primary,
-                  fontSize: '1.1rem'
-                }}
-              >
-                {section.name}
-              </Typography>
-              <Chip
-                label={getTypeLabel(section.type)}
-                size="small"
-                sx={{
-                  height: 24,
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                  color: theme.palette.primary.main,
-                  border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
-                }}
-              />
-            </Stack>
             <Typography 
-              variant="caption" 
+              variant="h6" 
               sx={{ 
-                color: theme.palette.text.secondary,
-                fontStyle: 'italic',
-                fontSize: '0.8rem'
+                fontWeight: 700,
+                color: isSelected ? theme.palette.primary.main : theme.palette.text.primary,
+                fontSize: '1.2rem',
+                mb: 0.5,
+                transition: 'color 0.3s ease'
               }}
             >
-              Position {index + 1} • Existing section
+              {label}
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: theme.palette.text.secondary,
+                fontSize: '0.9rem',
+                fontWeight: 500
+              }}
+            >
+              {isFirst ? 'Your new section will appear at the very top' : 'Your new section will be placed here'}
             </Typography>
           </Box>
+
+          {isSelected && (
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                backgroundColor: theme.palette.success.main,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: `0 4px 12px ${alpha(theme.palette.success.main, 0.4)}`
+              }}
+            >
+              <CheckCircleIcon sx={{ color: 'white', fontSize: 20 }} />
+            </Box>
+          )}
         </Stack>
       </Paper>
-    </Fade>
+    );
+  };
+
+  const ExistingSection = ({ section, index }: { section: { id: string; name: string; type?: string }; index: number }) => (
+    <Paper
+      elevation={2}
+      sx={{
+        p: 3,
+        mb: 3,
+        borderRadius: 3,
+        backgroundColor: alpha(theme.palette.grey[50], 0.8),
+        border: `2px solid ${alpha(theme.palette.divider, 0.1)}`,
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          backgroundColor: alpha(theme.palette.grey[100], 0.8),
+          transform: 'translateY(-1px)',
+          boxShadow: `0 6px 20px ${alpha(theme.palette.grey[500], 0.15)}`
+        }
+      }}
+    >
+      <Stack direction="row" alignItems="center" spacing={3}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 48,
+            height: 48,
+            borderRadius: 3,
+            backgroundColor: alpha(theme.palette.grey[400], 0.15),
+            color: theme.palette.grey[600],
+            border: `2px solid ${alpha(theme.palette.grey[400], 0.2)}`
+          }}
+        >
+          <DragIndicatorIcon />
+        </Box>
+        
+        <Box sx={{ flex: 1 }}>
+          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+            {getTypeIcon(section.type)}
+            <Typography 
+              variant="subtitle1" 
+              sx={{ 
+                fontWeight: 700,
+                color: theme.palette.text.primary,
+                fontSize: '1.1rem'
+              }}
+            >
+              {section.name}
+            </Typography>
+            <Chip
+              label={getTypeLabel(section.type)}
+              size="small"
+              sx={{
+                height: 24,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                color: theme.palette.primary.main,
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
+              }}
+            />
+          </Stack>
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              color: theme.palette.text.secondary,
+              fontStyle: 'italic',
+              fontSize: '0.8rem'
+            }}
+          >
+            Position {index + 1} • Existing section
+          </Typography>
+        </Box>
+      </Stack>
+    </Paper>
   );
 
   return (
@@ -396,13 +390,13 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           />
 
           {existingSections.map((section, index) => (
-            <Box key={section.id}>
+            <React.Fragment key={section.id}>
               <ExistingSection section={section} index={index} />
               <PlacementZone 
                 position={index + 1} 
                 label={`Place After "${section.name}"`}
               />
-            </Box>
+            </React.Fragment>
           ))}
 
           {existingSections.length === 0 && (
