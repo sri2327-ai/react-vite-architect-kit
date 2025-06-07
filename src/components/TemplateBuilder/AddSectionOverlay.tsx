@@ -56,6 +56,12 @@ import {
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import SectionPlacementDialog from './SectionPlacementDialog';
+import ChecklistConfigDialog from './SectionConfigDialogs/ChecklistConfigDialog';
+import ParagraphConfigDialog from './SectionConfigDialogs/ParagraphConfigDialog';
+import SectionHeaderConfigDialog from './SectionConfigDialogs/SectionHeaderConfigDialog';
+import BulletedListConfigDialog from './SectionConfigDialogs/BulletedListConfigDialog';
+import ExamListConfigDialog from './SectionConfigDialogs/ExamListConfigDialog';
+import StaticTextConfigDialog from './SectionConfigDialogs/StaticTextConfigDialog';
 
 interface SectionTemplate {
   id: string;
@@ -159,6 +165,11 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
   const [placementDialogOpen, setPlacementDialogOpen] = useState(false);
   const [selectedSection, setSelectedSection] = useState<SectionTemplate | null>(null);
 
+  // New state for configuration dialogs
+  const [configDialogOpen, setConfigDialogOpen] = useState(false);
+  const [configType, setConfigType] = useState<string>('');
+  const [sectionConfig, setSectionConfig] = useState<any>(null);
+
   const categories = ['All', 'Subjective', 'Plan', 'Objective', 'Assessment', 'Patient Information', 'Add-Ons', 'Custom Blocks'];
 
   const filteredSections = sectionTemplates.filter(section => {
@@ -200,15 +211,42 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
 
   const handleSectionClick = (section: SectionTemplate) => {
     setSelectedSection(section);
+    
+    // Check if this section type needs configuration
+    const needsConfig = ['checklist', 'paragraph', 'section-header', 'bulleted-list', 'exam-list', 'static-text'].includes(section.id);
+    
+    if (needsConfig) {
+      setConfigType(section.id);
+      setConfigDialogOpen(true);
+    } else {
+      setPlacementDialogOpen(true);
+    }
+  };
+
+  const handleConfigComplete = (config: any) => {
+    setSectionConfig(config);
+    setConfigDialogOpen(false);
     setPlacementDialogOpen(true);
+  };
+
+  const handleConfigBack = () => {
+    setConfigDialogOpen(false);
+    setSelectedSection(null);
+    setConfigType('');
+    setSectionConfig(null);
   };
 
   const handlePlaceSection = (position: number) => {
     if (selectedSection) {
-      // Create a new object with position for the onAddSection callback
-      const sectionWithPosition = { ...selectedSection, position };
-      onAddSection(sectionWithPosition);
+      // Include both section and config data
+      const sectionData = {
+        ...selectedSection,
+        config: sectionConfig
+      };
+      onAddSection(sectionData);
       setSelectedSection(null);
+      setSectionConfig(null);
+      setConfigType('');
       setPlacementDialogOpen(false);
       onClose();
     }
@@ -217,18 +255,26 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
   const handlePlacementDialogClose = () => {
     setPlacementDialogOpen(false);
     setSelectedSection(null);
+    setSectionConfig(null);
+    setConfigType('');
   };
 
   const handleBackFromPlacement = () => {
-    setPlacementDialogOpen(false);
-    setSelectedSection(null);
-    // Keep the main overlay open
+    const needsConfig = ['checklist', 'paragraph', 'section-header', 'bulleted-list', 'exam-list', 'static-text'].includes(selectedSection?.id || '');
+    
+    if (needsConfig) {
+      setPlacementDialogOpen(false);
+      setConfigDialogOpen(true);
+    } else {
+      setPlacementDialogOpen(false);
+      setSelectedSection(null);
+    }
   };
 
   return (
     <>
       <Dialog
-        open={open && !placementDialogOpen}
+        open={open && !placementDialogOpen && !configDialogOpen}
         onClose={onClose}
         maxWidth={false}
         fullScreen
@@ -693,6 +739,49 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
           </Box>
         </DialogContent>
       </Dialog>
+
+      {/* Configuration Dialogs */}
+      <ChecklistConfigDialog
+        open={configDialogOpen && configType === 'checklist'}
+        onClose={handleConfigBack}
+        onContinue={handleConfigComplete}
+        onBack={handleConfigBack}
+      />
+
+      <ParagraphConfigDialog
+        open={configDialogOpen && configType === 'paragraph'}
+        onClose={handleConfigBack}
+        onContinue={handleConfigComplete}
+        onBack={handleConfigBack}
+      />
+
+      <SectionHeaderConfigDialog
+        open={configDialogOpen && configType === 'section-header'}
+        onClose={handleConfigBack}
+        onContinue={handleConfigComplete}
+        onBack={handleConfigBack}
+      />
+
+      <BulletedListConfigDialog
+        open={configDialogOpen && configType === 'bulleted-list'}
+        onClose={handleConfigBack}
+        onContinue={handleConfigComplete}
+        onBack={handleConfigBack}
+      />
+
+      <ExamListConfigDialog
+        open={configDialogOpen && configType === 'exam-list'}
+        onClose={handleConfigBack}
+        onContinue={handleConfigComplete}
+        onBack={handleConfigBack}
+      />
+
+      <StaticTextConfigDialog
+        open={configDialogOpen && configType === 'static-text'}
+        onClose={handleConfigBack}
+        onContinue={handleConfigComplete}
+        onBack={handleConfigBack}
+      />
 
       <SectionPlacementDialog
         open={placementDialogOpen}
