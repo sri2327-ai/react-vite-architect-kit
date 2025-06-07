@@ -445,8 +445,8 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
               sm: '0.875rem'
             }
           }}>
-              View and manage your subscription payments
-            </Typography>
+            View and manage your subscription payments
+          </Typography>
           </Box>
 
           {useCardView ?
@@ -552,8 +552,6 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
             </Box>}
 
           <TablePagination rowsPerPageOptions={[5, 10, 25]} component="div" count={invoices.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} sx={{
-          backgroundColor: '#FFFFFF',
-          color: '#000000',
           borderTop: '1px solid #e0e0e0',
           '& .MuiTablePagination-toolbar': {
             px: {
@@ -561,7 +559,6 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
               sm: 1.5,
               md: 2
             },
-            backgroundColor: '#FFFFFF',
             flexWrap: 'wrap',
             minHeight: {
               xs: 'auto',
@@ -574,44 +571,31 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
               sm: '0.875rem',
               md: '1rem'
             },
-            color: '#000000',
             margin: {
               xs: '4px 0',
               md: 0
             }
           },
           '& .MuiTablePagination-select': {
-            color: '#000000',
             fontSize: {
               xs: '0.75rem',
               sm: '0.875rem'
-            },
-            backgroundColor: '#FFFFFF'
+            }
           },
           '& .MuiTablePagination-actions': {
-            color: '#000000',
             ml: {
               xs: 0,
               md: 1
             }
           },
           '& .MuiIconButton-root': {
-            color: '#000000',
             padding: {
               xs: '4px',
               md: '8px'
             },
-            backgroundColor: 'transparent',
             '&:hover': {
               backgroundColor: '#f5f5f5'
             }
-          },
-          '& .MuiSelect-root': {
-            color: '#000000',
-            backgroundColor: '#FFFFFF'
-          },
-          '& .MuiSelect-icon': {
-            color: '#000000'
           }
         }} />
         </Paper>
