@@ -166,7 +166,7 @@ const MyTemplatesTab: React.FC = () => {
 
       <Grid container spacing={{ xs: 2, md: 3 }}>
         {filteredTemplates.map((template: Template) => (
-          <Grid item xs={12} sm={6} lg={4} key={template.id}>
+          <Grid xs={12} sm={6} lg={4} key={template.id}>
             <TemplateCard
               template={{
                 id: parseInt(template.id) || 0,
@@ -210,7 +210,7 @@ const MyTemplatesTab: React.FC = () => {
       <ImprovedTemplateCreationDialog
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
-        onSave={handleCreateTemplate}
+        onCreate={handleCreateTemplate}
         visitTypes={visitTypes}
       />
 
@@ -229,7 +229,7 @@ const MyTemplatesTab: React.FC = () => {
       >
         {selectedTemplate && (
           <DraggableTemplateEditor
-            template={selectedTemplate}
+            templateData={selectedTemplate}
             onSave={handleSaveTemplate}
             onClose={() => setIsEditorOpen(false)}
             visitTypes={visitTypes}
