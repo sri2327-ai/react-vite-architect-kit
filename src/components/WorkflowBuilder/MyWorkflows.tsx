@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Card, CardContent, Button, Chip, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControlLabel, Checkbox, Alert, LinearProgress, Stepper, Step, StepLabel, Tabs, Tab, List, ListItem, ListItemText, ListItemSecondaryAction, Divider, FormControl, InputLabel, Select, Accordion, AccordionSummary, AccordionDetails, Stack, Paper, useTheme, useMediaQuery } from '@mui/material';
-import { PlayArrow as PlayIcon, MoreVert as MoreIcon, Download as ImportIcon, Edit as EditIcon, Delete as DeleteIcon, CheckCircle as CheckIcon, Error as ErrorIcon, Warning as WarningIcon, Settings as SettingsIcon, Map as MapIcon, Assignment as AssignmentIcon, ExpandMore as ExpandMoreIcon, AccountTree as WorkflowIcon, Schedule as ScheduleIcon, Person as PersonIcon, LocationOn as LocationIcon, Note as NoteIcon, History as HistoryIcon, Checklist as ChecklistIcon, Computer as EHRIcon, AccessTime as TimeIcon, LocalHospital as ClinicIcon, Psychology as AIIcon, Security as SecurityIcon } from '@mui/icons-material';
+import { PlayArrow as PlayIcon, MoreVert as MoreIcon, Download as ImportIcon, Edit as EditIcon, Delete as DeleteIcon, CheckCircle as CheckIcon, Error as ErrorIcon, Warning as WarningIcon, Settings as SettingsIcon, Map as MapIcon, Assignment as AssignmentIcon, ExpandMore as ExpandMoreIcon, AccountTree as WorkflowIcon, Schedule as ScheduleIcon, Person as PersonIcon, LocationOn as LocationIcon, Note as NoteIcon, History as HistoryIcon, Checklist as ChecklistIcon, Computer as EHRIcon, AccessTime as TimeIcon, LocalHospital as ClinicIcon, Psychology as AIIcon, Security as SecurityIcon, ArrowBack as ArrowBackIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
 import { templateBuilderService } from '../../services/templateBuilderService';
 interface WorkflowBlock {
   id: string;
@@ -150,6 +150,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
   const [executionStep, setExecutionStep] = useState(0);
   const [isExecuting, setIsExecuting] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [configurationStep, setConfigurationStep] = useState(0);
+  const configurationSteps = ['Schedule Settings', 'Visit Type Mapping'];
   const executionSteps = ['EHR Login', 'Security Verification', 'AI Automation Running', 'Complete'];
   const handleExecuteWorkflow = (workflow: ImportedWorkflow) => {
     setSelectedWorkflow(workflow);
@@ -165,6 +167,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
   const handleConfigureWorkflow = (workflow: ImportedWorkflow) => {
     setSelectedWorkflow(workflow);
     setConfigureDialog(true);
+    setConfigurationStep(0); // Reset to first step
   };
   const handleStartExecution = async () => {
     if (!credentials.username || !credentials.password) return;
@@ -329,6 +332,12 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
       default:
         return 'Automation';
     }
+  };
+  const handleNextConfigurationStep = () => {
+    setConfigurationStep(prev => Math.min(prev + 1, configurationSteps.length - 1));
+  };
+  const handlePreviousConfigurationStep = () => {
+    setConfigurationStep(prev => Math.max(prev - 1, 0));
   };
   return <Box sx={{
     width: '100%',
@@ -738,14 +747,14 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     }} />}
                           </Box>)}
                         {workflow.blocks.length > (isSmallMobile ? 4 : 6) && <Typography variant="caption" color="text.secondary" sx={{
-                    textAlign: 'center',
-                    display: 'block',
-                    mt: 1,
-                    fontSize: {
-                      xs: '0.7rem',
-                      sm: '0.75rem'
-                    }
-                  }}>
+                            textAlign: 'center',
+                            display: 'block',
+                            mt: 1,
+                            fontSize: {
+                              xs: '0.7rem',
+                              sm: '0.75rem'
+                            }
+                          }}>
                             +{workflow.blocks.length - (isSmallMobile ? 4 : 6)} more automation steps
                           </Typography>}
                       </Box>
@@ -868,47 +877,47 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     
                     {/* Status Alerts */}
                     {workflow.status === 'draft' && <Alert severity="warning" sx={{
-                fontSize: {
-                  xs: '0.75rem',
-                  sm: '0.875rem'
-                },
-                '& .MuiAlert-message': {
-                  fontSize: {
-                    xs: '0.75rem',
-                    sm: '0.875rem'
-                  }
-                }
-              }}>
+                        fontSize: {
+                          xs: '0.75rem',
+                          sm: '0.875rem'
+                        },
+                        '& .MuiAlert-message': {
+                          fontSize: {
+                            xs: '0.75rem',
+                            sm: '0.875rem'
+                          }
+                        }
+                      }}>
                         <strong>Setup Required:</strong> Configure visit type mappings to enable workflow execution
                       </Alert>}
                     
                     {workflow.status === 'configured' && <Alert severity="success" sx={{
-                fontSize: {
-                  xs: '0.75rem',
-                  sm: '0.875rem'
-                },
-                '& .MuiAlert-message': {
-                  fontSize: {
-                    xs: '0.75rem',
-                    sm: '0.875rem'
-                  }
-                }
-              }}>
+                        fontSize: {
+                          xs: '0.75rem',
+                          sm: '0.875rem'
+                        },
+                        '& .MuiAlert-message': {
+                          fontSize: {
+                            xs: '0.75rem',
+                            sm: '0.875rem'
+                          }
+                        }
+                      }}>
                         <strong>Ready to Use:</strong> Workflow configured and ready for EHR execution
                       </Alert>}
 
                     {workflow.status === 'active' && <Alert severity="info" sx={{
-                fontSize: {
-                  xs: '0.75rem',
-                  sm: '0.875rem'
-                },
-                '& .MuiAlert-message': {
-                  fontSize: {
-                    xs: '0.75rem',
-                    sm: '0.875rem'
-                  }
-                }
-              }}>
+                        fontSize: {
+                          xs: '0.75rem',
+                          sm: '0.875rem'
+                        },
+                        '& .MuiAlert-message': {
+                          fontSize: {
+                            xs: '0.75rem',
+                            sm: '0.875rem'
+                          }
+                        }
+                      }}>
                         <strong>Currently Running:</strong> AI automation is active in your EHR
                       </Alert>}
                   </Stack>
@@ -1042,33 +1051,33 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
             borderRadius: 1
           }}>
                 <Typography variant="subtitle2" sx={{
-              mb: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              fontSize: {
-                xs: '0.875rem',
-                sm: '1rem'
-              }
-            }}>
+                  mb: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  fontSize: {
+                    xs: '0.875rem',
+                    sm: '1rem'
+                  }
+                }}>
                   <WorkflowIcon color="primary" sx={{
-                fontSize: {
-                  xs: 16,
-                  sm: 18
-                }
-              }} />
+                    fontSize: {
+                      xs: 16,
+                      sm: 18
+                    }
+                  }} />
                   Configured Visit Types
                 </Typography>
                 <Stack direction="row" spacing={1} sx={{
-              flexWrap: 'wrap',
-              gap: 1,
-              '& .MuiChip-root': {
-                fontSize: {
-                  xs: '0.7rem',
-                  sm: '0.75rem'
-                }
-              }
-            }}>
+                  flexWrap: 'wrap',
+                  gap: 1,
+                  '& .MuiChip-root': {
+                    fontSize: {
+                      xs: '0.7rem',
+                      sm: '0.75rem'
+                    }
+                  }
+                }}>
                   {selectedWorkflow?.visitTypeMappings.filter(mapping => mapping.isConfigured).map(mapping => <Chip key={mapping.visitType} label={mapping.visitType} size="small" color="primary" variant="outlined" />)}
                 </Stack>
               </Box>
@@ -1203,7 +1212,7 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* Configuration Dialog - Mobile Optimized */}
+      {/* Configuration Dialog - Mobile Optimized with Steps */}
       <Dialog open={configureDialog} onClose={() => setConfigureDialog(false)} maxWidth="md" fullWidth fullScreen={isMobile} sx={{
       '& .MuiDialog-paper': {
         m: {
@@ -1226,298 +1235,96 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
           sm: 2
         }
       }}>
-          Configure Workflow: {selectedWorkflow?.name}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <SettingsIcon color="primary" sx={{ fontSize: { xs: 20, sm: 24 } }} />
+            <Typography variant={isSmallMobile ? "h6" : "h6"} sx={{
+              fontSize: {
+                xs: '1rem',
+                sm: '1.125rem'
+              }
+            }}>
+              Configure Workflow: {selectedWorkflow?.name}
+            </Typography>
+          </Box>
+          
+          {/* Configuration Steps */}
+          <Stepper activeStep={configurationStep} alternativeLabel={!isSmallMobile} orientation={isSmallMobile ? "horizontal" : "horizontal"} sx={{
+            '& .MuiStepLabel-label': {
+              fontSize: {
+                xs: '0.75rem',
+                sm: '0.875rem'
+              }
+            }
+          }}>
+            {configurationSteps.map(label => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
         </DialogTitle>
+        
         <DialogContent sx={{
         px: {
           xs: 2,
           sm: 3
         }
       }}>
-          <Alert severity="info" sx={{
-          mb: {
-            xs: 2,
-            sm: 3
-          },
-          '& .MuiAlert-message': {
-            fontSize: {
-              xs: '0.875rem',
-              sm: '1rem'
-            }
-          }
-        }}>
-            Configure schedule settings, note types, and map workflow blocks to template note sections for each visit type. 
-            Visit types and template sections come from your Template Builder. You can select multiple note headings for each field.
-          </Alert>
-          
-          {/* Common Schedule Configuration Section */}
-          <Box sx={{
-          mb: {
-            xs: 3,
-            sm: 4
-          },
-          p: {
-            xs: 2,
-            sm: 3
-          },
-          border: 1,
-          borderColor: 'divider',
-          borderRadius: {
-            xs: 1,
-            sm: 2
-          }
-        }}>
-            <Typography variant="h6" sx={{
-            mb: 2,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            fontSize: {
-              xs: '1rem',
-              sm: '1.125rem',
-              md: '1.25rem'
-            }
-          }}>
-              <ScheduleIcon color="primary" sx={{
-              fontSize: {
-                xs: 18,
-                sm: 20
-              }
-            }} />
-              Schedule Configuration (Common for all visit types)
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{
-            mb: {
-              xs: 2,
-              sm: 3
-            },
-            fontSize: {
-              xs: '0.75rem',
-              sm: '0.875rem'
-            }
-          }}>
-              These settings will apply to all visit types in this workflow.
-            </Typography>
-            <Box sx={{
-            display: 'flex',
-            flexDirection: {
-              xs: 'column',
-              md: 'row'
-            },
-            gap: 2,
-            mb: {
-              xs: 2,
-              sm: 3
-            }
-          }}>
-              <Box sx={{
-              flex: 1
-            }}>
-                <TextField fullWidth size="small" label="Provider Name" value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.providerName || ''} onChange={e => handleGlobalScheduleConfigChange('providerName', e.target.value)} placeholder="e.g., Dr. Smith" InputProps={{
-                startAdornment: <PersonIcon sx={{
-                  mr: 1,
-                  color: 'text.secondary',
-                  fontSize: {
-                    xs: 16,
-                    sm: 18
-                  }
-                }} />
-              }} InputLabelProps={{
-                style: {
-                  fontSize: isSmallMobile ? '0.875rem' : '1rem'
-                }
-              }} />
-              </Box>
-              <Box sx={{
-              flex: 1
-            }}>
-                <TextField fullWidth size="small" label="Location" value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.location || ''} onChange={e => handleGlobalScheduleConfigChange('location', e.target.value)} placeholder="e.g., Main Clinic" InputProps={{
-                startAdornment: <LocationIcon sx={{
-                  mr: 1,
-                  color: 'text.secondary',
-                  fontSize: {
-                    xs: 16,
-                    sm: 18
-                  }
-                }} />
-              }} InputLabelProps={{
-                style: {
-                  fontSize: isSmallMobile ? '0.875rem' : '1rem'
-                }
-              }} />
-              </Box>
-            </Box>
-            
-            {/* Previous Visit Note Import Option */}
-            <Box sx={{
-            p: {
-              xs: 1.5,
-              sm: 2
-            },
-            backgroundColor: 'grey.50',
-            borderRadius: 1
-          }}>
-              <FormControlLabel control={<Checkbox checked={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote || false} onChange={e => handleGlobalScheduleConfigChange('importPreviousNote', e.target.checked)} size={isSmallMobile ? "small" : "medium"} />} label={<Box sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1
-            }}>
-                    <ChecklistIcon color="primary" sx={{
-                fontSize: {
-                  xs: 16,
-                  sm: 18
-                }
-              }} />
-                    <Typography variant="body2" sx={{
-                fontSize: {
-                  xs: '0.75rem',
-                  sm: '0.875rem'
-                }
-              }}>
-                      Import previous visit note as checklist
-                    </Typography>
-                  </Box>} />
-              <Typography variant="caption" color="text.secondary" sx={{
-              ml: 4,
-              display: 'block',
-              mb: 2,
-              fontSize: {
-                xs: '0.7rem',
-                sm: '0.75rem'
-              }
-            }}>
-                Automatically import the last visit note to reference during the current encounter
-              </Typography>
-              
-              {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote && <Box sx={{
-              ml: {
-                xs: 2,
-                sm: 4
-              },
-              mt: 2
-            }}>
-                  <FormControl fullWidth size="small" sx={{
-                mb: 2
-              }}>
-                    <InputLabel style={{
-                  fontSize: isSmallMobile ? '0.875rem' : '1rem'
-                }}>
-                      Import Note For
-                    </InputLabel>
-                    <Select value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor || 'all'} label="Import Note For" onChange={e => handleGlobalScheduleConfigChange('importPreviousNoteFor', e.target.value)}>
-                      <MenuItem value="all">All visit types</MenuItem>
-                      <MenuItem value="selected">Selected visit types only</MenuItem>
-                    </Select>
-                  </FormControl>
-                  
-                  {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor === 'selected' && <FormControl fullWidth size="small">
-                      <InputLabel style={{
-                  fontSize: isSmallMobile ? '0.875rem' : '1rem'
-                }}>
-                        Select Visit Types
-                      </InputLabel>
-                      <Select multiple value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.selectedVisitTypes || []} label="Select Visit Types" onChange={e => handleGlobalScheduleConfigChange('selectedVisitTypes', e.target.value as string[])} renderValue={selected => <Box sx={{
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          gap: 0.5
-                        }}>
-                            {(selected as string[]).map(value => <Chip key={value} label={value} size="small" sx={{
-                                fontSize: {
-                                  xs: '0.7rem',
-                                  sm: '0.75rem'
-                                }
-                              }} />)}
-                          </Box>}>
-                        {selectedWorkflow?.availableVisitTypes.map(visitType => <MenuItem key={visitType} value={visitType}>
-                            {visitType}
-                          </MenuItem>)}
-                      </Select>
-                    </FormControl>}
-                </Box>}
-            </Box>
-          </Box>
-
-          {/* Visit Type Specific Configuration */}
-          <Typography variant="h6" sx={{
-          mb: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          fontSize: {
-            xs: '1rem',
-            sm: '1.125rem',
-            md: '1.25rem'
-          }
-        }}>
-            <AssignmentIcon color="primary" sx={{
-            fontSize: {
-              xs: 18,
-              sm: 20
-            }
-          }} />
-            Visit Type Configuration
-          </Typography>
-          
-          {selectedWorkflow?.visitTypeMappings.map(mapping => {
-          const templateSections = getTemplateSectionsForVisitType(mapping.visitType);
-          return <Accordion key={mapping.visitType} sx={{
-            mb: 2,
-            '& .MuiAccordionSummary-content': {
-              margin: {
-                xs: '8px 0',
-                sm: '12px 0'
-              }
-            }
-          }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Box sx={{
-                display: 'flex',
-                alignItems: {
-                  xs: 'flex-start',
-                  sm: 'center'
+          {/* Step 1: Schedule Configuration */}
+          {configurationStep === 0 && (
+            <Box>
+              <Alert severity="info" sx={{
+                mb: {
+                  xs: 2,
+                  sm: 3
                 },
-                gap: {
+                '& .MuiAlert-message': {
+                  fontSize: {
+                    xs: '0.875rem',
+                    sm: '1rem'
+                  }
+                }
+              }}>
+                Configure common schedule settings that will apply to all visit types in this workflow.
+              </Alert>
+              
+              {/* Common Schedule Configuration Section */}
+              <Box sx={{
+                mb: {
+                  xs: 3,
+                  sm: 4
+                },
+                p: {
+                  xs: 2,
+                  sm: 3
+                },
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: {
                   xs: 1,
                   sm: 2
-                },
-                width: '100%',
-                flexDirection: {
-                  xs: 'column',
-                  sm: 'row'
                 }
               }}>
-                    <Typography variant="h6" sx={{
+                <Typography variant="h6" sx={{
+                  mb: 2,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
                   fontSize: {
                     xs: '1rem',
-                    sm: '1.125rem'
+                    sm: '1.125rem',
+                    md: '1.25rem'
                   }
                 }}>
-                      {mapping.visitType}
-                    </Typography>
-                    <Chip label={mapping.isConfigured ? 'Configured' : 'Needs Configuration'} color={mapping.isConfigured ? 'success' : 'warning'} size="small" sx={{
-                  fontSize: {
-                    xs: '0.7rem',
-                    sm: '0.75rem'
-                  }
-                }} />
-                    <Typography variant="caption" color="text.secondary" sx={{
-                  fontSize: {
-                    xs: '0.7rem',
-                    sm: '0.75rem'
-                  }
-                }}>
-                      ({templateSections.length} template sections available)
-                    </Typography>
-                  </Box>
-                </AccordionSummary>
-                <AccordionDetails sx={{
-              px: {
-                xs: 1,
-                sm: 2
-              }
-            }}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary" sx={{
+                  <ScheduleIcon color="primary" sx={{
+                    fontSize: {
+                      xs: 18,
+                      sm: 20
+                    }
+                  }} />
+                  Schedule Configuration (Common for all visit types)
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{
                   mb: {
                     xs: 2,
                     sm: 3
@@ -1527,16 +1334,60 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                     sm: '0.875rem'
                   }
                 }}>
-                      Configure note type and map workflow blocks to template sections for {mapping.visitType}.
-                      You can select multiple note headings for each workflow block.
-                    </Typography>
-                    
-                    {/* Note Type Configuration */}
-                    <Box sx={{
+                  These settings will apply to all visit types in this workflow.
+                </Typography>
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: {
+                    xs: 'column',
+                    md: 'row'
+                  },
+                  gap: 2,
                   mb: {
                     xs: 2,
                     sm: 3
-                  },
+                  }
+                }}>
+                  <Box sx={{
+                    flex: 1
+                  }}>
+                    <TextField fullWidth size="small" label="Provider Name" value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.providerName || ''} onChange={e => handleGlobalScheduleConfigChange('providerName', e.target.value)} placeholder="e.g., Dr. Smith" InputProps={{
+                      startAdornment: <PersonIcon sx={{
+                        mr: 1,
+                        color: 'text.secondary',
+                        fontSize: {
+                          xs: 16,
+                          sm: 18
+                        }
+                      }} />
+                    }} InputLabelProps={{
+                      style: {
+                        fontSize: isSmallMobile ? '0.875rem' : '1rem'
+                      }
+                    }} />
+                  </Box>
+                  <Box sx={{
+                    flex: 1
+                  }}>
+                    <TextField fullWidth size="small" label="Location" value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.location || ''} onChange={e => handleGlobalScheduleConfigChange('location', e.target.value)} placeholder="e.g., Main Clinic" InputProps={{
+                      startAdornment: <LocationIcon sx={{
+                        mr: 1,
+                        color: 'text.secondary',
+                        fontSize: {
+                          xs: 16,
+                          sm: 18
+                        }
+                      }} />
+                    }} InputLabelProps={{
+                      style: {
+                        fontSize: isSmallMobile ? '0.875rem' : '1rem'
+                      }
+                    }} />
+                  </Box>
+                </Box>
+                
+                {/* Previous Visit Note Import Option */}
+                <Box sx={{
                   p: {
                     xs: 1.5,
                     sm: 2
@@ -1544,122 +1395,333 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                   backgroundColor: 'grey.50',
                   borderRadius: 1
                 }}>
-                      <Typography variant="subtitle2" sx={{
-                    mb: 2,
+                  <FormControlLabel control={<Checkbox checked={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote || false} onChange={e => handleGlobalScheduleConfigChange('importPreviousNote', e.target.checked)} size={isSmallMobile ? "small" : "medium"} />} label={<Box sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1,
-                    fontSize: {
-                      xs: '0.875rem',
-                      sm: '1rem'
-                    }
+                    gap: 1
                   }}>
-                        <NoteIcon color="primary" sx={{
-                      fontSize: {
-                        xs: 16,
-                        sm: 18
-                      }
-                    }} />
-                        Note Type Configuration
-                      </Typography>
-                      <TextField fullWidth size="small" label="EHR Note Type" value={mapping.noteType || ''} onChange={e => handleNoteTypeChange(mapping.visitType, e.target.value)} placeholder="e.g., Progress Note, SOAP Note, H&P Note" helperText="Specify the note type that will be selected in your EHR system for this visit type" InputLabelProps={{
-                    style: {
-                      fontSize: isSmallMobile ? '0.875rem' : '1rem'
-                    }
-                  }} FormHelperTextProps={{
-                    style: {
-                      fontSize: isSmallMobile ? '0.7rem' : '0.75rem'
-                    }
-                  }} />
-                    </Box>
-
-                    {/* Template Field Mapping */}
-                    <Typography variant="subtitle2" sx={{
-                  mb: 2,
-                  fontSize: {
-                    xs: '0.875rem',
-                    sm: '1rem'
-                  }
-                }}>
-                      Template Field Mapping
-                    </Typography>
-                    
-                    {selectedWorkflow.blocks.filter(block => block.type === 'note_entry').map(block => <Box key={block.id} sx={{
-                  mb: {
-                    xs: 2,
-                    sm: 3
-                  },
-                  p: {
-                    xs: 1.5,
-                    sm: 2
-                  },
-                  border: 1,
-                  borderColor: 'divider',
-                  borderRadius: 1
-                }}>
-                          <Typography variant="subtitle2" sx={{
-                    mb: 2,
-                    fontWeight: 600,
-                    fontSize: {
-                      xs: '0.875rem',
-                      sm: '1rem'
-                    }
-                  }}>
-                            {block.name}
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{
-                    mb: 2,
-                    fontSize: {
-                      xs: '0.75rem',
-                      sm: '0.875rem'
-                    }
-                  }}>
-                            {block.description}
-                          </Typography>
-                          <FormControl fullWidth size="small">
-                            <InputLabel style={{
-                      fontSize: isSmallMobile ? '0.875rem' : '1rem'
-                    }}>
-                              Select Template Note Sections (Multiple)
-                            </InputLabel>
-                            <Select multiple value={mapping.templateFields[block.id] || []} label="Select Template Note Sections (Multiple)" onChange={e => handleFieldMapping(mapping.visitType, block.id, e.target.value as string[])} renderValue={selected => <Box sx={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: 0.5
-                    }}>
-                                  {(selected as string[]).map(value => <Chip key={value} label={value} size="small" color="primary" variant="outlined" sx={{
+                      <ChecklistIcon color="primary" sx={{
                         fontSize: {
-                          xs: '0.7rem',
-                          sm: '0.75rem'
+                          xs: 16,
+                          sm: 18
                         }
-                      }} />)}
-                                </Box>}>
-                              {templateSections.map(section => <MenuItem key={section.id} value={section.name}>
-                                  <Checkbox checked={(mapping.templateFields[block.id] || []).includes(section.name)} size="small" />
-                                  <ListItemText primary={section.name} secondary={section.type} primaryTypographyProps={{
-                          fontSize: isSmallMobile ? '0.875rem' : '1rem'
-                        }} secondaryTypographyProps={{
-                          fontSize: isSmallMobile ? '0.75rem' : '0.875rem'
-                        }} />
-                                </MenuItem>)}
-                            </Select>
-                          </FormControl>
-                          {mapping.templateFields[block.id] && mapping.templateFields[block.id].length > 0 && <Typography variant="caption" color="text.secondary" sx={{
-                    mt: 1,
+                      }} />
+                      <Typography variant="body2" sx={{
+                        fontSize: {
+                          xs: '0.75rem',
+                          sm: '0.875rem'
+                        }
+                      }}>
+                        Import previous visit note as checklist
+                      </Typography>
+                    </Box>} />
+                  <Typography variant="caption" color="text.secondary" sx={{
+                    ml: 4,
                     display: 'block',
+                    mb: 2,
                     fontSize: {
                       xs: '0.7rem',
                       sm: '0.75rem'
                     }
                   }}>
-                              Maps to: {mapping.templateFields[block.id].join(', ')}
-                            </Typography>}
-                        </Box>)}
-                  </Box>
-                </AccordionDetails>
-              </Accordion>;
-        })}
+                    Automatically import the last visit note to reference during the current encounter
+                  </Typography>
+                  
+                  {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNote && <Box sx={{
+                    ml: {
+                      xs: 2,
+                      sm: 4
+                    },
+                    mt: 2
+                  }}>
+                      <FormControl fullWidth size="small" sx={{
+                        mb: 2
+                      }}>
+                        <InputLabel style={{
+                          fontSize: isSmallMobile ? '0.875rem' : '1rem'
+                        }}>
+                          Import Note For
+                        </InputLabel>
+                        <Select value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor || 'all'} label="Import Note For" onChange={e => handleGlobalScheduleConfigChange('importPreviousNoteFor', e.target.value)}>
+                          <MenuItem value="all">All visit types</MenuItem>
+                          <MenuItem value="selected">Selected visit types only</MenuItem>
+                        </Select>
+                      </FormControl>
+                      
+                      {selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.importPreviousNoteFor === 'selected' && <FormControl fullWidth size="small">
+                          <InputLabel style={{
+                            fontSize: isSmallMobile ? '0.875rem' : '1rem'
+                          }}>
+                            Select Visit Types
+                          </InputLabel>
+                          <Select multiple value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.selectedVisitTypes || []} label="Select Visit Types" onChange={e => handleGlobalScheduleConfigChange('selectedVisitTypes', e.target.value as string[])} renderValue={selected => <Box sx={{
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              gap: 0.5
+                            }}>
+                                {(selected as string[]).map(value => <Chip key={value} label={value} size="small" sx={{
+                                    fontSize: {
+                                      xs: '0.7rem',
+                                      sm: '0.75rem'
+                                    }
+                                  }} />)}
+                              </Box>}>
+                            {selectedWorkflow?.availableVisitTypes.map(visitType => <MenuItem key={visitType} value={visitType}>
+                                {visitType}
+                              </MenuItem>)}
+                          </Select>
+                        </FormControl>}
+                    </Box>}
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {/* Step 2: Visit Type Configuration */}
+          {configurationStep === 1 && (
+            <Box>
+              <Alert severity="info" sx={{
+                mb: {
+                  xs: 2,
+                  sm: 3
+                },
+                '& .MuiAlert-message': {
+                  fontSize: {
+                    xs: '0.875rem',
+                    sm: '1rem'
+                  }
+                }
+              }}>
+                Configure note types and map workflow blocks to template note sections for each visit type. 
+                Visit types and template sections come from your Template Builder. You can select multiple note headings for each field.
+              </Alert>
+              
+              {/* Visit Type Specific Configuration */}
+              <Typography variant="h6" sx={{
+                mb: 2,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                fontSize: {
+                  xs: '1rem',
+                  sm: '1.125rem',
+                  md: '1.25rem'
+                }
+              }}>
+                <AssignmentIcon color="primary" sx={{
+                  fontSize: {
+                    xs: 18,
+                    sm: 20
+                  }
+                }} />
+                Visit Type Configuration
+              </Typography>
+              
+              {selectedWorkflow?.visitTypeMappings.map(mapping => {
+                const templateSections = getTemplateSectionsForVisitType(mapping.visitType);
+                return <Accordion key={mapping.visitType} sx={{
+                  mb: 2,
+                  '& .MuiAccordionSummary-content': {
+                    margin: {
+                      xs: '8px 0',
+                      sm: '12px 0'
+                    }
+                  }
+                }}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                      <Box sx={{
+                        display: 'flex',
+                        alignItems: {
+                          xs: 'flex-start',
+                          sm: 'center'
+                        },
+                        gap: {
+                          xs: 1,
+                          sm: 2
+                        },
+                        width: '100%',
+                        flexDirection: {
+                          xs: 'column',
+                          sm: 'row'
+                        }
+                      }}>
+                        <Typography variant="h6" sx={{
+                          fontSize: {
+                            xs: '1rem',
+                            sm: '1.125rem'
+                          }
+                        }}>
+                          {mapping.visitType}
+                        </Typography>
+                        <Chip label={mapping.isConfigured ? 'Configured' : 'Needs Configuration'} color={mapping.isConfigured ? 'success' : 'warning'} size="small" sx={{
+                          fontSize: {
+                            xs: '0.7rem',
+                            sm: '0.75rem'
+                          }
+                        }} />
+                        <Typography variant="caption" color="text.secondary" sx={{
+                          fontSize: {
+                            xs: '0.7rem',
+                            sm: '0.75rem'
+                          }
+                        }}>
+                          ({templateSections.length} template sections available)
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{
+                      px: {
+                        xs: 1,
+                        sm: 2
+                      }
+                    }}>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{
+                          mb: {
+                            xs: 2,
+                            sm: 3
+                          },
+                          fontSize: {
+                            xs: '0.75rem',
+                            sm: '0.875rem'
+                          }
+                        }}>
+                          Configure note type and map workflow blocks to template sections for {mapping.visitType}.
+                          You can select multiple note headings for each workflow block.
+                        </Typography>
+                        
+                        {/* Note Type Configuration */}
+                        <Box sx={{
+                          mb: {
+                            xs: 2,
+                            sm: 3
+                          },
+                          p: {
+                            xs: 1.5,
+                            sm: 2
+                          },
+                          backgroundColor: 'grey.50',
+                          borderRadius: 1
+                        }}>
+                          <Typography variant="subtitle2" sx={{
+                            mb: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1,
+                            fontSize: {
+                              xs: '0.875rem',
+                              sm: '1rem'
+                            }
+                          }}>
+                            <NoteIcon color="primary" sx={{
+                              fontSize: {
+                                xs: 16,
+                                sm: 18
+                              }
+                            }} />
+                            EHR Note Type
+                          </Typography>
+                          <TextField fullWidth size="small" label="EHR Note Type" value={mapping.noteType || ''} onChange={e => handleNoteTypeChange(mapping.visitType, e.target.value)} placeholder="e.g., Progress Note, SOAP Note, H&P Note" helperText="Specify the note type that will be selected in your EHR system for this visit type" InputLabelProps={{
+                            style: {
+                              fontSize: isSmallMobile ? '0.875rem' : '1rem'
+                            }
+                          }} FormHelperTextProps={{
+                            style: {
+                              fontSize: isSmallMobile ? '0.7rem' : '0.75rem'
+                            }
+                          }} />
+                        </Box>
+
+                        {/* Template Field Mapping */}
+                        <Typography variant="subtitle2" sx={{
+                          mb: 2,
+                          fontSize: {
+                            xs: '0.875rem',
+                            sm: '1rem'
+                          }
+                        }}>
+                          Template Field Mapping
+                        </Typography>
+                        
+                        {selectedWorkflow.blocks.filter(block => block.type === 'note_entry').map(block => <Box key={block.id} sx={{
+                          mb: {
+                            xs: 2,
+                            sm: 3
+                          },
+                          p: {
+                            xs: 1.5,
+                            sm: 2
+                          },
+                          border: 1,
+                          borderColor: 'divider',
+                          borderRadius: 1
+                        }}>
+                              <Typography variant="subtitle2" sx={{
+                                mb: 2,
+                                fontWeight: 600,
+                                fontSize: {
+                                  xs: '0.875rem',
+                                  sm: '1rem'
+                                }
+                              }}>
+                                {block.name}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{
+                                mb: 2,
+                                fontSize: {
+                                  xs: '0.75rem',
+                                  sm: '0.875rem'
+                                }
+                              }}>
+                                {block.description}
+                              </Typography>
+                              <FormControl fullWidth size="small">
+                                <InputLabel style={{
+                                  fontSize: isSmallMobile ? '0.875rem' : '1rem'
+                                }}>
+                                  Select Template Note Sections (Multiple)
+                                </InputLabel>
+                                <Select multiple value={mapping.templateFields[block.id] || []} label="Select Template Note Sections (Multiple)" onChange={e => handleFieldMapping(mapping.visitType, block.id, e.target.value as string[])} renderValue={selected => <Box sx={{
+                                  display: 'flex',
+                                  flexWrap: 'wrap',
+                                  gap: 0.5
+                                }}>
+                                      {(selected as string[]).map(value => <Chip key={value} label={value} size="small" color="primary" variant="outlined" sx={{
+                                            fontSize: {
+                                              xs: '0.7rem',
+                                              sm: '0.75rem'
+                                            }
+                                          }} />)}
+                                    </Box>}>
+                                  {templateSections.map(section => <MenuItem key={section.id} value={section.name}>
+                                      <Checkbox checked={(mapping.templateFields[block.id] || []).includes(section.name)} size="small" />
+                                      <ListItemText primary={section.name} secondary={section.type} primaryTypographyProps={{
+                                          fontSize: isSmallMobile ? '0.875rem' : '1rem'
+                                        }} secondaryTypographyProps={{
+                                          fontSize: isSmallMobile ? '0.75rem' : '0.875rem'
+                                        }} />
+                                    </MenuItem>)}
+                                </Select>
+                              </FormControl>
+                              {mapping.templateFields[block.id] && mapping.templateFields[block.id].length > 0 && <Typography variant="caption" color="text.secondary" sx={{
+                                mt: 1,
+                                display: 'block',
+                                fontSize: {
+                                  xs: '0.7rem',
+                                  sm: '0.75rem'
+                                }
+                              }}>
+                                  Maps to: {mapping.templateFields[block.id].join(', ')}
+                                </Typography>}
+                            </Box>)}
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>;
+              })}
+            </Box>
+          )}
         </DialogContent>
+        
         <DialogActions sx={{
         p: {
           xs: 2,
@@ -1675,21 +1737,62 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         }
       }}>
           <Button onClick={() => setConfigureDialog(false)} fullWidth={isSmallMobile} sx={{
-          fontSize: {
-            xs: '0.875rem',
-            sm: '1rem'
-          }
-        }}>
+            fontSize: {
+              xs: '0.875rem',
+              sm: '1rem'
+            }
+          }}>
             Cancel
           </Button>
-          <Button variant="contained" fullWidth={isSmallMobile} sx={{
-          fontSize: {
-            xs: '0.875rem',
-            sm: '1rem'
-          }
-        }}>
-            Save Configuration
-          </Button>
+          
+          {/* Step Navigation */}
+          <Box sx={{ display: 'flex', gap: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
+            {configurationStep > 0 && (
+              <Button 
+                onClick={handlePreviousConfigurationStep}
+                startIcon={<ArrowBackIcon />}
+                fullWidth={isSmallMobile}
+                sx={{
+                  fontSize: {
+                    xs: '0.875rem',
+                    sm: '1rem'
+                  }
+                }}
+              >
+                Previous
+              </Button>
+            )}
+            
+            {configurationStep < configurationSteps.length - 1 ? (
+              <Button 
+                variant="contained" 
+                onClick={handleNextConfigurationStep}
+                endIcon={<ArrowForwardIcon />}
+                fullWidth={isSmallMobile}
+                sx={{
+                  fontSize: {
+                    xs: '0.875rem',
+                    sm: '1rem'
+                  }
+                }}
+              >
+                Next: {configurationSteps[configurationStep + 1]}
+              </Button>
+            ) : (
+              <Button 
+                variant="contained" 
+                fullWidth={isSmallMobile} 
+                sx={{
+                  fontSize: {
+                    xs: '0.875rem',
+                    sm: '1rem'
+                  }
+                }}
+              >
+                Save Configuration
+              </Button>
+            )}
+          </Box>
         </DialogActions>
       </Dialog>
 
