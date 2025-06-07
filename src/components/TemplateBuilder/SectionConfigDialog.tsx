@@ -21,7 +21,12 @@ import {
   Card,
   CardContent,
   Checkbox,
-  FormGroup
+  FormGroup,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Tooltip
 } from '@mui/material';
 import { 
   Close as CloseIcon, 
@@ -29,7 +34,9 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   KeyboardArrowUp as MoveUpIcon,
-  KeyboardArrowDown as MoveDownIcon
+  KeyboardArrowDown as MoveDownIcon,
+  ExpandMore as ExpandMoreIcon,
+  Info as InfoIcon
 } from '@mui/icons-material';
 
 interface SectionConfigDialogProps {
@@ -171,75 +178,65 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   };
 
   const getBulletedListGuidance = () => (
-    <Box sx={{ mb: 3 }}>
-      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
-        How this works
-      </Typography>
-      <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-        Specify your bulleted list instructions
-      </Typography>
-      <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
-        Tell the A.I. what information you want it to generate in a bulleted list format.
-      </Typography>
-      
-      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
-        Example
-      </Typography>
-      <Paper sx={{ p: 2, mb: 3, bgcolor: 'grey.50', border: '1px solid', borderColor: 'grey.200' }}>
-        <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-          For instance, you could write:
+    <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+      <Box>
+        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
+          💡 How Bulleted Lists Work
         </Typography>
-        <Typography variant="body2" sx={{ mt: 1, color: 'text.primary' }}>
-          Create a bullet for each medication that was discussed. Each bullet should follow this format: {'{Medication Name}'} - {'{Dosage}'}, {'{Frequency}'}
+        <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+          Tell the A.I. what information you want it to generate in a bulleted list format.
         </Typography>
-      </Paper>
-      
-      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
-        Tips
-      </Typography>
-      <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-        Be specific about what information you want included in each bullet point. The A.I. will format the output as a bulleted list.
-      </Typography>
-    </Box>
+        
+        <Box sx={{ bgcolor: 'grey.50', p: 2, borderRadius: 1, border: '1px solid', borderColor: 'grey.200' }}>
+          <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+            EXAMPLE
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic' }}>
+            "Create a bullet for each medication that was discussed. Each bullet should follow this format: {'{Medication Name}'} - {'{Dosage}'}, {'{Frequency}'}"
+          </Typography>
+        </Box>
+      </Box>
+    </Alert>
   );
 
   const getExamListGuidance = () => (
-    <Box sx={{ mb: 3 }}>
-      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
-        How this works
-      </Typography>
-      <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary' }}>
-        Review each subsection
-      </Typography>
-      <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-        An exam-list is a structured output, with each subsection as its own instruction for Medwriter. You can add, remove, or edit sections.
-      </Typography>
-      
-      <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontWeight: 500 }}>
-        Tell Medwriter what to focus on
-      </Typography>
-      <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-        For each section, you can tell Medwriter what to write for that subsection.
-      </Typography>
-      
-      <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontWeight: 500 }}>
-        Decide Normal Limits Behavior
-      </Typography>
-      <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
-        You can specify certain default "within normal limits" text, and decide when you want Medwriter to fall back to that text.
-      </Typography>
-    </Box>
+    <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+      <Box>
+        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2', display: 'flex', alignItems: 'center', gap: 1 }}>
+          🔍 How Exam Lists Work
+        </Typography>
+        <Box component="ul" sx={{ pl: 2, mb: 0, '& li': { mb: 1 } }}>
+          <li>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <strong>Structured Output:</strong> Each subsection has its own instruction for AI generation
+            </Typography>
+          </li>
+          <li>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <strong>Customizable Sections:</strong> Add, remove, or edit sections as needed
+            </Typography>
+          </li>
+          <li>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <strong>Normal Limits:</strong> Set default text and behavior for normal findings
+            </Typography>
+          </li>
+        </Box>
+      </Box>
+    </Alert>
   );
 
   const getChecklistGuidance = () => (
-    <Box sx={{ mb: 3 }}>
-      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
-        How this works
-      </Typography>
-      <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
-        Add items below. Each item will get a button. On press of the button, the corresponding text will be added to the note. This will not be A.I. generated; you will need to manually press the button to insert the exact corresponding text.
-      </Typography>
-    </Box>
+    <Alert severity="info" sx={{ mb: 3, borderRadius: 2 }}>
+      <Box>
+        <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
+          ✅ How Checklists Work
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          Create clickable buttons that insert predefined text into your notes. Each button click adds the exact corresponding text - no AI generation involved.
+        </Typography>
+      </Box>
+    </Alert>
   );
 
   const getGeneralGuidance = () => (
@@ -275,7 +272,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       maxWidth="md"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 3 }
+        sx: { borderRadius: 3, maxHeight: '90vh' }
       }}
     >
       <DialogTitle sx={{ pb: 2 }}>
@@ -293,12 +290,22 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 <ArrowBackIcon />
               </IconButton>
             )}
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              {isBulletedList ? 'Edit Bulleted List' : 
-               isExamList ? 'Edit Exam List' :
-               isChecklist ? 'Edit Checklist' :
-               `Configure Section: ${sectionName}`}
-            </Typography>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                {isBulletedList ? 'Edit Bulleted List' : 
+                 isExamList ? 'Edit Exam List' :
+                 isChecklist ? 'Edit Checklist' :
+                 `Configure Section: ${sectionName}`}
+              </Typography>
+              {isExamList && (
+                <Chip 
+                  label="Structured AI Output" 
+                  size="small" 
+                  variant="outlined"
+                  sx={{ mt: 0.5 }}
+                />
+              )}
+            </Box>
           </Box>
           <IconButton onClick={onClose}>
             <CloseIcon />
@@ -306,7 +313,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         </Box>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={{ pb: 2 }}>
         {isBulletedList && getBulletedListGuidance()}
         {isExamList && getExamListGuidance()}
         {isChecklist && getChecklistGuidance()}
@@ -315,65 +322,99 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <TextField
             fullWidth
-            label="Title"
+            label="Section Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             variant="outlined"
             size="small"
+            required
+            helperText="This will appear as the section header in your template"
           />
           
           {isExamList && (
             <Box>
-              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
-                What exam sections would you like A.I. to report on?
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  Exam Sections
+                </Typography>
+                <Tooltip title="Define what specific aspects of the exam the AI should report on">
+                  <InfoIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                </Tooltip>
+              </Box>
               
               {examItems.map((item, index) => (
-                <Card key={item.id} sx={{ mb: 2, border: '1px solid', borderColor: 'grey.300' }}>
-                  <CardContent>
+                <Card 
+                  key={item.id} 
+                  sx={{ 
+                    mb: 2, 
+                    border: '2px solid', 
+                    borderColor: 'grey.200',
+                    '&:hover': { borderColor: 'primary.light' },
+                    transition: 'border-color 0.2s'
+                  }}
+                >
+                  <CardContent sx={{ '&:last-child': { pb: 2 } }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                        Item {index + 1}
-                      </Typography>
-                      {examItems.length > 1 && (
-                        <IconButton 
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Chip 
+                          label={`Section ${index + 1}`} 
                           size="small" 
-                          onClick={() => removeExamItem(item.id)}
-                          sx={{ color: 'error.main' }}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
+                          color="primary" 
+                          variant="outlined"
+                        />
+                        {item.title && (
+                          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                            {item.title}
+                          </Typography>
+                        )}
+                      </Box>
+                      {examItems.length > 1 && (
+                        <Tooltip title="Remove this section">
+                          <IconButton 
+                            size="small" 
+                            onClick={() => removeExamItem(item.id)}
+                            sx={{ 
+                              color: 'error.main',
+                              '&:hover': { bgcolor: 'error.lighter' }
+                            }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
                       )}
                     </Box>
                     
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <TextField
                         fullWidth
-                        label="I want to title this subsection..."
+                        label="Subsection Title"
                         value={item.title}
                         onChange={(e) => updateExamItem(item.id, 'title', e.target.value)}
                         variant="outlined"
                         size="small"
+                        placeholder="e.g., Heart, Lungs, Abdomen..."
                       />
                       
                       <TextField
                         fullWidth
-                        label="I want the A.I. to report on..."
+                        label="AI Instructions"
                         value={item.instructions}
                         onChange={(e) => updateExamItem(item.id, 'instructions', e.target.value)}
                         multiline
                         rows={2}
                         variant="outlined"
                         size="small"
+                        placeholder="Tell the AI what to focus on for this section..."
                       />
                       
                       <TextField
                         fullWidth
-                        label="When findings are normal, use this text..."
+                        label="Normal Findings Text (Optional)"
                         value={item.normalText}
                         onChange={(e) => updateExamItem(item.id, 'normalText', e.target.value)}
                         variant="outlined"
                         size="small"
+                        placeholder="Text to use when findings are within normal limits..."
                       />
                     </Box>
                   </CardContent>
@@ -383,85 +424,129 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               <Button
                 startIcon={<AddIcon />}
                 onClick={addExamItem}
-                sx={{ mb: 3, textTransform: 'none' }}
+                variant="outlined"
+                sx={{ 
+                  mb: 4, 
+                  textTransform: 'none',
+                  borderStyle: 'dashed',
+                  '&:hover': { borderStyle: 'solid' }
+                }}
               >
-                Add another item
+                Add Another Exam Section
               </Button>
               
-              <Divider sx={{ my: 3 }} />
+              <Divider sx={{ my: 4 }} />
               
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Within Normal Limits Settings
-              </Typography>
-              
-              <Box sx={{ mb: 3 }}>
-                <FormControl component="fieldset">
-                  <FormLabel component="legend" sx={{ mb: 1, fontWeight: 500 }}>
-                    When an item is not discussed in the session:
-                  </FormLabel>
-                  <RadioGroup
-                    value={notDiscussedBehavior}
-                    onChange={(e) => setNotDiscussedBehavior(e.target.value)}
-                  >
-                    <FormControlLabel 
-                      value="leave_blank" 
-                      control={<Radio size="small" />} 
-                      label="Leave it blank" 
-                    />
-                    <FormControlLabel 
-                      value="default_normal" 
-                      control={<Radio size="small" />} 
-                      label='Default to "Within Normal Limits"' 
-                    />
-                    <FormControlLabel 
-                      value="alert_provider" 
-                      control={<Radio size="small" />} 
-                      label="Alert provider to discuss this item" 
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Box>
-              
-              <Box sx={{ mb: 3 }}>
-                <FormControl component="fieldset">
-                  <FormLabel component="legend" sx={{ mb: 1, fontWeight: 500 }}>
-                    When findings are within normal limits:
-                  </FormLabel>
-                  <RadioGroup
-                    value={normalLimitsBehavior}
-                    onChange={(e) => setNormalLimitsBehavior(e.target.value)}
-                  >
-                    <FormControlLabel 
-                      value="summarize" 
-                      control={<Radio size="small" />} 
-                      label="Summarize the discussion" 
-                    />
-                    <FormControlLabel 
-                      value="use_specified" 
-                      control={<Radio size="small" />} 
-                      label='Use specified "Within Normal Limits" text' 
-                    />
-                    <FormControlLabel 
-                      value="highlight_abnormal" 
-                      control={<Radio size="small" />} 
-                      label="Highlight findings that are not within normal limits" 
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </Box>
-              
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={hideEmptyItems}
-                      onChange={(e) => setHideEmptyItems(e.target.checked)}
-                      size="small"
-                    />
-                  }
-                  label="Hide items that are empty"
-                />
-              </FormGroup>
+              <Accordion defaultExpanded sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200' }}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                    Normal Limits Settings
+                  </Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600 }}>
+                        When an exam section is not discussed:
+                      </FormLabel>
+                      <RadioGroup
+                        value={notDiscussedBehavior}
+                        onChange={(e) => setNotDiscussedBehavior(e.target.value)}
+                      >
+                        <FormControlLabel 
+                          value="leave_blank" 
+                          control={<Radio size="small" />} 
+                          label={
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Leave it blank</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Section won't appear in the final output</Typography>
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel 
+                          value="default_normal" 
+                          control={<Radio size="small" />} 
+                          label={
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Default to "Within Normal Limits"</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Use standard normal findings text</Typography>
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel 
+                          value="alert_provider" 
+                          control={<Radio size="small" />} 
+                          label={
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Alert provider to discuss this item</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Add a reminder note for missing sections</Typography>
+                            </Box>
+                          }
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    
+                    <FormControl component="fieldset">
+                      <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600 }}>
+                        When findings are within normal limits:
+                      </FormLabel>
+                      <RadioGroup
+                        value={normalLimitsBehavior}
+                        onChange={(e) => setNormalLimitsBehavior(e.target.value)}
+                      >
+                        <FormControlLabel 
+                          value="summarize" 
+                          control={<Radio size="small" />} 
+                          label={
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Summarize the discussion</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>AI generates summary of normal findings</Typography>
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel 
+                          value="use_specified" 
+                          control={<Radio size="small" />} 
+                          label={
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Use specified "Normal Limits" text</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Use the text you defined above</Typography>
+                            </Box>
+                          }
+                        />
+                        <FormControlLabel 
+                          value="highlight_abnormal" 
+                          control={<Radio size="small" />} 
+                          label={
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Highlight abnormal findings only</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Focus on what's not normal</Typography>
+                            </Box>
+                          }
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                    
+                    <FormGroup>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={hideEmptyItems}
+                            onChange={(e) => setHideEmptyItems(e.target.checked)}
+                            size="small"
+                          />
+                        }
+                        label={
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 500 }}>Hide empty sections</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Don't show sections with no content</Typography>
+                          </Box>
+                        }
+                      />
+                    </FormGroup>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
             </Box>
           )}
 
@@ -571,7 +656,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 1 }}>
+      <DialogActions sx={{ p: 3, pt: 1, gap: 1 }}>
         <Button onClick={onClose} variant="outlined">
           Cancel
         </Button>
@@ -579,6 +664,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
           variant="contained" 
           onClick={handleContinue}
           disabled={!title.trim()}
+          sx={{ minWidth: 120 }}
         >
           Continue
         </Button>
