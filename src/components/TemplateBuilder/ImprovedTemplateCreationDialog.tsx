@@ -183,16 +183,9 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
 
   const handleNext = () => {
     if (currentStep === 1) {
-      // Custom Template Builder - go directly to editor with name
+      // Custom Template Builder - go directly to final step with basic template
       if (selectedMethod?.id === 3) {
-        const templateData = {
-          name: templateName || 'New Custom Template',
-          method: selectedMethod.title,
-          content: '', // Empty content for custom builder
-          skipPreview: true
-        };
-        onCreateTemplate(templateData);
-        handleStartNew();
+        setCurrentStep(2);
         return;
       }
       
@@ -224,31 +217,59 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
   const handleCreate = () => {
     let templateData;
 
-    if (selectedMethod?.id === 5 && selectedLibraryTemplate) {
-      // Browse Template Library - use selected template
+    // Method 1: Smart Copy from Previous
+    if (selectedMethod?.id === 1) {
+      templateData = {
+        name: templateName || 'Template from Previous Notes',
+        method: selectedMethod.title,
+        content: previousNotes,
+        redirectToEditor: true
+      };
+    }
+    // Method 2: AI-Assisted Creation  
+    else if (selectedMethod?.id === 2) {
+      templateData = {
+        name: templateName || 'AI Generated Template',
+        method: selectedMethod.title,
+        content: processedContent,
+        aiSummary: aiSummary,
+        redirectToEditor: true
+      };
+    }
+    // Method 3: Custom Template Builder
+    else if (selectedMethod?.id === 3) {
+      templateData = {
+        name: templateName || 'Custom Template',
+        method: selectedMethod.title,
+        content: '', // Start with empty content for custom builder
+        redirectToEditor: true
+      };
+    }
+    // Method 4: Import Existing Template
+    else if (selectedMethod?.id === 4) {
+      templateData = {
+        name: templateName || 'Imported Template',
+        method: selectedMethod.title,
+        content: existingTemplateContent,
+        redirectToEditor: true
+      };
+    }
+    // Method 5: Browse Template Library
+    else if (selectedMethod?.id === 5 && selectedLibraryTemplate) {
       templateData = {
         name: selectedLibraryTemplate.name,
         specialty: selectedLibraryTemplate.specialty,
         templateType: selectedLibraryTemplate.type,
         content: templateService.generateTemplateContent(selectedLibraryTemplate.type),
         method: selectedMethod.title,
-        redirectToEditor: true // Add flag to indicate editor redirect
-      };
-    } else {
-      // Other methods - use form data
-      templateData = {
-        name: templateName,
-        method: selectedMethod?.title,
-        content: selectedMethod?.id === 2 ? processedContent : existingTemplateContent,
-        previousNotes: selectedMethod?.id === 1 ? previousNotes : undefined,
-        aiSummary: selectedMethod?.id === 2 ? aiSummary : undefined,
-        redirectToEditor: true // Add flag to indicate editor redirect
+        redirectToEditor: true
       };
     }
     
+    // Call the parent callback to create template and redirect to editor
     onCreateTemplate(templateData);
     handleStartNew();
-    onClose(); // Close the dialog after creating template
+    onClose();
   };
 
   const handleStartNew = () => {
@@ -799,80 +820,79 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     color: bravoColors.primaryFlat,
                     fontSize: '1.25rem'
                   }}>
-                    Template Preview
+                    Ready to Create Template
                   </Typography>
                 </Box>
                 
-                {/* Template Preview Section */}
+                <Alert severity="success" sx={{ mb: 3 }}>
+                  <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                    ✅ Template configured successfully! Click "Create Template" to open the Template Editor where you can customize sections, add content, and finalize your template.
+                  </Typography>
+                </Alert>
+
+                {/* Template Summary */}
                 <Paper 
                   variant="outlined" 
                   sx={{ 
-                    flex: 1,
+                    p: 3,
                     borderRadius: 2,
                     backgroundColor: alpha(bravoColors.primaryFlat, 0.02),
-                    border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    minHeight: '300px'
+                    border: `2px solid ${alpha(bravoColors.primaryFlat, 0.1)}`
                   }}
                 >
-                  <Box sx={{ 
-                    flex: 1,
-                    p: 2, 
-                    backgroundColor: 'white',
-                    borderRadius: 1.5,
-                    border: '1px solid #e0e0e0',
-                    m: 1,
-                    overflow: 'auto'
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 600, 
+                    mb: 2,
+                    color: bravoColors.primaryFlat 
                   }}>
-                    {selectedMethod?.id === 5 && selectedLibraryTemplate ? (
-                      <Typography variant="body2" sx={{ 
-                        whiteSpace: 'pre-line', 
-                        fontFamily: 'monospace',
-                        fontSize: '0.8rem',
-                        lineHeight: 1.6
-                      }}>
-                        {templateService.generateTemplateContent(selectedLibraryTemplate.type)}
+                    Template Summary
+                  </Typography>
+                  
+                  <Box sx={{ display: 'grid', gap: 2 }}>
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Template Name:
                       </Typography>
-                    ) : selectedMethod?.id === 2 && processedContent ? (
-                      <Typography variant="body2" sx={{ 
-                        whiteSpace: 'pre-line', 
-                        fontFamily: 'monospace',
-                        fontSize: '0.8rem',
-                        lineHeight: 1.6
-                      }}>
-                        {processedContent}
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {selectedMethod?.id === 5 && selectedLibraryTemplate 
+                          ? selectedLibraryTemplate.name
+                          : templateName || 'New Template'
+                        }
                       </Typography>
-                    ) : (
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center', 
-                        height: '100%',
-                        flexDirection: 'column'
-                      }}>
-                        <Typography variant="h6" color="text.secondary" sx={{ 
-                          fontStyle: 'italic', 
-                          textAlign: 'center',
-                          fontSize: '1rem'
-                        }}>
-                          Template preview will be generated based on your configuration...
+                    </Box>
+                    
+                    <Box>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Creation Method:
+                      </Typography>
+                      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                        {selectedMethod?.title}
+                      </Typography>
+                    </Box>
+
+                    {selectedMethod?.id === 5 && selectedLibraryTemplate && (
+                      <Box>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          Template Type:
+                        </Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                          {selectedLibraryTemplate.specialty} • {selectedLibraryTemplate.type}
+                        </Typography>
+                      </Box>
+                    )}
+
+                    {selectedMethod?.id === 2 && aiSummary && (
+                      <Box>
+                        <Typography variant="subtitle2" color="text.secondary">
+                          AI Analysis:
+                        </Typography>
+                        <Typography variant="body2">
+                          {aiSummary}
                         </Typography>
                       </Box>
                     )}
                   </Box>
                 </Paper>
-
-                {selectedMethod?.id === 2 && processedContent && (
-                  <Alert severity="success" sx={{ mt: 2 }}>
-                    <Typography variant="body2" sx={{ 
-                      fontWeight: 500,
-                      fontSize: '0.8rem'
-                    }}>
-                      ✅ {aiSummary}
-                    </Typography>
-                  </Alert>
-                )}
               </Box>
             )}
           </Box>
@@ -1038,7 +1058,7 @@ const ImprovedTemplateCreationDialog: React.FC<ImprovedTemplateCreationDialogPro
                     py: 1
                   }}
                 >
-                  {selectedMethod?.id === 3 ? 'Create Template' : 'Next Step'}
+                  Next Step
                 </Button>
               ) : (
                 <Stack direction="row" spacing={2}>
