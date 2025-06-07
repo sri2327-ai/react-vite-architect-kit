@@ -6,7 +6,7 @@ import {
   useTheme,
   useMediaQuery,
   Container,
-  Grid,
+  Grid2 as Grid,
   Card,
   CardContent,
   CardActions,
