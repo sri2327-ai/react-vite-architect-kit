@@ -18,6 +18,7 @@ import VisitTypeManager from './VisitTypeManager';
 import MyTemplatesNavBar from './MyTemplatesNavBar';
 import { useTemplateData } from '@/hooks/useTemplateData';
 import { useApiContext } from '@/contexts/ApiContext';
+import TemplatePreviewDialog from './TemplatePreviewDialog';
 
 interface Template {
   id: string;
@@ -65,6 +66,8 @@ const MyTemplatesTab: React.FC = () => {
     visitType: '',
     specialty: ''
   });
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState<Template | null>(null);
 
   const handleCreateTemplate = (templateData: any) => {
     console.log('MyTemplatesTab: handleCreateTemplate called with data:', templateData);
@@ -102,7 +105,8 @@ const MyTemplatesTab: React.FC = () => {
       t.name === templateData.title && t.visitTypes.includes(templateData.type)
     );
     if (template) {
-      handleEditTemplate(template);
+      setPreviewTemplate(template);
+      setIsPreviewDialogOpen(true);
     } else {
       console.error('Template not found for viewing:', templateData);
     }
@@ -351,6 +355,15 @@ const MyTemplatesTab: React.FC = () => {
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
         onCreateTemplate={handleCreateTemplate}
+      />
+
+      <TemplatePreviewDialog
+        open={isPreviewDialogOpen}
+        onClose={() => {
+          setIsPreviewDialogOpen(false);
+          setPreviewTemplate(null);
+        }}
+        template={previewTemplate}
       />
     </Container>
   );
