@@ -274,35 +274,39 @@ const SortableItem: React.FC<SortableItemProps> = ({
                     gap: { xs: 0.5, sm: 1 }
                   }}
                 >
-                  <Tooltip title="Move Up">
-                    <IconButton
-                      size="small"
-                      onClick={(e) => handleButtonClick(e, () => onMoveUp(item.id))}
-                      disabled={index === 0}
-                      sx={{ 
-                        backgroundColor: alpha(theme.palette.action.active, 0.08),
-                        '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.15) },
-                        '&:disabled': { opacity: 0.3 }
-                      }}
-                    >
-                      <UpIcon sx={{ fontSize: 18 }} />
-                    </IconButton>
-                  </Tooltip>
+                  <span>
+                    <Tooltip title={index === 0 ? "Already at top" : "Move Up"}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleButtonClick(e, () => onMoveUp(item.id))}
+                        disabled={index === 0}
+                        sx={{ 
+                          backgroundColor: alpha(theme.palette.action.active, 0.08),
+                          '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.15) },
+                          '&:disabled': { opacity: 0.3 }
+                        }}
+                      >
+                        <UpIcon sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </span>
                   
-                  <Tooltip title="Move Down">
-                    <IconButton
-                      size="small"
-                      onClick={(e) => handleButtonClick(e, () => onMoveDown(item.id))}
-                      disabled={index === totalItems - 1}
-                      sx={{ 
-                        backgroundColor: alpha(theme.palette.action.active, 0.08),
-                        '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.15) },
-                        '&:disabled': { opacity: 0.3 }
-                      }}
-                    >
-                      <DownIcon sx={{ fontSize: 18 }} />
-                    </IconButton>
-                  </Tooltip>
+                  <span>
+                    <Tooltip title={index === totalItems - 1 ? "Already at bottom" : "Move Down"}>
+                      <IconButton
+                        size="small"
+                        onClick={(e) => handleButtonClick(e, () => onMoveDown(item.id))}
+                        disabled={index === totalItems - 1}
+                        sx={{ 
+                          backgroundColor: alpha(theme.palette.action.active, 0.08),
+                          '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.15) },
+                          '&:disabled': { opacity: 0.3 }
+                        }}
+                      >
+                        <DownIcon sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    </Tooltip>
+                  </span>
                   
                   <Tooltip title="Duplicate">
                     <IconButton

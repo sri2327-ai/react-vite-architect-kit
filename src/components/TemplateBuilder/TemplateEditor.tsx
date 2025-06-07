@@ -74,9 +74,13 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     ]
   );
 
-  // Handle navigation when a template is created
+  const [hasProcessedCreatedTemplate, setHasProcessedCreatedTemplate] = useState(false);
+
+  // Handle navigation when a template is created - only process once
   useEffect(() => {
-    if (createdTemplateData && createdTemplateData.redirectToEditor) {
+    if (createdTemplateData && createdTemplateData.redirectToEditor && !hasProcessedCreatedTemplate) {
+      setHasProcessedCreatedTemplate(true);
+      
       // Convert created template data to template items based on method
       const newItems: TemplateItem[] = [];
       
@@ -229,7 +233,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
         onNavigateToEditor();
       }
     }
-  }, [createdTemplateData, onNavigateToEditor]);
+  }, [createdTemplateData, onNavigateToEditor, hasProcessedCreatedTemplate]);
 
   const handleSave = useCallback((items: TemplateItem[]) => {
     setCurrentItems(items);
