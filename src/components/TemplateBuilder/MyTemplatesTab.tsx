@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -16,6 +15,7 @@ import TemplateFilters from './TemplateFilters';
 import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
 import VisitTypeManager from './VisitTypeManager';
+import MyTemplatesNavBar from './MyTemplatesNavBar';
 import { useTemplateData } from '@/hooks/useTemplateData';
 import { useApiContext } from '@/contexts/ApiContext';
 
@@ -229,12 +229,17 @@ const MyTemplatesTab: React.FC = () => {
           sx={{ 
             color: bravoColors.primaryFlat, 
             fontWeight: 700,
-            mb: 4,
+            mb: 2,
             textAlign: { xs: 'center', sm: 'left' }
           }}
         >
-          Select Visit Type
+          My Templates
         </Typography>
+        
+        <MyTemplatesNavBar
+          currentStep="visit-types"
+          onCreateTemplate={() => {}}
+        />
         
         <VisitTypeManager onVisitTypeSelect={handleVisitTypeSelect} />
       </Container>
@@ -244,72 +249,27 @@ const MyTemplatesTab: React.FC = () => {
   // Show Templates for selected Visit Type
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
-      <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          mb: 3,
-          gap: 2
-        }}>
-          <IconButton 
-            onClick={handleBackToVisitTypes}
-            sx={{ 
-              color: bravoColors.primaryFlat,
-              '&:hover': {
-                backgroundColor: `${bravoColors.primaryFlat}10`
-              }
-            }}
-          >
-            <ArrowBackIcon />
-          </IconButton>
-          
-          <Box sx={{ flex: 1 }}>
-            <Typography 
-              variant="h4" 
-              sx={{ 
-                color: bravoColors.primaryFlat, 
-                fontWeight: 700
-              }}
-            >
-              {selectedVisitType?.name} Templates
-            </Typography>
-            {selectedVisitType?.description && (
-              <Typography 
-                variant="body1" 
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
-                {selectedVisitType.description}
-              </Typography>
-            )}
-          </Box>
-          
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setIsCreateDialogOpen(true)}
-            sx={{
-              backgroundColor: bravoColors.primaryFlat,
-              borderRadius: 3,
-              px: { xs: 3, md: 4 },
-              py: { xs: 1.5, md: 2 },
-              textTransform: 'none',
-              fontWeight: 600,
-              fontSize: { xs: '0.9rem', md: '1rem' },
-              boxShadow: `0 4px 20px ${bravoColors.primaryFlat}40`,
-              '&:hover': {
-                backgroundColor: bravoColors.secondary,
-                transform: 'translateY(-2px)',
-                boxShadow: `0 6px 25px ${bravoColors.secondary}50`
-              },
-              transition: 'all 0.3s ease',
-              width: { xs: '100%', sm: 'auto' }
-            }}
-          >
-            Create New Template
-          </Button>
-        </Box>
+      <Typography 
+        variant="h4" 
+        sx={{ 
+          color: bravoColors.primaryFlat, 
+          fontWeight: 700,
+          mb: 2,
+          textAlign: { xs: 'center', sm: 'left' }
+        }}
+      >
+        My Templates
+      </Typography>
 
+      <MyTemplatesNavBar
+        currentStep="templates"
+        selectedVisitType={selectedVisitType?.name}
+        onCreateTemplate={() => setIsCreateDialogOpen(true)}
+        onBackToVisitTypes={handleBackToVisitTypes}
+        templateCount={filteredTemplates.length}
+      />
+
+      <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
         <TemplateFilters
           searchTerm={filters.searchTerm}
           onSearchChange={(value: string) => setFilters(prev => ({ ...prev, searchTerm: value }))}

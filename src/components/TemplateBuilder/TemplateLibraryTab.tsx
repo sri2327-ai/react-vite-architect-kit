@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -588,7 +587,6 @@ const TemplateLibraryTab: React.FC = () => {
         container 
         spacing={{ xs: 2, sm: 3, md: 4 }}
         sx={{
-          // Ensure proper grid behavior on all screen sizes
           width: '100%',
           margin: 0,
           '& .MuiGrid-item': {
