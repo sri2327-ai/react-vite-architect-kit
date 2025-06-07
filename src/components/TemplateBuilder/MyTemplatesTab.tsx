@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -68,6 +67,8 @@ const MyTemplatesTab: React.FC = () => {
   });
 
   const handleCreateTemplate = (templateData: any) => {
+    console.log('MyTemplatesTab: handleCreateTemplate called with data:', templateData);
+    
     const newTemplateData = {
       name: templateData.name,
       description: templateData.description || '',
@@ -76,8 +77,17 @@ const MyTemplatesTab: React.FC = () => {
       specialty: templateData.specialty || '',
       isActive: true
     };
-    createTemplate(newTemplateData);
-    setIsCreateDialogOpen(false);
+    
+    console.log('MyTemplatesTab: Formatted template data:', newTemplateData);
+    
+    try {
+      const result = createTemplate(newTemplateData);
+      console.log('MyTemplatesTab: Template creation result:', result);
+      setIsCreateDialogOpen(false);
+      console.log('MyTemplatesTab: Dialog closed successfully');
+    } catch (error) {
+      console.error('MyTemplatesTab: Error creating template:', error);
+    }
   };
 
   const handleEditTemplate = (template: Template) => {

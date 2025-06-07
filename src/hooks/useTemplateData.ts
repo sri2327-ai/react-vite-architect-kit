@@ -59,25 +59,37 @@ export const useTemplateData = (useApi: boolean = false) => {
   };
 
   const createTemplate = async (templateData: Omit<Template, 'id' | 'lastModified'>) => {
+    console.log('useTemplateData: createTemplate called with:', templateData);
+    console.log('useTemplateData: useApi flag is:', useApi);
+    
     if (useApi) {
       try {
         setLoading(true);
+        console.log('useTemplateData: Making API call to create template');
         const newTemplate = await apiService.post<Template>('/templates', templateData);
+        console.log('useTemplateData: API response:', newTemplate);
         setTemplates(prev => [newTemplate, ...prev]);
         return newTemplate;
       } catch (err) {
+        console.error('useTemplateData: API error:', err);
         setError(err instanceof Error ? err.message : 'Failed to create template');
         throw err;
       } finally {
         setLoading(false);
       }
     } else {
+      console.log('useTemplateData: Creating template locally (no API)');
       const newTemplate: Template = {
         ...templateData,
         id: `template-${Date.now()}`,
         lastModified: new Date().toISOString()
       };
-      setTemplates(prev => [newTemplate, ...prev]);
+      console.log('useTemplateData: New template created:', newTemplate);
+      setTemplates(prev => {
+        const updated = [newTemplate, ...prev];
+        console.log('useTemplateData: Updated templates list:', updated);
+        return updated;
+      });
       return newTemplate;
     }
   };
