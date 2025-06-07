@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -19,6 +20,7 @@ import MyTemplatesNavBar from './MyTemplatesNavBar';
 import { useTemplateData } from '@/hooks/useTemplateData';
 import { useApiContext } from '@/contexts/ApiContext';
 import TemplatePreviewDialog from './TemplatePreviewDialog';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface Template {
   id: string;
@@ -53,7 +55,7 @@ interface TemplateData {
 
 const MyTemplatesTab: React.FC = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile, isTablet, isDesktop, isMobileView } = useResponsive();
   const { useApiData } = useApiContext();
   const { templates, visitTypes, createTemplate, updateTemplate, deleteTemplate } = useTemplateData(useApiData);
 
@@ -209,10 +211,26 @@ const MyTemplatesTab: React.FC = () => {
   // Show Template Editor as separate screen
   if (isEditorOpen && selectedTemplate) {
     return (
-      <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 3 }, height: '100vh' }}>
-        <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Container 
+        maxWidth={false} 
+        sx={{ 
+          py: { xs: 1, sm: 2, md: 3, lg: 4 }, 
+          px: { xs: 1, sm: 2, md: 3 }, 
+          height: '100vh',
+          width: '100%',
+          maxWidth: '100vw'
+        }}
+      >
+        <Box sx={{ 
+          mb: { xs: 2, sm: 3 }, 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: { xs: 1, sm: 2 },
+          flexWrap: { xs: 'wrap', sm: 'nowrap' }
+        }}>
           <IconButton 
             onClick={handleCloseEditor}
+            size={isMobile ? 'small' : 'medium'}
             sx={{ 
               color: bravoColors.primaryFlat,
               '&:hover': {
@@ -223,17 +241,27 @@ const MyTemplatesTab: React.FC = () => {
             <ArrowBackIcon />
           </IconButton>
           <Typography 
-            variant="h4" 
+            variant={isMobile ? "h5" : "h4"}
             sx={{ 
               color: bravoColors.primaryFlat, 
-              fontWeight: 700
+              fontWeight: 700,
+              fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' },
+              lineHeight: 1.2,
+              wordBreak: 'break-word'
             }}
           >
             Edit Template: {selectedTemplate.name}
           </Typography>
         </Box>
         
-        <Box sx={{ height: 'calc(100vh - 120px)' }}>
+        <Box sx={{ 
+          height: { 
+            xs: 'calc(100vh - 80px)', 
+            sm: 'calc(100vh - 100px)', 
+            md: 'calc(100vh - 120px)' 
+          },
+          width: '100%'
+        }}>
           <DraggableTemplateEditor
             initialItems={selectedTemplate.sections || []}
             onSave={handleSaveTemplate}
@@ -246,24 +274,36 @@ const MyTemplatesTab: React.FC = () => {
   // Show Visit Type selection screen
   if (!selectedVisitType) {
     return (
-      <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
+      <Container 
+        maxWidth={false} 
+        sx={{ 
+          py: { xs: 1, sm: 2, md: 3, lg: 4 }, 
+          px: { xs: 1, sm: 2, md: 3 },
+          width: '100%',
+          maxWidth: '100vw'
+        }}
+      >
         <Typography 
-          variant="h4" 
+          variant={isMobile ? "h5" : "h4"}
           sx={{ 
             color: bravoColors.primaryFlat, 
             fontWeight: 700,
-            mb: 2,
-            textAlign: { xs: 'center', sm: 'left' }
+            mb: { xs: 1, sm: 2 },
+            textAlign: { xs: 'center', sm: 'left' },
+            fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+            lineHeight: 1.2
           }}
         >
           My Templates
         </Typography>
         
-        <MyTemplatesNavBar
-          currentStep="visit-types"
-          onCreateTemplate={() => {}}
-          onCreateVisitType={() => setIsCreateVisitTypeDialogOpen(true)}
-        />
+        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+          <MyTemplatesNavBar
+            currentStep="visit-types"
+            onCreateTemplate={() => {}}
+            onCreateVisitType={() => setIsCreateVisitTypeDialogOpen(true)}
+          />
+        </Box>
         
         <VisitTypeManager 
           onVisitTypeSelect={handleVisitTypeSelect}
@@ -276,26 +316,38 @@ const MyTemplatesTab: React.FC = () => {
 
   // Show Templates for selected Visit Type
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
+    <Container 
+      maxWidth={false} 
+      sx={{ 
+        py: { xs: 1, sm: 2, md: 3, lg: 4 }, 
+        px: { xs: 1, sm: 2, md: 3 },
+        width: '100%',
+        maxWidth: '100vw'
+      }}
+    >
       <Typography 
-        variant="h4" 
+        variant={isMobile ? "h5" : "h4"}
         sx={{ 
           color: bravoColors.primaryFlat, 
           fontWeight: 700,
-          mb: 2,
-          textAlign: { xs: 'center', sm: 'left' }
+          mb: { xs: 1, sm: 2 },
+          textAlign: { xs: 'center', sm: 'left' },
+          fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2rem' },
+          lineHeight: 1.2
         }}
       >
         My Templates
       </Typography>
 
-      <MyTemplatesNavBar
-        currentStep="templates"
-        selectedVisitType={selectedVisitType?.name}
-        onCreateTemplate={() => setIsCreateDialogOpen(true)}
-        onBackToVisitTypes={handleBackToVisitTypes}
-        templateCount={filteredTemplates.length}
-      />
+      <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+        <MyTemplatesNavBar
+          currentStep="templates"
+          selectedVisitType={selectedVisitType?.name}
+          onCreateTemplate={() => setIsCreateDialogOpen(true)}
+          onBackToVisitTypes={handleBackToVisitTypes}
+          templateCount={filteredTemplates.length}
+        />
+      </Box>
 
       <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
         <TemplateFilters
@@ -314,36 +366,58 @@ const MyTemplatesTab: React.FC = () => {
         />
       </Box>
 
-      <TemplateTable
-        templates={filteredTemplates.map((template: Template) => ({
-          id: parseInt(template.id.replace('template-', '')) || Math.random(),
-          title: template.name,
-          specialty: template.specialty,
-          type: template.visitTypes[0] || 'General',
-          fields: template.sections || [],
-          content: template.description,
-          lastUsed: template.lastModified,
-          usageCount: 0,
-          isFavorite: false,
-          createdBy: 'You',
-          tags: template.visitTypes
-        }))}
-        onView={handleViewTemplate}
-        onEdit={handleEditFromTable}
-        onCopy={handleCopyFromTable}
-        onToggleFavorite={handleToggleFavorite}
-      />
+      <Box sx={{ 
+        width: '100%',
+        overflowX: 'auto',
+        '& .MuiDataGrid-root': {
+          minWidth: { xs: '320px', sm: '100%' }
+        }
+      }}>
+        <TemplateTable
+          templates={filteredTemplates.map((template: Template) => ({
+            id: parseInt(template.id.replace('template-', '')) || Math.random(),
+            title: template.name,
+            specialty: template.specialty,
+            type: template.visitTypes[0] || 'General',
+            fields: template.sections || [],
+            content: template.description,
+            lastUsed: template.lastModified,
+            usageCount: 0,
+            isFavorite: false,
+            createdBy: 'You',
+            tags: template.visitTypes
+          }))}
+          onView={handleViewTemplate}
+          onEdit={handleEditFromTable}
+          onCopy={handleCopyFromTable}
+          onToggleFavorite={handleToggleFavorite}
+        />
+      </Box>
 
       {filteredTemplates.length === 0 && (
         <Box sx={{
           textAlign: 'center',
-          py: 8,
-          color: 'text.secondary'
+          py: { xs: 4, sm: 6, md: 8 },
+          color: 'text.secondary',
+          px: { xs: 2, sm: 3 }
         }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              mb: 2,
+              fontSize: { xs: '1.1rem', sm: '1.25rem' }
+            }}
+          >
             No templates found for {selectedVisitType?.name}
           </Typography>
-          <Typography variant="body2">
+          <Typography 
+            variant="body2"
+            sx={{
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              maxWidth: '600px',
+              mx: 'auto'
+            }}
+          >
             {filters.specialty
               ? 'Try adjusting your filters to see more templates.'
               : `Create your first template for ${selectedVisitType?.name} to get started.`}
