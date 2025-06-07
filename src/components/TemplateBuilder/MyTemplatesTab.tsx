@@ -111,9 +111,14 @@ const MyTemplatesTab: React.FC = () => {
 
   const handleSaveTemplate = (templateData: any) => {
     if (selectedTemplate) {
-      updateTemplate(selectedTemplate.id, templateData);
-      setIsEditorOpen(false);
-      setSelectedTemplate(null);
+      const updatedTemplate = {
+        ...selectedTemplate,
+        sections: templateData,
+        lastModified: new Date().toISOString()
+      };
+      updateTemplate(selectedTemplate.id, updatedTemplate);
+      setSelectedTemplate(updatedTemplate);
+      console.log('Template saved successfully:', updatedTemplate);
     }
   };
 
