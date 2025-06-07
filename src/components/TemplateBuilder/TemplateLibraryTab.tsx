@@ -17,7 +17,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Stack
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import { 
   Search as SearchIcon, 
@@ -29,6 +33,7 @@ import {
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import { useResponsive } from '@/hooks/useResponsive';
+import { SelectField } from '@/components/form';
 
 interface Template {
   id: string;
@@ -41,6 +46,87 @@ interface Template {
   downloads?: number;
   rating?: number;
 }
+
+interface ImportDialogProps {
+  open: boolean;
+  template: Template | null;
+  onClose: () => void;
+  onConfirm: (templateType: string) => void;
+}
+
+const ImportDialog: React.FC<ImportDialogProps> = ({ open, template, onClose, onConfirm }) => {
+  const [selectedType, setSelectedType] = useState('');
+  
+  const templateTypes = [
+    { value: 'SOAP', label: 'SOAP Note' },
+    { value: 'Progress', label: 'Progress Note' },
+    { value: 'Consultation', label: 'Consultation Note' },
+    { value: 'Discharge', label: 'Discharge Summary' },
+    { value: 'History', label: 'History & Physical' },
+    { value: 'Procedure', label: 'Procedure Note' }
+  ];
+
+  const handleConfirm = () => {
+    if (selectedType && template) {
+      onConfirm(selectedType);
+      setSelectedType('');
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedType('');
+    onClose();
+  };
+
+  return (
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>
+        Import Template: {template?.name}
+      </DialogTitle>
+      <DialogContent>
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Select the type of template you want to import this as:
+          </Typography>
+          
+          <FormControl fullWidth size="small">
+            <InputLabel>Template Type</InputLabel>
+            <Select
+              value={selectedType}
+              label="Template Type"
+              onChange={(e) => setSelectedType(e.target.value)}
+            >
+              {templateTypes.map((type) => (
+                <MenuItem key={type.value} value={type.value}>
+                  {type.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} color="inherit">
+          Cancel
+        </Button>
+        <Button 
+          onClick={handleConfirm} 
+          variant="contained" 
+          disabled={!selectedType}
+          sx={{
+            backgroundColor: bravoColors.primaryFlat,
+            '&:hover': {
+              backgroundColor: bravoColors.secondary
+            }
+          }}
+        >
+          Import Template
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 const libraryTemplates: Template[] = [
   {
@@ -94,6 +180,8 @@ const TemplateLibraryTab: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [selectedType, setSelectedType] = useState('');
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
 
   const specialties = Array.from(new Set(libraryTemplates.map(t => t.specialty)));
   const types = Array.from(new Set(libraryTemplates.map(t => t.type)));
@@ -113,7 +201,16 @@ const TemplateLibraryTab: React.FC = () => {
   };
 
   const handleImportTemplate = (template: Template) => {
-    console.log('Import template:', template);
+    setSelectedTemplate(template);
+    setImportDialogOpen(true);
+  };
+
+  const handleConfirmImport = (templateType: string) => {
+    if (selectedTemplate) {
+      console.log('Importing template:', selectedTemplate, 'as type:', templateType);
+      // Here you would implement the actual import logic
+      // This could involve calling an API or updating local state
+    }
   };
 
   const getGridColumns = () => {
@@ -222,8 +319,12 @@ const TemplateLibraryTab: React.FC = () => {
       <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         {filteredTemplates.map((template) => (
           <Grid 
+            item
             key={template.id}
-            size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+            xs={12}
+            sm={6}
+            md={4}
+            lg={3}
           >
             <Card 
               sx={{ 
@@ -374,6 +475,13 @@ const TemplateLibraryTab: React.FC = () => {
           </Typography>
         </Box>
       )}
+
+      <ImportDialog
+        open={importDialogOpen}
+        template={selectedTemplate}
+        onClose={() => setImportDialogOpen(false)}
+        onConfirm={handleConfirmImport}
+      />
     </Container>
   );
 };
