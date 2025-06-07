@@ -82,7 +82,7 @@ const Dashboard: React.FC = () => {
         {/* Stats Grid */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           {stats.map((stat, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid key={index} size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -109,7 +109,7 @@ const Dashboard: React.FC = () => {
               Quick Actions
             </Typography>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Button
                   variant="outlined"
                   fullWidth
@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
                   Create Template
                 </Button>
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Button
                   variant="outlined"
                   fullWidth
@@ -129,7 +129,7 @@ const Dashboard: React.FC = () => {
                   Import Workflow
                 </Button>
               </Grid>
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                 <Button
                   variant="outlined"
                   fullWidth
