@@ -30,7 +30,7 @@ const WelcomeStep: React.FC = () => {
           </Typography>
 
           <Grid container spacing={3} sx={{ maxWidth: 800, mx: 'auto' }}>
-            <Grid xs={12} md={4}>
+            <Grid item xs={12} md={4}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <TemplateIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -42,7 +42,7 @@ const WelcomeStep: React.FC = () => {
               </Card>
             </Grid>
             
-            <Grid xs={12} md={4}>
+            <Grid item xs={12} md={4}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <WorkflowIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -54,7 +54,7 @@ const WelcomeStep: React.FC = () => {
               </Card>
             </Grid>
             
-            <Grid xs={12} md={4}>
+            <Grid item xs={12} md={4}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <StarIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -75,7 +75,7 @@ const WelcomeStep: React.FC = () => {
           </Typography>
 
           <Grid container spacing={3} sx={{ maxWidth: 600, mx: 'auto' }}>
-            <Grid xs={12} md={6}>
+            <Grid item xs={12} md={6}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <TemplateIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>
@@ -87,7 +87,7 @@ const WelcomeStep: React.FC = () => {
               </Card>
             </Grid>
             
-            <Grid xs={12} md={6}>
+            <Grid item xs={12} md={6}>
               <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
                 <StarIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
                 <Typography variant="h6" gutterBottom>

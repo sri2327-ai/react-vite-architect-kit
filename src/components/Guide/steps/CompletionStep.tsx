@@ -63,7 +63,7 @@ const CompletionStep: React.FC = () => {
 
       <Grid container spacing={3} sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
         {quickLinks.map((link, index) => (
-          <Grid xs={12} sm={6} md={4} key={index}>
+          <Grid item xs={12} sm={6} md={4} key={index}>
             <Card sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h6" gutterBottom>
                 {link.title}
