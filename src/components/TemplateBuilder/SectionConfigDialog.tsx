@@ -209,7 +209,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         Review each subsection
       </Typography>
       <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
-        An exam-list is a structured output, with each subsection as it's own instruction for Medwriter. You can add, remove, or edit sections.
+        An exam-list is a structured output, with each subsection as its own instruction for Medwriter. You can add, remove, or edit sections.
       </Typography>
       
       <Typography variant="body2" sx={{ mb: 1, color: 'text.secondary', fontWeight: 500 }}>
@@ -314,83 +314,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             size="small"
           />
           
-          {sectionType === 'checklist' ? (
-            <Box>
-              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
-                What buttons do you want to include?
-              </Typography>
-              
-              {checklistItems.map((item, index) => (
-                <Card key={item.id} sx={{ mb: 2, border: '1px solid', borderColor: 'grey.300' }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                        Item {index + 1}
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton 
-                          size="small" 
-                          onClick={() => moveChecklistItem(item.id, 'up')}
-                          disabled={index === 0}
-                          title="Move Up"
-                        >
-                          <MoveUpIcon />
-                        </IconButton>
-                        <IconButton 
-                          size="small" 
-                          onClick={() => moveChecklistItem(item.id, 'down')}
-                          disabled={index === checklistItems.length - 1}
-                          title="Move Down"
-                        >
-                          <MoveDownIcon />
-                        </IconButton>
-                        {checklistItems.length > 1 && (
-                          <IconButton 
-                            size="small" 
-                            onClick={() => removeChecklistItem(item.id)}
-                            sx={{ color: 'error.main' }}
-                            title="Delete Item"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        )}
-                      </Box>
-                    </Box>
-                    
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <TextField
-                        fullWidth
-                        label="Button Name"
-                        value={item.buttonName}
-                        onChange={(e) => updateChecklistItem(item.id, 'buttonName', e.target.value)}
-                        variant="outlined"
-                        size="small"
-                      />
-                      
-                      <TextField
-                        fullWidth
-                        label="What text should be added when this button is clicked?"
-                        value={item.text}
-                        onChange={(e) => updateChecklistItem(item.id, 'text', e.target.value)}
-                        multiline
-                        rows={3}
-                        variant="outlined"
-                        size="small"
-                      />
-                    </Box>
-                  </CardContent>
-                </Card>
-              ))}
-              
-              <Button
-                startIcon={<AddIcon />}
-                onClick={addChecklistItem}
-                sx={{ mb: 3, textTransform: 'none' }}
-              >
-                Add Another Item
-              </Button>
-            </Box>
-          ) : sectionType === 'exam_list' ? (
+          {sectionType === 'exam_list' && (
             <Box>
               <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
                 What exam sections would you like A.I. to report on?
@@ -531,18 +455,108 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 />
               </FormGroup>
             </Box>
-          ) : (
+          )}
+
+          {sectionType === 'checklist' && (
+            <Box>
+              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
+                What buttons do you want to include?
+              </Typography>
+              
+              {checklistItems.map((item, index) => (
+                <Card key={item.id} sx={{ mb: 2, border: '1px solid', borderColor: 'grey.300' }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        Item {index + 1}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => moveChecklistItem(item.id, 'up')}
+                          disabled={index === 0}
+                          title="Move Up"
+                        >
+                          <MoveUpIcon />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => moveChecklistItem(item.id, 'down')}
+                          disabled={index === checklistItems.length - 1}
+                          title="Move Down"
+                        >
+                          <MoveDownIcon />
+                        </IconButton>
+                        {checklistItems.length > 1 && (
+                          <IconButton 
+                            size="small" 
+                            onClick={() => removeChecklistItem(item.id)}
+                            sx={{ color: 'error.main' }}
+                            title="Delete Item"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <TextField
+                        fullWidth
+                        label="Button Name"
+                        value={item.buttonName}
+                        onChange={(e) => updateChecklistItem(item.id, 'buttonName', e.target.value)}
+                        variant="outlined"
+                        size="small"
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        label="What text should be added when this button is clicked?"
+                        value={item.text}
+                        onChange={(e) => updateChecklistItem(item.id, 'text', e.target.value)}
+                        multiline
+                        rows={3}
+                        variant="outlined"
+                        size="small"
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              <Button
+                startIcon={<AddIcon />}
+                onClick={addChecklistItem}
+                sx={{ mb: 3, textTransform: 'none' }}
+              >
+                Add Another Item
+              </Button>
+            </Box>
+          )}
+
+          {sectionType === 'bulleted_list' && (
             <TextField
               fullWidth
-              label={sectionType === 'bulleted_list' ? "What do you want the A.I. to generate bullets for?" : "AI Instructions"}
+              label="What do you want the A.I. to generate bullets for?"
               value={instructions}
               onChange={(e) => setInstructions(e.target.value)}
               multiline
               rows={6}
-              placeholder={sectionType === 'bulleted_list' 
-                ? "Describe what information should be included in each bullet point..."
-                : `Provide detailed instructions for how the AI should generate the ${sectionName} section...`
-              }
+              placeholder="Describe what information should be included in each bullet point..."
+              variant="outlined"
+            />
+          )}
+
+          {!['bulleted_list', 'exam_list', 'checklist'].includes(sectionType) && (
+            <TextField
+              fullWidth
+              label="AI Instructions"
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              multiline
+              rows={6}
+              placeholder={`Provide detailed instructions for how the AI should generate the ${sectionName} section...`}
               variant="outlined"
             />
           )}
