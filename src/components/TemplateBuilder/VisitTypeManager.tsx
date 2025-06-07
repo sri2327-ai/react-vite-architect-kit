@@ -50,16 +50,16 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
   
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingVisitType, setEditingVisitType] = useState<VisitType | null>(null);
-  const [formData, setFormData] = useState({ name: '', description: '' });
+  const [formData, setFormData] = useState({ name: '' });
 
   const handleOpenCreateDialog = () => {
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '' });
     setEditingVisitType(null);
     setIsCreateDialogOpen(true);
   };
 
   const handleEditVisitType = (visitType: VisitType) => {
-    setFormData({ name: visitType.name, description: visitType.description || '' });
+    setFormData({ name: visitType.name });
     setEditingVisitType(visitType);
     setIsCreateDialogOpen(true);
   };
@@ -70,7 +70,7 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
     const visitTypeData = {
       id: editingVisitType?.id || `vt-${Date.now()}`,
       name: formData.name,
-      description: formData.description
+      description: `Template for ${formData.name} appointments`
     };
 
     if (editingVisitType) {
@@ -80,7 +80,7 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
     }
 
     setIsCreateDialogOpen(false);
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '' });
     setEditingVisitType(null);
   };
 
@@ -137,32 +137,33 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
         </Button>
       </Box>
 
-      <Grid container spacing={2}>
+      <Grid container spacing={3}>
         {visitTypes.map((visitType) => (
-          <Grid key={visitType.id} size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid key={visitType.id} size={{ xs: 12, sm: 6, lg: 4 }}>
             <Card 
               sx={{ 
                 height: '100%',
                 border: `1px solid ${bravoColors.primary}20`,
-                borderRadius: 2,
-                transition: 'all 0.2s ease',
+                borderRadius: 3,
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 cursor: onVisitTypeSelect ? 'pointer' : 'default',
                 '&:hover': {
                   borderColor: bravoColors.primaryFlat,
-                  transform: 'translateY(-2px)',
-                  boxShadow: `0 4px 12px ${bravoColors.primaryFlat}20`
+                  transform: 'translateY(-4px)',
+                  boxShadow: `0 8px 25px ${bravoColors.primaryFlat}20`
                 }
               }}
               onClick={() => handleVisitTypeClick(visitType)}
             >
-              <CardContent sx={{ pb: 1 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+              <CardContent sx={{ pb: 1, p: 3 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                   <Typography 
                     variant="h6" 
                     sx={{ 
-                      fontWeight: 600,
+                      fontWeight: 700,
                       color: bravoColors.primaryFlat,
-                      flex: 1
+                      flex: 1,
+                      fontSize: '1.1rem'
                     }}
                   >
                     {visitType.name}
@@ -174,19 +175,25 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
                 <Typography 
                   variant="body2" 
                   color="text.secondary"
-                  sx={{ minHeight: 40 }}
+                  sx={{ minHeight: 40, fontSize: '0.875rem' }}
                 >
                   {visitType.description}
                 </Typography>
               </CardContent>
-              <CardActions sx={{ pt: 0, justifyContent: 'flex-end' }}>
+              <CardActions sx={{ pt: 0, justifyContent: 'flex-end', px: 3, pb: 2 }}>
                 <IconButton
                   size="small"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleEditVisitType(visitType);
                   }}
-                  sx={{ color: bravoColors.primaryFlat }}
+                  sx={{ 
+                    color: bravoColors.primaryFlat,
+                    backgroundColor: `${bravoColors.primaryFlat}10`,
+                    '&:hover': {
+                      backgroundColor: `${bravoColors.primaryFlat}20`
+                    }
+                  }}
                 >
                   <EditIcon fontSize="small" />
                 </IconButton>
@@ -196,7 +203,13 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
                     e.stopPropagation();
                     handleDeleteVisitType(visitType.id);
                   }}
-                  sx={{ color: 'error.main' }}
+                  sx={{ 
+                    color: 'error.main',
+                    backgroundColor: 'error.main10',
+                    '&:hover': {
+                      backgroundColor: 'error.main20'
+                    }
+                  }}
                 >
                   <DeleteIcon fontSize="small" />
                 </IconButton>
@@ -245,15 +258,6 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="e.g., Office Visit, Follow-up, Annual Physical"
-            />
-            <InputField
-              name="description"
-              label="Description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Brief description of this visit type"
-              multiline
-              rows={3}
             />
           </Box>
         </DialogContent>

@@ -12,15 +12,12 @@ import {
   Chip,
   Typography,
   Box,
-  Tooltip,
-  Avatar
+  Tooltip
 } from '@mui/material';
 import {
   Edit as EditIcon,
   Visibility as VisibilityIcon,
-  ContentCopy as ContentCopyIcon,
-  Star as StarIcon,
-  StarBorder as StarBorderIcon
+  ContentCopy as ContentCopyIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 
@@ -65,19 +62,8 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
     return colors[specialty as keyof typeof colors] || bravoColors.primaryFlat;
   };
 
-  const getTypeIcon = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'soap': return '📋';
-      case 'consultation': return '🩺';
-      case 'progress': return '📈';
-      case 'procedure': return '⚕️';
-      case 'discharge': return '🏥';
-      default: return '📝';
-    }
-  };
-
   const handleView = (template: TemplateData) => {
-    console.log('View button clicked for template:', template);
+    console.log('Preview button clicked for template:', template);
     if (onView) {
       onView(template);
     }
@@ -94,13 +80,6 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
     console.log('Copy button clicked for template:', template);
     if (onCopy) {
       onCopy(template);
-    }
-  };
-
-  const handleToggleFavorite = (template: TemplateData) => {
-    console.log('Favorite button clicked for template:', template);
-    if (onToggleFavorite) {
-      onToggleFavorite(template);
     }
   };
 
@@ -141,88 +120,70 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
               }}
             >
               <TableCell>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleToggleFavorite(template)}
-                    sx={{ p: 0.5 }}
+                <Box>
+                  <Typography 
+                    variant="subtitle2" 
+                    sx={{ 
+                      fontWeight: 600, 
+                      color: bravoColors.primaryFlat,
+                      lineHeight: 1.2
+                    }}
                   >
-                    {template.isFavorite ? (
-                      <StarIcon sx={{ color: '#ffc107', fontSize: 18 }} />
-                    ) : (
-                      <StarBorderIcon sx={{ color: 'text.secondary', fontSize: 18 }} />
-                    )}
-                  </IconButton>
-                  <Box>
+                    {template.title}
+                  </Typography>
+                  {template.content && (
                     <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        fontWeight: 600, 
-                        color: bravoColors.primaryFlat,
-                        lineHeight: 1.2
-                      }}
+                      variant="caption" 
+                      color="text.secondary"
+                      sx={{ display: 'block', mt: 0.5 }}
                     >
-                      {template.title}
+                      {template.content.length > 50 
+                        ? `${template.content.substring(0, 50)}...` 
+                        : template.content}
                     </Typography>
-                    {template.content && (
-                      <Typography 
-                        variant="caption" 
-                        color="text.secondary"
-                        sx={{ display: 'block', mt: 0.5 }}
-                      >
-                        {template.content.length > 50 
-                          ? `${template.content.substring(0, 50)}...` 
-                          : template.content}
-                      </Typography>
-                    )}
-                    {template.tags && template.tags.length > 0 && (
-                      <Box sx={{ mt: 0.5, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                        {template.tags.slice(0, 2).map((tag, index) => (
-                          <Chip
-                            key={index}
-                            label={tag}
-                            size="small"
-                            variant="outlined"
-                            sx={{
-                              fontSize: '0.65rem',
-                              height: 20,
-                              borderColor: bravoColors.primaryFlat,
-                              color: bravoColors.primaryFlat
-                            }}
-                          />
-                        ))}
-                        {template.tags.length > 2 && (
-                          <Typography variant="caption" color="text.secondary">
-                            +{template.tags.length - 2}
-                          </Typography>
-                        )}
-                      </Box>
-                    )}
-                  </Box>
+                  )}
+                  {template.tags && template.tags.length > 0 && (
+                    <Box sx={{ mt: 0.5, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                      {template.tags.slice(0, 2).map((tag, index) => (
+                        <Chip
+                          key={index}
+                          label={tag}
+                          size="small"
+                          variant="outlined"
+                          sx={{
+                            fontSize: '0.65rem',
+                            height: 20,
+                            borderColor: bravoColors.primaryFlat,
+                            color: bravoColors.primaryFlat
+                          }}
+                        />
+                      ))}
+                      {template.tags.length > 2 && (
+                        <Typography variant="caption" color="text.secondary">
+                          +{template.tags.length - 2}
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
                 </Box>
               </TableCell>
               
               <TableCell>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <Typography variant="h6" sx={{ fontSize: '1.2rem' }}>
-                    {getTypeIcon(template.type)}
-                  </Typography>
-                  <Chip
-                    label={template.type}
-                    size="small"
-                    sx={{
-                      backgroundColor: getSpecialtyColor(template.specialty),
-                      color: 'white',
-                      fontWeight: 600,
-                      fontSize: '0.7rem'
-                    }}
-                  />
-                </Box>
+                <Chip
+                  label={template.type}
+                  size="small"
+                  sx={{
+                    backgroundColor: getSpecialtyColor(template.specialty),
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '0.7rem'
+                  }}
+                />
               </TableCell>
               
               <TableCell align="center">
                 <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
-                  <Tooltip title="View Template">
+                  <Tooltip title="Preview Template">
                     <IconButton
                       size="small"
                       onClick={() => handleView(template)}

@@ -1,7 +1,9 @@
+
 import React from 'react';
-import { Box, TextField, FormControl, InputLabel, Select, MenuItem, Chip, Stack, Button, Autocomplete, ToggleButtonGroup, ToggleButton, Typography, Divider } from '@mui/material';
-import { Search as SearchIcon, FilterList as FilterListIcon, Star as StarIcon, AccessTime as AccessTimeIcon, TrendingUp as TrendingUpIcon, Clear as ClearIcon } from '@mui/icons-material';
+import { Box, TextField, FormControl, InputLabel, Select, MenuItem, Chip, Stack, Button, Autocomplete, Typography, Divider } from '@mui/material';
+import { Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
+
 interface TemplateFiltersProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
@@ -18,6 +20,7 @@ interface TemplateFiltersProps {
   onClearFilters: () => void;
   hasActiveFilters: boolean;
 }
+
 const TemplateFilters: React.FC<TemplateFiltersProps> = ({
   searchTerm,
   onSearchChange,
@@ -53,52 +56,77 @@ const TemplateFilters: React.FC<TemplateFiltersProps> = ({
     value: 'specialty',
     label: 'By Specialty'
   }];
-  return <Box sx={{
-    mb: 3
-  }}>
-      {/* Quick View Toggles */}
-      <Box sx={{
-      mb: 3
-    }}>
-        <ToggleButtonGroup value={viewMode} exclusive onChange={(_, newMode) => newMode && onViewModeChange(newMode)} sx={{
-        '& .MuiToggleButton-root': {
-          borderRadius: 3,
-          textTransform: 'none',
-          fontWeight: 600,
-          px: 3,
-          py: 1,
-          border: '2px solid',
-          borderColor: 'divider',
-          '&.Mui-selected': {
-            backgroundColor: bravoColors.primaryFlat,
-            color: 'white',
-            borderColor: bravoColors.primaryFlat,
-            '&:hover': {
-              backgroundColor: bravoColors.primaryDark
-            }
-          }
-        }
-      }}>
-          <ToggleButton value="all">
-            <FilterListIcon sx={{
-            mr: 1,
-            fontSize: 18
-          }} />
-            All Templates
-          </ToggleButton>
-          <ToggleButton value="favorites">
-            <StarIcon sx={{
-            mr: 1,
-            fontSize: 18
-          }} />
-            Favorites
-          </ToggleButton>
-          
-        </ToggleButtonGroup>
-      </Box>
 
-      {/* Search and Filters */}
-      
-    </Box>;
+  return (
+    <Box sx={{ mb: 3 }}>
+      {/* Search and Basic Filters */}
+      <Box sx={{
+        display: 'flex',
+        gap: 2,
+        flexDirection: { xs: 'column', md: 'row' },
+        alignItems: { xs: 'stretch', md: 'center' }
+      }}>
+        <TextField
+          placeholder="Search templates..."
+          value={searchTerm}
+          onChange={(e) => onSearchChange(e.target.value)}
+          variant="outlined"
+          size="small"
+          sx={{
+            flex: 1,
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 2
+            }
+          }}
+          InputProps={{
+            startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
+          }}
+        />
+        
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Specialty</InputLabel>
+          <Select
+            value={selectedSpecialty}
+            onChange={(e) => onSpecialtyChange(e.target.value)}
+            label="Specialty"
+          >
+            {specialties.map((specialty) => (
+              <MenuItem key={specialty} value={specialty}>
+                {specialty}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 120 }}>
+          <InputLabel>Sort By</InputLabel>
+          <Select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value)}
+            label="Sort By"
+          >
+            {sortOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        {hasActiveFilters && (
+          <Button
+            onClick={onClearFilters}
+            startIcon={<ClearIcon />}
+            variant="outlined"
+            size="small"
+            sx={{ textTransform: 'none' }}
+          >
+            Clear
+          </Button>
+        )}
+      </Box>
+    </Box>
+  );
 };
+
 export default TemplateFilters;
