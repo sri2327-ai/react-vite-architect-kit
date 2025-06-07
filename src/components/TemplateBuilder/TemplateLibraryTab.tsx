@@ -63,6 +63,7 @@ interface PreviewDialogProps {
   open: boolean;
   template: Template | null;
   onClose: () => void;
+  onImport: (template: Template) => void;
 }
 
 const ImportDialog: React.FC<ImportDialogProps> = ({ open, template, onClose, onConfirm }) => {
@@ -166,12 +167,18 @@ const ImportDialog: React.FC<ImportDialogProps> = ({ open, template, onClose, on
   );
 };
 
-const PreviewDialog: React.FC<PreviewDialogProps> = ({ open, template, onClose }) => {
+const PreviewDialog: React.FC<PreviewDialogProps> = ({ open, template, onClose, onImport }) => {
   const [activeTab, setActiveTab] = useState(0);
   const { isMobile } = useResponsive();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
+  };
+
+  const handleImport = () => {
+    if (template) {
+      onImport(template);
+    }
   };
 
   const sampleNoteContent = `
@@ -350,6 +357,38 @@ Detailed history of the presenting problem including:
           )}
         </Box>
       </DialogContent>
+      
+      <DialogActions sx={{ 
+        p: { xs: 2, sm: 3 },
+        borderTop: 1,
+        borderColor: 'divider',
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: 1, sm: 2 }
+      }}>
+        <Button 
+          onClick={onClose} 
+          color="inherit"
+          fullWidth={isMobile}
+          sx={{ order: { xs: 2, sm: 1 } }}
+        >
+          Close
+        </Button>
+        <Button 
+          onClick={handleImport} 
+          variant="contained"
+          startIcon={<GetAppIcon />}
+          fullWidth={isMobile}
+          sx={{
+            backgroundColor: bravoColors.primaryFlat,
+            order: { xs: 1, sm: 2 },
+            '&:hover': {
+              backgroundColor: bravoColors.secondary
+            }
+          }}
+        >
+          Import Template
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };
@@ -429,6 +468,12 @@ const TemplateLibraryTab: React.FC = () => {
   };
 
   const handleImportTemplate = (template: Template) => {
+    setSelectedTemplate(template);
+    setImportDialogOpen(true);
+  };
+
+  const handleImportFromPreview = (template: Template) => {
+    setPreviewDialogOpen(false);
     setSelectedTemplate(template);
     setImportDialogOpen(true);
   };
@@ -539,15 +584,36 @@ const TemplateLibraryTab: React.FC = () => {
       </Box>
 
       {/* Templates Grid */}
-      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
+      <Grid 
+        container 
+        spacing={{ xs: 2, sm: 3, md: 4 }}
+        sx={{
+          // Ensure proper grid behavior on all screen sizes
+          width: '100%',
+          margin: 0,
+          '& .MuiGrid-item': {
+            paddingLeft: { xs: '8px', sm: '12px', md: '16px' },
+            paddingTop: { xs: '8px', sm: '12px', md: '16px' }
+          }
+        }}
+      >
         {filteredTemplates.map((template) => (
           <Grid 
+            item
             key={template.id}
-            size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+            xs={12}
+            sm={6}
+            md={4}
+            lg={3}
+            sx={{
+              display: 'flex',
+              width: '100%'
+            }}
           >
             <Card 
               sx={{ 
                 height: '100%',
+                width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 borderRadius: 3,
@@ -555,13 +621,18 @@ const TemplateLibraryTab: React.FC = () => {
                 borderColor: 'divider',
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  transform: 'translateY(-4px)',
+                  transform: { xs: 'none', sm: 'translateY(-4px)' },
                   boxShadow: theme.shadows[8],
                   borderColor: bravoColors.primaryFlat
                 }
               }}
             >
-              <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+              <CardContent sx={{ 
+                flexGrow: 1, 
+                p: { xs: 2, sm: 3 },
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
                 <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography 
@@ -595,7 +666,8 @@ const TemplateLibraryTab: React.FC = () => {
                   sx={{ 
                     mb: 2,
                     fontSize: { xs: '0.85rem', sm: '0.875rem' },
-                    lineHeight: 1.4
+                    lineHeight: 1.4,
+                    flexGrow: 1
                   }}
                 >
                   {template.description}
@@ -706,6 +778,7 @@ const TemplateLibraryTab: React.FC = () => {
         open={previewDialogOpen}
         template={selectedTemplate}
         onClose={() => setPreviewDialogOpen(false)}
+        onImport={handleImportFromPreview}
       />
     </Container>
   );
