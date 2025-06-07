@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
 
@@ -73,31 +74,53 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     ]
   );
 
-  // Track if we've already processed this template creation session
+  // Enhanced refs to prevent unwanted navigation during screen resize
   const hasProcessedRef = useRef(false);
   const isNavigatingRef = useRef(false);
   const lastProcessedDataRef = useRef<string>('');
+  const processingLockRef = useRef(false);
+  const navigationSessionIdRef = useRef<string>('');
 
-  // Handle navigation when a template is created - only process once per template creation session
+  // Handle navigation when a template is created - enhanced to prevent duplicate processing
   useEffect(() => {
-    // Create a unique identifier for this template data to prevent duplicate processing
-    const templateDataString = JSON.stringify(createdTemplateData);
-    
-    // Only process if we have valid template data that should redirect AND we haven't processed this exact data yet
+    // Enhanced validation to prevent processing during screen resizes
     if (!createdTemplateData || 
         !createdTemplateData.redirectToEditor || 
         hasProcessedRef.current ||
         isNavigatingRef.current ||
-        lastProcessedDataRef.current === templateDataString) {
+        processingLockRef.current) {
       return;
     }
 
-    console.log('Processing template creation for the first time:', createdTemplateData);
+    // Create a unique session identifier for this template creation
+    const templateSessionId = `${createdTemplateData.method}-${createdTemplateData.name}-${Date.now()}`;
     
-    // Mark as processed immediately to prevent re-processing
+    // Check if we've already processed this exact session
+    if (navigationSessionIdRef.current === templateSessionId) {
+      return;
+    }
+
+    // Create a unique identifier for this template data
+    const templateDataString = JSON.stringify({
+      method: createdTemplateData.method,
+      name: createdTemplateData.name,
+      content: createdTemplateData.content,
+      redirectToEditor: createdTemplateData.redirectToEditor
+    });
+    
+    // Enhanced duplicate check
+    if (lastProcessedDataRef.current === templateDataString) {
+      return;
+    }
+
+    console.log('Processing template creation for session:', templateSessionId);
+    
+    // Lock processing immediately to prevent concurrent execution
+    processingLockRef.current = true;
     hasProcessedRef.current = true;
     isNavigatingRef.current = true;
     lastProcessedDataRef.current = templateDataString;
+    navigationSessionIdRef.current = templateSessionId;
     
     // Convert created template data to template items based on method
     const newItems: TemplateItem[] = [];
@@ -246,27 +269,52 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     
     setCurrentItems(newItems);
     
-    // Navigate to editor only if navigation function is provided
-    if (onNavigateToEditor) {
-      console.log('Navigating to editor once');
+    // Navigate to editor only if navigation function is provided and we haven't navigated yet
+    if (onNavigateToEditor && !isNavigatingRef.current) {
+      console.log('Navigating to editor for session:', templateSessionId);
       onNavigateToEditor();
     }
     
-    // Clear the navigation flag after a short delay to allow navigation to complete
+    // Enhanced cleanup with longer delay to ensure navigation completes
     setTimeout(() => {
       isNavigatingRef.current = false;
-    }, 100);
+      processingLockRef.current = false;
+      console.log('Navigation cleanup completed for session:', templateSessionId);
+    }, 500);
   }, [createdTemplateData, onNavigateToEditor]);
 
-  // Reset processing flag when createdTemplateData becomes null/undefined or loses redirect flag
+  // Enhanced reset logic to handle all edge cases
   useEffect(() => {
     if (!createdTemplateData || !createdTemplateData.redirectToEditor) {
+      // Reset all flags when template data is cleared
       hasProcessedRef.current = false;
       isNavigatingRef.current = false;
+      processingLockRef.current = false;
       lastProcessedDataRef.current = '';
-      console.log('Reset processing flags - template data cleared or no redirect needed');
+      navigationSessionIdRef.current = '';
+      console.log('All navigation flags reset - template data cleared or no redirect needed');
     }
   }, [createdTemplateData]);
+
+  // Additional effect to handle window resize events and prevent unwanted navigation
+  useEffect(() => {
+    const handleResize = () => {
+      // During resize, temporarily lock navigation to prevent unwanted redirects
+      if (hasProcessedRef.current) {
+        processingLockRef.current = true;
+        console.log('Screen resize detected - locking navigation');
+        
+        // Unlock after resize is complete
+        setTimeout(() => {
+          processingLockRef.current = false;
+          console.log('Screen resize complete - unlocking navigation');
+        }, 300);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSave = useCallback((items: TemplateItem[]) => {
     setCurrentItems(items);

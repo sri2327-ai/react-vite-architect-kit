@@ -10,9 +10,13 @@ import {
   Box,
   Typography,
   IconButton,
-  Paper
+  Paper,
+  Stack,
+  Divider,
+  Alert
 } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { Close as CloseIcon, ArrowBack as ArrowBackIcon, Info as InfoIcon, List as ListIcon } from '@mui/icons-material';
+import { alpha } from '@mui/material/styles';
 
 interface BulletedListConfigDialogProps {
   open: boolean;
@@ -35,65 +39,164 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="md" 
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          maxHeight: '90vh'
+        }
+      }}
+    >
+      <DialogTitle sx={{ pb: 2 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6">Edit Bulleted List</Typography>
-          <IconButton onClick={onClose}>
+          <Box display="flex" alignItems="center" gap={2}>
+            <IconButton 
+              onClick={onBack}
+              sx={{
+                backgroundColor: alpha('#000', 0.05),
+                '&:hover': { backgroundColor: alpha('#000', 0.1) }
+              }}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+                Configure Bulleted List Section
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Set up AI-generated bulleted content for your template
+              </Typography>
+            </Box>
+          </Box>
+          <IconButton 
+            onClick={onClose}
+            sx={{
+              backgroundColor: alpha('#000', 0.05),
+              '&:hover': { backgroundColor: alpha('#000', 0.1) }
+            }}
+          >
             <CloseIcon />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <DialogContent>
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            <strong>How this works</strong><br />
-            Specify your bulleted list instructions
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Tell the A.I. what information you want it to generate in a bulleted list format.
-          </Typography>
-        </Box>
+      <Divider />
 
-        <Paper sx={{ p: 2, mb: 3, bgcolor: '#f5f5f5' }}>
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>Example</Typography>
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            For instance, you could write:
+      <DialogContent sx={{ p: 3 }}>
+        <Alert 
+          severity="info" 
+          icon={<ListIcon />}
+          sx={{ 
+            mb: 3,
+            borderRadius: 2,
+            '& .MuiAlert-message': { fontSize: '0.875rem' }
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+            How Bulleted Lists Work
           </Typography>
-          <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 2 }}>
-            Create a bullet for each medication that was discussed. Each bullet should follow this format: {'{Medication Name}'} - {'{Dosage}'}, {'{Frequency}'}
+          <Typography variant="body2" sx={{ mb: 1 }}>
+            Tell the AI what information you want it to generate in a bulleted list format. Be specific about what should be included in each bullet point.
           </Typography>
-          <Typography variant="subtitle2" sx={{ mb: 1 }}>Tips</Typography>
-          <Typography variant="body2">
-            Be specific about what information you want included in each bullet point. The A.I. will format the output as a bulleted list.
+        </Alert>
+
+        <Paper sx={{ p: 3, mb: 3, bgcolor: alpha('#f5f5f5', 0.5), borderRadius: 2 }}>
+          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+            💡 Example Instructions
           </Typography>
+          <Typography variant="body2" sx={{ fontStyle: 'italic', mb: 2, lineHeight: 1.6 }}>
+            "Create a bullet for each medication that was discussed. Each bullet should follow this format: {'{Medication Name}'} - {'{Dosage}'}, {'{Frequency}'}."
+          </Typography>
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+            💡 Pro Tips
+          </Typography>
+          <Box component="ul" sx={{ m: 0, pl: 2 }}>
+            <Typography component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Be specific about what information should be in each bullet
+            </Typography>
+            <Typography component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+              Use formatting templates like: "• {'{Item}'} - {'{Details}'}"
+            </Typography>
+            <Typography component="li" variant="body2" color="text.secondary">
+              The AI will automatically format the output as a bulleted list
+            </Typography>
+          </Box>
         </Paper>
 
-        <TextField
-          fullWidth
-          label="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          sx={{ mb: 3 }}
-        />
+        <Stack spacing={3}>
+          <TextField
+            fullWidth
+            label="Section Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g., Medications, Treatment Plan, Key Points"
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2
+              }
+            }}
+          />
 
-        <TextField
-          fullWidth
-          label="What do you want the A.I. to generate bullets for?"
-          multiline
-          rows={4}
-          value={instructions}
-          onChange={(e) => setInstructions(e.target.value)}
-        />
+          <TextField
+            fullWidth
+            label="What do you want the A.I. to generate bullets for?"
+            multiline
+            rows={5}
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            placeholder="Describe what should be included in each bullet point..."
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2
+              }
+            }}
+          />
+        </Stack>
       </DialogContent>
 
-      <DialogActions>
-        <Button onClick={onBack}>Back</Button>
+      <Divider />
+
+      <DialogActions sx={{ p: 3, gap: 2 }}>
+        <Button 
+          onClick={onBack}
+          variant="outlined"
+          size="large"
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600,
+            px: 3
+          }}
+        >
+          Back
+        </Button>
         <Button
           variant="contained"
+          size="large"
           onClick={handleContinue}
           disabled={!title || !instructions}
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600,
+            px: 4,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            '&:hover': {
+              boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+              transform: 'translateY(-1px)'
+            },
+            '&:disabled': {
+              boxShadow: 'none'
+            },
+            transition: 'all 0.3s ease'
+          }}
         >
           Continue to Placement
         </Button>
