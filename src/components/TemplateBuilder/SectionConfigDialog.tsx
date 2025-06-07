@@ -27,7 +27,9 @@ import {
   Close as CloseIcon, 
   ArrowBack as ArrowBackIcon,
   Add as AddIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  KeyboardArrowUp as MoveUpIcon,
+  KeyboardArrowDown as MoveDownIcon
 } from '@mui/icons-material';
 
 interface SectionConfigDialogProps {
@@ -46,6 +48,12 @@ interface ExamItem {
   normalText: string;
 }
 
+interface ChecklistItem {
+  id: string;
+  buttonName: string;
+  text: string;
+}
+
 const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   open,
   onClose,
@@ -59,6 +67,9 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   const [examItems, setExamItems] = useState<ExamItem[]>([
     { id: '1', title: '', instructions: '', normalText: '' }
   ]);
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([
+    { id: '1', buttonName: '', text: '' }
+  ]);
   const [notDiscussedBehavior, setNotDiscussedBehavior] = useState('leave_blank');
   const [normalLimitsBehavior, setNormalLimitsBehavior] = useState('summarize');
   const [hideEmptyItems, setHideEmptyItems] = useState(false);
@@ -68,6 +79,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       setTitle(sectionName);
       setInstructions('');
       setExamItems([{ id: '1', title: '', instructions: '', normalText: '' }]);
+      setChecklistItems([{ id: '1', buttonName: '', text: '' }]);
       setNotDiscussedBehavior('leave_blank');
       setNormalLimitsBehavior('summarize');
       setHideEmptyItems(false);
@@ -80,6 +92,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       instructions, 
       sectionType,
       examItems,
+      checklistItems,
       notDiscussedBehavior,
       normalLimitsBehavior,
       hideEmptyItems
@@ -94,6 +107,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
     }
   };
 
+  // Exam items functions
   const addExamItem = () => {
     const newItem: ExamItem = {
       id: Date.now().toString(),
@@ -116,8 +130,45 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
     ));
   };
 
+  // Checklist items functions
+  const addChecklistItem = () => {
+    const newItem: ChecklistItem = {
+      id: Date.now().toString(),
+      buttonName: '',
+      text: ''
+    };
+    setChecklistItems([...checklistItems, newItem]);
+  };
+
+  const removeChecklistItem = (id: string) => {
+    if (checklistItems.length > 1) {
+      setChecklistItems(checklistItems.filter(item => item.id !== id));
+    }
+  };
+
+  const updateChecklistItem = (id: string, field: keyof ChecklistItem, value: string) => {
+    setChecklistItems(checklistItems.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    ));
+  };
+
+  const moveChecklistItem = (id: string, direction: 'up' | 'down') => {
+    const currentIndex = checklistItems.findIndex(item => item.id === id);
+    if (
+      (direction === 'up' && currentIndex === 0) ||
+      (direction === 'down' && currentIndex === checklistItems.length - 1)
+    ) {
+      return;
+    }
+
+    const newItems = [...checklistItems];
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    [newItems[currentIndex], newItems[targetIndex]] = [newItems[targetIndex], newItems[currentIndex]];
+    setChecklistItems(newItems);
+  };
+
   const getBulletedListGuidance = () => (
-    <Box>
+    <Box sx={{ mb: 3 }}>
       <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
         How this works
       </Typography>
@@ -150,7 +201,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   );
 
   const getExamListGuidance = () => (
-    <Box>
+    <Box sx={{ mb: 3 }}>
       <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
         How this works
       </Typography>
@@ -173,6 +224,17 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       </Typography>
       <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
         You can specify certain default "within normal limits" text, and decide when you want Medwriter to fall back to that text.
+      </Typography>
+    </Box>
+  );
+
+  const getChecklistGuidance = () => (
+    <Box sx={{ mb: 3 }}>
+      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600, color: '#1976d2' }}>
+        How this works
+      </Typography>
+      <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary' }}>
+        Add items below. Each item will get a button. On press of the button, the corresponding text will be added to the note. This will not be A.I. generated; you will need to manually press the button to insert the exact corresponding text.
       </Typography>
     </Box>
   );
@@ -226,6 +288,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
               {sectionType === 'bulleted_list' ? 'Edit Bulleted List' : 
                sectionType === 'exam_list' ? 'Edit Exam List' :
+               sectionType === 'checklist' ? 'Edit Checklist' :
                `Configure Section: ${sectionName}`}
             </Typography>
           </Box>
@@ -238,7 +301,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       <DialogContent>
         {sectionType === 'bulleted_list' && getBulletedListGuidance()}
         {sectionType === 'exam_list' && getExamListGuidance()}
-        {sectionType !== 'bulleted_list' && sectionType !== 'exam_list' && getGeneralGuidance()}
+        {sectionType === 'checklist' && getChecklistGuidance()}
+        {!['bulleted_list', 'exam_list', 'checklist'].includes(sectionType) && getGeneralGuidance()}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <TextField
@@ -250,7 +314,83 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             size="small"
           />
           
-          {sectionType === 'exam_list' ? (
+          {sectionType === 'checklist' ? (
+            <Box>
+              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
+                What buttons do you want to include?
+              </Typography>
+              
+              {checklistItems.map((item, index) => (
+                <Card key={item.id} sx={{ mb: 2, border: '1px solid', borderColor: 'grey.300' }}>
+                  <CardContent>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        Item {index + 1}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => moveChecklistItem(item.id, 'up')}
+                          disabled={index === 0}
+                          title="Move Up"
+                        >
+                          <MoveUpIcon />
+                        </IconButton>
+                        <IconButton 
+                          size="small" 
+                          onClick={() => moveChecklistItem(item.id, 'down')}
+                          disabled={index === checklistItems.length - 1}
+                          title="Move Down"
+                        >
+                          <MoveDownIcon />
+                        </IconButton>
+                        {checklistItems.length > 1 && (
+                          <IconButton 
+                            size="small" 
+                            onClick={() => removeChecklistItem(item.id)}
+                            sx={{ color: 'error.main' }}
+                            title="Delete Item"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        )}
+                      </Box>
+                    </Box>
+                    
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <TextField
+                        fullWidth
+                        label="Button Name"
+                        value={item.buttonName}
+                        onChange={(e) => updateChecklistItem(item.id, 'buttonName', e.target.value)}
+                        variant="outlined"
+                        size="small"
+                      />
+                      
+                      <TextField
+                        fullWidth
+                        label="What text should be added when this button is clicked?"
+                        value={item.text}
+                        onChange={(e) => updateChecklistItem(item.id, 'text', e.target.value)}
+                        multiline
+                        rows={3}
+                        variant="outlined"
+                        size="small"
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              ))}
+              
+              <Button
+                startIcon={<AddIcon />}
+                onClick={addChecklistItem}
+                sx={{ mb: 3, textTransform: 'none' }}
+              >
+                Add Another Item
+              </Button>
+            </Box>
+          ) : sectionType === 'exam_list' ? (
             <Box>
               <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
                 What exam sections would you like A.I. to report on?
