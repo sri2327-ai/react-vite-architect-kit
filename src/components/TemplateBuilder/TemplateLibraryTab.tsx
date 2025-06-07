@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -6,7 +7,7 @@ import {
   useTheme,
   useMediaQuery,
   Container,
-  Grid2 as Grid,
+  Grid,
   Card,
   CardContent,
   CardActions,
@@ -222,6 +223,7 @@ const TemplateLibraryTab: React.FC = () => {
       <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         {filteredTemplates.map((template) => (
           <Grid 
+            item
             xs={12} 
             sm={6} 
             md={4} 
