@@ -8,8 +8,6 @@ import { lightTheme, darkTheme } from '@/theme';
 import { Layout } from '@/components/common';
 import { ThemeContext, useThemeStorage } from '@/hooks/useTheme';
 import { ApiProvider } from '@/contexts/ApiContext';
-import { GuideProvider } from '@/contexts/GuideContext';
-import GuideModal from '@/components/Guide/GuideModal';
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -26,22 +24,19 @@ const AppContent = () => {
       <ThemeProvider theme={themeMode.isDarkMode ? darkTheme : lightTheme}>
         <CssBaseline />
         <ApiProvider>
-          <GuideProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/" element={
-                  <Layout>
-                    <Index />
-                  </Layout>
-                } />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <GuideModal />
-            </BrowserRouter>
-          </GuideProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/" element={
+                <Layout>
+                  <Index />
+                </Layout>
+              } />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
         </ApiProvider>
       </ThemeProvider>
     </ThemeContext.Provider>
