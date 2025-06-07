@@ -9,6 +9,7 @@ import {
   Dialog,
   DialogContent,
   DialogActions,
+  DialogTitle,
   useTheme,
   alpha,
   Fade,
@@ -48,7 +49,8 @@ import {
   Help as HelpIcon,
   Save as SaveIcon,
   Preview as PreviewIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Description as DescriptionIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import AddSectionOverlay from './AddSectionOverlay';
@@ -113,6 +115,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   
   const {
     attributes,
@@ -164,10 +167,10 @@ const SortableItem: React.FC<SortableItemProps> = ({
             alignItems: 'flex-start', 
             justifyContent: 'space-between',
             mb: 2,
-            gap: 2
+            gap: { xs: 1, sm: 2 }
           }}>
             {/* Left Section - Drag Handle & Info */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, flex: 1, minWidth: 0 }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: { xs: 1, sm: 2 }, flex: 1, minWidth: 0 }}>
               {/* Drag Handle */}
               <Box
                 {...attributes}
@@ -177,8 +180,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: 40,
-                  height: 40,
+                  width: { xs: 36, sm: 40 },
+                  height: { xs: 36, sm: 40 },
                   borderRadius: 2,
                   backgroundColor: alpha(bravoColors.primaryFlat, 0.08),
                   color: bravoColors.primaryFlat,
@@ -194,7 +197,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   }
                 }}
               >
-                <DragIcon sx={{ fontSize: 20 }} />
+                <DragIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
               </Box>
 
               {/* Content Info */}
@@ -205,7 +208,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                     sx={{ 
                       fontWeight: 700,
                       color: bravoColors.primaryFlat,
-                      fontSize: { xs: '1rem', sm: '1.1rem' },
+                      fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
                       lineHeight: 1.2,
                       wordBreak: 'break-word'
                     }}
@@ -219,8 +222,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       backgroundColor: alpha(bravoColors.secondary, 0.15),
                       color: bravoColors.secondary,
                       fontWeight: 600,
-                      fontSize: '0.75rem',
-                      height: 24
+                      fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                      height: { xs: 20, sm: 24 }
                     }}
                   />
                 </Box>
@@ -231,7 +234,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                     color="text.secondary"
                     sx={{ 
                       mb: 1.5,
-                      fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                      fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
                       lineHeight: 1.4,
                       wordBreak: 'break-word'
                     }}
@@ -244,7 +247,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   <Paper 
                     elevation={0}
                     sx={{ 
-                      p: 2, 
+                      p: { xs: 1.5, sm: 2 }, 
                       backgroundColor: alpha(bravoColors.primaryFlat, 0.02),
                       border: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
                       borderRadius: 2,
@@ -254,7 +257,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                     <Typography 
                       variant="body2"
                       sx={{ 
-                        fontSize: { xs: '0.8rem', sm: '0.85rem' },
+                        fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.85rem' },
                         lineHeight: 1.4,
                         wordBreak: 'break-word',
                         fontFamily: 'monospace'
@@ -268,7 +271,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                 {/* Action Buttons Row */}
                 <Stack 
                   direction="row" 
-                  spacing={1} 
+                  spacing={0.5} 
                   sx={{ 
                     flexWrap: 'wrap',
                     gap: { xs: 0.5, sm: 1 }
@@ -283,10 +286,12 @@ const SortableItem: React.FC<SortableItemProps> = ({
                         sx={{ 
                           backgroundColor: alpha(theme.palette.action.active, 0.08),
                           '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.15) },
-                          '&:disabled': { opacity: 0.3 }
+                          '&:disabled': { opacity: 0.3 },
+                          minWidth: { xs: 32, sm: 36 },
+                          height: { xs: 32, sm: 36 }
                         }}
                       >
-                        <UpIcon sx={{ fontSize: 18 }} />
+                        <UpIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
                       </IconButton>
                     </Tooltip>
                   </span>
@@ -300,10 +305,12 @@ const SortableItem: React.FC<SortableItemProps> = ({
                         sx={{ 
                           backgroundColor: alpha(theme.palette.action.active, 0.08),
                           '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.15) },
-                          '&:disabled': { opacity: 0.3 }
+                          '&:disabled': { opacity: 0.3 },
+                          minWidth: { xs: 32, sm: 36 },
+                          height: { xs: 32, sm: 36 }
                         }}
                       >
-                        <DownIcon sx={{ fontSize: 18 }} />
+                        <DownIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
                       </IconButton>
                     </Tooltip>
                   </span>
@@ -315,10 +322,12 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       sx={{ 
                         backgroundColor: alpha(theme.palette.info.main, 0.08),
                         color: theme.palette.info.main,
-                        '&:hover': { backgroundColor: alpha(theme.palette.info.main, 0.15) }
+                        '&:hover': { backgroundColor: alpha(theme.palette.info.main, 0.15) },
+                        minWidth: { xs: 32, sm: 36 },
+                        height: { xs: 32, sm: 36 }
                       }}
                     >
-                      <CopyIcon sx={{ fontSize: 18 }} />
+                      <CopyIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
                     </IconButton>
                   </Tooltip>
                   
@@ -329,10 +338,12 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       sx={{ 
                         backgroundColor: alpha(theme.palette.error.main, 0.08),
                         color: theme.palette.error.main,
-                        '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.15) }
+                        '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.15) },
+                        minWidth: { xs: 32, sm: 36 },
+                        height: { xs: 32, sm: 36 }
                       }}
                     >
-                      <DeleteIcon sx={{ fontSize: 18 }} />
+                      <DeleteIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
                     </IconButton>
                   </Tooltip>
                 </Stack>
@@ -341,7 +352,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
 
             {/* Right Section - Primary Actions */}
             {!isMobile && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-end' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-end', flexShrink: 0 }}>
                 <Button
                   variant="outlined"
                   size="small"
@@ -351,7 +362,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
                     borderRadius: 2,
                     textTransform: 'none',
                     fontWeight: 600,
-                    minWidth: 100,
+                    minWidth: { sm: 90, md: 100 },
+                    fontSize: { sm: '0.75rem', md: '0.8rem' },
                     borderColor: bravoColors.primaryFlat,
                     color: bravoColors.primaryFlat,
                     '&:hover': {
@@ -372,7 +384,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
                     borderRadius: 2,
                     textTransform: 'none',
                     fontWeight: 600,
-                    minWidth: 100,
+                    minWidth: { sm: 90, md: 100 },
+                    fontSize: { sm: '0.75rem', md: '0.8rem' },
                     borderColor: bravoColors.secondary,
                     color: bravoColors.secondary,
                     '&:hover': {
@@ -406,6 +419,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600,
+                  fontSize: '0.75rem',
                   borderColor: bravoColors.primaryFlat,
                   color: bravoColors.primaryFlat
                 }}
@@ -423,6 +437,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600,
+                  fontSize: '0.75rem',
                   borderColor: bravoColors.secondary,
                   color: bravoColors.secondary
                 }}
@@ -455,6 +470,8 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [helpItemName, setHelpItemName] = useState<string>('');
+  const [showMacrosDialog, setShowMacrosDialog] = useState(false);
+  const [macroText, setMacroText] = useState('');
 
   // Update items when initialItems changes
   useEffect(() => {
@@ -608,6 +625,28 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     console.log('Template saved:', items);
   }, [items, onSave]);
 
+  const handleSaveMacro = () => {
+    if (macroText.trim()) {
+      const newItem: TemplateItem = {
+        id: `macro-${Date.now()}`,
+        name: 'Macro Template',
+        type: 'macro',
+        content: macroText,
+        description: 'Pasted from macro/template'
+      };
+
+      const newItems = [...items, newItem];
+      setItems(newItems);
+      setShowMacrosDialog(false);
+      setMacroText('');
+      
+      // Auto-save when macro is added
+      if (onSave) {
+        onSave(newItems);
+      }
+    }
+  };
+
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
@@ -615,19 +654,46 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         mb: 3, 
         display: 'flex', 
         justifyContent: 'space-between', 
-        alignItems: 'center',
+        alignItems: 'flex-start',
         flexWrap: 'wrap',
         gap: 2
       }}>
         <Typography variant="h5" sx={{ 
           fontWeight: 700, 
           color: bravoColors.primaryFlat,
-          fontSize: { xs: '1.25rem', sm: '1.5rem' }
+          fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' }
         }}>
           Template Sections ({items.length})
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 1, sm: 2 },
+          width: { xs: '100%', sm: 'auto' }
+        }}>
+          <Button
+            variant="outlined"
+            startIcon={<DescriptionIcon />}
+            onClick={() => setShowMacrosDialog(true)}
+            sx={{
+              backgroundColor: 'transparent',
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600,
+              px: { xs: 2, sm: 3 },
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
+              borderColor: bravoColors.secondary,
+              color: bravoColors.secondary,
+              '&:hover': {
+                borderColor: bravoColors.primaryFlat,
+                backgroundColor: alpha(bravoColors.primaryFlat, 0.08)
+              }
+            }}
+          >
+            Macros/Templates
+          </Button>
+
           <Button
             variant="contained"
             startIcon={<AddIcon />}
@@ -638,6 +704,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
               textTransform: 'none',
               fontWeight: 600,
               px: { xs: 2, sm: 3 },
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
               '&:hover': {
                 backgroundColor: bravoColors.primaryFlat
               }
@@ -657,6 +724,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
               borderColor: bravoColors.primaryFlat,
               color: bravoColors.primaryFlat,
               px: { xs: 2, sm: 3 },
+              fontSize: { xs: '0.8rem', sm: '0.9rem' },
               '&:hover': {
                 borderColor: bravoColors.secondary,
                 backgroundColor: alpha(bravoColors.secondary, 0.08)
@@ -674,7 +742,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
           <Paper
             elevation={0}
             sx={{
-              p: { xs: 4, sm: 6 },
+              p: { xs: 3, sm: 4, md: 6 },
               textAlign: 'center',
               backgroundColor: alpha(bravoColors.primaryFlat, 0.02),
               border: `2px dashed ${alpha(bravoColors.primaryFlat, 0.2)}`,
@@ -682,7 +750,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
             }}
           >
             <AddIcon sx={{ 
-              fontSize: { xs: 48, sm: 64 }, 
+              fontSize: { xs: 40, sm: 48, md: 64 }, 
               color: alpha(bravoColors.primaryFlat, 0.4),
               mb: 2 
             }} />
@@ -690,13 +758,13 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
               mb: 2, 
               fontWeight: 600,
               color: bravoColors.primaryFlat,
-              fontSize: { xs: '1.1rem', sm: '1.25rem' }
+              fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
             }}>
               No sections added yet
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ 
               mb: 3,
-              fontSize: { xs: '0.9rem', sm: '1rem' }
+              fontSize: { xs: '0.85rem', sm: '0.9rem', md: '1rem' }
             }}>
               Start building your template by adding sections
             </Typography>
@@ -709,8 +777,9 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
                 borderRadius: 2,
                 textTransform: 'none',
                 fontWeight: 600,
-                px: 4,
-                py: 1.5,
+                px: { xs: 3, sm: 4 },
+                py: { xs: 1, sm: 1.5 },
+                fontSize: { xs: '0.85rem', sm: '0.9rem' },
                 '&:hover': {
                   backgroundColor: bravoColors.primaryFlat
                 }
@@ -759,9 +828,14 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         onClose={() => setShowEditDialog(false)}
         maxWidth="md"
         fullWidth
+        fullScreen={isMobile}
       >
-        <DialogContent sx={{ p: 3 }}>
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Typography variant="h6" sx={{ 
+            mb: 3, 
+            fontWeight: 600,
+            fontSize: { xs: '1.1rem', sm: '1.25rem' }
+          }}>
             Edit Section: {editingItem?.name}
           </Typography>
           
@@ -771,6 +845,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
             value={editingItem?.name || ''}
             onChange={(e) => setEditingItem(prev => prev ? { ...prev, name: e.target.value } : null)}
             sx={{ mb: 2 }}
+            size={isMobile ? "small" : "medium"}
           />
           
           <TextField
@@ -779,28 +854,90 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
             value={editingItem?.description || ''}
             onChange={(e) => setEditingItem(prev => prev ? { ...prev, description: e.target.value } : null)}
             sx={{ mb: 2 }}
+            size={isMobile ? "small" : "medium"}
           />
           
           <TextField
             fullWidth
             multiline
-            rows={4}
+            rows={isMobile ? 3 : 4}
             label="Content"
             value={editingItem?.content || ''}
             onChange={(e) => setEditingItem(prev => prev ? { ...prev, content: e.target.value } : null)}
+            size={isMobile ? "small" : "medium"}
           />
         </DialogContent>
         
-        <DialogActions sx={{ p: 3, pt: 0 }}>
-          <Button onClick={() => setShowEditDialog(false)}>
+        <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
+          <Button 
+            onClick={() => setShowEditDialog(false)}
+            size={isMobile ? "small" : "medium"}
+          >
             Cancel
           </Button>
           <Button 
             variant="contained" 
             onClick={handleSaveEdit}
             sx={{ backgroundColor: bravoColors.primaryFlat }}
+            size={isMobile ? "small" : "medium"}
           >
             Save Changes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Macros/Templates Dialog */}
+      <Dialog 
+        open={showMacrosDialog} 
+        onClose={() => setShowMacrosDialog(false)}
+        maxWidth="md"
+        fullWidth
+        fullScreen={isMobile}
+      >
+        <DialogTitle sx={{ 
+          fontSize: { xs: '1.1rem', sm: '1.25rem' },
+          fontWeight: 600
+        }}>
+          Paste Macro/Template
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Typography variant="body2" color="text.secondary" sx={{ 
+            mb: 2,
+            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+          }}>
+            Paste your macro or template content below to add it as a new section.
+          </Typography>
+          
+          <TextField
+            fullWidth
+            multiline
+            rows={isMobile ? 6 : 8}
+            label="Macro/Template Content"
+            value={macroText}
+            onChange={(e) => setMacroText(e.target.value)}
+            placeholder="Paste your macro or template content here..."
+            size={isMobile ? "small" : "medium"}
+          />
+        </DialogContent>
+        
+        <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 0 }}>
+          <Button 
+            onClick={() => {
+              setShowMacrosDialog(false);
+              setMacroText('');
+            }}
+            size={isMobile ? "small" : "medium"}
+          >
+            Cancel
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={handleSaveMacro}
+            disabled={!macroText.trim()}
+            sx={{ backgroundColor: bravoColors.primaryFlat }}
+            size={isMobile ? "small" : "medium"}
+          >
+            Save
           </Button>
         </DialogActions>
       </Dialog>

@@ -225,13 +225,16 @@ const MyTemplatesTab: React.FC = () => {
           display: 'flex', 
           alignItems: 'center', 
           gap: { xs: 1, sm: 2 },
-          flexWrap: { xs: 'wrap', sm: 'nowrap' }
+          flexWrap: { xs: 'nowrap', sm: 'wrap' },
+          position: 'relative'
         }}>
           <IconButton 
             onClick={handleCloseEditor}
             size={isMobile ? 'small' : 'medium'}
             sx={{ 
               color: bravoColors.primaryFlat,
+              flexShrink: 0,
+              zIndex: 10,
               '&:hover': {
                 backgroundColor: `${bravoColors.primaryFlat}10`
               }
@@ -244,9 +247,11 @@ const MyTemplatesTab: React.FC = () => {
             sx={{ 
               color: bravoColors.primaryFlat, 
               fontWeight: 700,
-              fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' },
+              fontSize: { xs: '1.1rem', sm: '1.5rem', md: '2rem' },
               lineHeight: 1.2,
-              wordBreak: 'break-word'
+              wordBreak: 'break-word',
+              flex: 1,
+              minWidth: 0
             }}
           >
             Edit Template: {selectedTemplate.name}
