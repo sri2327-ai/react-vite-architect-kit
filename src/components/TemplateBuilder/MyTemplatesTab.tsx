@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -211,7 +210,6 @@ const MyTemplatesTab: React.FC = () => {
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
         onCreateTemplate={handleCreateTemplate}
-        visitTypes={visitTypes}
       />
 
       <Dialog
