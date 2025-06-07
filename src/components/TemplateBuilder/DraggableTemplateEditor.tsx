@@ -358,6 +358,27 @@ const SortableItem: React.FC<SortableItemProps> = ({
                 >
                   Edit
                 </Button>
+                
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<AutoFixHighIcon />}
+                  onClick={(e) => handleButtonClick(e, () => onHelp(item.id))}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    minWidth: 100,
+                    borderColor: bravoColors.secondary,
+                    color: bravoColors.secondary,
+                    '&:hover': {
+                      borderColor: bravoColors.primaryFlat,
+                      backgroundColor: alpha(bravoColors.primaryFlat, 0.08)
+                    }
+                  }}
+                >
+                  Help Me
+                </Button>
               </Box>
             )}
           </Box>
@@ -389,35 +410,20 @@ const SortableItem: React.FC<SortableItemProps> = ({
               </Button>
               
               <Button
-                variant="contained"
-                startIcon={<AutoFixHighIcon />}
-                onClick={(e) => handleButtonClick(e, () => onAiEdit(item.id))}
-                sx={{
-                  borderRadius: 2,
-                  textTransform: 'none',
-                  fontWeight: 600,
-                  backgroundColor: bravoColors.secondary,
-                  '&:hover': {
-                    backgroundColor: bravoColors.primaryFlat
-                  }
-                }}
-              >
-                AI
-              </Button>
-              
-              <Button
                 variant="outlined"
-                startIcon={<HelpIcon />}
+                size="small"
+                startIcon={<AutoFixHighIcon />}
                 onClick={(e) => handleButtonClick(e, () => onHelp(item.id))}
                 sx={{
+                  flex: 1,
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 600,
-                  borderColor: alpha(bravoColors.primaryFlat, 0.5),
-                  color: alpha(bravoColors.primaryFlat, 0.7)
+                  borderColor: bravoColors.secondary,
+                  color: bravoColors.secondary
                 }}
               >
-                Help
+                Help Me
               </Button>
             </Box>
           )}

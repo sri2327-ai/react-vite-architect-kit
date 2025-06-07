@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -8,24 +8,20 @@ import {
   Typography,
   Box,
   Button,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+  TextField,
+  Slider,
   useTheme,
-  alpha
+  alpha,
+  Divider
 } from '@mui/material';
 import {
-  Help as HelpIcon,
-  DragIndicator as DragIcon,
-  Edit as EditIcon,
-  ContentCopy as CopyIcon,
-  Delete as DeleteIcon,
   AutoFixHigh as AutoFixHighIcon,
-  KeyboardArrowUp as UpIcon,
-  KeyboardArrowDown as DownIcon,
-  Add as AddIcon
+  Close as CloseIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 
@@ -37,70 +33,34 @@ interface HelpDialogProps {
 
 const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
   const theme = useTheme();
+  const [selectedOption, setSelectedOption] = useState('change-narrative');
+  const [paragraphCount, setParagraphCount] = useState(2);
+  const [customRequest, setCustomRequest] = useState('');
 
-  const helpSections = [
-    {
-      title: 'Template Section Actions',
-      items: [
-        {
-          icon: <EditIcon sx={{ fontSize: 20 }} />,
-          title: 'Edit Section',
-          description: 'Modify the section name, description, and content'
-        },
-        {
-          icon: <CopyIcon sx={{ fontSize: 20 }} />,
-          title: 'Duplicate Section',
-          description: 'Create a copy of this section'
-        },
-        {
-          icon: <DeleteIcon sx={{ fontSize: 20 }} />,
-          title: 'Delete Section',
-          description: 'Remove this section from the template'
-        },
-        {
-          icon: <AutoFixHighIcon sx={{ fontSize: 20 }} />,
-          title: 'AI Edit',
-          description: 'Use AI to improve or modify the section content'
-        }
-      ]
-    },
-    {
-      title: 'Navigation & Organization',
-      items: [
-        {
-          icon: <DragIcon sx={{ fontSize: 20 }} />,
-          title: 'Drag & Drop',
-          description: 'Click and drag the handle to reorder sections'
-        },
-        {
-          icon: <UpIcon sx={{ fontSize: 20 }} />,
-          title: 'Move Up',
-          description: 'Move this section up in the template order'
-        },
-        {
-          icon: <DownIcon sx={{ fontSize: 20 }} />,
-          title: 'Move Down',
-          description: 'Move this section down in the template order'
-        }
-      ]
-    },
-    {
-      title: 'Template Management',
-      items: [
-        {
-          icon: <AddIcon sx={{ fontSize: 20 }} />,
-          title: 'Add Section',
-          description: 'Add new sections to your template from the library'
-        }
-      ]
-    }
-  ];
+  const handleOptionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedOption(event.target.value);
+  };
+
+  const handleParagraphChange = (event: Event, newValue: number | number[]) => {
+    setParagraphCount(newValue as number);
+  };
+
+  const handleGenerate = () => {
+    console.log('Generating with options:', {
+      option: selectedOption,
+      paragraphs: paragraphCount,
+      customRequest,
+      itemName
+    });
+    // TODO: Implement the actual generation logic
+    onClose();
+  };
 
   return (
     <Dialog 
       open={open} 
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: {
@@ -119,17 +79,17 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
               width: 40,
               height: 40,
               borderRadius: 2,
-              backgroundColor: alpha(bravoColors.primaryFlat, 0.1),
+              backgroundColor: alpha(bravoColors.secondary, 0.1),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}
           >
-            <HelpIcon sx={{ color: bravoColors.primaryFlat, fontSize: 24 }} />
+            <AutoFixHighIcon sx={{ color: bravoColors.secondary, fontSize: 24 }} />
           </Box>
           <Box>
             <Typography variant="h6" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
-              Template Editor Help
+              Edit Auto-Generated Section
             </Typography>
             {itemName && (
               <Typography variant="body2" color="text.secondary">
@@ -142,100 +102,157 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
 
       <DialogContent sx={{ py: 3 }}>
         <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
-          Learn how to use the template editor to create and manage your clinical note templates.
+          Select an option to modify how this section is generated:
         </Typography>
 
-        {helpSections.map((section, sectionIndex) => (
-          <Box key={sectionIndex} sx={{ mb: 3 }}>
-            <Typography 
-              variant="h6" 
-              sx={{ 
-                fontWeight: 600, 
-                color: bravoColors.primaryFlat,
-                mb: 2,
-                fontSize: '1.1rem'
-              }}
-            >
-              {section.title}
-            </Typography>
-            
-            <List dense sx={{ bgcolor: alpha(bravoColors.primaryFlat, 0.02), borderRadius: 2, p: 0 }}>
-              {section.items.map((item, itemIndex) => (
-                <React.Fragment key={itemIndex}>
-                  <ListItem sx={{ py: 1.5, px: 2 }}>
-                    <ListItemIcon sx={{ minWidth: 40 }}>
-                      <Box
-                        sx={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 1.5,
-                          backgroundColor: alpha(bravoColors.secondary, 0.1),
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: bravoColors.secondary
-                        }}
-                      >
-                        {item.icon}
-                      </Box>
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
-                          {item.title}
-                        </Typography>
-                      }
-                      secondary={
-                        <Typography variant="body2" color="text.secondary">
-                          {item.description}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                  {itemIndex < section.items.length - 1 && (
-                    <Divider sx={{ mx: 2 }} />
-                  )}
-                </React.Fragment>
-              ))}
-            </List>
-          </Box>
-        ))}
+        <FormControl component="fieldset" fullWidth>
+          <FormLabel component="legend" sx={{ 
+            fontWeight: 600, 
+            color: bravoColors.primaryFlat,
+            mb: 2
+          }}>
+            Select an option:
+          </FormLabel>
+          
+          <RadioGroup
+            value={selectedOption}
+            onChange={handleOptionChange}
+            sx={{ mb: 3 }}
+          >
+            <FormControlLabel 
+              value="change-narrative" 
+              control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
+              label="Change to Narrative"
+              sx={{ mb: 1 }}
+            />
+            <FormControlLabel 
+              value="increase-detail" 
+              control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
+              label="Increase Detail"
+              sx={{ mb: 1 }}
+            />
+            <FormControlLabel 
+              value="decrease-detail" 
+              control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
+              label="Decrease Detail"
+              sx={{ mb: 1 }}
+            />
+            <FormControlLabel 
+              value="format-specific" 
+              control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
+              label="Format Specific"
+              sx={{ mb: 1 }}
+            />
+            <FormControlLabel 
+              value="other" 
+              control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
+              label="Other"
+              sx={{ mb: 1 }}
+            />
+          </RadioGroup>
+        </FormControl>
 
-        <Box
-          sx={{
-            mt: 3,
-            p: 2,
-            backgroundColor: alpha(bravoColors.secondary, 0.05),
-            border: `1px solid ${alpha(bravoColors.secondary, 0.2)}`,
-            borderRadius: 2
-          }}
-        >
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: bravoColors.secondary, mb: 1 }}>
-            💡 Pro Tip
+        <Divider sx={{ my: 3 }} />
+
+        {/* Paragraph Count Selector */}
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle2" sx={{ 
+            fontWeight: 600, 
+            color: bravoColors.primaryFlat,
+            mb: 2
+          }}>
+            How many paragraphs do you prefer?
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Use the drag handle to quickly reorder sections, or use the Move Up/Down buttons for precise positioning. 
-            The AI Edit feature can help you improve content based on your specific requirements.
+          
+          <Box sx={{ px: 2 }}>
+            <Slider
+              value={paragraphCount}
+              onChange={handleParagraphChange}
+              min={1}
+              max={5}
+              step={1}
+              marks={[
+                { value: 1, label: '1' },
+                { value: 2, label: '2' },
+                { value: 3, label: '3' },
+                { value: 4, label: '4' },
+                { value: 5, label: '5' }
+              ]}
+              valueLabelDisplay="auto"
+              sx={{
+                color: bravoColors.secondary,
+                '& .MuiSlider-markLabel': {
+                  fontSize: '0.75rem'
+                }
+              }}
+            />
+          </Box>
+          
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
+            Currently selected: {paragraphCount} paragraph{paragraphCount > 1 ? 's' : ''}
           </Typography>
         </Box>
+
+        {/* Custom Request Field for "Other" option */}
+        {selectedOption === 'other' && (
+          <Box sx={{ mt: 3 }}>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="Describe your specific request"
+              value={customRequest}
+              onChange={(e) => setCustomRequest(e.target.value)}
+              placeholder="Please describe how you'd like this section to be modified..."
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: bravoColors.primaryFlat
+                  }
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: bravoColors.primaryFlat
+                }
+              }}
+            />
+          </Box>
+        )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 0 }}>
+      <DialogActions sx={{ p: 3, pt: 0, gap: 2 }}>
         <Button 
-          variant="contained" 
+          variant="outlined"
           onClick={onClose}
           sx={{
-            backgroundColor: bravoColors.primaryFlat,
+            borderRadius: 2,
+            textTransform: 'none',
+            fontWeight: 600,
+            borderColor: alpha(bravoColors.primaryFlat, 0.5),
+            color: bravoColors.primaryFlat,
+            '&:hover': {
+              borderColor: bravoColors.primaryFlat,
+              backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
+            }
+          }}
+        >
+          Cancel
+        </Button>
+        <Button 
+          variant="contained" 
+          onClick={handleGenerate}
+          startIcon={<AutoFixHighIcon />}
+          sx={{
+            backgroundColor: bravoColors.secondary,
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
             px: 4,
             '&:hover': {
-              backgroundColor: bravoColors.secondary
+              backgroundColor: bravoColors.primaryFlat
             }
           }}
         >
-          Got it, thanks!
+          Generate
         </Button>
       </DialogActions>
     </Dialog>
