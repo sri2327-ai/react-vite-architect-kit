@@ -107,6 +107,9 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
     }
   };
 
+  // Debug log to see what sectionType we're receiving
+  console.log('SectionConfigDialog - sectionType:', sectionType);
+
   // Exam items functions
   const addExamItem = () => {
     const newItem: ExamItem = {
@@ -260,6 +263,11 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
     </Alert>
   );
 
+  // Check if this is an exam list type (handle different possible values)
+  const isExamList = sectionType === 'exam_list' || sectionType === 'exam-list' || sectionType === 'examlist' || sectionType.toLowerCase().includes('exam');
+  const isBulletedList = sectionType === 'bulleted_list' || sectionType === 'bulleted-list' || sectionType === 'bulletedlist' || sectionType.toLowerCase().includes('bullet');
+  const isChecklist = sectionType === 'checklist' || sectionType === 'check-list' || sectionType.toLowerCase().includes('checklist');
+
   return (
     <Dialog
       open={open}
@@ -286,9 +294,9 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               </IconButton>
             )}
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              {sectionType === 'bulleted_list' ? 'Edit Bulleted List' : 
-               sectionType === 'exam_list' ? 'Edit Exam List' :
-               sectionType === 'checklist' ? 'Edit Checklist' :
+              {isBulletedList ? 'Edit Bulleted List' : 
+               isExamList ? 'Edit Exam List' :
+               isChecklist ? 'Edit Checklist' :
                `Configure Section: ${sectionName}`}
             </Typography>
           </Box>
@@ -299,10 +307,10 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       </DialogTitle>
 
       <DialogContent>
-        {sectionType === 'bulleted_list' && getBulletedListGuidance()}
-        {sectionType === 'exam_list' && getExamListGuidance()}
-        {sectionType === 'checklist' && getChecklistGuidance()}
-        {!['bulleted_list', 'exam_list', 'checklist'].includes(sectionType) && getGeneralGuidance()}
+        {isBulletedList && getBulletedListGuidance()}
+        {isExamList && getExamListGuidance()}
+        {isChecklist && getChecklistGuidance()}
+        {!isBulletedList && !isExamList && !isChecklist && getGeneralGuidance()}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <TextField
@@ -314,7 +322,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             size="small"
           />
           
-          {sectionType === 'exam_list' && (
+          {isExamList && (
             <Box>
               <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
                 What exam sections would you like A.I. to report on?
@@ -457,7 +465,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             </Box>
           )}
 
-          {sectionType === 'checklist' && (
+          {isChecklist && (
             <Box>
               <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
                 What buttons do you want to include?
@@ -535,7 +543,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             </Box>
           )}
 
-          {sectionType === 'bulleted_list' && (
+          {isBulletedList && (
             <TextField
               fullWidth
               label="What do you want the A.I. to generate bullets for?"
@@ -548,7 +556,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             />
           )}
 
-          {!['bulleted_list', 'exam_list', 'checklist'].includes(sectionType) && (
+          {!isBulletedList && !isExamList && !isChecklist && (
             <TextField
               fullWidth
               label="AI Instructions"
