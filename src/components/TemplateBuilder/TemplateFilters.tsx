@@ -93,13 +93,7 @@ const TemplateFilters: React.FC<TemplateFiltersProps> = ({
           }} />
             Favorites
           </ToggleButton>
-          <ToggleButton value="recent">
-            <AccessTimeIcon sx={{
-            mr: 1,
-            fontSize: 18
-          }} />
-            Recently Used
-          </ToggleButton>
+          
         </ToggleButtonGroup>
       </Box>
 
