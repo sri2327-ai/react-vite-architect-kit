@@ -6,7 +6,7 @@ import {
   useTheme,
   useMediaQuery,
   Container,
-  Grid2 as Grid,
+  Grid,
   Card,
   CardContent,
   CardActions,
@@ -588,11 +588,7 @@ const TemplateLibraryTab: React.FC = () => {
         spacing={{ xs: 2, sm: 2.5, md: 3 }}
         sx={{
           width: '100%',
-          margin: 0,
-          '& .MuiGrid-item': {
-            paddingLeft: { xs: 2, sm: 2.5, md: 3 },
-            paddingTop: { xs: 2, sm: 2.5, md: 3 }
-          }
+          margin: 0
         }}
       >
         {filteredTemplates.map((template) => (
@@ -604,10 +600,6 @@ const TemplateLibraryTab: React.FC = () => {
             md={4}
             lg={3}
             xl={3}
-            sx={{
-              display: 'flex',
-              width: '100%'
-            }}
           >
             <Card 
               sx={{ 
@@ -691,7 +683,7 @@ const TemplateLibraryTab: React.FC = () => {
                     {template.specialty}
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {template.tags.slice(0, isMobile ? 1 : isTablet ? 2 : 2).map((tag) => (
+                    {template.tags.slice(0, isMobile ? 1 : 2).map((tag) => (
                       <Chip 
                         key={tag} 
                         label={tag} 
