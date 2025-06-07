@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -34,7 +33,10 @@ import {
   TextSnippet as TextSnippetIcon,
   Checklist as ChecklistIcon,
   ArrowBack as ArrowBackIcon,
-  CheckCircle as CheckCircleIcon
+  CheckCircle as CheckCircleIcon,
+  VerticalAlignTop as VerticalAlignTopIcon,
+  VerticalAlignBottom as VerticalAlignBottomIcon,
+  VerticalAlignCenter as VerticalAlignCenterIcon
 } from '@mui/icons-material';
 
 interface SectionPlacementDialogProps {
@@ -96,7 +98,19 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
     return labels[type as keyof typeof labels] || 'Section';
   };
 
-  const PlacementZone = ({ position, label, isFirst = false }: { position: number; label: string; isFirst?: boolean }) => {
+  const PlacementZone = ({ 
+    position, 
+    label, 
+    description,
+    icon: IconComponent = ArrowDownwardIcon,
+    isSpecial = false 
+  }: { 
+    position: number; 
+    label: string; 
+    description: string;
+    icon?: React.ElementType;
+    isSpecial?: boolean;
+  }) => {
     const isSelected = selectedPosition === position;
     const isHovered = hoveredPosition === position;
     const isActive = isSelected || isHovered;
@@ -177,11 +191,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               }
             }}
           >
-            {isFirst ? (
-              <AddIcon sx={{ fontSize: 28 }} />
-            ) : (
-              <ArrowDownwardIcon className="placement-arrow" sx={{ fontSize: 28 }} />
-            )}
+            <IconComponent className={isSpecial ? "" : "placement-arrow"} sx={{ fontSize: 28 }} />
           </Box>
           
           <Box sx={{ flex: 1 }}>
@@ -205,12 +215,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 fontWeight: 500
               }}
             >
-              {isFirst 
-                ? (existingSections.length === 0 
-                  ? 'Your new section will appear at the very top'
-                  : 'Your new section will be placed before all existing sections')
-                : 'Your new section will be placed here'
-              }
+              {description}
             </Typography>
           </Box>
 
@@ -382,25 +387,46 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               💡 Quick Tip
             </Typography>
             <Typography variant="body2" sx={{ color: theme.palette.info.main, fontWeight: 500, lineHeight: 1.6 }}>
-              Click on any placement zone below to position your new section. The selected position will be highlighted with a checkmark.
+              Click on any placement zone to position your new section. You can place it at the beginning, end, or between any existing sections.
             </Typography>
           </Paper>
         </Box>
 
         <Box>
+          {/* Place at Beginning */}
           <PlacementZone 
             position={0} 
-            label={existingSections.length === 0 ? "Place at Beginning" : "Place at Top"}
-            isFirst={true}
+            label="Place at Beginning"
+            description={existingSections.length === 0 
+              ? "Your new section will be the first section in the template"
+              : "Your new section will be placed before all existing sections"
+            }
+            icon={VerticalAlignTopIcon}
+            isSpecial={true}
           />
 
+          {/* Existing sections with placement options between them */}
           {existingSections.map((section, index) => (
             <React.Fragment key={section.id}>
               <ExistingSection section={section} index={index} />
-              <PlacementZone 
-                position={index + 1} 
-                label={`Place After "${section.name}"`}
-              />
+              
+              {/* Place between this section and the next (or at end if last section) */}
+              {index < existingSections.length - 1 ? (
+                <PlacementZone 
+                  position={index + 1} 
+                  label={`Place Between "${section.name}" and "${existingSections[index + 1].name}"`}
+                  description="Your new section will be inserted between these sections"
+                  icon={VerticalAlignCenterIcon}
+                />
+              ) : (
+                <PlacementZone 
+                  position={index + 1} 
+                  label="Place at End"
+                  description="Your new section will be placed after all existing sections"
+                  icon={VerticalAlignBottomIcon}
+                  isSpecial={true}
+                />
+              )}
             </React.Fragment>
           ))}
 
