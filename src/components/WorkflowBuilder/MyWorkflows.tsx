@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Card, CardContent, Button, Chip, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControlLabel, Checkbox, Alert, LinearProgress, Stepper, Step, StepLabel, Tabs, Tab, List, ListItem, ListItemText, ListItemSecondaryAction, Divider, FormControl, InputLabel, Select, Accordion, AccordionSummary, AccordionDetails, Stack, Paper, useTheme, useMediaQuery, Container } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, Chip, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControlLabel, Checkbox, Alert, LinearProgress, Stepper, Step, StepLabel, Tabs, Tab, List, ListItem, ListItemText, ListItemSecondaryAction, Divider, FormControl, InputLabel, Select, Accordion, AccordionSummary, AccordionDetails, Stack, Paper, useTheme, useMediaQuery } from '@mui/material';
 import { PlayArrow as PlayIcon, MoreVert as MoreIcon, Download as ImportIcon, Edit as EditIcon, Delete as DeleteIcon, CheckCircle as CheckIcon, Error as ErrorIcon, Warning as WarningIcon, Settings as SettingsIcon, Map as MapIcon, Assignment as AssignmentIcon, ExpandMore as ExpandMoreIcon, AccountTree as WorkflowIcon, Schedule as ScheduleIcon, Person as PersonIcon, LocationOn as LocationIcon, Note as NoteIcon, History as HistoryIcon, Checklist as ChecklistIcon, Computer as EHRIcon, AccessTime as TimeIcon, LocalHospital as ClinicIcon, Psychology as AIIcon, Security as SecurityIcon } from '@mui/icons-material';
 import { templateBuilderService } from '../../services/templateBuilderService';
 interface WorkflowBlock {
@@ -330,8 +330,15 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         return 'Automation';
     }
   };
-  return <Container maxWidth="xl" sx={{
+  return <Box sx={{
+    width: '100%',
+    height: '100vh',
     py: {
+      xs: 2,
+      sm: 3,
+      md: 4
+    },
+    px: {
       xs: 2,
       sm: 3,
       md: 4
@@ -1410,16 +1417,16 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                         Select Visit Types
                       </InputLabel>
                       <Select multiple value={selectedWorkflow?.visitTypeMappings[0]?.scheduleConfig.selectedVisitTypes || []} label="Select Visit Types" onChange={e => handleGlobalScheduleConfigChange('selectedVisitTypes', e.target.value as string[])} renderValue={selected => <Box sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 0.5
-                }}>
+                          display: 'flex',
+                          flexWrap: 'wrap',
+                          gap: 0.5
+                        }}>
                             {(selected as string[]).map(value => <Chip key={value} label={value} size="small" sx={{
-                    fontSize: {
-                      xs: '0.7rem',
-                      sm: '0.75rem'
-                    }
-                  }} />)}
+                                fontSize: {
+                                  xs: '0.7rem',
+                                  sm: '0.75rem'
+                                }
+                              }} />)}
                           </Box>}>
                         {selectedWorkflow?.availableVisitTypes.map(visitType => <MenuItem key={visitType} value={visitType}>
                             {visitType}
@@ -1719,6 +1726,6 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
           Delete Workflow
         </MenuItem>
       </Menu>
-    </Container>;
+    </Box>;
 };
 export default MyWorkflows;
