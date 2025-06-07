@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Box,
@@ -22,6 +21,7 @@ import {
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import { useResponsive } from '@/hooks/useResponsive';
+import { SecondaryButton } from '@/components/ui/Buttons';
 
 interface MyTemplatesNavBarProps {
   currentStep: 'visit-types' | 'templates';
@@ -185,32 +185,19 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
           ) : (
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
-                <Button
+                <SecondaryButton
                   startIcon={<ArrowBackIcon />}
                   onClick={onBackToVisitTypes}
                   size="small"
-                  variant="outlined"
                   sx={{
-                    borderColor: '#000000',
-                    color: '#FFFFFF',
-                    backgroundColor: '#000000',
-                    textTransform: 'none',
-                    fontWeight: 500,
                     minWidth: 'auto',
-                    px: 1,
+                    px: 1.5,
                     py: 0.5,
-                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                    borderWidth: 1,
-                    '&:hover': {
-                      borderColor: '#333333',
-                      backgroundColor: '#333333',
-                      color: '#FFFFFF'
-                    },
-                    transition: 'all 0.2s ease'
+                    fontSize: { xs: '0.7rem', sm: '0.75rem' }
                   }}
                 >
                   Back
-                </Button>
+                </SecondaryButton>
               </Box>
               <Typography
                 variant="caption"
