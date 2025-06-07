@@ -45,6 +45,7 @@ interface SectionPlacementDialogProps {
   onPlaceSection: (position: number) => void;
   onBack?: () => void;
   existingSections: Array<{ id: string; name: string; type?: string; }>;
+  pendingSection?: any; // The section that will be placed
 }
 
 const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
@@ -52,7 +53,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
   onClose,
   onPlaceSection,
   onBack,
-  existingSections
+  existingSections,
+  pendingSection
 }) => {
   const theme = useTheme();
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
@@ -60,6 +62,9 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
 
   const handlePlacement = () => {
     if (selectedPosition !== null) {
+      console.log('SectionPlacementDialog: Placing section at position:', selectedPosition);
+      console.log('SectionPlacementDialog: Pending section data:', pendingSection);
+      
       onPlaceSection(selectedPosition);
       setSelectedPosition(null);
       onClose();
@@ -120,7 +125,10 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
         elevation={isActive ? 12 : 3}
         onMouseEnter={() => setHoveredPosition(position)}
         onMouseLeave={() => setHoveredPosition(null)}
-        onClick={() => setSelectedPosition(position)}
+        onClick={() => {
+          console.log('SectionPlacementDialog: Position selected:', position);
+          setSelectedPosition(position);
+        }}
         sx={{
           p: 3,
           mb: 3,

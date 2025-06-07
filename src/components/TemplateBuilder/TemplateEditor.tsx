@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
 
@@ -325,13 +324,34 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
   }, [onSave]);
 
   const handleAddSectionToTemplate = useCallback((sectionWithPosition: any) => {
+    console.log('TemplateEditor: handleAddSectionToTemplate called with:', sectionWithPosition);
+    
     // If it's a function, store it for later use
     if (typeof sectionWithPosition === 'function') {
       return;
     }
 
-    // Extract position and section data
-    const { position, ...section } = sectionWithPosition;
+    // Handle different input formats
+    let position: number;
+    let section: any;
+
+    if (typeof sectionWithPosition === 'number') {
+      // If only position is provided, this is likely from the placement dialog
+      position = sectionWithPosition;
+      section = {
+        id: Date.now().toString(),
+        name: 'New Section',
+        type: 'paragraph',
+        content: 'AI will generate content based on the instructions below.',
+        description: 'A.I. will write content following the guidelines below.'
+      };
+      console.log('TemplateEditor: Position-only placement detected, creating default section');
+    } else {
+      // Extract position and section data
+      const { position: pos, ...sectionData } = sectionWithPosition;
+      position = pos;
+      section = sectionData;
+    }
     
     const newItem: TemplateItem = {
       id: section.id || Date.now().toString(),
@@ -352,8 +372,10 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     const updatedItems = [...currentItems];
     if (position !== undefined && position >= 0 && position <= updatedItems.length) {
       updatedItems.splice(position, 0, newItem);
+      console.log('TemplateEditor: Section inserted at position', position);
     } else {
       updatedItems.push(newItem);
+      console.log('TemplateEditor: Section added at end');
     }
     
     setCurrentItems(updatedItems);
@@ -362,7 +384,8 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
       onSave(updatedItems);
     }
 
-    console.log('Section added to template at position', position, ':', newItem);
+    console.log('TemplateEditor: Section added to template at position', position, ':', newItem);
+    console.log('TemplateEditor: Updated items list:', updatedItems);
   }, [currentItems, onSave]);
 
   // Expose the addSection function to parent components
