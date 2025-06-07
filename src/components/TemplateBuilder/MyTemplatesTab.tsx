@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Button,
-  Grid,
   Dialog,
   useTheme,
   useMediaQuery,
@@ -13,7 +12,7 @@ import {
 } from '@mui/material';
 import { Add as AddIcon, ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
-import TemplateCard from './TemplateCard';
+import TemplateTable from './TemplateTable';
 import TemplateFilters from './TemplateFilters';
 import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
@@ -227,31 +226,34 @@ const MyTemplatesTab: React.FC = () => {
         />
       </Box>
 
-      <Grid container spacing={{ xs: 2, md: 3 }}>
-        {filteredTemplates.map((template: Template) => (
-          <Grid key={template.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-            <TemplateCard
-              template={{
-                id: parseInt(template.id) || 0,
-                title: template.name,
-                specialty: template.specialty,
-                type: template.visitTypes[0] || 'General',
-                fields: template.sections || [],
-                content: template.description,
-                lastUsed: template.lastModified,
-                usageCount: 0,
-                isFavorite: false,
-                createdBy: 'You',
-                tags: template.visitTypes
-              }}
-              onView={() => handleEditTemplate(template)}
-              onEdit={() => handleEditTemplate(template)}
-              onCopy={() => handleDuplicateTemplate(template)}
-              onToggleFavorite={() => {}}
-            />
-          </Grid>
-        ))}
-      </Grid>
+      <TemplateTable
+        templates={filteredTemplates.map((template: Template) => ({
+          id: parseInt(template.id) || 0,
+          title: template.name,
+          specialty: template.specialty,
+          type: template.visitTypes[0] || 'General',
+          fields: template.sections || [],
+          content: template.description,
+          lastUsed: template.lastModified,
+          usageCount: 0,
+          isFavorite: false,
+          createdBy: 'You',
+          tags: template.visitTypes
+        }))}
+        onView={(templateData) => {
+          const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
+          if (template) handleEditTemplate(template);
+        }}
+        onEdit={(templateData) => {
+          const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
+          if (template) handleEditTemplate(template);
+        }}
+        onCopy={(templateData) => {
+          const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
+          if (template) handleDuplicateTemplate(template);
+        }}
+        onToggleFavorite={() => {}}
+      />
 
       {filteredTemplates.length === 0 && (
         <Box sx={{
