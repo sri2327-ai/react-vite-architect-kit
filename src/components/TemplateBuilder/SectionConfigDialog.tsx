@@ -426,4 +426,3 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
 };
 
 export default SectionConfigDialog;
-```
