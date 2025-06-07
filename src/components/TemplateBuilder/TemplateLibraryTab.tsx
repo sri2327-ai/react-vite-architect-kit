@@ -582,189 +582,186 @@ const TemplateLibraryTab: React.FC = () => {
         </Stack>
       </Box>
 
-      {/* Templates Grid - Fixed Responsive Layout */}
-      <Grid 
-        container 
-        spacing={{ xs: 2, sm: 2.5, md: 3 }}
+      {/* Templates Grid - Using Box with CSS Grid instead of MUI Grid */}
+      <Box 
         sx={{
-          width: '100%',
-          margin: 0
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(3, 1fr)',
+            lg: 'repeat(4, 1fr)',
+            xl: 'repeat(4, 1fr)'
+          },
+          gap: { xs: 2, sm: 2.5, md: 3 },
+          width: '100%'
         }}
       >
         {filteredTemplates.map((template) => (
-          <Grid 
-            item
+          <Card 
             key={template.id}
-            xs={12}
-            sm={6}
-            md={4}
-            lg={3}
-            xl={3}
+            sx={{ 
+              height: '100%',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'divider',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: { xs: 'none', sm: 'translateY(-2px)' },
+                boxShadow: theme.shadows[4],
+                borderColor: bravoColors.primaryFlat
+              }
+            }}
           >
-            <Card 
-              sx={{ 
-                height: '100%',
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: { xs: 'none', sm: 'translateY(-2px)' },
-                  boxShadow: theme.shadows[4],
-                  borderColor: bravoColors.primaryFlat
-                }
-              }}
-            >
-              <CardContent sx={{ 
-                flexGrow: 1, 
-                p: { xs: 2, sm: 2.5, md: 3 },
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography 
-                      variant="h6" 
+            <CardContent sx={{ 
+              flexGrow: 1, 
+              p: { xs: 2, sm: 2.5, md: 3 },
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 600,
+                      mb: 1,
+                      fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
+                      lineHeight: 1.3
+                    }}
+                  >
+                    {template.name}
+                  </Typography>
+                  {template.isPopular && (
+                    <Chip 
+                      label="Popular" 
+                      size="small" 
                       sx={{ 
-                        fontWeight: 600,
-                        mb: 1,
-                        fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
-                        lineHeight: 1.3
-                      }}
-                    >
-                      {template.name}
-                    </Typography>
-                    {template.isPopular && (
-                      <Chip 
-                        label="Popular" 
-                        size="small" 
-                        sx={{ 
-                          backgroundColor: `${bravoColors.primaryFlat}20`,
-                          color: bravoColors.primaryFlat,
-                          fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                          height: { xs: 22, sm: 24 }
-                        }} 
-                      />
-                    )}
-                  </Box>
+                        backgroundColor: `${bravoColors.primaryFlat}20`,
+                        color: bravoColors.primaryFlat,
+                        fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                        height: { xs: 22, sm: 24 }
+                      }} 
+                    />
+                  )}
                 </Box>
+              </Box>
 
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{ 
+                  mb: 2,
+                  fontSize: { xs: '0.85rem', sm: '0.875rem', md: '0.9rem' },
+                  lineHeight: 1.4,
+                  flexGrow: 1,
+                  display: '-webkit-box',
+                  WebkitLineClamp: { xs: 2, sm: 3, md: 3 },
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden'
+                }}
+              >
+                {template.description}
+              </Typography>
+
+              <Box sx={{ mb: 2 }}>
                 <Typography 
-                  variant="body2" 
+                  variant="caption" 
                   color="text.secondary" 
                   sx={{ 
-                    mb: 2,
-                    fontSize: { xs: '0.85rem', sm: '0.875rem', md: '0.9rem' },
-                    lineHeight: 1.4,
-                    flexGrow: 1,
-                    display: '-webkit-box',
-                    WebkitLineClamp: { xs: 2, sm: 3, md: 3 },
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden'
+                    display: 'block', 
+                    mb: 1, 
+                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                    fontWeight: 500
                   }}
                 >
-                  {template.description}
+                  {template.specialty}
                 </Typography>
-
-                <Box sx={{ mb: 2 }}>
-                  <Typography 
-                    variant="caption" 
-                    color="text.secondary" 
-                    sx={{ 
-                      display: 'block', 
-                      mb: 1, 
-                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                      fontWeight: 500
-                    }}
-                  >
-                    {template.specialty}
-                  </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {template.tags.slice(0, isMobile ? 1 : 2).map((tag) => (
-                      <Chip 
-                        key={tag} 
-                        label={tag} 
-                        size="small" 
-                        variant="outlined"
-                        sx={{ 
-                          fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                          height: { xs: 20, sm: 22 }
-                        }} 
-                      />
-                    ))}
-                    {template.tags.length > 2 && (
-                      <Chip 
-                        label={`+${template.tags.length - 2}`} 
-                        size="small" 
-                        variant="outlined"
-                        sx={{ 
-                          fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                          height: { xs: 20, sm: 22 }
-                        }} 
-                      />
-                    )}
-                  </Box>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  {template.tags.slice(0, isMobile ? 1 : 2).map((tag) => (
+                    <Chip 
+                      key={tag} 
+                      label={tag} 
+                      size="small" 
+                      variant="outlined"
+                      sx={{ 
+                        fontSize: { xs: '0.65rem', sm: '0.7rem' },
+                        height: { xs: 20, sm: 22 }
+                      }} 
+                    />
+                  ))}
+                  {template.tags.length > 2 && (
+                    <Chip 
+                      label={`+${template.tags.length - 2}`} 
+                      size="small" 
+                      variant="outlined"
+                      sx={{ 
+                        fontSize: { xs: '0.65rem', sm: '0.7rem' },
+                        height: { xs: 20, sm: 22 }
+                      }} 
+                    />
+                  )}
                 </Box>
+              </Box>
 
-                {template.rating && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                    <StarIcon sx={{ fontSize: { xs: 14, sm: 16 }, color: '#ffa726' }} />
-                    <Typography variant="caption" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
-                      {template.rating} ({template.downloads})
-                    </Typography>
-                  </Box>
-                )}
-              </CardContent>
+              {template.rating && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                  <StarIcon sx={{ fontSize: { xs: 14, sm: 16 }, color: '#ffa726' }} />
+                  <Typography variant="caption" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                    {template.rating} ({template.downloads})
+                  </Typography>
+                </Box>
+              )}
+            </CardContent>
 
-              <CardActions sx={{ p: { xs: 2, sm: 2.5, md: 3 }, pt: 0 }}>
-                <Stack 
-                  direction={{ xs: 'column', sm: 'row' }} 
-                  spacing={{ xs: 1, sm: 1.5 }} 
-                  sx={{ width: '100%' }}
+            <CardActions sx={{ p: { xs: 2, sm: 2.5, md: 3 }, pt: 0 }}>
+              <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                spacing={{ xs: 1, sm: 1.5 }} 
+                sx={{ width: '100%' }}
+              >
+                <Button
+                  variant="outlined"
+                  startIcon={<ViewIcon />}
+                  onClick={() => handlePreviewTemplate(template)}
+                  size="small"
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    flex: { xs: 'none', sm: 1 },
+                    fontSize: { xs: '0.8rem', sm: '0.85rem' },
+                    py: { xs: 0.75, sm: 1 }
+                  }}
                 >
-                  <Button
-                    variant="outlined"
-                    startIcon={<ViewIcon />}
-                    onClick={() => handlePreviewTemplate(template)}
-                    size="small"
-                    sx={{
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      flex: { xs: 'none', sm: 1 },
-                      fontSize: { xs: '0.8rem', sm: '0.85rem' },
-                      py: { xs: 0.75, sm: 1 }
-                    }}
-                  >
-                    Preview
-                  </Button>
-                  <Button
-                    variant="contained"
-                    startIcon={<GetAppIcon />}
-                    onClick={() => handleImportTemplate(template)}
-                    size="small"
-                    sx={{
-                      backgroundColor: bravoColors.primaryFlat,
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      flex: { xs: 'none', sm: 1 },
-                      fontSize: { xs: '0.8rem', sm: '0.85rem' },
-                      py: { xs: 0.75, sm: 1 },
-                      '&:hover': {
-                        backgroundColor: bravoColors.secondary
-                      }
-                    }}
-                  >
-                    Import
-                  </Button>
-                </Stack>
-              </CardActions>
-            </Card>
-          </Grid>
+                  Preview
+                </Button>
+                <Button
+                  variant="contained"
+                  startIcon={<GetAppIcon />}
+                  onClick={() => handleImportTemplate(template)}
+                  size="small"
+                  sx={{
+                    backgroundColor: bravoColors.primaryFlat,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    flex: { xs: 'none', sm: 1 },
+                    fontSize: { xs: '0.8rem', sm: '0.85rem' },
+                    py: { xs: 0.75, sm: 1 },
+                    '&:hover': {
+                      backgroundColor: bravoColors.secondary
+                    }
+                  }}
+                >
+                  Import
+                </Button>
+              </Stack>
+            </CardActions>
+          </Card>
         ))}
-      </Grid>
+      </Box>
 
       {filteredTemplates.length === 0 && (
         <Box sx={{
