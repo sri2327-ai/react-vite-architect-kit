@@ -1,698 +1,671 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   Box,
-  Grid,
+  Typography,
+  TextField,
   Card,
   CardContent,
-  Typography,
+  CardActionArea,
   IconButton,
-  useTheme,
-  alpha,
+  Button,
+  InputAdornment,
   Stack,
   Chip,
-  Tabs,
-  Tab
+  alpha,
+  Paper,
+  Badge,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import {
   Close as CloseIcon,
-  ViewHeadline as ViewHeadlineIcon,
-  FormatListBulleted as FormatListBulletedIcon,
-  Title as TitleIcon,
-  Assignment as AssignmentIcon,
-  TextSnippet as TextSnippetIcon,
-  Checklist as ChecklistIcon,
+  Search as SearchIcon,
   Psychology as PsychologyIcon,
   LocalHospital as LocalHospitalIcon,
   MedicalServices as MedicalServicesIcon,
-  Healing as HealingIcon,
+  Medication as MedicationIcon,
   Warning as WarningIcon,
   SmokingRooms as SmokingRoomsIcon,
-  Family as FamilyIcon,
+  People as PeopleIcon,
   ChildCare as ChildCareIcon,
   School as SchoolIcon,
   Restaurant as RestaurantIcon,
-  Groups as GroupsIcon,
+  Group as GroupIcon,
   Bedtime as BedtimeIcon,
-  FemaleIcon,
+  Female as FemaleIcon,
   CheckCircle as CheckCircleIcon,
-  People as PeopleIcon,
-  ReportProblem as ReportProblemIcon,
-  Description as DescriptionIcon,
+  Assignment as AssignmentIcon,
   Science as ScienceIcon,
   Visibility as VisibilityIcon,
   MonitorHeart as MonitorHeartIcon,
-  BarChart as BarChartIcon,
-  FavoriteIcon,
+  Assessment as AssessmentIcon,
+  Favorite as FavoriteIcon,
   LocationOn as LocationOnIcon,
   Person as PersonIcon,
-  AutoFixHigh as AutoFixHighIcon,
-  MagnetIcon,
-  Medication as MedicationIcon,
-  Folder as FolderIcon
+  Healing as HealingIcon,
+  Folder as FolderIcon,
+  TextFields as TextFieldsIcon,
+  Title as TitleIcon,
+  List as ListIcon,
+  Checklist as ChecklistIcon,
+  Description as DescriptionIcon,
+  Add as AddIcon,
+  AutoAwesome as AutoAwesomeIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
-import SectionPlacementDialog from './SectionPlacementDialog';
 
 interface SectionTemplate {
   id: string;
   name: string;
-  category: string;
   description: string;
-  type: string;
-  icon: React.ReactNode;
+  icon: React.ReactElement;
+  category: string;
+  emoji: string;
 }
 
 interface AddSectionOverlayProps {
   open: boolean;
   onClose: () => void;
-  onAddSection: (sectionTemplate: SectionTemplate, position: number) => void;
-  existingSections: Array<{ id: string; name: string; type?: string; }>;
+  onAddSection: (section: SectionTemplate) => void;
 }
+
+const sectionTemplates: SectionTemplate[] = [
+  // Subjective
+  { id: 'psych-history', name: 'Past Psychiatric History', description: "Patient's history of psychiatric conditions and treatments", icon: <PsychologyIcon />, category: 'Subjective', emoji: '🧠' },
+  { id: 'medical-history', name: 'Medical History', description: "Patient's history of medical conditions", icon: <LocalHospitalIcon />, category: 'Subjective', emoji: '🏥' },
+  { id: 'surgical-history', name: 'Surgical History', description: "Patient's history of surgical procedures", icon: <MedicalServicesIcon />, category: 'Subjective', emoji: '🔪' },
+  { id: 'current-medications', name: 'Current Medications', description: "List of patient's current medications", icon: <MedicationIcon />, category: 'Subjective', emoji: '💊' },
+  { id: 'allergies', name: 'Allergies', description: "Patient's allergies to medications, foods, or other substances", icon: <WarningIcon />, category: 'Subjective', emoji: '⚠️' },
+  { id: 'substance-use', name: 'Substance Use History', description: "Patient's history of substance use", icon: <SmokingRoomsIcon />, category: 'Subjective', emoji: '🚬' },
+  { id: 'treatment-history', name: 'Treatment History', description: "Patient's history of substance use treatment", icon: <LocalHospitalIcon />, category: 'Subjective', emoji: '🏥' },
+  { id: 'family-history', name: 'Family History', description: "Patient's family psychiatric history", icon: <PeopleIcon />, category: 'Subjective', emoji: '👪' },
+  { id: 'developmental-history', name: 'Developmental History', description: "Patient's developmental history and milestones", icon: <ChildCareIcon />, category: 'Subjective', emoji: '👶' },
+  { id: 'academic-history', name: 'Academic History', description: "Patient's academic performance and school history", icon: <SchoolIcon />, category: 'Subjective', emoji: '🏫' },
+  { id: 'nutrition-weight', name: 'Nutrition and Weight History', description: "Patient's diet, nutrition patterns and weight history", icon: <RestaurantIcon />, category: 'Subjective', emoji: '🍎' },
+  { id: 'collateral-info', name: 'Collateral Information', description: 'Information from family, caregivers, or other providers', icon: <GroupIcon />, category: 'Subjective', emoji: '👥' },
+  { id: 'sleep-history', name: 'Sleep History', description: "Patient's sleep patterns and sleep-related issues", icon: <BedtimeIcon />, category: 'Subjective', emoji: '😴' },
+  { id: 'obgyn-history', name: 'OBGYN History', description: "Patient's obstetric and gynecological history", icon: <FemaleIcon />, category: 'Subjective', emoji: '👩‍⚕️' },
+  { id: 'treatment-compliance', name: 'Treatment Compliance', description: "Patient's adherence to treatment plans and medication", icon: <CheckCircleIcon />, category: 'Subjective', emoji: '✅' },
+  { id: 'social-history', name: 'Social History', description: "Patient's social background, relationships and living situation", icon: <GroupIcon />, category: 'Subjective', emoji: '👥' },
+  { id: 'psychiatric-ros', name: 'Psychiatric Review of Systems', description: 'Comprehensive review of psychiatric symptoms and mental health concerns', icon: <PsychologyIcon />, category: 'Subjective', emoji: '🧠' },
+  { id: 'chief-complaint', name: 'Chief Complaint', description: "Patient's primary reason for visit", icon: <AssignmentIcon />, category: 'Subjective', emoji: '❗' },
+  { id: 'hpi', name: 'History of Present Illness', description: "Detailed history of the patient's current condition", icon: <DescriptionIcon />, category: 'Subjective', emoji: '📝' },
+
+  // Plan sections
+  { id: 'plan', name: 'Plan', description: 'Comprehensive treatment plan with interventions', icon: <AssignmentIcon />, category: 'Plan', emoji: '📝' },
+  { id: 'patient-instructions', name: 'Patient Instructions', description: 'Instructions provided to patient for self-care', icon: <DescriptionIcon />, category: 'Plan', emoji: '📝' },
+  { id: 'orders-referrals', name: 'Orders and Referrals', description: 'Documentation of orders and referrals with justification', icon: <AssignmentIcon />, category: 'Plan', emoji: '📋' },
+  { id: 'follow-ups', name: 'Follow-ups', description: 'Details for follow-up appointments and check-ins', icon: <CheckCircleIcon />, category: 'Plan', emoji: '📅' },
+  { id: 'todo-next-steps', name: 'To-do and Next Steps', description: 'Action items for provider and patient before next visit', icon: <ChecklistIcon />, category: 'Plan', emoji: '✅' },
+  { id: 'crisis-safety', name: 'Crisis and Safety Plan', description: 'Comprehensive safety plan for crisis situations', icon: <WarningIcon />, category: 'Plan', emoji: '🚨' },
+  { id: 'long-term-plan', name: 'Long-Term Treatment Plan', description: 'Comprehensive long-term treatment plan with SMART goals', icon: <AssignmentIcon />, category: 'Plan', emoji: '🎯' },
+
+  // Objective sections
+  { id: 'lab-results', name: 'Lab Results / Imaging', description: 'Documentation of laboratory and imaging results', icon: <ScienceIcon />, category: 'Objective', emoji: '🔬' },
+  { id: 'medical-ros', name: 'Medical Review of Systems', description: 'Comprehensive review of body systems and symptoms', icon: <VisibilityIcon />, category: 'Objective', emoji: '🔍' },
+  { id: 'mental-status', name: 'Mental Status Exam', description: "Detailed assessment of patient's mental status and cognitive functioning", icon: <PsychologyIcon />, category: 'Objective', emoji: '🔍' },
+  { id: 'physical-exam', name: 'Physical Examination', description: 'Comprehensive physical examination findings', icon: <MedicalServicesIcon />, category: 'Objective', emoji: '🩺' },
+  { id: 'assessments-scales', name: 'Assessments & Scales', description: 'Documentation of assessment scales and their results', icon: <AssessmentIcon />, category: 'Objective', emoji: '📊' },
+  { id: 'vitals', name: 'Vitals', description: "Patient's vital signs documentation", icon: <MonitorHeartIcon />, category: 'Objective', emoji: '❤️' },
+
+  // Assessment sections
+  { id: 'assessment', name: 'Assessment', description: 'Clinical assessment of diagnoses with ICD-10 codes', icon: <AssessmentIcon />, category: 'Assessment', emoji: '🔍' },
+  { id: 'biopsychosocial', name: 'Biopsychosocial Assessment', description: 'Comprehensive assessment of biological, psychological, and social factors', icon: <PsychologyIcon />, category: 'Assessment', emoji: '🧠' },
+  { id: 'assessment-plan', name: 'Assessment & Plan', description: 'Combined assessment and plan organized by diagnosis', icon: <AssignmentIcon />, category: 'Assessment', emoji: '📊' },
+  { id: 'risk-assessment', name: 'Risk Assessment', description: 'Assessment of suicide, homicide, and other safety risks', icon: <WarningIcon />, category: 'Assessment', emoji: '⚠️' },
+  { id: 'risk-protective', name: 'Risk & Protective Factors', description: 'Identification of risk and protective factors', icon: <FavoriteIcon />, category: 'Assessment', emoji: '🛡️' },
+  { id: 'medical-decision', name: 'Medical Decision Making', description: 'Documentation of medical decision making complexity', icon: <AssessmentIcon />, category: 'Assessment', emoji: '🧩' },
+  { id: 'psychiatric-impression', name: 'Psychiatric Impression', description: 'Comprehensive psychiatric diagnostic formulation', icon: <PsychologyIcon />, category: 'Assessment', emoji: '🧠' },
+  { id: 'differential-dx', name: 'Differential Diagnosis', description: 'Alternative diagnoses considered with supporting evidence', icon: <AssessmentIcon />, category: 'Assessment', emoji: '🔄' },
+  { id: 'dsm5-eval', name: 'DSM5 Evaluation', description: 'Formal DSM-5 diagnostic evaluation with criteria', icon: <AssignmentIcon />, category: 'Assessment', emoji: '📋' },
+
+  // Patient Information sections
+  { id: 'location-accompaniment', name: 'Location and Accompaniment', description: 'Information about visit location and patient accompaniment', icon: <LocationOnIcon />, category: 'Patient Information', emoji: '📍' },
+  { id: 'patient-demographics', name: 'Patient Demographics', description: 'Basic patient demographic information', icon: <PersonIcon />, category: 'Patient Information', emoji: '👤' },
+
+  // Add-Ons sections
+  { id: 'therapy-interventions', name: 'Therapy Interventions', description: 'Documentation of therapeutic techniques and patient response', icon: <HealingIcon />, category: 'Add-Ons', emoji: '🧠' },
+  { id: 'tms-justification', name: 'TMS Justification', description: 'Clinical justification for TMS therapy', icon: <PsychologyIcon />, category: 'Add-Ons', emoji: '🧲' },
+  { id: 'spravato-justification', name: 'Spravato Justification', description: 'Clinical justification for Spravato treatment', icon: <MedicationIcon />, category: 'Add-Ons', emoji: '💊' },
+  { id: 'case-management', name: 'Case Management Notes', description: 'Documentation of case management and care coordination', icon: <FolderIcon />, category: 'Add-Ons', emoji: '📁' },
+
+  // Custom Blocks
+  { id: 'paragraph', name: 'Paragraph', description: 'A block of text for general content', icon: <TextFieldsIcon />, category: 'Custom Blocks', emoji: '📝' },
+  { id: 'section-header', name: 'Section Header', description: 'A header to organize your template', icon: <TitleIcon />, category: 'Custom Blocks', emoji: '📌' },
+  { id: 'bulleted-list', name: 'Bulleted List', description: 'A list of items with bullet points', icon: <ListIcon />, category: 'Custom Blocks', emoji: '•' },
+  { id: 'exam-list', name: 'Exam List', description: 'A structured list for exam findings', icon: <ListIcon />, category: 'Custom Blocks', emoji: '📋' },
+  { id: 'checklist', name: 'Checklist', description: 'A list of items that can be checked off', icon: <ChecklistIcon />, category: 'Custom Blocks', emoji: '✓' },
+  { id: 'static-text', name: 'Static Text', description: 'Fixed text that cannot be edited in notes', icon: <DescriptionIcon />, category: 'Custom Blocks', emoji: '📄' }
+];
 
 const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
   open,
   onClose,
-  onAddSection,
-  existingSections = []
+  onAddSection
 }) => {
   const theme = useTheme();
-  const [selectedSection, setSelectedSection] = useState<SectionTemplate | null>(null);
-  const [showPlacementDialog, setShowPlacementDialog] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  
+  const [searchTerm, setSearchTerm] = useState('');
+  const [customSectionName, setCustomSectionName] = useState('');
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const sectionTemplates: SectionTemplate[] = [
-    // Basic sections
-    {
-      id: 'paragraph',
-      name: 'Paragraph',
-      category: 'Basic',
-      description: 'A.I. will write a descriptive block of text following the guidelines below.',
-      type: 'paragraph',
-      icon: <ViewHeadlineIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'bulleted-list',
-      name: 'Bulleted List',
-      category: 'Basic',
-      description: 'A.I. will create a bulleted list based on the instructions provided.',
-      type: 'bulleted-list',
-      icon: <FormatListBulletedIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'section-header',
-      name: 'Section Header',
-      category: 'Basic',
-      description: 'Add a section header to organize your template.',
-      type: 'section-header',
-      icon: <TitleIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'exam-list',
-      name: 'Exam List',
-      category: 'Basic',
-      description: 'A structured list for physical examination findings.',
-      type: 'exam-list',
-      icon: <AssignmentIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'static-text',
-      name: 'Static Text',
-      category: 'Basic',
-      description: 'Add static text that will not be modified by A.I.',
-      type: 'static-text',
-      icon: <TextSnippetIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'checklist',
-      name: 'Checklist',
-      category: 'Basic',
-      description: 'Create a checklist with customizable items.',
-      type: 'checklist',
-      icon: <ChecklistIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    
-    // Subjective sections
-    {
-      id: 'chief-complaint',
-      name: 'Chief Complaint',
-      category: 'Subjective',
-      description: "Patient's primary reason for visit",
-      type: 'chief-complaint',
-      icon: <ReportProblemIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'history-present-illness',
-      name: 'History of Present Illness',
-      category: 'Subjective',
-      description: "Detailed history of the patient's current condition",
-      type: 'history-present-illness',
-      icon: <DescriptionIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'past-psychiatric-history',
-      name: 'Past Psychiatric History',
-      category: 'Subjective',
-      description: "Patient's history of psychiatric conditions and treatments",
-      type: 'past-psychiatric-history',
-      icon: <PsychologyIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'medical-history',
-      name: 'Medical History',
-      category: 'Subjective',
-      description: "Patient's history of medical conditions",
-      type: 'medical-history',
-      icon: <LocalHospitalIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'surgical-history',
-      name: 'Surgical History',
-      category: 'Subjective',
-      description: "Patient's history of surgical procedures",
-      type: 'surgical-history',
-      icon: <HealingIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'current-medications',
-      name: 'Current Medications',
-      category: 'Subjective',
-      description: "List of patient's current medications",
-      type: 'current-medications',
-      icon: <MedicationIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'allergies',
-      name: 'Allergies',
-      category: 'Subjective',
-      description: "Patient's allergies to medications, foods, or other substances",
-      type: 'allergies',
-      icon: <WarningIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'substance-use-history',
-      name: 'Substance Use History',
-      category: 'Subjective',
-      description: "Patient's history of substance use",
-      type: 'substance-use-history',
-      icon: <SmokingRoomsIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'treatment-history',
-      name: 'Treatment History',
-      category: 'Subjective',
-      description: "Patient's history of substance use treatment",
-      type: 'treatment-history',
-      icon: <LocalHospitalIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'family-history',
-      name: 'Family History',
-      category: 'Subjective',
-      description: "Patient's family psychiatric history",
-      type: 'family-history',
-      icon: <FamilyIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'developmental-history',
-      name: 'Developmental History',
-      category: 'Subjective',
-      description: "Patient's developmental history and milestones",
-      type: 'developmental-history',
-      icon: <ChildCareIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'academic-history',
-      name: 'Academic History',
-      category: 'Subjective',
-      description: "Patient's academic performance and school history",
-      type: 'academic-history',
-      icon: <SchoolIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'nutrition-weight-history',
-      name: 'Nutrition and Weight History',
-      category: 'Subjective',
-      description: "Patient's diet, nutrition patterns and weight history",
-      type: 'nutrition-weight-history',
-      icon: <RestaurantIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'collateral-information',
-      name: 'Collateral Information',
-      category: 'Subjective',
-      description: 'Information from family, caregivers, or other providers',
-      type: 'collateral-information',
-      icon: <GroupsIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'sleep-history',
-      name: 'Sleep History',
-      category: 'Subjective',
-      description: "Patient's sleep patterns and sleep-related issues",
-      type: 'sleep-history',
-      icon: <BedtimeIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'obgyn-history',
-      name: 'OBGYN History',
-      category: 'Subjective',
-      description: "Patient's obstetric and gynecological history",
-      type: 'obgyn-history',
-      icon: <FemaleIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'treatment-compliance',
-      name: 'Treatment Compliance',
-      category: 'Subjective',
-      description: "Patient's adherence to treatment plans and medication",
-      type: 'treatment-compliance',
-      icon: <CheckCircleIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'social-history',
-      name: 'Social History',
-      category: 'Subjective',
-      description: "Patient's social background, relationships and living situation",
-      type: 'social-history',
-      icon: <PeopleIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'psychiatric-review-systems',
-      name: 'Psychiatric Review of Systems',
-      category: 'Subjective',
-      description: 'Comprehensive review of psychiatric symptoms and mental health concerns',
-      type: 'psychiatric-review-systems',
-      icon: <PsychologyIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
+  const categories = ['All', 'Subjective', 'Plan', 'Objective', 'Assessment', 'Patient Information', 'Add-Ons', 'Custom Blocks'];
 
-    // Objective sections
-    {
-      id: 'lab-results-imaging',
-      name: 'Lab Results / Imaging',
-      category: 'Objective',
-      description: 'Documentation of laboratory and imaging results',
-      type: 'lab-results-imaging',
-      icon: <ScienceIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'medical-review-systems',
-      name: 'Medical Review of Systems',
-      category: 'Objective',
-      description: 'Comprehensive review of body systems and symptoms',
-      type: 'medical-review-systems',
-      icon: <VisibilityIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'mental-status-exam',
-      name: 'Mental Status Exam',
-      category: 'Objective',
-      description: "Detailed assessment of patient's mental status and cognitive functioning",
-      type: 'mental-status-exam',
-      icon: <PsychologyIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'physical-examination',
-      name: 'Physical Examination',
-      category: 'Objective',
-      description: 'Comprehensive physical examination findings',
-      type: 'physical-examination',
-      icon: <MedicalServicesIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'assessments-scales',
-      name: 'Assessments & Scales',
-      category: 'Objective',
-      description: 'Documentation of assessment scales and their results',
-      type: 'assessments-scales',
-      icon: <BarChartIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'vitals',
-      name: 'Vitals',
-      category: 'Objective',
-      description: "Patient's vital signs documentation",
-      type: 'vitals',
-      icon: <MonitorHeartIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
+  const filteredSections = sectionTemplates.filter(section => {
+    const matchesSearch = section.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      section.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || section.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
-    // Assessment sections
-    {
-      id: 'assessment',
-      name: 'Assessment',
-      category: 'Assessment',
-      description: 'Clinical assessment of diagnoses with ICD-10 codes',
-      type: 'assessment',
-      icon: <VisibilityIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'biopsychosocial-assessment',
-      name: 'Biopsychosocial Assessment',
-      category: 'Assessment',
-      description: 'Comprehensive assessment of biological, psychological, and social factors',
-      type: 'biopsychosocial-assessment',
-      icon: <PsychologyIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'assessment-plan',
-      name: 'Assessment & Plan',
-      category: 'Assessment',
-      description: 'Combined assessment and plan organized by diagnosis',
-      type: 'assessment-plan',
-      icon: <AssignmentIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'risk-assessment',
-      name: 'Risk Assessment',
-      category: 'Assessment',
-      description: 'Assessment of suicide, homicide, and other safety risks',
-      type: 'risk-assessment',
-      icon: <WarningIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'risk-protective-factors',
-      name: 'Risk & Protective Factors',
-      category: 'Assessment',
-      description: 'Identification of risk and protective factors',
-      type: 'risk-protective-factors',
-      icon: <CheckCircleIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'medical-decision-making',
-      name: 'Medical Decision Making',
-      category: 'Assessment',
-      description: 'Documentation of medical decision making complexity',
-      type: 'medical-decision-making',
-      icon: <PsychologyIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'psychiatric-impression',
-      name: 'Psychiatric Impression',
-      category: 'Assessment',
-      description: 'Comprehensive psychiatric diagnostic formulation',
-      type: 'psychiatric-impression',
-      icon: <PsychologyIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'differential-diagnosis',
-      name: 'Differential Diagnosis',
-      category: 'Assessment',
-      description: 'Alternative diagnoses considered with supporting evidence',
-      type: 'differential-diagnosis',
-      icon: <VisibilityIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'dsm5-evaluation',
-      name: 'DSM5 Evaluation',
-      category: 'Assessment',
-      description: 'Formal DSM-5 diagnostic evaluation with criteria',
-      type: 'dsm5-evaluation',
-      icon: <AssignmentIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-
-    // Plan sections
-    {
-      id: 'plan',
-      name: 'Plan',
-      category: 'Plan',
-      description: 'Comprehensive treatment plan with interventions',
-      type: 'plan',
-      icon: <DescriptionIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'patient-instructions',
-      name: 'Patient Instructions',
-      category: 'Plan',
-      description: 'Instructions provided to patient for self-care',
-      type: 'patient-instructions',
-      icon: <DescriptionIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'orders-referrals',
-      name: 'Orders and Referrals',
-      category: 'Plan',
-      description: 'Documentation of orders and referrals with justification',
-      type: 'orders-referrals',
-      icon: <AssignmentIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'follow-ups',
-      name: 'Follow-ups',
-      category: 'Plan',
-      description: 'Details for follow-up appointments and check-ins',
-      type: 'follow-ups',
-      icon: <CheckCircleIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'todo-next-steps',
-      name: 'To-do and Next Steps',
-      category: 'Plan',
-      description: 'Action items for provider and patient before next visit',
-      type: 'todo-next-steps',
-      icon: <ChecklistIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'crisis-safety-plan',
-      name: 'Crisis and Safety Plan',
-      category: 'Plan',
-      description: 'Comprehensive safety plan for crisis situations',
-      type: 'crisis-safety-plan',
-      icon: <WarningIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'long-term-treatment-plan',
-      name: 'Long-Term Treatment Plan',
-      category: 'Plan',
-      description: 'Comprehensive long-term treatment plan with SMART goals',
-      type: 'long-term-treatment-plan',
-      icon: <AssignmentIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-
-    // Patient Information sections
-    {
-      id: 'location-accompaniment',
-      name: 'Location and Accompaniment',
-      category: 'Patient Information',
-      description: 'Information about visit location and patient accompaniment',
-      type: 'location-accompaniment',
-      icon: <LocationOnIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'patient-demographics',
-      name: 'Patient Demographics',
-      category: 'Patient Information',
-      description: 'Basic patient demographic information',
-      type: 'patient-demographics',
-      icon: <PersonIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-
-    // Add-Ons sections
-    {
-      id: 'therapy-interventions',
-      name: 'Therapy Interventions',
-      category: 'Add-Ons',
-      description: 'Documentation of therapeutic techniques and patient response',
-      type: 'therapy-interventions',
-      icon: <PsychologyIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'tms-justification',
-      name: 'TMS Justification',
-      category: 'Add-Ons',
-      description: 'Clinical justification for TMS therapy',
-      type: 'tms-justification',
-      icon: <MagnetIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'spravato-justification',
-      name: 'Spravato Justification',
-      category: 'Add-Ons',
-      description: 'Clinical justification for Spravato treatment',
-      type: 'spravato-justification',
-      icon: <MedicationIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    },
-    {
-      id: 'case-management-notes',
-      name: 'Case Management Notes',
-      category: 'Add-Ons',
-      description: 'Documentation of case management and care coordination',
-      type: 'case-management-notes',
-      icon: <FolderIcon sx={{ fontSize: 24, color: bravoColors.primaryFlat }} />
-    }
-  ];
-
-  const categories = ['Basic', 'Subjective', 'Objective', 'Assessment', 'Plan', 'Patient Information', 'Add-Ons'];
-
-  const getFilteredSections = () => {
-    if (activeTab === 0) return sectionTemplates;
-    const category = categories[activeTab];
-    return sectionTemplates.filter(section => section.category === category);
-  };
-
-  const handleSectionClick = (section: SectionTemplate) => {
-    setSelectedSection(section);
-    setShowPlacementDialog(true);
-  };
-
-  const handlePlaceSection = (position: number) => {
-    if (selectedSection) {
-      onAddSection(selectedSection, position);
-      setSelectedSection(null);
-      setShowPlacementDialog(false);
+  const handleAddCustomSection = () => {
+    if (customSectionName.trim()) {
+      const customSection: SectionTemplate = {
+        id: `custom-${Date.now()}`,
+        name: customSectionName,
+        description: 'Custom section',
+        icon: <TextFieldsIcon />,
+        category: 'Custom',
+        emoji: '📝'
+      };
+      onAddSection(customSection);
+      setCustomSectionName('');
+      setShowCustomForm(false);
       onClose();
     }
   };
 
-  const handleClosePlacement = () => {
-    setShowPlacementDialog(false);
-    setSelectedSection(null);
-  };
-
-  const handleBackToSections = () => {
-    setShowPlacementDialog(false);
-    setSelectedSection(null);
+  const getCategoryColor = (category: string) => {
+    const colors = {
+      'Subjective': '#2196F3',
+      'Plan': '#4CAF50', 
+      'Objective': '#FF9800',
+      'Assessment': '#9C27B0',
+      'Patient Information': '#00BCD4',
+      'Add-Ons': '#FF5722',
+      'Custom Blocks': '#607D8B'
+    };
+    return colors[category as keyof typeof colors] || bravoColors.primaryFlat;
   };
 
   return (
-    <>
-      {/* Main Add Section Dialog */}
-      <Dialog
-        open={open && !showPlacementDialog}
-        onClose={onClose}
-        maxWidth="lg"
-        fullWidth
-        PaperProps={{
-          sx: { 
-            borderRadius: 4,
-            maxHeight: '90vh'
-          }
-        }}
-      >
-        <DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth={false}
+      fullScreen
+      sx={{
+        '& .MuiDialog-paper': {
+          margin: 0,
+          maxHeight: '100vh',
+          height: '100vh',
+          width: '100vw',
+          maxWidth: '100vw',
+          borderRadius: 0,
+          background: '#f8fafc',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        },
+        '& .MuiBackdrop-root': {
+          backgroundColor: alpha('#000000', 0.7)
+        }
+      }}
+    >
+      <DialogContent sx={{ p: 0, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Compact Header */}
+        <Box sx={{ 
+          background: `linear-gradient(135deg, ${bravoColors.primaryFlat} 0%, ${bravoColors.secondary} 100%)`,
+          color: '#ffffff',
+          p: { xs: 1.5, sm: 2 },
+          flexShrink: 0,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+        }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-                Add New Section
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Choose a section type to add to your template
-              </Typography>
+            <Box display="flex" alignItems="center">
+              <Box>
+                <Typography variant={isMobile ? "h6" : "h5"} sx={{ 
+                  fontWeight: 700,
+                  fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                  lineHeight: 1.2,
+                  color: '#ffffff'
+                }}>
+                  Add Section
+                </Typography>
+                {!isMobile && (
+                  <Typography variant="body2" sx={{ 
+                    opacity: 0.9,
+                    fontSize: '0.875rem',
+                    mt: 0.25,
+                    color: '#ffffff'
+                  }}>
+                    Choose from medical documentation sections
+                  </Typography>
+                )}
+              </Box>
             </Box>
             <IconButton 
               onClick={onClose}
-              sx={{
-                backgroundColor: alpha(theme.palette.grey[500], 0.1),
-                '&:hover': {
-                  backgroundColor: alpha(theme.palette.grey[500], 0.2)
+              sx={{ 
+                bgcolor: alpha('#ffffff', 0.15),
+                color: '#ffffff',
+                width: { xs: 36, sm: 44 },
+                height: { xs: 36, sm: 44 },
+                '&:hover': { 
+                  bgcolor: alpha('#ffffff', 0.25)
                 }
               }}
             >
-              <CloseIcon />
+              <CloseIcon sx={{ fontSize: { xs: 18, sm: 22 } }} />
             </IconButton>
           </Box>
-        </DialogTitle>
+        </Box>
 
-        <DialogContent sx={{ px: 3, pb: 3 }}>
-          {/* Category Tabs */}
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-            <Tabs 
-              value={activeTab} 
-              onChange={(_, newValue) => setActiveTab(newValue)}
-              variant="scrollable"
-              scrollButtons="auto"
-              sx={{
-                '& .MuiTab-root': {
-                  textTransform: 'none',
+        {/* Compact Search and Filter */}
+        <Box sx={{ 
+          p: { xs: 1.5, sm: 2 }, 
+          bgcolor: alpha(bravoColors.primaryFlat, 0.02),
+          flexShrink: 0,
+          borderBottom: '1px solid #e0e0e0'
+        }}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search sections..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: bravoColors.primaryFlat, fontSize: 20 }} />
+                </InputAdornment>
+              ),
+            }}
+            sx={{ 
+              mb: { xs: 1.5, sm: 2 },
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                backgroundColor: '#ffffff',
+                height: { xs: 40, sm: 44 },
+                '& fieldset': {
+                  borderColor: alpha(bravoColors.primaryFlat, 0.2)
+                }
+              }
+            }}
+          />
+
+          {/* Compact Category Filter */}
+          <Stack 
+            direction="row" 
+            spacing={1} 
+            sx={{ 
+              flexWrap: 'wrap', 
+              gap: { xs: 0.75, sm: 1 },
+              mb: 1
+            }}
+          >
+            {categories.map((category) => (
+              <Chip
+                key={category}
+                label={category}
+                onClick={() => setSelectedCategory(category)}
+                variant={selectedCategory === category ? 'filled' : 'outlined'}
+                size={isMobile ? "small" : "medium"}
+                sx={{
+                  borderRadius: 2,
                   fontWeight: 600,
-                  fontSize: '0.9rem'
+                  fontSize: { xs: '0.75rem', sm: '0.85rem' },
+                  height: { xs: 28, sm: 32 },
+                  bgcolor: selectedCategory === category ? getCategoryColor(category) : 'transparent',
+                  color: selectedCategory === category ? '#ffffff' : getCategoryColor(category),
+                  borderColor: getCategoryColor(category),
+                  '&:hover': {
+                    bgcolor: selectedCategory === category ? getCategoryColor(category) : alpha(getCategoryColor(category), 0.08)
+                  }
+                }}
+              />
+            ))}
+          </Stack>
+          
+          {/* Compact Custom Section Creator */}
+          <Paper 
+            elevation={0}
+            sx={{ 
+              p: { xs: 1.5, sm: 2 }, 
+              border: `1px dashed ${bravoColors.highlight.border}`, 
+              borderRadius: 2, 
+              background: alpha(bravoColors.primaryFlat, 0.02)
+            }}
+          >
+            {!showCustomForm ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <AddIcon sx={{ color: bravoColors.secondary, mr: 1, fontSize: 20 }} />
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>
+                    Create Custom Section
+                  </Typography>
+                </Box>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setShowCustomForm(true)}
+                  sx={{ 
+                    textTransform: 'none',
+                    fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                    height: { xs: 28, sm: 32 },
+                    borderColor: bravoColors.secondary,
+                    color: bravoColors.secondary
+                  }}
+                >
+                  Create
+                </Button>
+              </Box>
+            ) : (
+              <Box>
+                <TextField
+                  fullWidth
+                  label="Section Name"
+                  value={customSectionName}
+                  onChange={(e) => setCustomSectionName(e.target.value)}
+                  size="small"
+                  sx={{ 
+                    mb: 1.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: 1.5,
+                      backgroundColor: '#ffffff'
+                    }
+                  }}
+                />
+                <Stack direction="row" spacing={1}>
+                  <Button 
+                    variant="contained" 
+                    size="small"
+                    onClick={handleAddCustomSection}
+                    disabled={!customSectionName.trim()}
+                    sx={{ 
+                      backgroundColor: bravoColors.secondary,
+                      fontSize: { xs: '0.75rem', sm: '0.8rem' }
+                    }}
+                  >
+                    Add
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    size="small"
+                    onClick={() => setShowCustomForm(false)}
+                    sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+                  >
+                    Cancel
+                  </Button>
+                </Stack>
+              </Box>
+            )}
+          </Paper>
+
+          {/* Results Summary */}
+          <Paper sx={{
+            p: { xs: 1, sm: 1.5 },
+            mt: { xs: 1.5, sm: 2 },
+            borderRadius: 1.5,
+            backgroundColor: alpha(bravoColors.primaryFlat, 0.05),
+            border: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+            <Typography variant="body2" sx={{ 
+              fontWeight: 600, 
+              color: bravoColors.primaryFlat,
+              fontSize: { xs: '0.8rem', sm: '0.875rem' }
+            }}>
+              {filteredSections.length} sections
+              {selectedCategory !== 'All' && ` in ${selectedCategory}`}
+            </Typography>
+            <Badge 
+              badgeContent={filteredSections.length} 
+              color="primary"
+              sx={{
+                '& .MuiBadge-badge': {
+                  backgroundColor: bravoColors.secondary,
+                  fontSize: '0.7rem',
+                  height: 18,
+                  minWidth: 18
                 }
               }}
             >
-              <Tab label="All Sections" />
-              {categories.map((category) => (
-                <Tab key={category} label={category} />
-              ))}
-            </Tabs>
-          </Box>
+              <Box sx={{ width: 20, height: 20 }} />
+            </Badge>
+          </Paper>
+        </Box>
 
-          <Grid container spacing={3}>
-            {getFilteredSections().map((section) => (
-              <Grid item xs={12} sm={6} md={4} key={section.id}>
-                <Card
-                  sx={{
+        {/* Scrollable Sections Grid */}
+        <Box sx={{ 
+          flex: 1,
+          overflow: 'auto',
+          p: { xs: 1.5, sm: 2 }
+        }}>
+          {selectedCategory === 'All' ? (
+            // Category groups
+            categories.slice(1).map((category) => {
+              const categorySections = filteredSections.filter(section => section.category === category);
+              if (categorySections.length === 0) return null;
+
+              return (
+                <Box key={category} sx={{ mb: { xs: 2.5, sm: 3 } }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: { xs: 1.5, sm: 2 },
+                      mb: { xs: 1.5, sm: 2 },
+                      borderRadius: 2,
+                      background: alpha(getCategoryColor(category), 0.05),
+                      border: `1px solid ${alpha(getCategoryColor(category), 0.15)}`
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Box sx={{
+                          width: { xs: 8, sm: 12 },
+                          height: { xs: 8, sm: 12 },
+                          borderRadius: '50%',
+                          bgcolor: getCategoryColor(category),
+                          mr: { xs: 1.5, sm: 2 }
+                        }} />
+                        <Typography variant={isMobile ? "subtitle2" : "h6"} sx={{ 
+                          fontWeight: 700,
+                          color: getCategoryColor(category),
+                          fontSize: { xs: '1rem', sm: '1.1rem' }
+                        }}>
+                          {category}
+                        </Typography>
+                      </Box>
+                      <Chip 
+                        label={`${categorySections.length}`}
+                        size="small"
+                        sx={{ 
+                          bgcolor: getCategoryColor(category),
+                          color: '#ffffff',
+                          fontWeight: 600,
+                          height: { xs: 22, sm: 26 },
+                          fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                        }}
+                      />
+                    </Box>
+                  </Paper>
+                  
+                  <Box sx={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: { 
+                      xs: '1fr', 
+                      sm: 'repeat(auto-fit, minmax(260px, 1fr))', 
+                      md: 'repeat(auto-fill, minmax(280px, 1fr))'
+                    }, 
+                    gap: { xs: 1.5, sm: 2 }
+                  }}>
+                    {categorySections.map((section) => (
+                      <Card 
+                        key={section.id}
+                        sx={{ 
+                          cursor: 'pointer',
+                          borderRadius: 2,
+                          border: `1px solid transparent`,
+                          transition: 'all 0.2s ease',
+                          background: '#ffffff',
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 4px 12px ${alpha(getCategoryColor(category), 0.15)}`,
+                            borderColor: getCategoryColor(category)
+                          }
+                        }}
+                      >
+                        <CardActionArea 
+                          onClick={() => {
+                            onAddSection(section);
+                            onClose();
+                          }}
+                          sx={{ p: { xs: 1.5, sm: 2 } }}
+                        >
+                          <CardContent sx={{ p: 0 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                              <Box sx={{
+                                width: { xs: 40, sm: 48 },
+                                height: { xs: 40, sm: 48 },
+                                borderRadius: 2,
+                                background: alpha(getCategoryColor(category), 0.1),
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                mr: { xs: 1.5, sm: 2 },
+                                fontSize: { xs: '1.2rem', sm: '1.4rem' },
+                                flexShrink: 0
+                              }}>
+                                {section.emoji}
+                              </Box>
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Typography variant="subtitle2" sx={{ 
+                                  fontWeight: 600, 
+                                  lineHeight: 1.3,
+                                  mb: 0.5,
+                                  color: getCategoryColor(category),
+                                  fontSize: { xs: '0.875rem', sm: '0.95rem' }
+                                }}>
+                                  {section.name}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ 
+                                  lineHeight: 1.4,
+                                  fontSize: { xs: '0.75rem', sm: '0.8rem' }
+                                }}>
+                                  {section.description}
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    ))}
+                  </Box>
+                </Box>
+              );
+            })
+          ) : (
+            // Single category view
+            <Box sx={{ 
+              display: 'grid', 
+              gridTemplateColumns: { 
+                xs: '1fr', 
+                sm: 'repeat(auto-fit, minmax(260px, 1fr))', 
+                md: 'repeat(auto-fill, minmax(280px, 1fr))'
+              }, 
+              gap: { xs: 1.5, sm: 2 }
+            }}>
+              {filteredSections.map((section) => (
+                <Card 
+                  key={section.id}
+                  sx={{ 
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    border: `2px solid transparent`,
-                    height: '100%',
+                    borderRadius: 2,
+                    border: `1px solid transparent`,
+                    transition: 'all 0.2s ease',
+                    background: '#ffffff',
                     '&:hover': {
-                      borderColor: bravoColors.primaryFlat,
-                      transform: 'translateY(-4px)',
-                      boxShadow: `0 8px 25px ${alpha(bravoColors.primaryFlat, 0.15)}`
+                      transform: 'translateY(-2px)',
+                      boxShadow: `0 4px 12px ${alpha(getCategoryColor(section.category), 0.15)}`,
+                      borderColor: getCategoryColor(section.category)
                     }
                   }}
-                  onClick={() => handleSectionClick(section)}
                 >
-                  <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
-                    <Stack spacing={2} sx={{ height: '100%' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        {section.icon}
-                        <Chip
-                          label={section.category}
-                          size="small"
-                          sx={{
-                            backgroundColor: alpha(bravoColors.secondary, 0.15),
-                            color: bravoColors.secondary,
-                            fontWeight: 600,
-                            fontSize: '0.75rem'
-                          }}
-                        />
-                      </Box>
-                      
-                      <Box sx={{ flex: 1 }}>
-                        <Typography 
-                          variant="h6" 
-                          sx={{ 
-                            fontWeight: 600,
-                            color: bravoColors.primaryFlat,
-                            mb: 1,
-                            fontSize: '1rem',
-                            lineHeight: 1.3
-                          }}
-                        >
-                          {section.name}
-                        </Typography>
-                        <Typography 
-                          variant="body2" 
-                          color="text.secondary"
-                          sx={{ 
+                  <CardActionArea 
+                    onClick={() => {
+                      onAddSection(section);
+                      onClose();
+                    }}
+                    sx={{ p: { xs: 1.5, sm: 2 } }}
+                  >
+                    <CardContent sx={{ p: 0 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                        <Box sx={{
+                          width: { xs: 40, sm: 48 },
+                          height: { xs: 40, sm: 48 },
+                          borderRadius: 2,
+                          background: alpha(getCategoryColor(section.category), 0.1),
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          mr: { xs: 1.5, sm: 2 },
+                          fontSize: { xs: '1.2rem', sm: '1.4rem' },
+                          flexShrink: 0
+                        }}>
+                          {section.emoji}
+                        </Box>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography variant="subtitle2" sx={{ 
+                            fontWeight: 600, 
+                            lineHeight: 1.3,
+                            mb: 0.5,
+                            color: getCategoryColor(section.category),
+                            fontSize: { xs: '0.875rem', sm: '0.95rem' }
+                          }}>
+                            {section.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ 
                             lineHeight: 1.4,
-                            fontSize: '0.85rem'
-                          }}
-                        >
-                          {section.description}
-                        </Typography>
+                            fontSize: { xs: '0.75rem', sm: '0.8rem' }
+                          }}>
+                            {section.description}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Stack>
-                  </CardContent>
+                    </CardContent>
+                  </CardActionArea>
                 </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </DialogContent>
-      </Dialog>
+              ))}
+            </Box>
+          )}
 
-      {/* Section Placement Dialog */}
-      <SectionPlacementDialog
-        open={showPlacementDialog}
-        onClose={handleClosePlacement}
-        onPlaceSection={handlePlaceSection}
-        onBack={handleBackToSections}
-        existingSections={existingSections}
-      />
-    </>
+          {filteredSections.length === 0 && (
+            <Box sx={{ 
+              textAlign: 'center', 
+              py: { xs: 4, sm: 6 },
+              color: 'text.secondary'
+            }}>
+              <SearchIcon sx={{ fontSize: { xs: 48, sm: 64 }, opacity: 0.3, mb: 2 }} />
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
+                No sections found
+              </Typography>
+              <Typography variant="body2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                Try adjusting your search or create a custom section.
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };
 
