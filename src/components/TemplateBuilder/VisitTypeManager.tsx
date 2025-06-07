@@ -19,7 +19,8 @@ import {
 import {
   Add as AddIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  ChevronRight as ChevronRightIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import { InputField } from '@/components/form/InputField/InputField';
@@ -87,6 +88,12 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
     setVisitTypes(prev => prev.filter(vt => vt.id !== id));
   };
 
+  const handleVisitTypeClick = (visitType: VisitType) => {
+    if (onVisitTypeSelect) {
+      onVisitTypeSelect(visitType);
+    }
+  };
+
   return (
     <Box sx={{ mb: 4 }}>
       <Box sx={{
@@ -139,24 +146,31 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
                 border: `1px solid ${bravoColors.primary}20`,
                 borderRadius: 2,
                 transition: 'all 0.2s ease',
+                cursor: onVisitTypeSelect ? 'pointer' : 'default',
                 '&:hover': {
                   borderColor: bravoColors.primaryFlat,
                   transform: 'translateY(-2px)',
                   boxShadow: `0 4px 12px ${bravoColors.primaryFlat}20`
                 }
               }}
+              onClick={() => handleVisitTypeClick(visitType)}
             >
               <CardContent sx={{ pb: 1 }}>
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
-                    fontWeight: 600,
-                    color: bravoColors.primaryFlat,
-                    mb: 1
-                  }}
-                >
-                  {visitType.name}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 600,
+                      color: bravoColors.primaryFlat,
+                      flex: 1
+                    }}
+                  >
+                    {visitType.name}
+                  </Typography>
+                  {onVisitTypeSelect && (
+                    <ChevronRightIcon sx={{ color: bravoColors.primaryFlat }} />
+                  )}
+                </Box>
                 <Typography 
                   variant="body2" 
                   color="text.secondary"
@@ -168,14 +182,20 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
               <CardActions sx={{ pt: 0, justifyContent: 'flex-end' }}>
                 <IconButton
                   size="small"
-                  onClick={() => handleEditVisitType(visitType)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditVisitType(visitType);
+                  }}
                   sx={{ color: bravoColors.primaryFlat }}
                 >
                   <EditIcon fontSize="small" />
                 </IconButton>
                 <IconButton
                   size="small"
-                  onClick={() => handleDeleteVisitType(visitType.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteVisitType(visitType.id);
+                  }}
                   sx={{ color: 'error.main' }}
                 >
                   <DeleteIcon fontSize="small" />
