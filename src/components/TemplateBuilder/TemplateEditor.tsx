@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
 
@@ -73,39 +74,25 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     ]
   );
 
-  // Track if we've already processed and navigated for this template
-  const hasNavigatedRef = useRef(false);
-  const processedTemplateIdRef = useRef<string | null>(null);
+  // Track if we've already processed this template creation session
+  const hasProcessedRef = useRef(false);
+  const isNavigatingRef = useRef(false);
 
-  // Handle navigation when a template is created - only process once per unique template
+  // Handle navigation when a template is created - only process once per template creation session
   useEffect(() => {
-    // Add logging to debug the issue
-    console.log('TemplateEditor useEffect triggered:', {
-      hasCreatedTemplateData: !!createdTemplateData,
-      hasRedirectFlag: createdTemplateData?.redirectToEditor,
-      hasNavigated: hasNavigatedRef.current,
-      processedId: processedTemplateIdRef.current,
-      currentTemplateId: createdTemplateData?.id || createdTemplateData?.name
-    });
-
-    // Only process if we have valid template data that should redirect
-    if (!createdTemplateData || !createdTemplateData.redirectToEditor) {
+    // Only process if we have valid template data that should redirect AND we haven't processed it yet
+    if (!createdTemplateData || 
+        !createdTemplateData.redirectToEditor || 
+        hasProcessedRef.current ||
+        isNavigatingRef.current) {
       return;
     }
 
-    // Create a unique identifier for this template
-    const templateId = createdTemplateData.id || createdTemplateData.name || JSON.stringify(createdTemplateData);
+    console.log('Processing template creation for the first time:', createdTemplateData);
     
-    // Skip if we've already processed this exact template and navigated
-    if (hasNavigatedRef.current && processedTemplateIdRef.current === templateId) {
-      console.log('Skipping - already processed and navigated for this template');
-      return;
-    }
-
-    // Mark as processed for this template
-    processedTemplateIdRef.current = templateId;
-    
-    console.log('Processing template creation data:', createdTemplateData);
+    // Mark as processed immediately to prevent re-processing
+    hasProcessedRef.current = true;
+    isNavigatingRef.current = true;
     
     // Convert created template data to template items based on method
     const newItems: TemplateItem[] = [];
@@ -254,20 +241,24 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     
     setCurrentItems(newItems);
     
-    // Only navigate if we haven't already navigated
-    if (!hasNavigatedRef.current && onNavigateToEditor) {
-      console.log('Navigating to editor');
-      hasNavigatedRef.current = true;
+    // Navigate to editor only if navigation function is provided
+    if (onNavigateToEditor) {
+      console.log('Navigating to editor once');
       onNavigateToEditor();
     }
+    
+    // Clear the navigation flag after a short delay to allow navigation to complete
+    setTimeout(() => {
+      isNavigatingRef.current = false;
+    }, 100);
   }, [createdTemplateData, onNavigateToEditor]);
 
-  // Reset navigation flag when createdTemplateData becomes null/undefined
+  // Reset processing flag when createdTemplateData becomes null/undefined or loses redirect flag
   useEffect(() => {
-    if (!createdTemplateData) {
-      hasNavigatedRef.current = false;
-      processedTemplateIdRef.current = null;
-      console.log('Reset navigation flags - no template data');
+    if (!createdTemplateData || !createdTemplateData.redirectToEditor) {
+      hasProcessedRef.current = false;
+      isNavigatingRef.current = false;
+      console.log('Reset processing flags - template data cleared or no redirect needed');
     }
   }, [createdTemplateData]);
 
