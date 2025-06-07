@@ -212,11 +212,27 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
   const handleSectionClick = (section: SectionTemplate) => {
     setSelectedSection(section);
     
-    // Check if this section type needs configuration
-    const needsConfig = ['checklist', 'paragraph', 'section-header', 'bulleted-list', 'exam-list', 'static-text'].includes(section.id);
+    // All sections need configuration except location-accompaniment and patient-demographics
+    const needsConfig = !['location-accompaniment', 'patient-demographics'].includes(section.id);
     
     if (needsConfig) {
-      setConfigType(section.id);
+      // Determine config type based on section characteristics
+      let configType = 'paragraph'; // default
+      
+      if (['checklist', 'paragraph', 'section-header', 'bulleted-list', 'exam-list', 'static-text'].includes(section.id)) {
+        configType = section.id;
+      } else {
+        // For medical sections, determine the most appropriate config type
+        if (section.name.toLowerCase().includes('exam') || section.name.toLowerCase().includes('physical')) {
+          configType = 'exam-list';
+        } else if (section.name.toLowerCase().includes('list') || section.name.toLowerCase().includes('medications') || section.name.toLowerCase().includes('allergies')) {
+          configType = 'bulleted-list';
+        } else {
+          configType = 'paragraph';
+        }
+      }
+      
+      setConfigType(configType);
       setConfigDialogOpen(true);
     } else {
       setPlacementDialogOpen(true);
@@ -260,7 +276,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
   };
 
   const handleBackFromPlacement = () => {
-    const needsConfig = ['checklist', 'paragraph', 'section-header', 'bulleted-list', 'exam-list', 'static-text'].includes(selectedSection?.id || '');
+    const needsConfig = !['location-accompaniment', 'patient-demographics'].includes(selectedSection?.id || '');
     
     if (needsConfig) {
       setPlacementDialogOpen(false);

@@ -12,7 +12,14 @@ import {
   IconButton,
   Stack,
   Paper,
-  Divider
+  Divider,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormGroup,
+  Checkbox
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -27,10 +34,20 @@ interface ExamItem {
   normalText: string;
 }
 
+interface WithinNormalLimitsSettings {
+  whenNotDiscussed: 'blank' | 'default' | 'alert';
+  whenNormal: 'summarize' | 'specified' | 'highlight';
+  hideEmpty: boolean;
+}
+
 interface ExamListConfigDialogProps {
   open: boolean;
   onClose: () => void;
-  onContinue: (config: { title: string; items: ExamItem[] }) => void;
+  onContinue: (config: { 
+    title: string; 
+    items: ExamItem[];
+    withinNormalLimits: WithinNormalLimitsSettings;
+  }) => void;
   onBack: () => void;
 }
 
@@ -44,6 +61,11 @@ const ExamListConfigDialog: React.FC<ExamListConfigDialogProps> = ({
   const [items, setItems] = useState<ExamItem[]>([
     { id: '1', subsectionTitle: '', reportInstructions: '', normalText: '' }
   ]);
+  const [withinNormalLimits, setWithinNormalLimits] = useState<WithinNormalLimitsSettings>({
+    whenNotDiscussed: 'blank',
+    whenNormal: 'summarize',
+    hideEmpty: false
+  });
 
   const addItem = () => {
     const newItem: ExamItem = {
@@ -65,8 +87,15 @@ const ExamListConfigDialog: React.FC<ExamListConfigDialogProps> = ({
     ));
   };
 
+  const handleWithinNormalLimitsChange = (field: keyof WithinNormalLimitsSettings, value: any) => {
+    setWithinNormalLimits(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
   const handleContinue = () => {
-    onContinue({ title, items });
+    onContinue({ title, items, withinNormalLimits });
   };
 
   return (
@@ -167,9 +196,73 @@ const ExamListConfigDialog: React.FC<ExamListConfigDialogProps> = ({
         <Typography variant="subtitle1" sx={{ mb: 2 }}>
           Within Normal Limits Settings
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Configure default behavior for normal findings above in each item's "When findings are normal" field.
-        </Typography>
+
+        <Stack spacing={3}>
+          <FormControl component="fieldset">
+            <FormLabel component="legend" sx={{ mb: 1 }}>
+              When an item is not discussed in the session:
+            </FormLabel>
+            <RadioGroup
+              value={withinNormalLimits.whenNotDiscussed}
+              onChange={(e) => handleWithinNormalLimitsChange('whenNotDiscussed', e.target.value)}
+            >
+              <FormControlLabel 
+                value="blank" 
+                control={<Radio size="small" />} 
+                label="Leave it blank" 
+              />
+              <FormControlLabel 
+                value="default" 
+                control={<Radio size="small" />} 
+                label='Default to "Within Normal Limits"' 
+              />
+              <FormControlLabel 
+                value="alert" 
+                control={<Radio size="small" />} 
+                label="Alert provider to discuss this item" 
+              />
+            </RadioGroup>
+          </FormControl>
+
+          <FormControl component="fieldset">
+            <FormLabel component="legend" sx={{ mb: 1 }}>
+              When findings are within normal limits:
+            </FormLabel>
+            <RadioGroup
+              value={withinNormalLimits.whenNormal}
+              onChange={(e) => handleWithinNormalLimitsChange('whenNormal', e.target.value)}
+            >
+              <FormControlLabel 
+                value="summarize" 
+                control={<Radio size="small" />} 
+                label="Summarize the discussion" 
+              />
+              <FormControlLabel 
+                value="specified" 
+                control={<Radio size="small" />} 
+                label='Use specified "Within Normal Limits" text' 
+              />
+              <FormControlLabel 
+                value="highlight" 
+                control={<Radio size="small" />} 
+                label="Highlight findings that are not within normal limits" 
+              />
+            </RadioGroup>
+          </FormControl>
+
+          <FormGroup>
+            <FormControlLabel
+              control={
+                <Checkbox 
+                  size="small"
+                  checked={withinNormalLimits.hideEmpty}
+                  onChange={(e) => handleWithinNormalLimitsChange('hideEmpty', e.target.checked)}
+                />
+              }
+              label="Hide items that are empty"
+            />
+          </FormGroup>
+        </Stack>
       </DialogContent>
 
       <DialogActions>
