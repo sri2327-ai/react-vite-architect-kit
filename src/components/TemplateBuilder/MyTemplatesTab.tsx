@@ -67,8 +67,17 @@ const MyTemplatesTab: React.FC = () => {
   };
 
   const handleEditTemplate = (template: Template) => {
+    console.log('Editing template:', template);
     setSelectedTemplate(template);
     setIsEditorOpen(true);
+  };
+
+  const handleViewTemplate = (templateData: any) => {
+    console.log('Viewing template:', templateData);
+    const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
+    if (template) {
+      handleEditTemplate(template);
+    }
   };
 
   const handleSaveTemplate = (templateData: any) => {
@@ -93,6 +102,19 @@ const MyTemplatesTab: React.FC = () => {
       isActive: template.isActive
     };
     createTemplate(duplicatedTemplate);
+  };
+
+  const handleCopyFromTable = (templateData: any) => {
+    console.log('Copying template from table:', templateData);
+    const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
+    if (template) {
+      handleDuplicateTemplate(template);
+    }
+  };
+
+  const handleToggleFavorite = (templateData: any) => {
+    console.log('Toggling favorite for template:', templateData);
+    // Implement favorite toggle logic here if needed
   };
 
   const handleVisitTypeSelect = (visitType: VisitType) => {
@@ -240,19 +262,13 @@ const MyTemplatesTab: React.FC = () => {
           createdBy: 'You',
           tags: template.visitTypes
         }))}
-        onView={(templateData) => {
-          const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
-          if (template) handleEditTemplate(template);
-        }}
+        onView={handleViewTemplate}
         onEdit={(templateData) => {
           const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
           if (template) handleEditTemplate(template);
         }}
-        onCopy={(templateData) => {
-          const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
-          if (template) handleDuplicateTemplate(template);
-        }}
-        onToggleFavorite={() => {}}
+        onCopy={handleCopyFromTable}
+        onToggleFavorite={handleToggleFavorite}
       />
 
       {filteredTemplates.length === 0 && (

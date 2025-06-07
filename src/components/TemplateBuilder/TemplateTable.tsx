@@ -77,6 +77,18 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
     }
   };
 
+  const handleToggleFavorite = (template: TemplateData) => {
+    if (onToggleFavorite) {
+      onToggleFavorite(template);
+    }
+  };
+
+  const handleCopy = (template: TemplateData) => {
+    if (onCopy) {
+      onCopy(template);
+    }
+  };
+
   return (
     <TableContainer 
       component={Paper} 
@@ -125,7 +137,6 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                 borderBottom: '1px solid',
                 borderColor: 'divider'
               }}
-              onClick={() => onView(template)}
             >
               <TableCell>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -133,7 +144,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onToggleFavorite?.(template);
+                      handleToggleFavorite(template);
                     }}
                     sx={{ p: 0.5 }}
                   >
@@ -279,25 +290,23 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                     </IconButton>
                   </Tooltip>
                   
-                  {onCopy && (
-                    <Tooltip title="Duplicate Template">
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onCopy(template);
-                        }}
-                        sx={{
-                          backgroundColor: 'rgba(0,0,0,0.1)',
-                          '&:hover': {
-                            backgroundColor: 'rgba(0,0,0,0.2)'
-                          }
-                        }}
-                      >
-                        <ContentCopyIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
+                  <Tooltip title="Duplicate Template">
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy(template);
+                      }}
+                      sx={{
+                        backgroundColor: 'rgba(0,0,0,0.1)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(0,0,0,0.2)'
+                        }
+                      }}
+                    >
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 </Box>
               </TableCell>
             </TableRow>
