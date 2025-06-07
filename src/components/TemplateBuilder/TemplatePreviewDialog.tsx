@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -42,6 +42,26 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
   onClose,
   template
 }) => {
+  // Handle Escape key
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && open) {
+        onClose();
+      }
+    };
+
+    if (open) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Prevent body scroll when dialog is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [open, onClose]);
+
   if (!template) return null;
 
   const getSectionTypeIcon = (type: string) => {
@@ -74,17 +94,31 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
       onClose={onClose}
       maxWidth="md"
       fullWidth
+      aria-labelledby="template-preview-title"
+      aria-describedby="template-preview-description"
       PaperProps={{
         sx: {
           borderRadius: 3,
-          maxHeight: '90vh'
+          maxHeight: '90vh',
+          outline: 'none'
         }
       }}
+      BackdropProps={{
+        sx: {
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(4px)'
+        }
+      }}
+      disableRestoreFocus
+      keepMounted={false}
     >
       <Box sx={{ p: 3, pb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box>
-            <DialogTitle sx={{ p: 0, fontSize: '1.5rem', fontWeight: 700, color: bravoColors.primaryFlat }}>
+            <DialogTitle 
+              id="template-preview-title"
+              sx={{ p: 0, fontSize: '1.5rem', fontWeight: 700, color: bravoColors.primaryFlat }}
+            >
               {template.name}
             </DialogTitle>
             {template.specialty && (
@@ -93,13 +127,36 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
               </Typography>
             )}
           </Box>
-          <IconButton onClick={onClose} sx={{ color: 'text.secondary' }}>
+          <IconButton 
+            onClick={onClose} 
+            sx={{ 
+              color: 'text.secondary',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              },
+              '&:focus': {
+                outline: `2px solid ${bravoColors.primaryFlat}`,
+                outlineOffset: '2px'
+              }
+            }}
+            aria-label="Close template preview"
+          >
             <CloseIcon />
           </IconButton>
         </Box>
       </Box>
 
-      <DialogContent sx={{ p: 3, pt: 2 }}>
+      <DialogContent 
+        sx={{ 
+          p: 3, 
+          pt: 2,
+          '&:focus': {
+            outline: 'none'
+          }
+        }}
+        id="template-preview-description"
+        tabIndex={-1}
+      >
         {/* Template Info */}
         <Box sx={{ mb: 3 }}>
           <Stack direction="row" spacing={2} flexWrap="wrap" sx={{ mb: 2 }}>
@@ -166,7 +223,11 @@ const TemplatePreviewDialog: React.FC<TemplatePreviewDialogProps> = ({
                     border: '1px solid',
                     borderColor: 'divider',
                     borderRadius: 2,
-                    backgroundColor: 'background.paper'
+                    backgroundColor: 'background.paper',
+                    transition: 'box-shadow 0.2s ease-in-out',
+                    '&:hover': {
+                      boxShadow: 2
+                    }
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
