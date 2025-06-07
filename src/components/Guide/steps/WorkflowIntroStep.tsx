@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Box, Typography, Card, Alert } from '@mui/material';
-import { AccountTree, Integration, AutoMode, Timeline } from '@mui/icons-material';
+import { AccountTree, Hub, AutoMode, Timeline } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
 const WorkflowIntroStep: React.FC = () => {
@@ -35,7 +35,7 @@ const WorkflowIntroStep: React.FC = () => {
       }}>
         <Card sx={{ p: 3, height: '100%' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Integration sx={{ color: 'primary.main', mr: 1, fontSize: 32 }} />
+            <Hub sx={{ color: 'primary.main', mr: 1, fontSize: 32 }} />
             <Typography variant="h6">What are Workflows?</Typography>
           </Box>
           <Typography variant="body2" sx={{ mb: 2 }}>
@@ -81,7 +81,7 @@ const WorkflowIntroStep: React.FC = () => {
           {[
             { icon: <Timeline />, title: 'Appointment Scheduled', desc: 'Patient books appointment in your EHR system' },
             { icon: <AccountTree />, title: 'Workflow Triggered', desc: 'System detects appointment type and activates workflow' },
-            { icon: <Integration />, title: 'Template Selected', desc: 'Appropriate note template is automatically chosen' },
+            { icon: <Hub />, title: 'Template Selected', desc: 'Appropriate note template is automatically chosen' },
             { icon: <AutoMode />, title: 'Note Generated', desc: 'Documentation is created and ready for your review' }
           ].map((step, index) => (
             <Card key={index} sx={{ p: 2, textAlign: 'center', height: '100%' }}>

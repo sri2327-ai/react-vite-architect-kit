@@ -24,7 +24,7 @@ interface GuideContextType {
   closeGuide: () => void;
 }
 
-const GuideContext = createContext<GuideContextType | undefined>(undefined);
+export const GuideContext = createContext<GuideContextType | undefined>(undefined);
 
 interface GuideProviderProps {
   children: ReactNode;

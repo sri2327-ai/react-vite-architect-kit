@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Box, Typography, Card, Alert, Stepper, Step, StepLabel } from '@mui/material';
-import { Download, LibraryBig, Search, CheckCircle } from '@mui/icons-material';
+import { Download, LocalLibrary, Search, CheckCircle } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
 const WorkflowImportStep: React.FC = () => {
@@ -37,7 +37,7 @@ const WorkflowImportStep: React.FC = () => {
 
       <Card sx={{ p: 3, mb: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
-          <LibraryBig sx={{ mr: 1, color: 'primary.main' }} />
+          <LocalLibrary sx={{ mr: 1, color: 'primary.main' }} />
           Import Process Overview
         </Typography>
         
