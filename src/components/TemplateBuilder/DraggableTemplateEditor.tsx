@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -23,7 +23,9 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
-  FormControl
+  FormControl,
+  AppBar,
+  Toolbar
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -48,7 +50,8 @@ import {
   ZoomIn as ZoomInIcon,
   ZoomOut as ZoomOutIcon,
   FilterList as FilterListIcon,
-  Create as CreateIcon
+  Create as CreateIcon,
+  Save as SaveIcon
 } from '@mui/icons-material';
 import {
   DndContext,
@@ -446,7 +449,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   onSave
 }) => {
   const theme = useTheme();
-  const [items, setItems] = useState<TemplateItem[]>(initialItems);
+  const [items, setItems] = useState<TemplateItem[]>([]);
   const [addSectionOpen, setAddSectionOpen] = useState(false);
   const [helpDialogOpen, setHelpDialogOpen] = useState(false);
   const [aiEditDialogOpen, setAiEditDialogOpen] = useState(false);
@@ -459,9 +462,35 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [aiTitle, setAiTitle] = useState('');
   const [pendingSection, setPendingSection] = useState<any>(null);
 
-  // Update items when initialItems change
-  React.useEffect(() => {
-    setItems(initialItems);
+  // Initialize with default items if none provided
+  useEffect(() => {
+    if (initialItems.length > 0) {
+      setItems(initialItems);
+    } else {
+      // Create some default sections if starting fresh
+      const defaultItems: TemplateItem[] = [
+        {
+          id: '1',
+          name: 'Chief Complaint',
+          type: 'paragraph',
+          content: 'Document the primary reason for the patient visit',
+          description: 'A.I. will write a descriptive block of text following the guidelines below.'
+        },
+        {
+          id: '2', 
+          name: 'History of Present Illness',
+          type: 'bulleted-list',
+          content: 'Document the current illness details',
+          description: 'A.I. will create a bulleted list based on the instructions provided',
+          items: [
+            { content: 'Onset and duration of symptoms' },
+            { content: 'Associated symptoms' },
+            { content: 'Previous treatments attempted' }
+          ]
+        }
+      ];
+      setItems(defaultItems);
+    }
   }, [initialItems]);
 
   const sensors = useSensors(
@@ -565,7 +594,15 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     }
   };
 
+  const handleSaveTemplate = () => {
+    if (onSave) {
+      onSave(items);
+    }
+    console.log('Template saved successfully!', items);
+  };
+
   const handleAddSection = (section: any) => {
+    console.log('Adding section:', section);
     if (['paragraph', 'section-header', 'bulleted-list', 'exam-list', 'checklist', 'static-text'].includes(section.id)) {
       setPendingSection(section);
       setSectionConfigOpen(true);
@@ -610,7 +647,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         name: pendingSection.name,
         type: pendingSection.id,
         content: pendingSection.description,
-        description: 'A.I. will write a descriptive block of text following the guidelines below.'
+        description: 'A.I. will write content following the guidelines below.'
       };
       
       const newItems = [...items];
@@ -719,6 +756,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     if (item) {
       setSelectedItemId(itemId);
       setAiTitle(item.name);
+      setAiInstructions(item.content || '');
       setAiEditDialogOpen(true);
     }
   };
@@ -727,7 +765,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     if (selectedItemId) {
       const newItems = items.map(item => 
         item.id === selectedItemId 
-          ? { ...item, name: aiTitle }
+          ? { ...item, name: aiTitle, content: aiInstructions }
           : item
       );
       setItems(newItems);
@@ -746,154 +784,135 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   };
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
-      {/* Header */}
-      <Paper 
-        elevation={0}
-        sx={{ 
-          p: 4, 
-          mb: 4, 
-          borderRadius: 3,
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
-          border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
-        }}
-      >
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Typography 
-              variant="h4" 
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      {/* Header with Save Button */}
+      <AppBar position="static" elevation={0} sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
+            Template Editor
+          </Typography>
+          
+          <Button
+            variant="contained"
+            startIcon={<SaveIcon />}
+            onClick={handleSaveTemplate}
+            sx={{
+              mr: 2,
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600
+            }}
+          >
+            Save Template
+          </Button>
+
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => setAddSectionOpen(true)}
+            sx={{
+              borderRadius: 2,
+              textTransform: 'none',
+              fontWeight: 600
+            }}
+          >
+            Add Section
+          </Button>
+        </Toolbar>
+      </AppBar>
+
+      {/* Main Content */}
+      <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+        {/* Template Sections with Drag and Drop */}
+        <Box sx={{ position: 'relative', pl: 2 }}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+              {items.map((item, index) => (
+                <SortableItem
+                  key={item.id}
+                  item={item}
+                  index={index}
+                  onDelete={handleDeleteItem}
+                  onCopy={handleCopyItem}
+                  onMoveUp={handleMoveUp}
+                  onMoveDown={handleMoveDown}
+                  onHelp={handleHelp}
+                  onAiEdit={handleAiEdit}
+                  getTypeColor={getTypeColor}
+                  getTypeIcon={getTypeIcon}
+                  getTypeLabel={getTypeLabel}
+                  theme={theme}
+                  totalItems={items.length}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        </Box>
+
+        {/* Empty State */}
+        {items.length === 0 && (
+          <Paper 
+            sx={{ 
+              textAlign: 'center', 
+              py: 8,
+              borderRadius: 3,
+              border: `2px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
+              backgroundColor: alpha(theme.palette.primary.main, 0.02)
+            }}
+          >
+            <PsychologyIcon 
               sx={{ 
-                fontWeight: 700,
+                fontSize: 80, 
+                color: alpha(theme.palette.primary.main, 0.3),
+                mb: 2
+              }} 
+            />
+            <Typography 
+              variant="h5" 
+              sx={{ 
+                fontWeight: 600,
                 color: theme.palette.text.primary,
                 mb: 1
               }}
             >
-              Template Editor
+              Start Building Your Template
             </Typography>
             <Typography 
               variant="body1" 
               sx={{ 
                 color: theme.palette.text.secondary,
-                maxWidth: 600
+                mb: 4,
+                maxWidth: 500,
+                mx: 'auto'
               }}
             >
-              Build your AI-powered template by adding and configuring sections. Drag sections to reorder them and customize each one with specific instructions.
+              Add your first section to begin creating an AI-powered template that will generate intelligent content based on your specifications.
             </Typography>
-          </Box>
-          
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<AddIcon />}
-            onClick={() => setAddSectionOpen(true)}
-            sx={{
-              borderRadius: 3,
-              textTransform: 'none',
-              fontWeight: 600,
-              px: 4,
-              py: 1.5,
-              fontSize: '1rem',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              '&:hover': {
-                boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
-                transform: 'translateY(-1px)'
-              },
-              transition: 'all 0.3s ease'
-            }}
-          >
-            Add Section
-          </Button>
-        </Box>
-      </Paper>
-
-      {/* Template Sections with Drag and Drop */}
-      <Box sx={{ position: 'relative', pl: 2 }}>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
-            {items.map((item, index) => (
-              <SortableItem
-                key={item.id}
-                item={item}
-                index={index}
-                onDelete={handleDeleteItem}
-                onCopy={handleCopyItem}
-                onMoveUp={handleMoveUp}
-                onMoveDown={handleMoveDown}
-                onHelp={handleHelp}
-                onAiEdit={handleAiEdit}
-                getTypeColor={getTypeColor}
-                getTypeIcon={getTypeIcon}
-                getTypeLabel={getTypeLabel}
-                theme={theme}
-                totalItems={items.length}
-              />
-            ))}
-          </SortableContext>
-        </DndContext>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<AddIcon />}
+              onClick={() => setAddSectionOpen(true)}
+              sx={{
+                borderRadius: 3,
+                textTransform: 'none',
+                fontWeight: 600,
+                px: 4,
+                py: 1.5,
+                fontSize: '1rem'
+              }}
+            >
+              Add Your First Section
+            </Button>
+          </Paper>
+        )}
       </Box>
 
-      {/* Empty State */}
-      {items.length === 0 && (
-        <Paper 
-          sx={{ 
-            textAlign: 'center', 
-            py: 8,
-            borderRadius: 3,
-            border: `2px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
-            backgroundColor: alpha(theme.palette.primary.main, 0.02)
-          }}
-        >
-          <PsychologyIcon 
-            sx={{ 
-              fontSize: 80, 
-              color: alpha(theme.palette.primary.main, 0.3),
-              mb: 2
-            }} 
-          />
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              fontWeight: 600,
-              color: theme.palette.text.primary,
-              mb: 1
-            }}
-          >
-            Start Building Your Template
-          </Typography>
-          <Typography 
-            variant="body1" 
-            sx={{ 
-              color: theme.palette.text.secondary,
-              mb: 4,
-              maxWidth: 500,
-              mx: 'auto'
-            }}
-          >
-            Add your first section to begin creating an AI-powered template that will generate intelligent content based on your specifications.
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            startIcon={<AddIcon />}
-            onClick={() => setAddSectionOpen(true)}
-            sx={{
-              borderRadius: 3,
-              textTransform: 'none',
-              fontWeight: 600,
-              px: 4,
-              py: 1.5,
-              fontSize: '1rem'
-            }}
-          >
-            Add Your First Section
-          </Button>
-        </Paper>
-      )}
-
+      {/* Dialogs */}
       <AddSectionOverlay
         open={addSectionOpen}
         onClose={() => setAddSectionOpen(false)}
@@ -917,7 +936,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         existingSections={items.map(item => ({ id: item.id, name: item.name }))}
       />
 
-      {/* Enhanced Help Dialog with Improved UX */}
+      {/* Help Dialog */}
       <Dialog 
         open={helpDialogOpen} 
         onClose={handleHelpClose}
@@ -1056,11 +1075,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
               textTransform: 'none',
               fontWeight: 600,
               px: 3,
-              py: 1,
-              background: bravoColors.button.gradient,
-              '&:hover': {
-                background: bravoColors.button.hover
-              }
+              py: 1
             }}
           >
             Update
@@ -1068,7 +1083,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         </DialogActions>
       </Dialog>
 
-      {/* AI Edit Dialog - Updated to remove description field */}
+      {/* AI Edit Dialog */}
       <Dialog 
         open={aiEditDialogOpen} 
         onClose={() => setAiEditDialogOpen(false)} 

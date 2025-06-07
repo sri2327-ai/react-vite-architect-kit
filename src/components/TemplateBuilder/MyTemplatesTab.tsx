@@ -82,14 +82,13 @@ const MyTemplatesTab: React.FC = () => {
   };
 
   const handleEditTemplate = (template: Template) => {
-    console.log('Editing template:', template);
+    console.log('Opening template editor for:', template);
     setSelectedTemplate(template);
     setIsEditorOpen(true);
   };
 
   const handleViewTemplate = (templateData: TemplateData) => {
     console.log('Viewing template:', templateData);
-    // Find template by matching title and type since IDs might be inconsistent
     const template = filteredTemplates.find(t => 
       t.name === templateData.title && t.visitTypes.includes(templateData.type)
     );
@@ -102,7 +101,6 @@ const MyTemplatesTab: React.FC = () => {
 
   const handleEditFromTable = (templateData: TemplateData) => {
     console.log('Editing template from table:', templateData);
-    // Find template by matching title and type since IDs might be inconsistent
     const template = filteredTemplates.find(t => 
       t.name === templateData.title && t.visitTypes.includes(templateData.type)
     );
@@ -119,6 +117,11 @@ const MyTemplatesTab: React.FC = () => {
       setIsEditorOpen(false);
       setSelectedTemplate(null);
     }
+  };
+
+  const handleCloseEditor = () => {
+    setIsEditorOpen(false);
+    setSelectedTemplate(null);
   };
 
   const handleDeleteTemplate = (templateId: string) => {
@@ -139,7 +142,6 @@ const MyTemplatesTab: React.FC = () => {
 
   const handleCopyFromTable = (templateData: TemplateData) => {
     console.log('Copying template from table:', templateData);
-    // Find template by matching title and type since IDs might be inconsistent
     const template = filteredTemplates.find(t => 
       t.name === templateData.title && t.visitTypes.includes(templateData.type)
     );
@@ -288,7 +290,7 @@ const MyTemplatesTab: React.FC = () => {
 
       <TemplateTable
         templates={filteredTemplates.map((template: Template) => ({
-          id: parseInt(template.id) || Math.random(),
+          id: parseInt(template.id.replace('template-', '')) || Math.random(),
           title: template.name,
           specialty: template.specialty,
           type: template.visitTypes[0] || 'General',
@@ -329,16 +331,18 @@ const MyTemplatesTab: React.FC = () => {
         onCreateTemplate={handleCreateTemplate}
       />
 
+      {/* Template Editor Dialog */}
       <Dialog
         open={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
+        onClose={handleCloseEditor}
         maxWidth="xl"
         fullWidth
         fullScreen={isMobile}
         PaperProps={{
           sx: {
             height: isMobile ? '100vh' : '90vh',
-            borderRadius: isMobile ? 0 : 3
+            borderRadius: isMobile ? 0 : 3,
+            m: isMobile ? 0 : 2
           }
         }}
       >
