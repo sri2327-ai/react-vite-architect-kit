@@ -147,8 +147,20 @@ const MyTemplatesTab: React.FC = () => {
         </Box>
 
         <TemplateFilters
-          visitTypes={visitTypes}
-          onFilter={setFilters}
+          searchTerm={filters.searchTerm}
+          onSearchChange={(value: string) => setFilters(prev => ({ ...prev, searchTerm: value }))}
+          selectedSpecialty={filters.specialty}
+          onSpecialtyChange={(value: string) => setFilters(prev => ({ ...prev, specialty: value }))}
+          selectedType={filters.visitType}
+          onTypeChange={(value: string) => setFilters(prev => ({ ...prev, visitType: value }))}
+          selectedTags={[]}
+          onTagsChange={() => {}}
+          sortBy="recent"
+          onSortChange={() => {}}
+          viewMode="all"
+          onViewModeChange={() => {}}
+          onClearFilters={() => setFilters({ visitType: '', specialty: '', searchTerm: '' })}
+          hasActiveFilters={!!(filters.visitType || filters.specialty || filters.searchTerm)}
         />
       </Box>
 
@@ -156,7 +168,12 @@ const MyTemplatesTab: React.FC = () => {
         {filteredTemplates.map((template: Template) => (
           <Grid item xs={12} sm={6} lg={4} key={template.id}>
             <TemplateCard
-              template={template}
+              template={{
+                ...template,
+                title: template.name,
+                type: template.visitTypes[0] || 'General',
+                fields: template.sections || []
+              }}
               onEdit={() => handleEditTemplate(template)}
               onDelete={() => handleDeleteTemplate(template.id)}
               onDuplicate={() => handleDuplicateTemplate(template)}
@@ -185,7 +202,7 @@ const MyTemplatesTab: React.FC = () => {
       <ImprovedTemplateCreationDialog
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
-        onCreate={handleCreateTemplate}
+        onSave={handleCreateTemplate}
         visitTypes={visitTypes}
       />
 
@@ -204,7 +221,7 @@ const MyTemplatesTab: React.FC = () => {
       >
         {selectedTemplate && (
           <DraggableTemplateEditor
-            templateData={selectedTemplate}
+            template={selectedTemplate}
             onSave={handleSaveTemplate}
             onClose={() => setIsEditorOpen(false)}
             visitTypes={visitTypes}
