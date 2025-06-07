@@ -1,42 +1,19 @@
+
 import React, { useState } from 'react';
-import { Box, Typography, Tabs, Tab, Paper, Alert, useTheme, useMediaQuery, Container, Chip } from '@mui/material';
-import { LibraryBooks as LibraryBooksIcon, Info as InfoIcon, AccountTree as AccountTreeIcon } from '@mui/icons-material';
+import { Box, Typography, useTheme, useMediaQuery, Container } from '@mui/material';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
 import { templateBuilderService } from '../../services/templateBuilderService';
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
+
+interface WorkflowBuilderProps {
+  activeTab?: 'my-workflows' | 'workflow-library';
 }
-function TabPanel(props: TabPanelProps) {
-  const {
-    children,
-    value,
-    index,
-    ...other
-  } = props;
-  return <div role="tabpanel" hidden={value !== index} id={`workflow-tabpanel-${index}`} aria-labelledby={`workflow-tab-${index}`} {...other}>
-      {value === index && <Box sx={{
-      pt: {
-        xs: 2,
-        sm: 3,
-        md: 4
-      }
-    }}>
-          {children}
-        </Box>}
-    </div>;
-}
-const WorkflowBuilder: React.FC = () => {
-  const [tabValue, setTabValue] = useState(0);
+
+const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ activeTab = 'my-workflows' }) => {
   const [importedWorkflows, setImportedWorkflows] = useState<any[]>([]);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
-  };
+
   const handleImportWorkflow = (workflow: any) => {
     // Get available visit types from template builder
     const availableVisitTypes = templateBuilderService.getAllVisitTypeNames();
@@ -61,169 +38,68 @@ const WorkflowBuilder: React.FC = () => {
       }))
     };
     setImportedWorkflows(prev => [...prev, importedWorkflow]);
-
-    // Stay on My Workflows tab to show the imported workflow
-    setTabValue(0);
   };
-  return <Container maxWidth="xl" sx={{
-    py: {
-      xs: 2,
-      sm: 3,
-      md: 4
-    },
-    px: {
-      xs: 1,
-      sm: 2,
-      md: 3
-    }
-  }}>
-      <Box sx={{
-      mb: {
-        xs: 2,
-        sm: 3,
-        md: 4
-      }
-    }}>
-        <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: {
-          xs: 1,
-          sm: 2
-        },
-        mb: 2,
-        flexDirection: {
-          xs: 'column',
-          sm: 'row'
-        },
-        textAlign: 'center'
-      }}>
-          <Box sx={{
-          width: '100%'
-        }}>
-            
-          </Box>
-        </Box>
-      </Box>
 
-      <Paper elevation={0} sx={{
-      width: '100%',
-      borderRadius: {
+  return (
+    <Container maxWidth="xl" sx={{
+      py: {
         xs: 2,
         sm: 3,
         md: 4
       },
-      overflow: 'hidden',
-      border: `1px solid ${theme.palette.divider}`,
-      backgroundColor: theme.palette.background.paper,
-      boxShadow: '0 8px 32px rgba(0,0,0,0.08)'
+      px: {
+        xs: 1,
+        sm: 2,
+        md: 3
+      }
     }}>
-        <Box sx={{
-        borderBottom: `2px solid ${theme.palette.divider}`,
-        backgroundColor: theme.palette.background.default
+      <Box sx={{
+        mb: {
+          xs: 2,
+          sm: 3,
+          md: 4
+        }
       }}>
-          <Tabs value={tabValue} onChange={handleTabChange} aria-label="workflow builder tabs" variant={isMobile ? "fullWidth" : "standard"} sx={{
-          '& .MuiTab-root': {
-            fontSize: {
-              xs: '0.75rem',
-              sm: '0.875rem',
-              md: '1rem'
-            },
-            fontWeight: 600,
-            textTransform: 'none',
-            minHeight: {
-              xs: 48,
-              sm: 56,
-              md: 64
-            },
-            px: {
-              xs: 1,
-              sm: 2,
-              md: 4
-            },
-            color: theme.palette.text.secondary,
-            '&.Mui-selected': {
-              color: theme.palette.success.main
-            },
-            '&:hover': {
-              color: theme.palette.success.main,
-              backgroundColor: theme.palette.action.hover
-            }
+        <Typography variant="h4" component="h1" sx={{
+          fontSize: {
+            xs: '1.5rem',
+            sm: '2rem',
+            md: '2.25rem'
           },
-          '& .MuiTabs-indicator': {
-            height: 3,
-            borderRadius: '3px 3px 0 0',
-            backgroundColor: theme.palette.success.main
-          }
+          fontWeight: 700,
+          color: theme.palette.text.primary,
+          mb: 1,
+          textAlign: 'center'
         }}>
-            <Tab icon={<AccountTreeIcon sx={{
-            mb: 0.5,
-            fontSize: {
-              xs: '1rem',
-              sm: '1.25rem'
-            }
-          }} />} iconPosition="start" label={<Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: {
-              xs: 0.5,
-              sm: 1
-            },
-            flexDirection: {
-              xs: 'column',
-              sm: 'row'
-            }
-          }}>
-                  <Typography variant="inherit" sx={{
-              fontSize: {
-                xs: '0.7rem',
-                sm: '0.875rem'
-              }
-            }}>
-                    My Workflows
-                  </Typography>
-                  {importedWorkflows.length > 0 && <Chip label={importedWorkflows.length} size="small" sx={{
-              height: {
-                xs: 16,
-                sm: 20
-              },
-              fontSize: {
-                xs: '0.65rem',
-                sm: '0.75rem'
-              },
-              backgroundColor: theme.palette.success.main,
-              color: 'white'
-            }} />}
-                </Box>} sx={{
-            flex: 1
-          }} />
-            <Tab icon={<LibraryBooksIcon sx={{
-            mb: 0.5,
-            fontSize: {
-              xs: '1rem',
-              sm: '1.25rem'
-            }
-          }} />} iconPosition="start" label={<Typography variant="inherit" sx={{
-            fontSize: {
-              xs: '0.7rem',
-              sm: '0.875rem'
-            }
-          }}>
-                  Workflow Library
-                </Typography>} sx={{
-            flex: 1
-          }} />
-          </Tabs>
-        </Box>
-        
-        <TabPanel value={tabValue} index={0}>
-          <MyWorkflows importedWorkflows={importedWorkflows} setImportedWorkflows={setImportedWorkflows} />
-        </TabPanel>
-        
-        <TabPanel value={tabValue} index={1}>
-          <WorkflowLibrary onImportWorkflow={handleImportWorkflow} />
-        </TabPanel>
-      </Paper>
-    </Container>;
+          {activeTab === 'my-workflows' ? 'My Workflows' : 'Workflow Library'}
+        </Typography>
+        <Typography variant="body1" sx={{
+          fontSize: {
+            xs: '0.875rem',
+            sm: '1rem'
+          },
+          color: theme.palette.text.secondary,
+          textAlign: 'center',
+          maxWidth: '600px',
+          mx: 'auto'
+        }}>
+          {activeTab === 'my-workflows' 
+            ? 'Create, edit, and manage your custom workflows'
+            : 'Browse and import pre-built workflows from our library'
+          }
+        </Typography>
+      </Box>
+
+      {activeTab === 'my-workflows' ? (
+        <MyWorkflows 
+          importedWorkflows={importedWorkflows} 
+          setImportedWorkflows={setImportedWorkflows} 
+        />
+      ) : (
+        <WorkflowLibrary onImportWorkflow={handleImportWorkflow} />
+      )}
+    </Container>
+  );
 };
+
 export default WorkflowBuilder;

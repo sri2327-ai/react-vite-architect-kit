@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -19,7 +18,8 @@ import {
   Slide,
   Avatar,
   Divider,
-  Paper
+  Paper,
+  Collapse
 } from '@mui/material';
 import { 
   LayoutTemplate, 
@@ -30,7 +30,11 @@ import {
   ChevronRight,
   Menu,
   X,
-  LogOut
+  LogOut,
+  Library,
+  FolderOpen,
+  ExpandMore,
+  ExpandLess
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { bravoColors } from '@/theme/colors';
@@ -49,15 +53,24 @@ interface MenuItem {
   id: string;
   label: string;
   icon: React.ReactNode;
-  component: React.ComponentType;
+  component?: React.ComponentType<any>;
   badge?: string;
   requiresEHR?: boolean;
+  subItems?: SubMenuItem[];
+}
+
+interface SubMenuItem {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  parentId: string;
 }
 
 export const Dashboard: React.FC = () => {
-  const [activeMenuItem, setActiveMenuItem] = useState<string>('template-builder');
+  const [activeMenuItem, setActiveMenuItem] = useState<string>('my-templates');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<string[]>(['templates', 'workflows']);
   
   const theme = useTheme();
   const navigate = useNavigate();
@@ -67,21 +80,47 @@ export const Dashboard: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
 
-  // Define menu items with EHR requirements
+  // Define menu items with submenus
   const allMenuItems: MenuItem[] = [
     {
-      id: 'template-builder',
-      label: 'Template Builder',
+      id: 'templates',
+      label: 'Templates',
       icon: <LayoutTemplate size={22} />,
-      component: TemplateBuilder
+      subItems: [
+        {
+          id: 'my-templates',
+          label: 'My Templates',
+          icon: <FolderOpen size={18} />,
+          parentId: 'templates'
+        },
+        {
+          id: 'template-library',
+          label: 'Template Library',
+          icon: <Library size={18} />,
+          parentId: 'templates'
+        }
+      ]
     },
     {
-      id: 'workflow-builder',
-      label: 'Workflow Builder',
+      id: 'workflows',
+      label: 'Workflows',
       icon: <Workflow size={22} />,
-      component: WorkflowBuilder,
       badge: 'New',
-      requiresEHR: true // Only show if EHR mode is enabled
+      requiresEHR: true,
+      subItems: [
+        {
+          id: 'my-workflows',
+          label: 'My Workflows',
+          icon: <FolderOpen size={18} />,
+          parentId: 'workflows'
+        },
+        {
+          id: 'workflow-library',
+          label: 'Workflow Library',
+          icon: <Library size={18} />,
+          parentId: 'workflows'
+        }
+      ]
     },
     {
       id: 'profile',
@@ -103,6 +142,25 @@ export const Dashboard: React.FC = () => {
   );
 
   const handleMenuItemClick = (itemId: string) => {
+    const item = menuItems.find(item => item.id === itemId);
+    
+    if (item?.subItems) {
+      // Toggle expansion for items with submenus
+      setExpandedItems(prev => 
+        prev.includes(itemId) 
+          ? prev.filter(id => id !== itemId)
+          : [...prev, itemId]
+      );
+    } else {
+      // For regular items or sub-items, set as active
+      setActiveMenuItem(itemId);
+      if (isMobile) {
+        setMobileOpen(false);
+      }
+    }
+  };
+
+  const handleSubMenuItemClick = (itemId: string) => {
     setActiveMenuItem(itemId);
     if (isMobile) {
       setMobileOpen(false);
@@ -122,7 +180,26 @@ export const Dashboard: React.FC = () => {
     navigate('/login');
   };
 
-  const ActiveComponent = menuItems.find(item => item.id === activeMenuItem)?.component || TemplateBuilder;
+  const getActiveComponent = () => {
+    switch (activeMenuItem) {
+      case 'my-templates':
+        return () => <TemplateBuilder activeTab="my-templates" />;
+      case 'template-library':
+        return () => <TemplateBuilder activeTab="template-library" />;
+      case 'my-workflows':
+        return () => <WorkflowBuilder activeTab="my-workflows" />;
+      case 'workflow-library':
+        return () => <WorkflowBuilder activeTab="workflow-library" />;
+      case 'profile':
+        return Profile;
+      case 'billing-history':
+        return BillingHistory;
+      default:
+        return () => <TemplateBuilder activeTab="my-templates" />;
+    }
+  };
+
+  const ActiveComponent = getActiveComponent();
   const drawerWidth = isCollapsed ? COLLAPSED_DRAWER_WIDTH : DRAWER_WIDTH;
 
   const DrawerContent = () => (
@@ -301,115 +378,209 @@ export const Dashboard: React.FC = () => {
       }}>
         <List sx={{ px: 0, py: 1 }}>
           {menuItems.map((item, index) => (
-            <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
-              <Tooltip 
-                title={isCollapsed && !isMobile ? item.label : ''} 
-                placement="right" 
-                arrow
-              >
-                <ListItemButton
-                  onClick={() => handleMenuItemClick(item.id)}
-                  selected={activeMenuItem === item.id}
-                  sx={{
-                    borderRadius: isMobile ? '14px' : '12px',
-                    mx: isMobile ? 1 : 1,
-                    minHeight: isMobile ? 56 : 52,
-                    justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
-                    px: isCollapsed && !isMobile ? 2 : isMobile ? 2.5 : 2.5,
-                    py: isMobile ? 1.5 : 1.25,
-                    color: 'rgba(255, 255, 255, 0.75)',
-                    backgroundColor: 'transparent',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: activeMenuItem === item.id 
-                        ? 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)'
-                        : 'transparent',
-                      borderRadius: 'inherit',
-                      transition: 'all 0.3s ease'
-                    },
-                    '&.Mui-selected': {
+            <React.Fragment key={item.id}>
+              <ListItem disablePadding sx={{ mb: 1 }}>
+                <Tooltip 
+                  title={isCollapsed && !isMobile ? item.label : ''} 
+                  placement="right" 
+                  arrow
+                >
+                  <ListItemButton
+                    onClick={() => handleMenuItemClick(item.id)}
+                    selected={item.subItems ? item.subItems.some(sub => sub.id === activeMenuItem) : activeMenuItem === item.id}
+                    sx={{
+                      borderRadius: isMobile ? '14px' : '12px',
+                      mx: isMobile ? 1 : 1,
+                      minHeight: isMobile ? 56 : 52,
+                      justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
+                      px: isCollapsed && !isMobile ? 2 : isMobile ? 2.5 : 2.5,
+                      py: isMobile ? 1.5 : 1.25,
+                      color: 'rgba(255, 255, 255, 0.75)',
                       backgroundColor: 'transparent',
-                      color: 'white',
-                      transform: isMobile ? 'none' : 'translateX(4px)',
-                      boxShadow: isMobile 
-                        ? '0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15)'
-                        : '0 4px 12px rgba(0,0,0,0.15)',
-                      border: isMobile ? '1px solid rgba(255,255,255,0.15)' : 'none',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: (item.subItems ? item.subItems.some(sub => sub.id === activeMenuItem) : activeMenuItem === item.id)
+                          ? 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)'
+                          : 'transparent',
+                        borderRadius: 'inherit',
+                        transition: 'all 0.3s ease'
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: 'transparent',
+                        color: 'white',
+                        transform: isMobile ? 'none' : 'translateX(4px)',
+                        boxShadow: isMobile 
+                          ? '0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15)'
+                          : '0 4px 12px rgba(0,0,0,0.15)',
+                        border: isMobile ? '1px solid rgba(255,255,255,0.15)' : 'none',
+                        '&:hover': {
+                          backgroundColor: 'transparent',
+                          transform: isMobile ? 'translateY(-1px)' : 'translateX(6px)',
+                          '&::before': {
+                            background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
+                          }
+                        }
+                      },
                       '&:hover': {
                         backgroundColor: 'transparent',
-                        transform: isMobile ? 'translateY(-1px)' : 'translateX(6px)',
+                        color: 'rgba(255, 255, 255, 0.95)',
+                        transform: isMobile ? 'translateY(-1px)' : 'translateX(2px)',
                         '&::before': {
-                          background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
+                          background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)'
                         }
                       }
-                    },
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                      color: 'rgba(255, 255, 255, 0.95)',
-                      transform: isMobile ? 'translateY(-1px)' : 'translateX(2px)',
-                      '&::before': {
-                        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)'
+                    }}
+                  >
+                    <ListItemIcon sx={{
+                      minWidth: isCollapsed && !isMobile ? 0 : (isMobile ? 44 : 40),
+                      color: 'inherit',
+                      justifyContent: 'center',
+                      position: 'relative',
+                      zIndex: 1,
+                      transition: 'transform 0.2s ease',
+                      '&:hover': {
+                        transform: 'scale(1.05)'
                       }
-                    }
-                  }}
-                >
-                  <ListItemIcon sx={{
-                    minWidth: isCollapsed && !isMobile ? 0 : (isMobile ? 44 : 40),
-                    color: 'inherit',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    zIndex: 1,
-                    transition: 'transform 0.2s ease',
-                    '&:hover': {
-                      transform: 'scale(1.05)'
-                    }
-                  }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  {(!isCollapsed || isMobile) && (
-                    <ListItemText
-                      primary={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <span>{item.label}</span>
-                          {item.badge && (
-                            <Paper
-                              elevation={0}
-                              sx={{
-                                backgroundColor: '#4CAF50',
-                                color: 'white',
-                                px: 1,
-                                py: 0.25,
-                                borderRadius: '10px',
-                                fontSize: '0.65rem',
-                                fontWeight: 600,
-                                letterSpacing: '0.3px'
-                              }}
-                            >
-                              {item.badge}
-                            </Paper>
-                          )}
-                        </Box>
-                      }
-                      primaryTypographyProps={{
-                        fontSize: isMobile ? '0.95rem' : '0.9rem',
-                        fontWeight: activeMenuItem === item.id ? 600 : 500,
-                        color: 'inherit',
-                        position: 'relative',
-                        zIndex: 1
-                      }}
-                    />
-                  )}
-                </ListItemButton>
-              </Tooltip>
-            </ListItem>
+                    }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    {(!isCollapsed || isMobile) && (
+                      <ListItemText
+                        primary={
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <span>{item.label}</span>
+                            {item.badge && (
+                              <Paper
+                                elevation={0}
+                                sx={{
+                                  backgroundColor: '#4CAF50',
+                                  color: 'white',
+                                  px: 1,
+                                  py: 0.25,
+                                  borderRadius: '10px',
+                                  fontSize: '0.65rem',
+                                  fontWeight: 600,
+                                  letterSpacing: '0.3px'
+                                }}
+                              >
+                                {item.badge}
+                              </Paper>
+                            )}
+                          </Box>
+                        }
+                        primaryTypographyProps={{
+                          fontSize: isMobile ? '0.95rem' : '0.9rem',
+                          fontWeight: (item.subItems ? item.subItems.some(sub => sub.id === activeMenuItem) : activeMenuItem === item.id) ? 600 : 500,
+                          color: 'inherit',
+                          position: 'relative',
+                          zIndex: 1
+                        }}
+                      />
+                    )}
+                    {(!isCollapsed || isMobile) && item.subItems && (
+                      <IconButton
+                        size="small"
+                        sx={{ 
+                          color: 'inherit',
+                          ml: 1,
+                          transition: 'transform 0.2s ease',
+                          transform: expandedItems.includes(item.id) ? 'rotate(180deg)' : 'rotate(0deg)'
+                        }}
+                      >
+                        <ExpandMore size={16} />
+                      </IconButton>
+                    )}
+                  </ListItemButton>
+                </Tooltip>
+              </ListItem>
+              
+              {/* Sub-menu items */}
+              {(!isCollapsed || isMobile) && item.subItems && (
+                <Collapse in={expandedItems.includes(item.id)} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {item.subItems.map((subItem) => (
+                      <ListItem key={subItem.id} disablePadding sx={{ mb: 0.5 }}>
+                        <ListItemButton
+                          onClick={() => handleSubMenuItemClick(subItem.id)}
+                          selected={activeMenuItem === subItem.id}
+                          sx={{
+                            borderRadius: isMobile ? '12px' : '10px',
+                            mx: isMobile ? 2 : 2,
+                            ml: isMobile ? 3 : 3,
+                            minHeight: isMobile ? 48 : 44,
+                            px: isMobile ? 2 : 2,
+                            py: isMobile ? 1 : 1,
+                            color: 'rgba(255, 255, 255, 0.6)',
+                            backgroundColor: 'transparent',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            '&::before': {
+                              content: '""',
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background: activeMenuItem === subItem.id 
+                                ? 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)'
+                                : 'transparent',
+                              borderRadius: 'inherit',
+                              transition: 'all 0.3s ease'
+                            },
+                            '&.Mui-selected': {
+                              backgroundColor: 'transparent',
+                              color: 'white',
+                              '&:hover': {
+                                backgroundColor: 'transparent',
+                                '&::before': {
+                                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)'
+                                }
+                              }
+                            },
+                            '&:hover': {
+                              backgroundColor: 'transparent',
+                              color: 'rgba(255, 255, 255, 0.85)',
+                              '&::before': {
+                                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%)'
+                              }
+                            }
+                          }}
+                        >
+                          <ListItemIcon sx={{
+                            minWidth: isMobile ? 36 : 32,
+                            color: 'inherit',
+                            justifyContent: 'center',
+                            position: 'relative',
+                            zIndex: 1
+                          }}>
+                            {subItem.icon}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={subItem.label}
+                            primaryTypographyProps={{
+                              fontSize: isMobile ? '0.85rem' : '0.8rem',
+                              fontWeight: activeMenuItem === subItem.id ? 600 : 400,
+                              color: 'inherit',
+                              position: 'relative',
+                              zIndex: 1
+                            }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    ))}
+                  </List>
+                </Collapse>
+              )}
+            </React.Fragment>
           ))}
         </List>
       </Box>
