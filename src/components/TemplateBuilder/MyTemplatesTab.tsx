@@ -9,9 +9,10 @@ import {
   useTheme,
   useMediaQuery,
   Container,
-  Divider
+  Tabs,
+  Tab
 } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon, Assignment as TemplateIcon, Category as VisitTypeIcon } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 import TemplateCard from './TemplateCard';
 import TemplateFilters from './TemplateFilters';
@@ -41,6 +42,7 @@ const MyTemplatesTab: React.FC = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState(0); // 0 for visit types, 1 for templates
   const [filters, setFilters] = useState({
     visitType: '',
     specialty: '',
@@ -102,117 +104,152 @@ const MyTemplatesTab: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
-      {/* Visit Type Management Section */}
-      <VisitTypeManager />
-      
-      <Divider sx={{ my: 4, borderColor: `${bravoColors.primary}20` }} />
-      
-      {/* Templates Section */}
-      <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mb: 3,
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: { xs: 2, sm: 0 }
-        }}>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              color: bravoColors.primaryFlat, 
-              fontWeight: 700,
-              textAlign: { xs: 'center', sm: 'left' }
-            }}
-          >
-            My Templates
-          </Typography>
-          
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setIsCreateDialogOpen(true)}
-            sx={{
-              backgroundColor: bravoColors.primaryFlat,
-              borderRadius: 3,
-              px: { xs: 3, md: 4 },
-              py: { xs: 1.5, md: 2 },
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
+        <Tabs 
+          value={activeTab} 
+          onChange={(_, newValue) => setActiveTab(newValue)}
+          sx={{
+            '& .MuiTab-root': {
               textTransform: 'none',
               fontWeight: 600,
-              fontSize: { xs: '0.9rem', md: '1rem' },
-              boxShadow: `0 4px 20px ${bravoColors.primaryFlat}40`,
-              '&:hover': {
-                backgroundColor: bravoColors.secondary,
-                transform: 'translateY(-2px)',
-                boxShadow: `0 6px 25px ${bravoColors.secondary}50`
-              },
-              transition: 'all 0.3s ease',
-              width: { xs: '100%', sm: 'auto' }
-            }}
-          >
-            Create New Template
-          </Button>
-        </Box>
-
-        <TemplateFilters
-          searchTerm={filters.searchTerm}
-          onSearchChange={(value: string) => setFilters(prev => ({ ...prev, searchTerm: value }))}
-          selectedSpecialty={filters.specialty}
-          onSpecialtyChange={(value: string) => setFilters(prev => ({ ...prev, specialty: value }))}
-          selectedType={filters.visitType}
-          onTypeChange={(value: string) => setFilters(prev => ({ ...prev, visitType: value }))}
-          selectedTags={[]}
-          onTagsChange={() => {}}
-          sortBy="recent"
-          onSortChange={() => {}}
-          viewMode="all"
-          onViewModeChange={() => {}}
-          onClearFilters={() => setFilters({ visitType: '', specialty: '', searchTerm: '' })}
-          hasActiveFilters={!!(filters.visitType || filters.specialty || filters.searchTerm)}
-        />
+              fontSize: '1rem',
+              color: 'text.secondary',
+              '&.Mui-selected': {
+                color: bravoColors.primaryFlat
+              }
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: bravoColors.primaryFlat,
+              height: 3
+            }
+          }}
+        >
+          <Tab 
+            icon={<VisitTypeIcon />} 
+            label="Visit Types" 
+            iconPosition="start"
+          />
+          <Tab 
+            icon={<TemplateIcon />} 
+            label="Templates" 
+            iconPosition="start"
+          />
+        </Tabs>
       </Box>
 
-      <Grid container spacing={{ xs: 2, md: 3 }}>
-        {filteredTemplates.map((template: Template) => (
-          <Grid key={template.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-            <TemplateCard
-              template={{
-                id: parseInt(template.id) || 0,
-                title: template.name,
-                specialty: template.specialty,
-                type: template.visitTypes[0] || 'General',
-                fields: template.sections || [],
-                content: template.description,
-                lastUsed: template.lastModified,
-                usageCount: 0,
-                isFavorite: false,
-                createdBy: 'You',
-                tags: template.visitTypes
-              }}
-              onView={() => handleEditTemplate(template)}
-              onEdit={() => handleEditTemplate(template)}
-              onCopy={() => handleDuplicateTemplate(template)}
-              onToggleFavorite={() => {}}
-            />
-          </Grid>
-        ))}
-      </Grid>
+      {activeTab === 0 && (
+        <VisitTypeManager />
+      )}
 
-      {filteredTemplates.length === 0 && (
-        <Box sx={{
-          textAlign: 'center',
-          py: 8,
-          color: 'text.secondary'
-        }}>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            No templates found
-          </Typography>
-          <Typography variant="body2">
-            {filters.visitType || filters.specialty || filters.searchTerm
-              ? 'Try adjusting your filters to see more templates.'
-              : 'Create your first template to get started.'}
-          </Typography>
-        </Box>
+      {activeTab === 1 && (
+        <>
+          <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              mb: 3,
+              flexDirection: { xs: 'column', sm: 'row' },
+              gap: { xs: 2, sm: 0 }
+            }}>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  color: bravoColors.primaryFlat, 
+                  fontWeight: 700,
+                  textAlign: { xs: 'center', sm: 'left' }
+                }}
+              >
+                My Templates
+              </Typography>
+              
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setIsCreateDialogOpen(true)}
+                sx={{
+                  backgroundColor: bravoColors.primaryFlat,
+                  borderRadius: 3,
+                  px: { xs: 3, md: 4 },
+                  py: { xs: 1.5, md: 2 },
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  fontSize: { xs: '0.9rem', md: '1rem' },
+                  boxShadow: `0 4px 20px ${bravoColors.primaryFlat}40`,
+                  '&:hover': {
+                    backgroundColor: bravoColors.secondary,
+                    transform: 'translateY(-2px)',
+                    boxShadow: `0 6px 25px ${bravoColors.secondary}50`
+                  },
+                  transition: 'all 0.3s ease',
+                  width: { xs: '100%', sm: 'auto' }
+                }}
+              >
+                Create New Template
+              </Button>
+            </Box>
+
+            <TemplateFilters
+              searchTerm={filters.searchTerm}
+              onSearchChange={(value: string) => setFilters(prev => ({ ...prev, searchTerm: value }))}
+              selectedSpecialty={filters.specialty}
+              onSpecialtyChange={(value: string) => setFilters(prev => ({ ...prev, specialty: value }))}
+              selectedType={filters.visitType}
+              onTypeChange={(value: string) => setFilters(prev => ({ ...prev, visitType: value }))}
+              selectedTags={[]}
+              onTagsChange={() => {}}
+              sortBy="recent"
+              onSortChange={() => {}}
+              viewMode="all"
+              onViewModeChange={() => {}}
+              onClearFilters={() => setFilters({ visitType: '', specialty: '', searchTerm: '' })}
+              hasActiveFilters={!!(filters.visitType || filters.specialty || filters.searchTerm)}
+            />
+          </Box>
+
+          <Grid container spacing={{ xs: 2, md: 3 }}>
+            {filteredTemplates.map((template: Template) => (
+              <Grid key={template.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                <TemplateCard
+                  template={{
+                    id: parseInt(template.id) || 0,
+                    title: template.name,
+                    specialty: template.specialty,
+                    type: template.visitTypes[0] || 'General',
+                    fields: template.sections || [],
+                    content: template.description,
+                    lastUsed: template.lastModified,
+                    usageCount: 0,
+                    isFavorite: false,
+                    createdBy: 'You',
+                    tags: template.visitTypes
+                  }}
+                  onView={() => handleEditTemplate(template)}
+                  onEdit={() => handleEditTemplate(template)}
+                  onCopy={() => handleDuplicateTemplate(template)}
+                  onToggleFavorite={() => {}}
+                />
+              </Grid>
+            ))}
+          </Grid>
+
+          {filteredTemplates.length === 0 && (
+            <Box sx={{
+              textAlign: 'center',
+              py: 8,
+              color: 'text.secondary'
+            }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                No templates found
+              </Typography>
+              <Typography variant="body2">
+                {filters.visitType || filters.specialty || filters.searchTerm
+                  ? 'Try adjusting your filters to see more templates.'
+                  : 'Create your first template to get started.'}
+              </Typography>
+            </Box>
+          )}
+        </>
       )}
 
       <ImprovedTemplateCreationDialog
