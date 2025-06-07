@@ -26,7 +26,7 @@ import {
 import { 
   Close as CloseIcon, 
   ArrowBack as ArrowBackIcon, 
-  FileText as FileTextIcon,
+  Description as DescriptionIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
   ExpandMore as ExpandMoreIcon,
@@ -218,7 +218,7 @@ const ExamListConfigDialog: React.FC<ExamListConfigDialogProps> = ({
                   alignItems: 'center'
                 }}
               >
-                <FileTextIcon sx={{ fontSize: 20, color: '#1976d2' }} />
+                <DescriptionIcon sx={{ fontSize: 20, color: '#1976d2' }} />
               </Box>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}>
