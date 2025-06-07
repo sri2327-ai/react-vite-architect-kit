@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -223,12 +222,11 @@ const TemplateLibraryTab: React.FC = () => {
       <Grid container spacing={{ xs: 2, sm: 3, md: 4 }}>
         {filteredTemplates.map((template) => (
           <Grid 
-            item
+            key={template.id}
             xs={12} 
             sm={6} 
             md={4} 
             lg={3}
-            key={template.id}
           >
             <Card 
               sx={{ 
