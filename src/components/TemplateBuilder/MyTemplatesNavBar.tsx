@@ -46,47 +46,53 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
       elevation={1}
       sx={{
         backgroundColor: 'background.paper',
-        borderRadius: 3,
-        p: { xs: 3, sm: 4 },
-        mb: { xs: 3, sm: 4 },
+        borderRadius: 2,
+        p: { xs: 2, sm: 2.5 },
+        mb: { xs: 2, sm: 2.5 },
         border: '1px solid',
         borderColor: 'divider'
       }}
     >
-      {/* Header Section */}
-      <Box sx={{ mb: 3 }}>
+      {/* Header Section - Compact */}
+      <Box sx={{ mb: 2 }}>
         <Typography
-          variant="h6"
+          variant="subtitle1"
           sx={{
             color: bravoColors.primaryFlat,
             fontWeight: 600,
-            mb: 1,
-            fontSize: { xs: '1.1rem', sm: '1.25rem' }
+            mb: 0.5,
+            fontSize: { xs: '1rem', sm: '1.1rem' }
           }}
         >
-          Template Management Workflow
+          Template Workflow
         </Typography>
         <Typography
           variant="body2"
           color="text.secondary"
-          sx={{ fontSize: { xs: '0.85rem', sm: '0.875rem' } }}
+          sx={{ fontSize: { xs: '0.8rem', sm: '0.85rem' } }}
         >
           {currentStep === 'visit-types' 
-            ? 'Step 1: Choose a visit type to manage its templates'
-            : `Step 2: Manage templates for ${selectedVisitType}`
+            ? 'Choose a visit type to manage templates'
+            : `Managing templates for ${selectedVisitType}`
           }
         </Typography>
       </Box>
 
-      {/* Workflow Steps */}
-      <Box sx={{ mb: 3 }}>
+      {/* Workflow Steps - Compact */}
+      <Box sx={{ mb: 2 }}>
         <Stepper 
           activeStep={currentStep === 'visit-types' ? 0 : 1} 
           alternativeLabel={!isMobile}
           orientation={isMobile ? 'vertical' : 'horizontal'}
           sx={{
             '& .MuiStepLabel-root': {
-              cursor: 'pointer'
+              cursor: 'pointer',
+              '& .MuiStepLabel-labelContainer': {
+                maxWidth: 'none'
+              }
+            },
+            '& .MuiStep-root': {
+              padding: { xs: '8px 0', sm: '8px' }
             }
           }}
         >
@@ -102,31 +108,31 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
                 } : {}
               }}
             >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <CategoryIcon fontSize="small" />
-                <Typography variant="body2" fontWeight={500}>
-                  Select Visit Type
+                <Typography variant="body2" fontWeight={500} sx={{ fontSize: '0.85rem' }}>
+                  Visit Type
                 </Typography>
               </Box>
             </StepLabel>
           </Step>
           <Step>
             <StepLabel>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                 <AssignmentIcon fontSize="small" />
-                <Typography variant="body2" fontWeight={500}>
-                  Manage Templates
+                <Typography variant="body2" fontWeight={500} sx={{ fontSize: '0.85rem' }}>
+                  Templates
                 </Typography>
                 {currentStep === 'templates' && (
                   <Chip
-                    label={`${templateCount} template${templateCount !== 1 ? 's' : ''}`}
+                    label={`${templateCount}`}
                     size="small"
                     sx={{
                       backgroundColor: `${bravoColors.primaryFlat}15`,
                       color: bravoColors.primaryFlat,
                       fontSize: '0.7rem',
-                      height: 20,
-                      ml: 1
+                      height: 18,
+                      ml: 0.5
                     }}
                   />
                 )}
@@ -136,15 +142,15 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
         </Stepper>
       </Box>
 
-      {/* Current Status & Actions */}
+      {/* Current Status & Actions - Compact */}
       <Box
         sx={{
           display: 'flex',
           flexDirection: { xs: 'column', sm: 'row' },
           alignItems: { xs: 'stretch', sm: 'center' },
           justifyContent: 'space-between',
-          gap: { xs: 2, sm: 3 },
-          pt: 2,
+          gap: { xs: 1.5, sm: 2 },
+          pt: 1.5,
           borderTop: '1px solid',
           borderColor: 'divider'
         }}
@@ -154,12 +160,12 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
           {currentStep === 'visit-types' ? (
             <Box>
               <Typography
-                variant="body1"
+                variant="body2"
                 sx={{
                   fontWeight: 600,
                   color: bravoColors.primaryFlat,
-                  mb: 0.5,
-                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                  mb: 0.25,
+                  fontSize: { xs: '0.85rem', sm: '0.9rem' }
                 }}
               >
                 Choose a Visit Type
@@ -167,14 +173,14 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
               >
-                Select from your existing visit types to view and manage their templates
+                Select to view and manage templates
               </Typography>
             </Box>
           ) : (
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
                 <Button
                   startIcon={<ArrowBackIcon />}
                   onClick={onBackToVisitTypes}
@@ -185,31 +191,31 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
                     fontWeight: 500,
                     minWidth: 'auto',
                     px: 1,
-                    fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                    fontSize: { xs: '0.75rem', sm: '0.8rem' }
                   }}
                 >
-                  Back to Visit Types
+                  Back
                 </Button>
               </Box>
               <Typography
-                variant="body1"
+                variant="body2"
                 sx={{
                   fontWeight: 600,
                   color: bravoColors.primaryFlat,
-                  mb: 0.5,
-                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                  mb: 0.25,
+                  fontSize: { xs: '0.85rem', sm: '0.9rem' }
                 }}
               >
-                Managing: {selectedVisitType}
+                {selectedVisitType}
               </Typography>
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
               >
                 {templateCount === 0 
-                  ? 'No templates yet. Create your first template to get started.'
-                  : `You have ${templateCount} template${templateCount !== 1 ? 's' : ''} for this visit type.`
+                  ? 'No templates yet. Create your first template.'
+                  : `${templateCount} template${templateCount !== 1 ? 's' : ''} available.`
                 }
               </Typography>
             </Box>
@@ -225,11 +231,11 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
           sx={{
             backgroundColor: bravoColors.primaryFlat,
             borderRadius: 2,
-            px: { xs: 3, sm: 4 },
-            py: { xs: 1.5, sm: 2 },
+            px: { xs: 2.5, sm: 3 },
+            py: { xs: 1, sm: 1.5 },
             textTransform: 'none',
             fontWeight: 600,
-            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            fontSize: { xs: '0.8rem', sm: '0.85rem' },
             boxShadow: currentStep === 'templates' ? `0 4px 20px ${bravoColors.primaryFlat}40` : 'none',
             minWidth: { xs: '100%', sm: 'auto' },
             '&:hover': {
@@ -244,7 +250,7 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
             transition: 'all 0.3s ease'
           }}
         >
-          {currentStep === 'visit-types' ? 'Select Visit Type First' : 'Create New Template'}
+          {currentStep === 'visit-types' ? 'Select Visit Type First' : 'Create Template'}
         </Button>
       </Box>
     </Paper>
