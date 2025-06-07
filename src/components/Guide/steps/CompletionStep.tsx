@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Card, Button, Grid2 as Grid, Alert } from '@mui/material';
+import { Box, Typography, Card, Button, Grid, Alert } from '@mui/material';
 import { Launch as LaunchIcon, Link as LinkIcon } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
@@ -63,7 +63,7 @@ const CompletionStep: React.FC = () => {
 
       <Grid container spacing={3} sx={{ maxWidth: 800, mx: 'auto', mb: 4 }}>
         {quickLinks.map((link, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
+          <Grid item xs={12} sm={6} md={4} key={index}>
             <Card sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Typography variant="h6" gutterBottom>
                 {link.title}

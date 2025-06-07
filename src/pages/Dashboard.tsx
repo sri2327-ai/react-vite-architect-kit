@@ -1,12 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Container, useTheme, useMediaQuery } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { TemplateBuilder } from '@/components/TemplateBuilder';
-import { WorkflowBuilder } from '@/components/WorkflowBuilder';
+import WorkflowBuilder from '@/components/WorkflowBuilder';
 import { PrimaryButton } from '@/components/ui';
 import { bravoColors } from '@/theme/colors';
-import { GuideModal } from '@/components/Guide/GuideModal';
+import GuideModal from '@/components/Guide/GuideModal';
 import { useGuide } from '@/contexts/GuideContext';
 
 interface TabPanelProps {

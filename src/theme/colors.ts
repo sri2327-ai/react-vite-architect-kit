@@ -35,5 +35,6 @@ export const bravoColors = {
     hover: '#F8FBFF',
     border: '#D6E8F5',
     accent: '#E8F4F8',
-  }
+  },
+  grey900: '#0F172A',
 };
