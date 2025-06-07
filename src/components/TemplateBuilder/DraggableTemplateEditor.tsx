@@ -487,16 +487,18 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
     }
   }, [onSave]);
 
-  const handleAddSection = useCallback((sectionTemplate: any) => {
+  const handleAddSection = useCallback((sectionTemplate: any, position: number) => {
     const newItem: TemplateItem = {
       id: `section-${Date.now()}`,
       name: sectionTemplate.name,
-      type: sectionTemplate.category?.toLowerCase() || 'custom',
+      type: sectionTemplate.type || sectionTemplate.category?.toLowerCase() || 'custom',
       content: sectionTemplate.description || 'AI will generate content based on the instructions below.',
       description: 'A.I. will write content following the guidelines below.'
     };
 
-    const newItems = [...items, newItem];
+    // Insert at the specified position
+    const newItems = [...items];
+    newItems.splice(position, 0, newItem);
     setItems(newItems);
     setShowAddSection(false);
     
@@ -505,7 +507,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       onSave(newItems);
     }
     
-    console.log('Section added successfully:', newItem);
+    console.log('Section added successfully at position:', position, newItem);
   }, [items, onSave]);
 
   const handleEditItem = useCallback((id: string) => {
@@ -747,6 +749,11 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         open={showAddSection}
         onClose={() => setShowAddSection(false)}
         onAddSection={handleAddSection}
+        existingSections={items.map(item => ({
+          id: item.id,
+          name: item.name,
+          type: item.type
+        }))}
       />
 
       {/* Edit Dialog */}
