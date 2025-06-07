@@ -205,7 +205,9 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
 
   const handlePlaceSection = (position: number) => {
     if (selectedSection) {
-      onAddSection({ ...selectedSection, position });
+      // Create a new object with position for the onAddSection callback
+      const sectionWithPosition = { ...selectedSection, position };
+      onAddSection(sectionWithPosition);
       setSelectedSection(null);
       setPlacementDialogOpen(false);
       onClose();
