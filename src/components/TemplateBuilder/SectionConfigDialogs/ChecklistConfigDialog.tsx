@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -10,23 +10,24 @@ import {
   Box,
   Typography,
   IconButton,
-  Stack,
   Paper,
+  Stack,
   Divider,
   Alert,
   Chip,
-  Card,
-  CardContent,
-  Tooltip
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  FormControlLabel,
+  Switch
 } from '@mui/material';
-import {
-  Close as CloseIcon,
-  ArrowBack as ArrowBackIcon,
-  CheckCircle as CheckCircleIcon,
+import { 
+  Close as CloseIcon, 
+  ArrowBack as ArrowBackIcon, 
+  CheckBox as CheckBoxIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
-  KeyboardArrowUp as MoveUpIcon,
-  KeyboardArrowDown as MoveDownIcon,
+  ExpandMore as ExpandMoreIcon,
   Lightbulb as LightbulbIcon
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
@@ -34,13 +35,19 @@ import { alpha } from '@mui/material/styles';
 interface ChecklistItem {
   id: string;
   buttonName: string;
-  textToAdd: string;
+  text: string;
 }
 
 interface ChecklistConfigDialogProps {
   open: boolean;
   onClose: () => void;
-  onContinue: (config: { title: string; items: ChecklistItem[] }) => void;
+  onContinue: (config: {
+    title: string;
+    instructions: string;
+    checklistItems: ChecklistItem[];
+    notDiscussedBehavior: string;
+    hideEmptyItems: boolean;
+  }) => void;
   onBack: () => void;
 }
 
@@ -51,12 +58,17 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
   onBack
 }) => {
   const [title, setTitle] = useState('');
-  const [items, setItems] = useState<ChecklistItem[]>([
-    { id: '1', buttonName: '', textToAdd: '' }
+  const [instructions, setInstructions] = useState('');
+  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([
+    { id: '1', buttonName: 'Normal', text: 'Normal examination findings' },
+    { id: '2', buttonName: 'Abnormal', text: 'Abnormal findings noted' }
   ]);
+  const [notDiscussedBehavior, setNotDiscussedBehavior] = useState('omit');
+  const [hideEmptyItems, setHideEmptyItems] = useState(false);
   const [titleError, setTitleError] = useState('');
+  const [instructionsError, setInstructionsError] = useState('');
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     let isValid = true;
     
     if (!title.trim()) {
@@ -66,77 +78,91 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
       setTitleError('');
     }
     
-    return isValid && items.every(item => item.buttonName.trim() && item.textToAdd.trim());
-  };
+    if (!instructions.trim()) {
+      setInstructionsError('Instructions are required');
+      isValid = false;
+    } else {
+      setInstructionsError('');
+    }
+    
+    return isValid;
+  }, [title, instructions]);
 
-  const addItem = () => {
+  const handleContinue = useCallback(() => {
+    if (validateForm()) {
+      onContinue({
+        title: title.trim(),
+        instructions: instructions.trim(),
+        checklistItems,
+        notDiscussedBehavior,
+        hideEmptyItems
+      });
+    }
+  }, [title, instructions, checklistItems, notDiscussedBehavior, hideEmptyItems, validateForm, onContinue]);
+
+  const addChecklistItem = useCallback(() => {
     const newItem: ChecklistItem = {
       id: Date.now().toString(),
       buttonName: '',
-      textToAdd: ''
+      text: ''
     };
-    setItems([...items, newItem]);
-  };
+    setChecklistItems(prev => [...prev, newItem]);
+  }, []);
 
-  const removeItem = (id: string) => {
-    if (items.length > 1) {
-      setItems(items.filter(item => item.id !== id));
-    }
-  };
+  const removeChecklistItem = useCallback((id: string) => {
+    setChecklistItems(prev => prev.filter(item => item.id !== id));
+  }, []);
 
-  const moveItem = (id: string, direction: 'up' | 'down') => {
-    const index = items.findIndex(item => item.id === id);
-    if (
-      (direction === 'up' && index > 0) ||
-      (direction === 'down' && index < items.length - 1)
-    ) {
-      const newItems = [...items];
-      const targetIndex = direction === 'up' ? index - 1 : index + 1;
-      [newItems[index], newItems[targetIndex]] = [newItems[targetIndex], newItems[index]];
-      setItems(newItems);
-    }
-  };
-
-  const updateItem = (id: string, field: 'buttonName' | 'textToAdd', value: string) => {
-    setItems(items.map(item =>
+  const updateChecklistItem = useCallback((id: string, field: keyof ChecklistItem, value: string) => {
+    setChecklistItems(prev => prev.map(item => 
       item.id === id ? { ...item, [field]: value } : item
     ));
-  };
-
-  const handleContinue = () => {
-    if (validateForm()) {
-      onContinue({ title: title.trim(), items });
-    }
-  };
+  }, []);
 
   const exampleTemplates = [
     {
-      label: "Vitals",
-      title: "Vital Signs Checklist",
+      label: "Physical Exam",
+      title: "Physical Examination",
+      instructions: "Document examination findings for each system",
       items: [
-        { buttonName: "Normal BP", textToAdd: "Blood pressure within normal limits" },
-        { buttonName: "Normal HR", textToAdd: "Heart rate regular and within normal range" }
+        { buttonName: "Normal", text: "Normal examination findings" },
+        { buttonName: "Abnormal", text: "Abnormal findings noted" },
+        { buttonName: "Not Examined", text: "Not examined during this visit" }
       ]
     },
     {
-      label: "Follow-up", 
-      title: "Follow-up Instructions",
+      label: "Review of Systems",
+      title: "Review of Systems", 
+      instructions: "Review each body system with the patient",
       items: [
-        { buttonName: "RTC 1 week", textToAdd: "Return to clinic in 1 week" },
-        { buttonName: "Call if worse", textToAdd: "Call office if symptoms worsen" }
+        { buttonName: "Negative", text: "Patient denies symptoms" },
+        { buttonName: "Positive", text: "Patient reports symptoms" },
+        { buttonName: "Not Asked", text: "Not discussed during visit" }
+      ]
+    },
+    {
+      label: "Medications",
+      title: "Current Medications",
+      instructions: "Review patient's current medication list",
+      items: [
+        { buttonName: "Continuing", text: "Continue current medication" },
+        { buttonName: "Discontinued", text: "Medication discontinued" },
+        { buttonName: "Modified", text: "Dosage or frequency modified" }
       ]
     }
   ];
 
-  const handleExampleClick = (example: typeof exampleTemplates[0]) => {
+  const handleExampleClick = useCallback((example: typeof exampleTemplates[0]) => {
     setTitle(example.title);
-    setItems(example.items.map((item, index) => ({
+    setInstructions(example.instructions);
+    setChecklistItems(example.items.map((item, index) => ({
       id: (Date.now() + index).toString(),
       buttonName: item.buttonName,
-      textToAdd: item.textToAdd
+      text: item.text
     })));
     setTitleError('');
-  };
+    setInstructionsError('');
+  }, []);
 
   return (
     <Dialog 
@@ -168,21 +194,21 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
             <Box display="flex" alignItems="center" gap={1.5}>
               <Box 
                 sx={{
-                  backgroundColor: alpha('#9c27b0', 0.1),
+                  backgroundColor: alpha('#4caf50', 0.1),
                   p: 1,
                   borderRadius: 2,
                   display: 'flex',
                   alignItems: 'center'
                 }}
               >
-                <CheckCircleIcon sx={{ fontSize: 20, color: '#7b1fa2' }} />
+                <CheckBoxIcon sx={{ fontSize: 20, color: '#2e7d32' }} />
               </Box>
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}>
                   Configure Checklist Section
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                  Clickable buttons for quick text insertion
+                  Create clickable buttons with associated text
                 </Typography>
               </Box>
             </Box>
@@ -206,7 +232,7 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
         <Stack spacing={3}>
           <Alert 
             severity="info" 
-            icon={<CheckCircleIcon />}
+            icon={<CheckBoxIcon />}
             sx={{ 
               borderRadius: 2,
               '& .MuiAlert-message': { fontSize: '0.875rem' }
@@ -216,7 +242,7 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
               How Checklists Work
             </Typography>
             <Typography variant="body2">
-              Create clickable buttons that insert predefined text into your notes. Each button click adds the exact corresponding text - no AI generation involved.
+              Create clickable buttons that insert predefined text when selected. Perfect for standardized examinations, reviews, or assessments.
             </Typography>
           </Alert>
 
@@ -236,8 +262,8 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
                   sx={{
                     borderRadius: 2,
                     '&:hover': {
-                      backgroundColor: alpha('#9c27b0', 0.05),
-                      borderColor: '#9c27b0'
+                      backgroundColor: alpha('#4caf50', 0.05),
+                      borderColor: '#4caf50'
                     }
                   }}
                 />
@@ -247,13 +273,13 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
 
           <TextField
             fullWidth
-            label="Checklist Title"
+            label="Section Title"
             value={title}
             onChange={(e) => {
               setTitle(e.target.value);
               if (titleError) setTitleError('');
             }}
-            placeholder="e.g., Quick Actions, Common Findings"
+            placeholder="e.g., Physical Examination, Review of Systems"
             variant="outlined"
             size="small"
             error={!!titleError}
@@ -265,116 +291,131 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
             }}
           />
 
+          <TextField
+            fullWidth
+            label="Instructions for AI"
+            multiline
+            rows={3}
+            value={instructions}
+            onChange={(e) => {
+              setInstructions(e.target.value);
+              if (instructionsError) setInstructionsError('');
+            }}
+            placeholder="Describe what this checklist is for and how it should be used..."
+            variant="outlined"
+            error={!!instructionsError}
+            helperText={instructionsError || "Guide the AI on how to use this checklist"}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2
+              }
+            }}
+          />
+
           <Box>
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-              What buttons do you want to include?
-            </Typography>
-            
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                Checklist Items
+              </Typography>
+              <Button
+                onClick={addChecklistItem}
+                startIcon={<AddIcon />}
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600
+                }}
+              >
+                Add Item
+              </Button>
+            </Box>
+
             <Stack spacing={2}>
-              {items.map((item, index) => (
-                <Card 
-                  key={item.id} 
+              {checklistItems.map((item, index) => (
+                <Paper 
+                  key={item.id}
                   sx={{ 
-                    border: '2px solid', 
-                    borderColor: 'grey.200',
-                    '&:hover': { borderColor: 'primary.light' },
-                    transition: 'border-color 0.2s'
+                    p: 2, 
+                    border: '1px solid', 
+                    borderColor: 'grey.200', 
+                    borderRadius: 2,
+                    backgroundColor: alpha('#f5f5f5', 0.3)
                   }}
                 >
-                  <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Chip 
-                        label={`Button ${index + 1}`} 
-                        size="small" 
-                        color="primary" 
-                        variant="outlined"
-                      />
-                      <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        <Tooltip title="Move Up">
-                          <IconButton 
-                            size="small" 
-                            onClick={() => moveItem(item.id, 'up')}
-                            disabled={index === 0}
-                          >
-                            <MoveUpIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Move Down">
-                          <IconButton 
-                            size="small" 
-                            onClick={() => moveItem(item.id, 'down')}
-                            disabled={index === items.length - 1}
-                          >
-                            <MoveDownIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                        {items.length > 1 && (
-                          <Tooltip title="Delete">
-                            <IconButton 
-                              size="small" 
-                              onClick={() => removeItem(item.id)}
-                              sx={{ color: 'error.main' }}
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                      </Box>
-                    </Box>
-                    
-                    <Stack spacing={2}>
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    <Box sx={{ flex: 1 }}>
                       <TextField
                         fullWidth
-                        label="Button Name"
+                        label="Button Text"
                         value={item.buttonName}
-                        onChange={(e) => updateItem(item.id, 'buttonName', e.target.value)}
+                        onChange={(e) => updateChecklistItem(item.id, 'buttonName', e.target.value)}
+                        placeholder="e.g., Normal, Abnormal"
                         variant="outlined"
                         size="small"
-                        placeholder="e.g., Normal BP, Follow-up"
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: 2
-                          }
+                        sx={{ 
+                          mb: 2,
+                          '& .MuiOutlinedInput-root': { borderRadius: 1.5 }
                         }}
                       />
-                      
                       <TextField
                         fullWidth
-                        label="Text to insert when clicked"
-                        value={item.textToAdd}
-                        onChange={(e) => updateItem(item.id, 'textToAdd', e.target.value)}
+                        label="Text to Insert"
+                        value={item.text}
+                        onChange={(e) => updateChecklistItem(item.id, 'text', e.target.value)}
+                        placeholder="Text that will be inserted when button is clicked"
+                        variant="outlined"
+                        size="small"
                         multiline
                         rows={2}
-                        variant="outlined"
-                        size="small"
-                        placeholder="Enter the exact text that will be added to the note..."
                         sx={{
-                          '& .MuiOutlinedInput-root': {
-                            borderRadius: 2
-                          }
+                          '& .MuiOutlinedInput-root': { borderRadius: 1.5 }
                         }}
                       />
-                    </Stack>
-                  </CardContent>
-                </Card>
+                    </Box>
+                    {checklistItems.length > 1 && (
+                      <IconButton
+                        onClick={() => removeChecklistItem(item.id)}
+                        size="small"
+                        sx={{
+                          color: 'error.main',
+                          backgroundColor: alpha('#f44336', 0.05),
+                          '&:hover': { backgroundColor: alpha('#f44336', 0.1) },
+                          mt: 0.5
+                        }}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </Box>
+                </Paper>
               ))}
             </Stack>
-
-            <Button
-              startIcon={<AddIcon />}
-              onClick={addItem}
-              variant="outlined"
-              sx={{ 
-                mt: 2, 
-                textTransform: 'none',
-                borderStyle: 'dashed',
-                '&:hover': { borderStyle: 'solid' },
-                borderRadius: 2
-              }}
-            >
-              Add Another Button
-            </Button>
           </Box>
+
+          <Accordion sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200', borderRadius: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                ⚙️ Advanced Options
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Stack spacing={2}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={hideEmptyItems}
+                      onChange={(e) => setHideEmptyItems(e.target.checked)}
+                      color="primary"
+                    />
+                  }
+                  label="Hide items with no selection"
+                  sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.875rem' } }}
+                />
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
         </Stack>
       </DialogContent>
 
@@ -398,7 +439,7 @@ const ChecklistConfigDialog: React.FC<ChecklistConfigDialogProps> = ({
           variant="contained"
           size="medium"
           onClick={handleContinue}
-          disabled={!validateForm()}
+          disabled={!title.trim() || !instructions.trim() || checklistItems.length === 0}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
