@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
+import { templateBuilderService } from '../services/templateBuilderService';
 
 interface Template {
   id: string;
@@ -28,6 +29,9 @@ export const useTemplateData = (useApi: boolean = false) => {
     visitType: '',
     searchTerm: ''
   });
+
+  // Get visit types from templateBuilderService
+  const visitTypes = templateBuilderService.getAllVisitTypeNames();
 
   useEffect(() => {
     if (useApi) {
@@ -121,6 +125,7 @@ export const useTemplateData = (useApi: boolean = false) => {
     error,
     filters,
     setFilters,
+    visitTypes,
     createTemplate,
     updateTemplate,
     deleteTemplate,

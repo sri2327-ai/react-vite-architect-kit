@@ -22,17 +22,12 @@ import { useApiContext } from '@/contexts/ApiContext';
 interface Template {
   id: string;
   name: string;
-  visitType: string;
+  description: string;
+  sections: any[];
+  visitTypes: string[];
   specialty: string;
-  tags: string[];
-  sections: Array<{
-    id: string;
-    title: string;
-    content: string;
-    type: string;
-  }>;
-  createdAt: string;
-  updatedAt: string;
+  lastModified: string;
+  isActive: boolean;
 }
 
 const MyTemplatesTab: React.FC = () => {
@@ -51,7 +46,16 @@ const MyTemplatesTab: React.FC = () => {
   });
 
   const handleCreateTemplate = (templateData: any) => {
-    createTemplate(templateData);
+    // Convert the templateData to match our Template interface
+    const newTemplateData = {
+      name: templateData.name,
+      description: templateData.description || '',
+      sections: templateData.sections || [],
+      visitTypes: templateData.visitTypes || [],
+      specialty: templateData.specialty || '',
+      isActive: true
+    };
+    createTemplate(newTemplateData);
     setIsCreateDialogOpen(false);
   };
 
@@ -74,19 +78,22 @@ const MyTemplatesTab: React.FC = () => {
 
   const handleDuplicateTemplate = (template: Template) => {
     const duplicatedTemplate = {
-      ...template,
       name: `${template.name} (Copy)`,
-      id: undefined
+      description: template.description,
+      sections: template.sections,
+      visitTypes: template.visitTypes,
+      specialty: template.specialty,
+      isActive: template.isActive
     };
     createTemplate(duplicatedTemplate);
   };
 
   const filteredTemplates = templates.filter((template: Template) => {
-    const matchesVisitType = !filters.visitType || template.visitType === filters.visitType;
+    const matchesVisitType = !filters.visitType || template.visitTypes.includes(filters.visitType);
     const matchesSpecialty = !filters.specialty || template.specialty === filters.specialty;
     const matchesSearch = !filters.searchTerm || 
       template.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-      template.tags.some(tag => tag.toLowerCase().includes(filters.searchTerm.toLowerCase()));
+      template.description.toLowerCase().includes(filters.searchTerm.toLowerCase());
     
     return matchesVisitType && matchesSpecialty && matchesSearch;
   });
@@ -140,9 +147,8 @@ const MyTemplatesTab: React.FC = () => {
         </Box>
 
         <TemplateFilters
-          filters={filters}
-          onFiltersChange={setFilters}
           visitTypes={visitTypes}
+          onFilter={setFilters}
         />
       </Box>
 
@@ -179,7 +185,7 @@ const MyTemplatesTab: React.FC = () => {
       <ImprovedTemplateCreationDialog
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
-        onSave={handleCreateTemplate}
+        onCreate={handleCreateTemplate}
         visitTypes={visitTypes}
       />
 
@@ -198,7 +204,7 @@ const MyTemplatesTab: React.FC = () => {
       >
         {selectedTemplate && (
           <DraggableTemplateEditor
-            template={selectedTemplate}
+            templateData={selectedTemplate}
             onSave={handleSaveTemplate}
             onClose={() => setIsEditorOpen(false)}
             visitTypes={visitTypes}
