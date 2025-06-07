@@ -41,8 +41,8 @@ interface TemplateData {
 
 interface TemplateTableProps {
   templates: TemplateData[];
-  onView: (template: TemplateData) => void;
-  onEdit: (template: TemplateData) => void;
+  onView?: (template: TemplateData) => void;
+  onEdit?: (template: TemplateData) => void;
   onCopy?: (template: TemplateData) => void;
   onToggleFavorite?: (template: TemplateData) => void;
 }
@@ -77,15 +77,31 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
     }
   };
 
-  const handleToggleFavorite = (template: TemplateData) => {
-    if (onToggleFavorite) {
-      onToggleFavorite(template);
+  const handleView = (template: TemplateData) => {
+    console.log('View button clicked for template:', template);
+    if (onView) {
+      onView(template);
+    }
+  };
+
+  const handleEdit = (template: TemplateData) => {
+    console.log('Edit button clicked for template:', template);
+    if (onEdit) {
+      onEdit(template);
     }
   };
 
   const handleCopy = (template: TemplateData) => {
+    console.log('Copy button clicked for template:', template);
     if (onCopy) {
       onCopy(template);
+    }
+  };
+
+  const handleToggleFavorite = (template: TemplateData) => {
+    console.log('Favorite button clicked for template:', template);
+    if (onToggleFavorite) {
+      onToggleFavorite(template);
     }
   };
 
@@ -131,8 +147,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
               key={template.id}
               sx={{ 
                 '&:hover': { 
-                  backgroundColor: 'grey.50',
-                  cursor: 'pointer'
+                  backgroundColor: 'grey.50'
                 },
                 borderBottom: '1px solid',
                 borderColor: 'divider'
@@ -142,10 +157,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <IconButton
                     size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleFavorite(template);
-                    }}
+                    onClick={() => handleToggleFavorite(template)}
                     sx={{ p: 0.5 }}
                   >
                     {template.isFavorite ? (
@@ -255,10 +267,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                   <Tooltip title="View Template">
                     <IconButton
                       size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onView(template);
-                      }}
+                      onClick={() => handleView(template)}
                       sx={{
                         backgroundColor: bravoColors.secondary,
                         color: 'white',
@@ -274,10 +283,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                   <Tooltip title="Edit Template">
                     <IconButton
                       size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEdit(template);
-                      }}
+                      onClick={() => handleEdit(template)}
                       sx={{
                         backgroundColor: bravoColors.primaryFlat,
                         color: 'white',
@@ -293,10 +299,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                   <Tooltip title="Duplicate Template">
                     <IconButton
                       size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopy(template);
-                      }}
+                      onClick={() => handleCopy(template)}
                       sx={{
                         backgroundColor: 'rgba(0,0,0,0.1)',
                         '&:hover': {

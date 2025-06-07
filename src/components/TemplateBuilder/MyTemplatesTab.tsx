@@ -72,11 +72,29 @@ const MyTemplatesTab: React.FC = () => {
     setIsEditorOpen(true);
   };
 
-  const handleViewTemplate = (templateData: any) => {
+  const handleViewTemplate = (templateData: TemplateData) => {
     console.log('Viewing template:', templateData);
-    const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
+    // Find template by matching title and type since IDs might be inconsistent
+    const template = filteredTemplates.find(t => 
+      t.name === templateData.title && t.visitTypes.includes(templateData.type)
+    );
     if (template) {
       handleEditTemplate(template);
+    } else {
+      console.error('Template not found for viewing:', templateData);
+    }
+  };
+
+  const handleEditFromTable = (templateData: TemplateData) => {
+    console.log('Editing template from table:', templateData);
+    // Find template by matching title and type since IDs might be inconsistent
+    const template = filteredTemplates.find(t => 
+      t.name === templateData.title && t.visitTypes.includes(templateData.type)
+    );
+    if (template) {
+      handleEditTemplate(template);
+    } else {
+      console.error('Template not found for editing:', templateData);
     }
   };
 
@@ -104,15 +122,20 @@ const MyTemplatesTab: React.FC = () => {
     createTemplate(duplicatedTemplate);
   };
 
-  const handleCopyFromTable = (templateData: any) => {
+  const handleCopyFromTable = (templateData: TemplateData) => {
     console.log('Copying template from table:', templateData);
-    const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
+    // Find template by matching title and type since IDs might be inconsistent
+    const template = filteredTemplates.find(t => 
+      t.name === templateData.title && t.visitTypes.includes(templateData.type)
+    );
     if (template) {
       handleDuplicateTemplate(template);
+    } else {
+      console.error('Template not found for copying:', templateData);
     }
   };
 
-  const handleToggleFavorite = (templateData: any) => {
+  const handleToggleFavorite = (templateData: TemplateData) => {
     console.log('Toggling favorite for template:', templateData);
     // Implement favorite toggle logic here if needed
   };
@@ -250,7 +273,7 @@ const MyTemplatesTab: React.FC = () => {
 
       <TemplateTable
         templates={filteredTemplates.map((template: Template) => ({
-          id: parseInt(template.id) || 0,
+          id: parseInt(template.id) || Math.random(),
           title: template.name,
           specialty: template.specialty,
           type: template.visitTypes[0] || 'General',
@@ -263,10 +286,7 @@ const MyTemplatesTab: React.FC = () => {
           tags: template.visitTypes
         }))}
         onView={handleViewTemplate}
-        onEdit={(templateData) => {
-          const template = filteredTemplates.find(t => parseInt(t.id) === templateData.id);
-          if (template) handleEditTemplate(template);
-        }}
+        onEdit={handleEditFromTable}
         onCopy={handleCopyFromTable}
         onToggleFavorite={handleToggleFavorite}
       />
