@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -397,15 +396,26 @@ const MyTemplatesTab: React.FC = () => {
       {filteredTemplates.length === 0 && (
         <Box sx={{
           textAlign: 'center',
-          py: { xs: 4, sm: 6, md: 8 },
+          py: { xs: 3, sm: 4, md: 6, lg: 8 },
+          px: { xs: 1.5, sm: 2, md: 3 },
           color: 'text.secondary',
-          px: { xs: 2, sm: 3 }
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: { xs: '200px', sm: '250px', md: '300px' },
+          maxWidth: { xs: '100%', sm: '600px' },
+          mx: 'auto'
         }}>
           <Typography 
             variant="h6" 
             sx={{ 
-              mb: 2,
-              fontSize: { xs: '1.1rem', sm: '1.25rem' }
+              mb: { xs: 1.5, sm: 2 },
+              fontSize: { xs: '1rem', sm: '1.15rem', md: '1.25rem' },
+              fontWeight: 600,
+              lineHeight: 1.3,
+              textAlign: 'center',
+              wordBreak: 'break-word'
             }}
           >
             No templates found for {selectedVisitType?.name}
@@ -413,9 +423,12 @@ const MyTemplatesTab: React.FC = () => {
           <Typography 
             variant="body2"
             sx={{
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              maxWidth: '600px',
-              mx: 'auto'
+              fontSize: { xs: '0.8rem', sm: '0.875rem', md: '1rem' },
+              lineHeight: { xs: 1.4, sm: 1.5 },
+              textAlign: 'center',
+              maxWidth: '100%',
+              wordBreak: 'break-word',
+              color: 'text.secondary'
             }}
           >
             {filters.specialty
