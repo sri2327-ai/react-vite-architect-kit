@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Card, Grid, Button, Alert } from '@mui/material';
-import { CheckCircle, Rocket, HelpCircle, Refresh, ExternalLink } from '@mui/icons-material';
+import { Box, Typography, Card, Button, Alert } from '@mui/material';
+import { CheckCircle, Rocket, Help, Refresh, Launch } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
 const CompletionStep: React.FC = () => {
@@ -31,7 +31,7 @@ const CompletionStep: React.FC = () => {
       title: 'Need Help?',
       description: 'Access documentation and support',
       action: 'View Help Resources',
-      icon: <HelpCircle />
+      icon: <Help />
     }
   ];
 
@@ -78,41 +78,44 @@ const CompletionStep: React.FC = () => {
         Quick Actions to Get Started
       </Typography>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+        gap: 3, 
+        mb: 4 
+      }}>
         {quickLinks.map((link, index) => (
-          <Grid xs={12} sm={6} md={4} key={index}>
-            <Card sx={{ 
-              p: 3, 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              transition: 'transform 0.2s, box-shadow 0.2s',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: 4
-              }
-            }}>
-              <Box sx={{ color: 'primary.main', mb: 2 }}>
-                {link.icon}
-              </Box>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                {link.title}
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 2, flex: 1 }}>
-                {link.description}
-              </Typography>
-              <Button 
-                variant="outlined" 
-                size="small"
-                endIcon={<ExternalLink size={16} />}
-                sx={{ alignSelf: 'flex-start' }}
-              >
-                {link.action}
-              </Button>
-            </Card>
-          </Grid>
+          <Card key={index} sx={{ 
+            p: 3, 
+            height: '100%', 
+            display: 'flex', 
+            flexDirection: 'column',
+            transition: 'transform 0.2s, box-shadow 0.2s',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: 4
+            }
+          }}>
+            <Box sx={{ color: 'primary.main', mb: 2 }}>
+              {link.icon}
+            </Box>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+              {link.title}
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 2, flex: 1 }}>
+              {link.description}
+            </Typography>
+            <Button 
+              variant="outlined" 
+              size="small"
+              endIcon={<Launch fontSize="small" />}
+              sx={{ alignSelf: 'flex-start' }}
+            >
+              {link.action}
+            </Button>
+          </Card>
         ))}
-      </Grid>
+      </Box>
 
       <Box sx={{ p: 3, backgroundColor: 'action.hover', borderRadius: 2, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
@@ -133,7 +136,7 @@ const CompletionStep: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
         <Button
           variant="outlined"
-          startIcon={<Refresh size={16} />}
+          startIcon={<Refresh fontSize="small" />}
           onClick={resetGuide}
           size="small"
         >
@@ -142,7 +145,7 @@ const CompletionStep: React.FC = () => {
         
         <Button
           variant="outlined"
-          startIcon={<HelpCircle size={16} />}
+          startIcon={<Help fontSize="small" />}
           size="small"
         >
           Get Support

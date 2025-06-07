@@ -15,7 +15,7 @@ import {
   useTheme,
   useMediaQuery
 } from '@mui/material';
-import { X, ArrowBack, ArrowForward, SkipForward } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, SkipForward } from 'lucide-react';
 import { useGuide } from '@/contexts/GuideContext';
 import { bravoColors } from '@/theme/colors';
 import WelcomeStep from './steps/WelcomeStep';
@@ -200,7 +200,7 @@ const GuideModal: React.FC = () => {
         <Button
           onClick={prevStep}
           disabled={guideState.currentStep === 0}
-          startIcon={<ArrowBack size={16} />}
+          startIcon={<ArrowLeft size={16} />}
           sx={{ visibility: guideState.currentStep === 0 ? 'hidden' : 'visible' }}
         >
           Previous
@@ -212,7 +212,7 @@ const GuideModal: React.FC = () => {
               variant="contained"
               onClick={nextStep}
               disabled={!guideState.canProceed}
-              endIcon={<ArrowForward size={16} />}
+              endIcon={<ArrowRight size={16} />}
               sx={{
                 background: bravoColors.primary,
                 '&:hover': {

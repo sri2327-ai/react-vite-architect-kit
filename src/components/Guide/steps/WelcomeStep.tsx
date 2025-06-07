@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Card, Grid } from '@mui/material';
+import { Box, Typography, Card } from '@mui/material';
 import { Description as TemplateIcon, AccountTree as WorkflowIcon, Star as StarIcon } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
@@ -29,43 +29,43 @@ const WelcomeStep: React.FC = () => {
             to create a complete documentation system that integrates with your EHR.
           </Typography>
 
-          <Grid container spacing={3} sx={{ maxWidth: 800, mx: 'auto' }}>
-            <Grid xs={12} md={4}>
-              <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
-                <TemplateIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Step 1: Templates
-                </Typography>
-                <Typography variant="body2">
-                  Create note templates for different visit types
-                </Typography>
-              </Card>
-            </Grid>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+            gap: 3, 
+            maxWidth: 800, 
+            mx: 'auto' 
+          }}>
+            <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
+              <TemplateIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Step 1: Templates
+              </Typography>
+              <Typography variant="body2">
+                Create note templates for different visit types
+              </Typography>
+            </Card>
             
-            <Grid xs={12} md={4}>
-              <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
-                <WorkflowIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Step 2: Workflows
-                </Typography>
-                <Typography variant="body2">
-                  Set up automated workflows for your EHR system
-                </Typography>
-              </Card>
-            </Grid>
+            <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
+              <WorkflowIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Step 2: Workflows
+              </Typography>
+              <Typography variant="body2">
+                Set up automated workflows for your EHR system
+              </Typography>
+            </Card>
             
-            <Grid xs={12} md={4}>
-              <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
-                <StarIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Step 3: Go Live
-                </Typography>
-                <Typography variant="body2">
-                  Start using your configured system with your EHR
-                </Typography>
-              </Card>
-            </Grid>
-          </Grid>
+            <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
+              <StarIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Step 3: Go Live
+              </Typography>
+              <Typography variant="body2">
+                Start using your configured system with your EHR
+              </Typography>
+            </Card>
+          </Box>
         </>
       ) : (
         <>
@@ -74,31 +74,33 @@ const WelcomeStep: React.FC = () => {
             that you can use independently for your clinical documentation needs.
           </Typography>
 
-          <Grid container spacing={4} sx={{ maxWidth: 600, mx: 'auto' }}>
-            <Grid xs={12} md={6}>
-              <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
-                <TemplateIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Create Templates
-                </Typography>
-                <Typography variant="body2">
-                  Build customized note templates for your practice
-                </Typography>
-              </Card>
-            </Grid>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+            gap: 4, 
+            maxWidth: 600, 
+            mx: 'auto' 
+          }}>
+            <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
+              <TemplateIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Create Templates
+              </Typography>
+              <Typography variant="body2">
+                Build customized note templates for your practice
+              </Typography>
+            </Card>
             
-            <Grid xs={12} md={6}>
-              <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
-                <StarIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h6" gutterBottom>
-                  Start Documenting
-                </Typography>
-                <Typography variant="body2">
-                  Use your templates for efficient clinical documentation
-                </Typography>
-              </Card>
-            </Grid>
-          </Grid>
+            <Card sx={{ p: 3, height: '100%', textAlign: 'center' }}>
+              <StarIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Start Documenting
+              </Typography>
+              <Typography variant="body2">
+                Use your templates for efficient clinical documentation
+              </Typography>
+            </Card>
+          </Box>
         </>
       )}
 

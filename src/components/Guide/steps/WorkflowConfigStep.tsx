@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Card, Alert, Grid } from '@mui/material';
-import { Settings, Assignment, Schedule, Mapping } from '@mui/icons-material';
+import { Box, Typography, Card, Alert } from '@mui/material';
+import { Settings, Assignment, Schedule, ShareLocation } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
 const WorkflowConfigStep: React.FC = () => {
@@ -28,60 +28,64 @@ const WorkflowConfigStep: React.FC = () => {
         </Typography>
       </Alert>
 
-      <Grid container spacing={3}>
-        <Grid xs={12} md={6}>
-          <Card sx={{ p: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Assignment sx={{ color: 'primary.main', mr: 1 }} />
-              <Typography variant="h6">Template Mapping</Typography>
-            </Box>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Connect your existing templates to different visit types in the workflow.
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+        gap: 3 
+      }}>
+        <Card sx={{ p: 3, height: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Assignment sx={{ color: 'primary.main', mr: 1 }} />
+            <Typography variant="h6">Template Mapping</Typography>
+          </Box>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Connect your existing templates to different visit types in the workflow.
+          </Typography>
+          <Box component="ul" sx={{ pl: 2, m: 0 }}>
+            <Typography variant="body2" component="li" color="text.secondary">
+              Map templates to appointment types
             </Typography>
-            <Box component="ul" sx={{ pl: 2, m: 0 }}>
-              <Typography variant="body2" component="li" color="text.secondary">
-                Map templates to appointment types
-              </Typography>
-              <Typography variant="body2" component="li" color="text.secondary">
-                Set default templates for each scenario
-              </Typography>
-              <Typography variant="body2" component="li" color="text.secondary">
-                Configure template variations
-              </Typography>
-            </Box>
-          </Card>
-        </Grid>
+            <Typography variant="body2" component="li" color="text.secondary">
+              Set default templates for each scenario
+            </Typography>
+            <Typography variant="body2" component="li" color="text.secondary">
+              Configure template variations
+            </Typography>
+          </Box>
+        </Card>
 
-        <Grid xs={12} md={6}>
-          <Card sx={{ p: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Schedule sx={{ color: 'primary.main', mr: 1 }} />
-              <Typography variant="h6">Scheduling Setup</Typography>
-            </Box>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Define when and how notes should be generated based on appointments.
+        <Card sx={{ p: 3, height: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Schedule sx={{ color: 'primary.main', mr: 1 }} />
+            <Typography variant="h6">Scheduling Setup</Typography>
+          </Box>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Define when and how notes should be generated based on appointments.
+          </Typography>
+          <Box component="ul" sx={{ pl: 2, m: 0 }}>
+            <Typography variant="body2" component="li" color="text.secondary">
+              Set provider preferences
             </Typography>
-            <Box component="ul" sx={{ pl: 2, m: 0 }}>
-              <Typography variant="body2" component="li" color="text.secondary">
-                Set provider preferences
-              </Typography>
-              <Typography variant="body2" component="li" color="text.secondary">
-                Configure location settings
-              </Typography>
-              <Typography variant="body2" component="li" color="text.secondary">
-                Define timing rules
-              </Typography>
-            </Box>
-          </Card>
-        </Grid>
-      </Grid>
+            <Typography variant="body2" component="li" color="text.secondary">
+              Configure location settings
+            </Typography>
+            <Typography variant="body2" component="li" color="text.secondary">
+              Define timing rules
+            </Typography>
+          </Box>
+        </Card>
+      </Box>
 
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
           Configuration Process
         </Typography>
         
-        <Grid container spacing={2}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+          gap: 2 
+        }}>
           {[
             { 
               icon: <Settings />, 
@@ -90,7 +94,7 @@ const WorkflowConfigStep: React.FC = () => {
               step: '1'
             },
             { 
-              icon: <Mapping />, 
+              icon: <ShareLocation />, 
               title: 'Map Templates', 
               desc: 'Select which templates to use for each visit type',
               step: '2'
@@ -108,40 +112,38 @@ const WorkflowConfigStep: React.FC = () => {
               step: '4'
             }
           ].map((item, index) => (
-            <Grid xs={12} sm={6} md={3} key={index}>
-              <Card sx={{ p: 2, textAlign: 'center', height: '100%', position: 'relative' }}>
-                <Box 
-                  sx={{ 
-                    position: 'absolute', 
-                    top: 8, 
-                    right: 8, 
-                    backgroundColor: 'primary.main', 
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: 24,
-                    height: 24,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.875rem',
-                    fontWeight: 600
-                  }}
-                >
-                  {item.step}
-                </Box>
-                <Box sx={{ color: 'primary.main', mb: 1, mt: 2 }}>
-                  {item.icon}
-                </Box>
-                <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                  {item.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                  {item.desc}
-                </Typography>
-              </Card>
-            </Grid>
+            <Card key={index} sx={{ p: 2, textAlign: 'center', height: '100%', position: 'relative' }}>
+              <Box 
+                sx={{ 
+                  position: 'absolute', 
+                  top: 8, 
+                  right: 8, 
+                  backgroundColor: 'primary.main', 
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: 24,
+                  height: 24,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.875rem',
+                  fontWeight: 600
+                }}
+              >
+                {item.step}
+              </Box>
+              <Box sx={{ color: 'primary.main', mb: 1, mt: 2 }}>
+                {item.icon}
+              </Box>
+              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                {item.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                {item.desc}
+              </Typography>
+            </Card>
           ))}
-        </Grid>
+        </Box>
       </Box>
 
       <Alert severity="info" sx={{ mt: 4 }}>

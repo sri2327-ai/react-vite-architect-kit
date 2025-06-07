@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Box, Typography, Card, Alert, Button } from '@mui/material';
-import { Description, Add, LibraryBig, Visibility } from '@mui/icons-material';
+import { Description, Add, LocalLibrary, Visibility } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
 const TemplateBuilderTour: React.FC = () => {
@@ -46,7 +46,7 @@ const TemplateBuilderTour: React.FC = () => {
 
         <Card sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <LibraryBig sx={{ color: 'primary.main', mr: 1 }} />
+            <LocalLibrary sx={{ color: 'primary.main', mr: 1 }} />
             <Typography variant="h6">Template Library</Typography>
           </Box>
           <Typography variant="body2" sx={{ mb: 2 }}>

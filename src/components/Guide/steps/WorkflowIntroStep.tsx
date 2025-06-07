@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { Box, Typography, Card, Grid, Alert } from '@mui/material';
+import { Box, Typography, Card, Alert } from '@mui/material';
 import { AccountTree, Integration, AutoMode, Timeline } from '@mui/icons-material';
 import { useGuide } from '@/contexts/GuideContext';
 
@@ -28,73 +28,75 @@ const WorkflowIntroStep: React.FC = () => {
         </Typography>
       </Alert>
 
-      <Grid container spacing={3}>
-        <Grid xs={12} md={6}>
-          <Card sx={{ p: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <Integration sx={{ color: 'primary.main', mr: 1, fontSize: 32 }} />
-              <Typography variant="h6">What are Workflows?</Typography>
-            </Box>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Workflows connect your note templates to your EHR system, automatically creating documentation based on appointment types.
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              When a patient appointment is scheduled, the workflow automatically:
-              • Detects the appointment type
-              • Selects the appropriate template
-              • Pre-fills patient information
-              • Schedules note generation
-            </Typography>
-          </Card>
-        </Grid>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)' },
+        gap: 3 
+      }}>
+        <Card sx={{ p: 3, height: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Integration sx={{ color: 'primary.main', mr: 1, fontSize: 32 }} />
+            <Typography variant="h6">What are Workflows?</Typography>
+          </Box>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Workflows connect your note templates to your EHR system, automatically creating documentation based on appointment types.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            When a patient appointment is scheduled, the workflow automatically:
+            • Detects the appointment type
+            • Selects the appropriate template
+            • Pre-fills patient information
+            • Schedules note generation
+          </Typography>
+        </Card>
 
-        <Grid xs={12} md={6}>
-          <Card sx={{ p: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <AutoMode sx={{ color: 'primary.main', mr: 1, fontSize: 32 }} />
-              <Typography variant="h6">Automation Benefits</Typography>
-            </Box>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Save time and reduce errors with automated note generation that adapts to your practice patterns.
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Benefits include:
-              • Consistent documentation standards
-              • Reduced manual data entry
-              • Automatic appointment detection
-              • Customizable scheduling rules
-            </Typography>
-          </Card>
-        </Grid>
-      </Grid>
+        <Card sx={{ p: 3, height: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <AutoMode sx={{ color: 'primary.main', mr: 1, fontSize: 32 }} />
+            <Typography variant="h6">Automation Benefits</Typography>
+          </Box>
+          <Typography variant="body2" sx={{ mb: 2 }}>
+            Save time and reduce errors with automated note generation that adapts to your practice patterns.
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Benefits include:
+            • Consistent documentation standards
+            • Reduced manual data entry
+            • Automatic appointment detection
+            • Customizable scheduling rules
+          </Typography>
+        </Card>
+      </Box>
 
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
           How Workflows Work in Your Practice
         </Typography>
         
-        <Grid container spacing={2}>
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
+          gap: 2 
+        }}>
           {[
             { icon: <Timeline />, title: 'Appointment Scheduled', desc: 'Patient books appointment in your EHR system' },
             { icon: <AccountTree />, title: 'Workflow Triggered', desc: 'System detects appointment type and activates workflow' },
             { icon: <Integration />, title: 'Template Selected', desc: 'Appropriate note template is automatically chosen' },
             { icon: <AutoMode />, title: 'Note Generated', desc: 'Documentation is created and ready for your review' }
           ].map((step, index) => (
-            <Grid xs={12} sm={6} md={3} key={index}>
-              <Card sx={{ p: 2, textAlign: 'center', height: '100%' }}>
-                <Box sx={{ color: 'primary.main', mb: 1 }}>
-                  {step.icon}
-                </Box>
-                <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                  {step.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                  {step.desc}
-                </Typography>
-              </Card>
-            </Grid>
+            <Card key={index} sx={{ p: 2, textAlign: 'center', height: '100%' }}>
+              <Box sx={{ color: 'primary.main', mb: 1 }}>
+                {step.icon}
+              </Box>
+              <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
+                {step.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                {step.desc}
+              </Typography>
+            </Card>
           ))}
-        </Grid>
+        </Box>
       </Box>
 
       <Box sx={{ mt: 4, p: 3, backgroundColor: 'action.hover', borderRadius: 2 }}>
