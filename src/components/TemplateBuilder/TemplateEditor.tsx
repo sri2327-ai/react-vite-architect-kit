@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
 
 interface TemplateItem {
@@ -74,12 +74,19 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     ]
   );
 
-  const [hasProcessedCreatedTemplate, setHasProcessedCreatedTemplate] = useState(false);
+  // Use useRef to track if we've already processed the created template data
+  const processedTemplateRef = useRef<any>(null);
 
-  // Handle navigation when a template is created - only process once
+  // Handle navigation when a template is created - only process once per unique template
   useEffect(() => {
-    if (createdTemplateData && createdTemplateData.redirectToEditor && !hasProcessedCreatedTemplate) {
-      setHasProcessedCreatedTemplate(true);
+    // Only process if we have createdTemplateData, it has redirectToEditor flag, 
+    // and we haven't processed this exact template data before
+    if (createdTemplateData && 
+        createdTemplateData.redirectToEditor && 
+        processedTemplateRef.current !== createdTemplateData) {
+      
+      // Mark this template data as processed
+      processedTemplateRef.current = createdTemplateData;
       
       // Convert created template data to template items based on method
       const newItems: TemplateItem[] = [];
@@ -233,7 +240,7 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
         onNavigateToEditor();
       }
     }
-  }, [createdTemplateData, onNavigateToEditor, hasProcessedCreatedTemplate]);
+  }, [createdTemplateData, onNavigateToEditor]);
 
   const handleSave = useCallback((items: TemplateItem[]) => {
     setCurrentItems(items);
