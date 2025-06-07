@@ -4,7 +4,7 @@ import {
   Box,
   Typography,
   Button,
-  Grid,
+  Grid2 as Grid,
   Dialog,
   useTheme,
   useMediaQuery,
@@ -166,17 +166,25 @@ const MyTemplatesTab: React.FC = () => {
 
       <Grid container spacing={{ xs: 2, md: 3 }}>
         {filteredTemplates.map((template: Template) => (
-          <Grid item xs={12} sm={6} lg={4} key={template.id}>
+          <Grid xs={12} sm={6} lg={4} key={template.id}>
             <TemplateCard
               template={{
-                ...template,
+                id: parseInt(template.id) || 0,
                 title: template.name,
+                specialty: template.specialty,
                 type: template.visitTypes[0] || 'General',
-                fields: template.sections || []
+                fields: template.sections || [],
+                content: template.description,
+                lastUsed: template.lastModified,
+                usageCount: 0,
+                isFavorite: false,
+                createdBy: 'You',
+                tags: template.visitTypes
               }}
+              onView={() => handleEditTemplate(template)}
               onEdit={() => handleEditTemplate(template)}
-              onDelete={() => handleDeleteTemplate(template.id)}
-              onDuplicate={() => handleDuplicateTemplate(template)}
+              onCopy={() => handleDuplicateTemplate(template)}
+              onToggleFavorite={() => {}}
             />
           </Grid>
         ))}
