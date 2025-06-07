@@ -1,425 +1,178 @@
 
 import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  TextField,
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Card, 
   Alert,
   CircularProgress,
-  Button,
-  Chip,
-  InputAdornment,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  IconButton
+  Checkbox,
+  FormControlLabel
 } from '@mui/material';
-import { CreditCard, CheckCircle, LocalOffer, ArrowBack, Close } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { PrimaryButton, SecondaryButton } from '@/components/ui/Buttons';
+import { CheckCircle, CreditCard, Security } from '@mui/icons-material';
+import { SignupData } from '../SignupFlow';
+import { useGuide } from '@/contexts/GuideContext';
 
 interface PaymentProps {
   onBack: () => void;
-  data: any;
+  data: Partial<SignupData>;
 }
 
 export const Payment: React.FC<PaymentProps> = ({ onBack, data }) => {
-  const [loading, setLoading] = useState(false);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
-  const [promoCode, setPromoCode] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [discount, setDiscount] = useState(0);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const navigate = useNavigate();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const { startGuide } = useGuide();
 
-  const zohoPaymentUrl = "https://zohosecurepay.com/books/s10aiinc/securepay?CInvoiceID=2-cab38e1b3e20ae6086682ef94096c3e79c3170a50e8a1445eae7a317be3fe45a83a8fc305b6392e6c032b46515559313bfd7df8d54ea98406754244081b9ca6aab2e67f7acee8330";
-
-  const handleApplyPromo = () => {
-    if (promoCode.toLowerCase() === 'save20') {
-      setPromoApplied(true);
-      setDiscount(20);
-    } else {
-      setPromoApplied(false);
-      setDiscount(0);
-    }
-  };
-
-  const handlePayNow = () => {
-    setShowPaymentModal(true);
-  };
-
-  const handleClosePaymentModal = () => {
-    setShowPaymentModal(false);
-  };
-
-  const handlePaymentSuccess = () => {
-    setPaymentSuccess(true);
-    setShowPaymentModal(false);
+  const handlePayment = async () => {
+    setIsProcessing(true);
+    
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsProcessing(false);
+    setPaymentCompleted(true);
+    
+    // Start the implementation guide after successful payment
     setTimeout(() => {
-      navigate('/login', { 
-        state: { 
-          message: 'Payment successful! Please log in with your credentials to activate your account.',
-          requiresOtpVerification: true,
-          email: data.email
-        }
-      });
-    }, 2000);
+      const userMode = data.ehrMode ? 'ehr' : 'standalone';
+      startGuide(userMode);
+    }, 1500);
   };
 
-  // Listen for payment success from iframe
-  React.useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.origin === 'https://zohosecurepay.com' && event.data === 'payment_success') {
-        handlePaymentSuccess();
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  if (paymentSuccess) {
+  if (paymentCompleted) {
     return (
       <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
+        textAlign: 'center', 
+        py: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
-        textAlign: 'center'
+        minHeight: 400
       }}>
-        <CheckCircle sx={{ fontSize: 80, color: '#4caf50', mb: 2 }} />
-        <Typography variant="h5" gutterBottom sx={{ color: '#4caf50', fontWeight: 600 }}>
-          Payment Successful!
+        <CheckCircle sx={{ fontSize: 80, color: 'success.main', mb: 3 }} />
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600, color: 'success.main' }}>
+          Welcome to S10.AI! 🎉
         </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-          Your subscription has been activated successfully.
+        <Typography variant="h6" sx={{ mb: 3, color: 'text.secondary' }}>
+          Your account has been successfully created
         </Typography>
+        <Alert severity="info" sx={{ mb: 3, maxWidth: 500 }}>
+          <Typography variant="body2">
+            Your implementation guide will start automatically to help you get set up with 
+            {data.ehrMode ? ' your EHR-integrated' : ' your standalone'} clinical documentation system.
+          </Typography>
+        </Alert>
         <Typography variant="body2" color="text.secondary">
-          Redirecting you to login screen...
+          If the guide doesn't appear, you can always access it from your dashboard.
         </Typography>
-        <CircularProgress size={24} sx={{ mt: 2, color: '#4caf50' }} />
       </Box>
     );
   }
-
-  const originalPrice = 99.99;
-  const finalPrice = originalPrice - (originalPrice * discount / 100);
 
   return (
     <Box sx={{ 
       display: 'flex', 
       flexDirection: 'column', 
       height: '100%',
-      maxHeight: '100%',
-      overflow: 'hidden'
+      overflow: 'auto'
     }}>
       {/* Header */}
-      <Box sx={{ textAlign: 'center', mb: 3, flexShrink: 0 }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 700,
-            color: '#4caf50',
-            mb: 2,
-            fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' }
-          }}
-        >
-          Complete Your Subscription
+      <Box sx={{ textAlign: 'center', mb: 4, flexShrink: 0 }}>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+          Complete Your Setup
         </Typography>
-        <Typography
-          variant="h6"
-          color="text.secondary"
-          sx={{ 
-            fontWeight: 500,
-            fontSize: { xs: '1rem', sm: '1.125rem' }
-          }}
-        >
-          Secure payment powered by Zoho
+        <Typography variant="body1" color="text.secondary">
+          Final step to activate your S10.AI account
         </Typography>
       </Box>
 
-      {/* Scrollable Content Area */}
-      <Box sx={{ 
-        flex: 1, 
-        overflow: 'auto',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 3,
-        minHeight: 0
-      }}>
-        {/* Subscription Summary */}
-        <Card sx={{ 
-          border: '1px solid', 
-          borderColor: '#e0e7ff',
-          backgroundColor: 'background.paper',
-          flexShrink: 0
-        }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom sx={{ color: '#4caf50', fontWeight: 600 }}>
-              S10.AI Pro Plan
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, lineHeight: 1.6 }}>
-              Full access to clinical workflows, templates, and EHR integration
-            </Typography>
-            
-            {/* Pricing */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="body1" fontWeight={600}>
-                Subscription Price:
-              </Typography>
-              <Typography 
-                variant="h5" 
-                sx={{ 
-                  color: promoApplied ? 'text.secondary' : '#4caf50',
-                  fontWeight: 700,
-                  textDecoration: promoApplied ? 'line-through' : 'none'
-                }}
-              >
-                ${originalPrice.toFixed(2)}
-              </Typography>
-            </Box>
-
-            {promoApplied && (
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <Typography variant="body1" fontWeight={600} sx={{ color: '#4caf50' }}>
-                    After {discount}% discount:
-                  </Typography>
-                  <Chip 
-                    label={`${discount}% OFF`} 
-                    size="small" 
-                    sx={{ 
-                      ml: 1,
-                      backgroundColor: '#e8f5e8',
-                      color: '#4caf50',
-                      fontWeight: 600
-                    }} 
-                  />
-                </Box>
-                <Typography variant="h5" sx={{ color: '#4caf50', fontWeight: 700 }}>
-                  ${finalPrice.toFixed(2)}
-                </Typography>
-              </Box>
-            )}
-
-            <Typography variant="body2" color="text.secondary">
-              per month
-            </Typography>
-          </CardContent>
-        </Card>
-
-        {/* Promo Code Section */}
-        <Card sx={{ flexShrink: 0 }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <LocalOffer sx={{ mr: 1, color: '#4caf50' }} />
-              <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 600 }}>
-                Promo Code
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
-              <TextField
-                fullWidth
-                label="Enter promo code"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                placeholder="SAVE20"
-                size="small"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LocalOffer sx={{ color: '#4caf50', fontSize: 20 }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <Button
-                variant="outlined"
-                onClick={handleApplyPromo}
-                disabled={!promoCode}
-                sx={{
-                  minWidth: 100,
-                  borderColor: '#4caf50',
-                  color: '#4caf50',
-                  '&:hover': {
-                    borderColor: '#388e3c',
-                    backgroundColor: 'rgba(76, 175, 80, 0.04)'
-                  }
-                }}
-              >
-                Apply
-              </Button>
-            </Box>
-
-            {promoApplied && (
-              <Alert severity="success" sx={{ mt: 2, borderRadius: 2 }}>
-                <Typography variant="body2" fontWeight={600}>
-                  Promo code applied! You save ${(originalPrice * discount / 100).toFixed(2)}
-                </Typography>
-              </Alert>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Payment Section */}
-        <Card sx={{ flexShrink: 0 }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <CreditCard sx={{ mr: 1, color: '#4caf50' }} />
-              <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 600 }}>
-                Secure Payment
-              </Typography>
-            </Box>
-
-            <Alert severity="info" sx={{ mb: 3 }}>
-              <Typography variant="body2">
-                🔒 Your payment is processed securely through Zoho SecurePay with bank-level encryption
-              </Typography>
-            </Alert>
-
-            {/* Pay Now Button */}
-            <Box sx={{ 
-              textAlign: 'center', 
-              mb: 3,
-              backgroundColor: '#f8f9fa',
-              borderRadius: 2,
-              border: '2px solid #4caf50',
-              p: 3
-            }}>
-              <PrimaryButton
-                onClick={handlePayNow}
-                disabled={loading}
-                sx={{
-                  py: 2,
-                  px: 6,
-                  fontSize: '1.25rem',
-                  fontWeight: 700,
-                  minWidth: 250,
-                  minHeight: 56
-                }}
-              >
-                {loading ? <CircularProgress size={24} color="inherit" /> : `Pay Now - $${finalPrice.toFixed(2)}`}
-              </PrimaryButton>
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontWeight: 500 }}>
-                Click to proceed to secure payment gateway
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
-      </Box>
-
-      {/* Fixed Navigation */}
-      <Box sx={{ 
-        flexShrink: 0,
-        pt: 3,
-        borderTop: '1px solid #e0e7ff',
-        backgroundColor: 'background.paper'
-      }}>
-        {/* Navigation Buttons */}
-        <Box sx={{ 
-          display: 'flex',
-          gap: 2,
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <SecondaryButton
-            onClick={onBack}
-            startIcon={<ArrowBack />}
-            disabled={loading}
-            sx={{
-              py: { xs: 1.5, sm: 1.25 },
-              fontWeight: 600,
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              minWidth: 120
-            }}
-          >
-            Back
-          </SecondaryButton>
-          
-          <Button
-            variant="text"
-            onClick={handlePaymentSuccess}
-            sx={{
-              py: { xs: 1.5, sm: 1.25 },
-              fontWeight: 600,
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              color: 'text.secondary'
-            }}
-          >
-            Simulate Payment Success (Demo)
-          </Button>
-        </Box>
-      </Box>
-
-      {/* Payment Modal */}
-      <Dialog
-        open={showPaymentModal}
-        onClose={handleClosePaymentModal}
-        maxWidth="md"
-        fullWidth
-        sx={{
-          '& .MuiDialog-paper': {
-            height: '80vh',
-            maxHeight: '80vh',
-            m: 2
-          }
-        }}
-      >
-        <DialogTitle sx={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          borderBottom: '1px solid #e0e7ff',
-          pb: 2
-        }}>
-          <Typography variant="h6" sx={{ color: '#4caf50', fontWeight: 600 }}>
-            Secure Payment - ${finalPrice.toFixed(2)}
-          </Typography>
-          <IconButton onClick={handleClosePaymentModal} size="small">
-            <Close />
-          </IconButton>
-        </DialogTitle>
-        
-        <DialogContent sx={{ p: 0, height: '100%' }}>
-          <Box sx={{ 
-            width: '100%', 
-            height: '100%',
-            position: 'relative'
-          }}>
-            <iframe
-              src={zohoPaymentUrl}
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              style={{ 
-                border: 'none',
-                display: 'block'
-              }}
-              title="Zoho SecurePay"
-              onLoad={() => setLoading(false)}
-            />
-            {loading && (
-              <Box sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)'
-              }}>
-                <CircularProgress />
-              </Box>
-            )}
+      {/* Payment Form */}
+      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Card sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <CreditCard sx={{ mr: 1, color: 'primary.main' }} />
+            <Typography variant="h6">Payment Information</Typography>
           </Box>
-        </DialogContent>
-      </Dialog>
+          
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Demo Mode:</strong> This is a demonstration. No actual payment will be processed.
+            </Typography>
+          </Alert>
+
+          <Box sx={{ 
+            p: 2, 
+            border: '1px solid', 
+            borderColor: 'divider', 
+            borderRadius: 1,
+            backgroundColor: 'action.hover'
+          }}>
+            <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+              S10.AI Professional Plan
+            </Typography>
+            <Typography variant="h5" sx={{ fontWeight: 600, color: 'primary.main' }}>
+              $99/month
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Includes EHR integration, unlimited templates, and priority support
+            </Typography>
+          </Box>
+        </Card>
+
+        <Card sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Security sx={{ mr: 1, color: 'primary.main' }} />
+            <Typography variant="h6">Security & Terms</Typography>
+          </Box>
+          
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                color="primary"
+              />
+            }
+            label={
+              <Typography variant="body2">
+                I agree to the Terms of Service and Privacy Policy
+              </Typography>
+            }
+          />
+        </Card>
+      </Box>
+
+      {/* Action Buttons */}
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        pt: 3,
+        flexShrink: 0
+      }}>
+        <Button 
+          onClick={onBack}
+          variant="outlined"
+          disabled={isProcessing}
+        >
+          Back
+        </Button>
+        
+        <Button
+          onClick={handlePayment}
+          variant="contained"
+          disabled={!agreedToTerms || isProcessing}
+          sx={{ minWidth: 120 }}
+        >
+          {isProcessing ? (
+            <CircularProgress size={20} color="inherit" />
+          ) : (
+            'Complete Setup'
+          )}
+        </Button>
+      </Box>
     </Box>
   );
 };
