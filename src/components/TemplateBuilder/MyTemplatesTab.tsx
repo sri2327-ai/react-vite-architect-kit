@@ -210,7 +210,7 @@ const MyTemplatesTab: React.FC = () => {
       <ImprovedTemplateCreationDialog
         open={isCreateDialogOpen}
         onClose={() => setIsCreateDialogOpen(false)}
-        onCreate={handleCreateTemplate}
+        onSave={handleCreateTemplate}
         visitTypes={visitTypes}
       />
 
@@ -229,7 +229,7 @@ const MyTemplatesTab: React.FC = () => {
       >
         {selectedTemplate && (
           <DraggableTemplateEditor
-            templateData={selectedTemplate}
+            template={selectedTemplate}
             onSave={handleSaveTemplate}
             onClose={() => setIsEditorOpen(false)}
             visitTypes={visitTypes}
