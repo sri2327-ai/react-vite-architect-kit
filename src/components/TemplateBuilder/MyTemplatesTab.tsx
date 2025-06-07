@@ -37,6 +37,21 @@ interface VisitType {
   description?: string;
 }
 
+// Define the TemplateData interface that matches what TemplateTable expects
+interface TemplateData {
+  id: number;
+  title: string;
+  specialty: string;
+  type: string;
+  fields: any[];
+  content?: string;
+  lastUsed?: string;
+  usageCount?: number;
+  isFavorite?: boolean;
+  createdBy?: string;
+  tags?: string[];
+}
+
 const MyTemplatesTab: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -214,9 +229,9 @@ const MyTemplatesTab: React.FC = () => {
                 fontWeight: 700
               }}
             >
-              {selectedVisitType.name} Templates
+              {selectedVisitType?.name} Templates
             </Typography>
-            {selectedVisitType.description && (
+            {selectedVisitType?.description && (
               <Typography 
                 variant="body1" 
                 color="text.secondary"
@@ -298,12 +313,12 @@ const MyTemplatesTab: React.FC = () => {
           color: 'text.secondary'
         }}>
           <Typography variant="h6" sx={{ mb: 2 }}>
-            No templates found for {selectedVisitType.name}
+            No templates found for {selectedVisitType?.name}
           </Typography>
           <Typography variant="body2">
             {filters.specialty || filters.searchTerm
               ? 'Try adjusting your filters to see more templates.'
-              : `Create your first template for ${selectedVisitType.name} to get started.`}
+              : `Create your first template for ${selectedVisitType?.name} to get started.`}
           </Typography>
         </Box>
       )}
