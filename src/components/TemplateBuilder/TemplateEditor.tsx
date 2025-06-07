@@ -239,15 +239,15 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
     console.log('Template saved:', items);
   }, [onSave]);
 
-  const handleAddSectionToTemplate = useCallback((sectionOrFunction: any) => {
+  const handleAddSectionToTemplate = useCallback((sectionWithPosition: any) => {
     // If it's a function, store it for later use
-    if (typeof sectionOrFunction === 'function') {
-      // This is the callback function from SectionConfigDialog
+    if (typeof sectionWithPosition === 'function') {
       return;
     }
 
-    // If it's section data from the configuration dialog
-    const section = sectionOrFunction;
+    // Extract position and section data
+    const { position, ...section } = sectionWithPosition;
+    
     const newItem: TemplateItem = {
       id: section.id || Date.now().toString(),
       name: section.name || section.label || 'New Section',
@@ -263,14 +263,21 @@ const TemplateEditor: React.FC<TemplateEditorProps> = ({
       ...(section.instructions && { instructions: section.instructions })
     };
     
-    const updatedItems = [...currentItems, newItem];
+    // Insert at the specified position
+    const updatedItems = [...currentItems];
+    if (position !== undefined && position >= 0 && position <= updatedItems.length) {
+      updatedItems.splice(position, 0, newItem);
+    } else {
+      updatedItems.push(newItem);
+    }
+    
     setCurrentItems(updatedItems);
     
     if (onSave) {
       onSave(updatedItems);
     }
 
-    console.log('Section added to template:', newItem);
+    console.log('Section added to template at position', position, ':', newItem);
   }, [currentItems, onSave]);
 
   // Expose the addSection function to parent components
