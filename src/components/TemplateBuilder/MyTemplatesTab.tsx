@@ -62,8 +62,7 @@ const MyTemplatesTab: React.FC = () => {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [filters, setFilters] = useState({
     visitType: '',
-    specialty: '',
-    searchTerm: ''
+    specialty: ''
   });
 
   const handleCreateTemplate = (templateData: any) => {
@@ -174,11 +173,8 @@ const MyTemplatesTab: React.FC = () => {
     if (selectedVisitType) {
       const matchesVisitType = template.visitTypes.includes(selectedVisitType.name);
       const matchesSpecialty = !filters.specialty || template.specialty === filters.specialty;
-      const matchesSearch = !filters.searchTerm || 
-        template.name.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-        template.description.toLowerCase().includes(filters.searchTerm.toLowerCase());
       
-      return matchesVisitType && matchesSpecialty && matchesSearch;
+      return matchesVisitType && matchesSpecialty;
     }
     return false;
   });
@@ -271,8 +267,6 @@ const MyTemplatesTab: React.FC = () => {
 
       <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
         <TemplateFilters
-          searchTerm={filters.searchTerm}
-          onSearchChange={(value: string) => setFilters(prev => ({ ...prev, searchTerm: value }))}
           selectedSpecialty={filters.specialty}
           onSpecialtyChange={(value: string) => setFilters(prev => ({ ...prev, specialty: value }))}
           selectedType=""
@@ -283,8 +277,8 @@ const MyTemplatesTab: React.FC = () => {
           onSortChange={() => {}}
           viewMode="all"
           onViewModeChange={() => {}}
-          onClearFilters={() => setFilters(prev => ({ ...prev, specialty: '', searchTerm: '' }))}
-          hasActiveFilters={!!(filters.specialty || filters.searchTerm)}
+          onClearFilters={() => setFilters(prev => ({ ...prev, specialty: '' }))}
+          hasActiveFilters={!!filters.specialty}
         />
       </Box>
 
@@ -318,7 +312,7 @@ const MyTemplatesTab: React.FC = () => {
             No templates found for {selectedVisitType?.name}
           </Typography>
           <Typography variant="body2">
-            {filters.specialty || filters.searchTerm
+            {filters.specialty
               ? 'Try adjusting your filters to see more templates.'
               : `Create your first template for ${selectedVisitType?.name} to get started.`}
           </Typography>

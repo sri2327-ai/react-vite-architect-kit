@@ -1,12 +1,10 @@
 
 import React from 'react';
-import { Box, TextField, FormControl, InputLabel, Select, MenuItem, Chip, Stack, Button, Autocomplete, Typography, Divider } from '@mui/material';
-import { Search as SearchIcon, Clear as ClearIcon } from '@mui/icons-material';
+import { Box, FormControl, InputLabel, Select, MenuItem, Chip, Stack, Button, Autocomplete, Typography, Divider } from '@mui/material';
+import { Clear as ClearIcon } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 
 interface TemplateFiltersProps {
-  searchTerm: string;
-  onSearchChange: (value: string) => void;
   selectedSpecialty: string;
   onSpecialtyChange: (value: string) => void;
   selectedType: string;
@@ -22,8 +20,6 @@ interface TemplateFiltersProps {
 }
 
 const TemplateFilters: React.FC<TemplateFiltersProps> = ({
-  searchTerm,
-  onSearchChange,
   selectedSpecialty,
   onSpecialtyChange,
   selectedType,
@@ -59,30 +55,13 @@ const TemplateFilters: React.FC<TemplateFiltersProps> = ({
 
   return (
     <Box sx={{ mb: 3 }}>
-      {/* Search and Basic Filters */}
+      {/* Basic Filters */}
       <Box sx={{
         display: 'flex',
         gap: 2,
         flexDirection: { xs: 'column', md: 'row' },
         alignItems: { xs: 'stretch', md: 'center' }
       }}>
-        <TextField
-          placeholder="Search templates..."
-          value={searchTerm}
-          onChange={(e) => onSearchChange(e.target.value)}
-          variant="outlined"
-          size="small"
-          sx={{
-            flex: 1,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 2
-            }
-          }}
-          InputProps={{
-            startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
-          }}
-        />
-        
         <FormControl size="small" sx={{ minWidth: 150 }}>
           <InputLabel>Specialty</InputLabel>
           <Select
