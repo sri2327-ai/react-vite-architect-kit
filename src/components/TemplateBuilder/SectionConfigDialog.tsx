@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -37,6 +38,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
+import { useResponsive } from '../../hooks/useResponsive';
 
 interface SectionConfigDialogProps {
   open: boolean;
@@ -68,6 +70,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   sectionType,
   sectionName
 }) => {
+  const { isMobile } = useResponsive();
   const [title, setTitle] = useState(sectionName);
   const [instructions, setInstructions] = useState('');
   const [examItems, setExamItems] = useState<ExamItem[]>([
@@ -464,7 +467,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 startIcon={<AddIcon />}
                 onClick={addExamItem}
                 variant="outlined"
-                fullWidth={{ xs: true, sm: false }}
+                fullWidth={isMobile}
                 sx={{ 
                   mb: 4, 
                   textTransform: 'none',
@@ -695,7 +698,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               <Button
                 startIcon={<AddIcon />}
                 onClick={addChecklistItem}
-                fullWidth={{ xs: true, sm: false }}
+                fullWidth={isMobile}
                 sx={{ 
                   mb: 3, 
                   textTransform: 'none',
@@ -739,7 +742,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         <Button 
           onClick={onClose} 
           variant="outlined"
-          fullWidth={{ xs: true, sm: false }}
+          fullWidth={isMobile}
           sx={{ fontSize: { xs: '0.85rem', sm: '0.9rem' } }}
         >
           Cancel
@@ -748,7 +751,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
           variant="contained" 
           onClick={handleContinue}
           disabled={!title.trim()}
-          fullWidth={{ xs: true, sm: false }}
+          fullWidth={isMobile}
           sx={{ 
             minWidth: 120,
             fontSize: { xs: '0.85rem', sm: '0.9rem' }

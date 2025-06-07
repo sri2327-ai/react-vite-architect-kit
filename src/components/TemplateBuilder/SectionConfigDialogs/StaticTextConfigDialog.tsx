@@ -27,6 +27,7 @@ import {
   Lightbulb as LightbulbIcon
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
+import { useResponsive } from '../../../hooks/useResponsive';
 
 interface StaticTextConfigDialogProps {
   open: boolean;
@@ -41,6 +42,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
   onContinue,
   onBack
 }) => {
+  const { isMobile } = useResponsive();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [titleError, setTitleError] = useState('');
@@ -261,7 +263,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
             fullWidth
             label="What fixed text do you want included in all notes?"
             multiline
-            rows={{ xs: 6, sm: 8 }}
+            rows={isMobile ? 6 : 8}
             value={content}
             onChange={(e) => {
               setContent(e.target.value);
@@ -365,7 +367,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
           onClick={onBack}
           variant="outlined"
           size="medium"
-          fullWidth={{ xs: true, sm: false }}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -381,7 +383,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
           size="medium"
           onClick={handleContinue}
           disabled={!title.trim() || !content.trim()}
-          fullWidth={{ xs: true, sm: false }}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',

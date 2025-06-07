@@ -39,6 +39,7 @@ import {
   VerticalAlignBottom as VerticalAlignBottomIcon,
   VerticalAlignCenter as VerticalAlignCenterIcon
 } from '@mui/icons-material';
+import { useResponsive } from '../../hooks/useResponsive';
 
 interface SectionPlacementDialogProps {
   open: boolean;
@@ -58,6 +59,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
   pendingSection
 }) => {
   const theme = useTheme();
+  const { isMobile } = useResponsive();
   const [selectedPosition, setSelectedPosition] = useState<number | null>(null);
   const [hoveredPosition, setHoveredPosition] = useState<number | null>(null);
 
@@ -524,7 +526,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           onClick={onClose} 
           variant="outlined"
           size="large"
-          fullWidth={{ xs: true, sm: false }}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 3,
             textTransform: 'none',
@@ -545,7 +547,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           variant="contained"
           size="large"
           disabled={selectedPosition === null}
-          fullWidth={{ xs: true, sm: false }}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 3,
             textTransform: 'none',

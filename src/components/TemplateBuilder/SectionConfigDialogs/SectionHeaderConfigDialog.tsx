@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { Close as CloseIcon, ArrowBack as ArrowBackIcon, Title as TitleIcon } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
+import { useResponsive } from '../../../hooks/useResponsive';
 
 interface SectionHeaderConfigDialogProps {
   open: boolean;
@@ -30,6 +31,7 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
   onContinue,
   onBack
 }) => {
+  const { isMobile } = useResponsive();
   const [title, setTitle] = useState('');
 
   const handleContinue = () => {
@@ -196,7 +198,7 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
           onClick={onBack}
           variant="outlined"
           size="large"
-          fullWidth={{ xs: true, sm: false }}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -212,7 +214,7 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
           size="large"
           onClick={handleContinue}
           disabled={!title}
-          fullWidth={{ xs: true, sm: false }}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
