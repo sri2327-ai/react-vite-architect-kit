@@ -11,10 +11,21 @@ import {
   Typography,
   IconButton,
   Paper,
+  Stack,
   Divider,
-  Alert
+  Alert,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails
 } from '@mui/material';
-import { Close as CloseIcon, ArrowBack as ArrowBackIcon, TextSnippet as TextSnippetIcon } from '@mui/icons-material';
+import { 
+  Close as CloseIcon, 
+  ArrowBack as ArrowBackIcon, 
+  TextSnippet as TextSnippetIcon,
+  ExpandMore as ExpandMoreIcon,
+  Lightbulb as LightbulbIcon
+} from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
 
 interface StaticTextConfigDialogProps {
@@ -32,9 +43,58 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [titleError, setTitleError] = useState('');
+  const [contentError, setContentError] = useState('');
+
+  const validateForm = () => {
+    let isValid = true;
+    
+    if (!title.trim()) {
+      setTitleError('Section title is required');
+      isValid = false;
+    } else {
+      setTitleError('');
+    }
+    
+    if (!content.trim()) {
+      setContentError('Static text content is required');
+      isValid = false;
+    } else {
+      setContentError('');
+    }
+    
+    return isValid;
+  };
 
   const handleContinue = () => {
-    onContinue({ title, content });
+    if (validateForm()) {
+      onContinue({ title: title.trim(), content: content.trim() });
+    }
+  };
+
+  const exampleTemplates = [
+    {
+      label: "Disclaimer",
+      title: "Medical Disclaimer",
+      content: "This note is for informational purposes only and does not constitute medical advice. Please consult your healthcare provider for medical concerns."
+    },
+    {
+      label: "Practice Info", 
+      title: "Practice Information",
+      content: "For questions or concerns, please contact our office at (555) 123-4567 or visit our patient portal."
+    },
+    {
+      label: "Instructions",
+      title: "Patient Instructions", 
+      content: "Please follow up as directed. Contact our office immediately if you experience any concerning symptoms."
+    }
+  ];
+
+  const handleExampleClick = (example: typeof exampleTemplates[0]) => {
+    setTitle(example.title);
+    setContent(example.content);
+    setTitleError('');
+    setContentError('');
   };
 
   return (
@@ -46,39 +106,55 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
       PaperProps={{
         sx: {
           borderRadius: 3,
-          maxHeight: '90vh'
+          maxHeight: '90vh',
+          boxShadow: '0 24px 56px rgba(0,0,0,0.15)'
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2 }}>
+      <DialogTitle sx={{ pb: 2, px: 3, pt: 3 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={2}>
             <IconButton 
               onClick={onBack}
+              size="small"
               sx={{
                 backgroundColor: alpha('#000', 0.05),
                 '&:hover': { backgroundColor: alpha('#000', 0.1) }
               }}
             >
-              <ArrowBackIcon />
+              <ArrowBackIcon fontSize="small" />
             </IconButton>
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-                Configure Static Text Section
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Add fixed text that appears the same in every note
-              </Typography>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <Box 
+                sx={{
+                  backgroundColor: alpha('#ff9800', 0.1),
+                  p: 1,
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                <TextSnippetIcon sx={{ fontSize: 20, color: '#f57c00' }} />
+              </Box>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}>
+                  Configure Static Text Section
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                  Fixed text that appears in every note
+                </Typography>
+              </Box>
             </Box>
           </Box>
           <IconButton 
             onClick={onClose}
+            size="small"
             sx={{
               backgroundColor: alpha('#000', 0.05),
               '&:hover': { backgroundColor: alpha('#000', 0.1) }
             }}
           >
-            <CloseIcon />
+            <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
       </DialogTitle>
@@ -86,51 +162,61 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
       <Divider />
 
       <DialogContent sx={{ p: 3 }}>
-        <Alert 
-          severity="info" 
-          icon={<TextSnippetIcon />}
-          sx={{ 
-            mb: 3,
-            borderRadius: 2,
-            '& .MuiAlert-message': { fontSize: '0.875rem' }
-          }}
-        >
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            How Static Text Works
-          </Typography>
-          <Typography variant="body2">
-            Whatever you enter here will appear exactly as-is in your generated note. Use this for fixed text that should remain the same across all notes.
-          </Typography>
-        </Alert>
+        <Stack spacing={3}>
+          <Alert 
+            severity="info" 
+            icon={<TextSnippetIcon />}
+            sx={{ 
+              borderRadius: 2,
+              '& .MuiAlert-message': { fontSize: '0.875rem' }
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+              How Static Text Works
+            </Typography>
+            <Typography variant="body2">
+              Whatever you enter here will appear exactly as-is in your generated note. Use this for fixed text that should remain the same across all notes.
+            </Typography>
+          </Alert>
 
-        <Paper sx={{ p: 3, mb: 3, bgcolor: alpha('#e8f5e8', 0.5), borderRadius: 2, border: `1px solid ${alpha('#4caf50', 0.2)}` }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: '#2e7d32' }}>
-            💡 Common Use Cases
-          </Typography>
-          <Box component="ul" sx={{ m: 0, pl: 2 }}>
-            <Typography component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-              Standard disclaimers or legal text
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <LightbulbIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+              Quick Start Templates
             </Typography>
-            <Typography component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-              Practice information or contact details
-            </Typography>
-            <Typography component="li" variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-              Instructions that appear in every note
-            </Typography>
-            <Typography component="li" variant="body2" color="text.secondary">
-              Standard closing statements
-            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+              {exampleTemplates.map((example) => (
+                <Chip
+                  key={example.label}
+                  label={example.label}
+                  variant="outlined"
+                  clickable
+                  onClick={() => handleExampleClick(example)}
+                  sx={{
+                    borderRadius: 2,
+                    '&:hover': {
+                      backgroundColor: alpha('#ff9800', 0.05),
+                      borderColor: '#ff9800'
+                    }
+                  }}
+                />
+              ))}
+            </Box>
           </Box>
-        </Paper>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <TextField
             fullWidth
             label="Section Title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (titleError) setTitleError('');
+            }}
             placeholder="e.g., Disclaimer, Practice Info, Instructions"
             variant="outlined"
+            size="small"
+            error={!!titleError}
+            helperText={titleError || "This will appear as the section header"}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
@@ -144,16 +230,60 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
             multiline
             rows={8}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              if (contentError) setContentError('');
+            }}
             placeholder="Enter the exact text that should appear in every generated note..."
             variant="outlined"
+            error={!!contentError}
+            helperText={contentError || `${content.length}/1000 characters`}
+            inputProps={{ maxLength: 1000 }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
               }
             }}
           />
-        </Box>
+
+          <Accordion sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200', borderRadius: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                💡 Common Use Cases
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Stack spacing={2}>
+                <Paper sx={{ p: 2, backgroundColor: alpha('#4caf50', 0.05), border: `1px solid ${alpha('#4caf50', 0.2)}` }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#388e3c' }}>
+                    📄 DISCLAIMERS
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Standard legal text or medical disclaimers
+                  </Typography>
+                </Paper>
+                
+                <Paper sx={{ p: 2, backgroundColor: alpha('#2196f3', 0.05), border: `1px solid ${alpha('#2196f3', 0.2)}` }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#1976d2' }}>
+                    🏥 PRACTICE INFO
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Contact details or practice information
+                  </Typography>
+                </Paper>
+                
+                <Paper sx={{ p: 2, backgroundColor: alpha('#9c27b0', 0.05), border: `1px solid ${alpha('#9c27b0', 0.2)}` }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#7b1fa2' }}>
+                    📋 INSTRUCTIONS
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Standard instructions that appear in every note
+                  </Typography>
+                </Paper>
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
+        </Stack>
       </DialogContent>
 
       <Divider />
@@ -162,7 +292,7 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
         <Button 
           onClick={onBack}
           variant="outlined"
-          size="large"
+          size="medium"
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -174,9 +304,9 @@ const StaticTextConfigDialog: React.FC<StaticTextConfigDialogProps> = ({
         </Button>
         <Button
           variant="contained"
-          size="large"
+          size="medium"
           onClick={handleContinue}
-          disabled={!title || !content}
+          disabled={!title.trim() || !content.trim()}
           sx={{
             borderRadius: 2,
             textTransform: 'none',

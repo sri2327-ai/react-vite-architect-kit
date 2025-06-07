@@ -11,12 +11,23 @@ import {
   Typography,
   IconButton,
   Paper,
-  Chip,
   Stack,
   Divider,
-  Alert
+  Alert,
+  Chip,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Tooltip
 } from '@mui/material';
-import { Close as CloseIcon, ArrowBack as ArrowBackIcon, Info as InfoIcon } from '@mui/icons-material';
+import { 
+  Close as CloseIcon, 
+  ArrowBack as ArrowBackIcon, 
+  Info as InfoIcon,
+  Article as ArticleIcon,
+  ExpandMore as ExpandMoreIcon,
+  Lightbulb as LightbulbIcon
+} from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
 
 interface ParagraphConfigDialogProps {
@@ -34,9 +45,58 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [instructions, setInstructions] = useState('');
+  const [titleError, setTitleError] = useState('');
+  const [instructionsError, setInstructionsError] = useState('');
+
+  const validateForm = () => {
+    let isValid = true;
+    
+    if (!title.trim()) {
+      setTitleError('Section title is required');
+      isValid = false;
+    } else {
+      setTitleError('');
+    }
+    
+    if (!instructions.trim()) {
+      setInstructionsError('AI instructions are required');
+      isValid = false;
+    } else {
+      setInstructionsError('');
+    }
+    
+    return isValid;
+  };
 
   const handleContinue = () => {
-    onContinue({ title, instructions });
+    if (validateForm()) {
+      onContinue({ title: title.trim(), instructions: instructions.trim() });
+    }
+  };
+
+  const exampleTemplates = [
+    {
+      label: "Chief Complaint",
+      title: "Chief Complaint",
+      instruction: "Summarize the patient's primary concern in 1-2 sentences. Include onset and severity if discussed."
+    },
+    {
+      label: "Assessment", 
+      title: "Assessment",
+      instruction: "Provide clinical impression based on findings. Keep it concise and professional."
+    },
+    {
+      label: "History",
+      title: "History of Present Illness", 
+      instruction: "Document the timeline and progression of current symptoms in paragraph format."
+    }
+  ];
+
+  const handleExampleClick = (example: typeof exampleTemplates[0]) => {
+    setTitle(example.title);
+    setInstructions(example.instruction);
+    setTitleError('');
+    setInstructionsError('');
   };
 
   return (
@@ -48,39 +108,55 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
       PaperProps={{
         sx: {
           borderRadius: 3,
-          maxHeight: '90vh'
+          maxHeight: '90vh',
+          boxShadow: '0 24px 56px rgba(0,0,0,0.15)'
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2 }}>
+      <DialogTitle sx={{ pb: 2, px: 3, pt: 3 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={2}>
             <IconButton 
               onClick={onBack}
+              size="small"
               sx={{
                 backgroundColor: alpha('#000', 0.05),
                 '&:hover': { backgroundColor: alpha('#000', 0.1) }
               }}
             >
-              <ArrowBackIcon />
+              <ArrowBackIcon fontSize="small" />
             </IconButton>
-            <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
-                Configure Paragraph Section
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Set up AI-generated paragraph content for your template
-              </Typography>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <Box 
+                sx={{
+                  backgroundColor: alpha('#2196f3', 0.1),
+                  p: 1,
+                  borderRadius: 2,
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                <ArticleIcon sx={{ fontSize: 20, color: '#1976d2' }} />
+              </Box>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}>
+                  Configure Paragraph Section
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                  AI-generated paragraph content
+                </Typography>
+              </Box>
             </Box>
           </Box>
           <IconButton 
             onClick={onClose}
+            size="small"
             sx={{
               backgroundColor: alpha('#000', 0.05),
               '&:hover': { backgroundColor: alpha('#000', 0.1) }
             }}
           >
-            <CloseIcon />
+            <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
       </DialogTitle>
@@ -88,83 +164,61 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
       <Divider />
 
       <DialogContent sx={{ p: 3 }}>
-        <Alert 
-          severity="info" 
-          icon={<InfoIcon />}
-          sx={{ 
-            mb: 3,
-            borderRadius: 2,
-            '& .MuiAlert-message': { fontSize: '0.875rem' }
-          }}
-        >
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            How Paragraph Sections Work
-          </Typography>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Tell the AI what you want it to write, as you would instruct a human. Be specific about content, focus areas, and desired length.
-          </Typography>
-        </Alert>
-
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-            Formatting Guidelines
-          </Typography>
-          <Stack spacing={2}>
-            <Paper sx={{ p: 2, backgroundColor: alpha('#2196f3', 0.05), border: `1px solid ${alpha('#2196f3', 0.2)}` }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, color: '#1976d2', fontWeight: 600 }}>
-                📝 Suggest Length
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                State the brevity or length (e.g., "keep this brief", "2-3 paragraphs")
-              </Typography>
-            </Paper>
-            
-            <Paper sx={{ p: 2, backgroundColor: alpha('#4caf50', 0.05), border: `1px solid ${alpha('#4caf50', 0.2)}` }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, color: '#388e3c', fontWeight: 600 }}>
-                🔗 Placeholders: {"{}"}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Use for info the AI should fill in: "Summary for {'{Scale Result}'}"
-              </Typography>
-            </Paper>
-            
-            <Paper sx={{ p: 2, backgroundColor: alpha('#ff9800', 0.05), border: `1px solid ${alpha('#ff9800', 0.2)}` }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, color: '#f57c00', fontWeight: 600 }}>
-                💬 Verbatim Text: ""
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Use quotes for exact text: 'Conclude with "Follow up as needed."'
-              </Typography>
-            </Paper>
-            
-            <Paper sx={{ p: 2, backgroundColor: alpha('#9c27b0', 0.05), border: `1px solid ${alpha('#9c27b0', 0.2)}` }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, color: '#7b1fa2', fontWeight: 600 }}>
-                🔒 Hidden Instructions: ()
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Use parentheses for AI notes (won't appear): "Physical exam (focus on cardio)"
-              </Typography>
-            </Paper>
-          </Stack>
-        </Box>
-
-        <Paper sx={{ p: 3, mb: 3, bgcolor: alpha('#f5f5f5', 0.5), borderRadius: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-            💡 Example
-          </Typography>
-          <Typography variant="body2" sx={{ fontStyle: 'italic', lineHeight: 1.6 }}>
-            "Summarize any assessments discussed in this session; keep it brief. Use the following format: {'{Scale Name}'}: {'{Scale Result}'}. (If none discussed, leave this blank)."
-          </Typography>
-        </Paper>
-
         <Stack spacing={3}>
+          <Alert 
+            severity="info" 
+            icon={<InfoIcon />}
+            sx={{ 
+              borderRadius: 2,
+              '& .MuiAlert-message': { fontSize: '0.875rem' }
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+              How Paragraph Sections Work
+            </Typography>
+            <Typography variant="body2">
+              Tell the AI what you want it to write, as you would instruct a colleague. Be specific about content and desired length.
+            </Typography>
+          </Alert>
+
+          <Box>
+            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <LightbulbIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+              Quick Start Templates
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+              {exampleTemplates.map((example) => (
+                <Chip
+                  key={example.label}
+                  label={example.label}
+                  variant="outlined"
+                  clickable
+                  onClick={() => handleExampleClick(example)}
+                  sx={{
+                    borderRadius: 2,
+                    '&:hover': {
+                      backgroundColor: alpha('#2196f3', 0.05),
+                      borderColor: '#2196f3'
+                    }
+                  }}
+                />
+              ))}
+            </Box>
+          </Box>
+
           <TextField
             fullWidth
             label="Section Title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (titleError) setTitleError('');
+            }}
             placeholder="e.g., Chief Complaint, Assessment, History"
             variant="outlined"
+            size="small"
+            error={!!titleError}
+            helperText={titleError || "This will appear as the section header in your template"}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
@@ -178,15 +232,59 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
             multiline
             rows={6}
             value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
+            onChange={(e) => {
+              setInstructions(e.target.value);
+              if (instructionsError) setInstructionsError('');
+            }}
             placeholder="Describe what you want the AI to generate in this section..."
             variant="outlined"
+            error={!!instructionsError}
+            helperText={instructionsError || `${instructions.length}/500 characters`}
+            inputProps={{ maxLength: 500 }}
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
               }
             }}
           />
+
+          <Accordion sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200', borderRadius: 2 }}>
+            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                💡 Advanced Formatting Tips
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Stack spacing={2}>
+                <Paper sx={{ p: 2, backgroundColor: alpha('#2196f3', 0.05), border: `1px solid ${alpha('#2196f3', 0.2)}` }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#1976d2' }}>
+                    📝 SUGGEST LENGTH
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    "Keep this brief" or "Write 2-3 paragraphs"
+                  </Typography>
+                </Paper>
+                
+                <Paper sx={{ p: 2, backgroundColor: alpha('#4caf50', 0.05), border: `1px solid ${alpha('#4caf50', 0.2)}` }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#388e3c' }}>
+                    🔗 PLACEHOLDERS: {"{}"}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Use for dynamic content: "Summary for {'{Scale Result}'}"
+                  </Typography>
+                </Paper>
+                
+                <Paper sx={{ p: 2, backgroundColor: alpha('#ff9800', 0.05), border: `1px solid ${alpha('#ff9800', 0.2)}` }}>
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: '#f57c00' }}>
+                    💬 EXACT TEXT: ""
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Use quotes: 'Conclude with "Follow up as needed."'
+                  </Typography>
+                </Paper>
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
         </Stack>
       </DialogContent>
 
@@ -196,7 +294,7 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
         <Button 
           onClick={onBack}
           variant="outlined"
-          size="large"
+          size="medium"
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -208,9 +306,9 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
         </Button>
         <Button
           variant="contained"
-          size="large"
+          size="medium"
           onClick={handleContinue}
-          disabled={!title || !instructions}
+          disabled={!title.trim() || !instructions.trim()}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
