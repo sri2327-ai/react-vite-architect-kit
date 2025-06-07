@@ -20,8 +20,7 @@ import {
   Visibility as VisibilityIcon,
   ContentCopy as ContentCopyIcon,
   Star as StarIcon,
-  StarBorder as StarBorderIcon,
-  AccessTime as AccessTimeIcon
+  StarBorder as StarBorderIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
 
@@ -124,18 +123,6 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
             <TableCell sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
               Type
             </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
-              Specialty
-            </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
-              Sections
-            </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
-              Last Used
-            </TableCell>
-            <TableCell sx={{ fontWeight: 600, color: bravoColors.primaryFlat }}>
-              Usage
-            </TableCell>
             <TableCell sx={{ fontWeight: 600, color: bravoColors.primaryFlat }} align="center">
               Actions
             </TableCell>
@@ -231,35 +218,6 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                     }}
                   />
                 </Box>
-              </TableCell>
-              
-              <TableCell>
-                <Typography variant="body2" color="text.secondary">
-                  {template.specialty}
-                </Typography>
-              </TableCell>
-              
-              <TableCell>
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                  {template.fields?.length || 0} sections
-                </Typography>
-              </TableCell>
-              
-              <TableCell>
-                {template.lastUsed && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <AccessTimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                    <Typography variant="caption" color="text.secondary">
-                      {template.lastUsed}
-                    </Typography>
-                  </Box>
-                )}
-              </TableCell>
-              
-              <TableCell>
-                <Typography variant="body2" color="text.secondary">
-                  {template.usageCount || 0} times
-                </Typography>
               </TableCell>
               
               <TableCell align="center">
