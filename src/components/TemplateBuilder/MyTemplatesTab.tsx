@@ -4,7 +4,6 @@ import {
   Box,
   Typography,
   Button,
-  Dialog,
   useTheme,
   useMediaQuery,
   Container,
@@ -37,7 +36,6 @@ interface VisitType {
   description?: string;
 }
 
-// Define the TemplateData interface that matches what TemplateTable expects
 interface TemplateData {
   id: number;
   title: string;
@@ -179,6 +177,43 @@ const MyTemplatesTab: React.FC = () => {
     }
     return false;
   });
+
+  // Show Template Editor as separate screen
+  if (isEditorOpen && selectedTemplate) {
+    return (
+      <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 3 }, height: '100vh' }}>
+        <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+          <IconButton 
+            onClick={handleCloseEditor}
+            sx={{ 
+              color: bravoColors.primaryFlat,
+              '&:hover': {
+                backgroundColor: `${bravoColors.primaryFlat}10`
+              }
+            }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              color: bravoColors.primaryFlat, 
+              fontWeight: 700
+            }}
+          >
+            Edit Template: {selectedTemplate.name}
+          </Typography>
+        </Box>
+        
+        <Box sx={{ height: 'calc(100vh - 120px)' }}>
+          <DraggableTemplateEditor
+            initialItems={selectedTemplate.sections || []}
+            onSave={handleSaveTemplate}
+          />
+        </Box>
+      </Container>
+    );
+  }
 
   // Show Visit Type selection screen
   if (!selectedVisitType) {
@@ -330,29 +365,6 @@ const MyTemplatesTab: React.FC = () => {
         onClose={() => setIsCreateDialogOpen(false)}
         onCreateTemplate={handleCreateTemplate}
       />
-
-      {/* Template Editor Dialog */}
-      <Dialog
-        open={isEditorOpen}
-        onClose={handleCloseEditor}
-        maxWidth="xl"
-        fullWidth
-        fullScreen={isMobile}
-        PaperProps={{
-          sx: {
-            height: isMobile ? '100vh' : '90vh',
-            borderRadius: isMobile ? 0 : 3,
-            m: isMobile ? 0 : 2
-          }
-        }}
-      >
-        {selectedTemplate && (
-          <DraggableTemplateEditor
-            initialItems={selectedTemplate.sections || []}
-            onSave={handleSaveTemplate}
-          />
-        )}
-      </Dialog>
     </Container>
   );
 };
