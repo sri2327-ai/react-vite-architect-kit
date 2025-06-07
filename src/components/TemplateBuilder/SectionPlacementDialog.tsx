@@ -205,7 +205,12 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 fontWeight: 500
               }}
             >
-              {isFirst ? 'Your new section will appear at the very top' : 'Your new section will be placed here'}
+              {isFirst 
+                ? (existingSections.length === 0 
+                  ? 'Your new section will appear at the very top'
+                  : 'Your new section will be placed before all existing sections')
+                : 'Your new section will be placed here'
+              }
             </Typography>
           </Box>
 
@@ -385,7 +390,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
         <Box>
           <PlacementZone 
             position={0} 
-            label="Place at Beginning" 
+            label={existingSections.length === 0 ? "Place at Beginning" : "Place at Top"}
             isFirst={true}
           />
 
