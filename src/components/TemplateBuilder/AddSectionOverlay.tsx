@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
   DialogTitle,
   DialogContent,
   Box,
-  Grid,
+  Grid2 as Grid,
   Card,
   CardContent,
   Typography,
@@ -170,7 +171,7 @@ const AddSectionOverlay: React.FC<AddSectionOverlayProps> = ({
         <DialogContent sx={{ px: 3, pb: 3 }}>
           <Grid container spacing={3}>
             {sectionTemplates.map((section) => (
-              <Grid item xs={12} sm={6} md={4} key={section.id}>
+              <Grid xs={12} sm={6} md={4} key={section.id}>
                 <Card
                   sx={{
                     cursor: 'pointer',
