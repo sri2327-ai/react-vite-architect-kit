@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import {
   Box,
   Typography,
-  Button,
   Grid,
   Card,
   CardContent,
@@ -17,7 +16,6 @@ import {
   useMediaQuery
 } from '@mui/material';
 import {
-  Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   ChevronRight as ChevronRightIcon
@@ -34,9 +32,15 @@ interface VisitType {
 
 interface VisitTypeManagerProps {
   onVisitTypeSelect?: (visitType: VisitType) => void;
+  isCreateDialogOpen?: boolean;
+  onCloseCreateDialog?: () => void;
 }
 
-const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }) => {
+const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ 
+  onVisitTypeSelect,
+  isCreateDialogOpen = false,
+  onCloseCreateDialog
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
@@ -48,20 +52,12 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
     }));
   });
   
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingVisitType, setEditingVisitType] = useState<VisitType | null>(null);
   const [formData, setFormData] = useState({ name: '' });
-
-  const handleOpenCreateDialog = () => {
-    setFormData({ name: '' });
-    setEditingVisitType(null);
-    setIsCreateDialogOpen(true);
-  };
 
   const handleEditVisitType = (visitType: VisitType) => {
     setFormData({ name: visitType.name });
     setEditingVisitType(visitType);
-    setIsCreateDialogOpen(true);
   };
 
   const handleSaveVisitType = () => {
@@ -79,7 +75,9 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
       setVisitTypes(prev => [...prev, visitTypeData]);
     }
 
-    setIsCreateDialogOpen(false);
+    if (onCloseCreateDialog) {
+      onCloseCreateDialog();
+    }
     setFormData({ name: '' });
     setEditingVisitType(null);
   };
@@ -94,16 +92,17 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
     }
   };
 
+  const handleCloseDialog = () => {
+    if (onCloseCreateDialog) {
+      onCloseCreateDialog();
+    }
+    setFormData({ name: '' });
+    setEditingVisitType(null);
+  };
+
   return (
     <Box sx={{ mb: 4 }}>
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        mb: 3,
-        flexDirection: { xs: 'column', sm: 'row' },
-        gap: { xs: 2, sm: 0 }
-      }}>
+      <Box sx={{ mb: 3 }}>
         <Typography 
           variant="h5" 
           sx={{ 
@@ -114,27 +113,6 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
         >
           Visit Types
         </Typography>
-        
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleOpenCreateDialog}
-          sx={{
-            backgroundColor: bravoColors.secondary,
-            borderRadius: 2,
-            px: 3,
-            py: 1,
-            textTransform: 'none',
-            fontWeight: 600,
-            fontSize: '0.875rem',
-            '&:hover': {
-              backgroundColor: bravoColors.primaryFlat,
-            },
-            width: { xs: '100%', sm: 'auto' }
-          }}
-        >
-          Add Visit Type
-        </Button>
       </Box>
 
       <Grid container spacing={3}>
@@ -235,8 +213,8 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
       )}
 
       <Dialog
-        open={isCreateDialogOpen}
-        onClose={() => setIsCreateDialogOpen(false)}
+        open={isCreateDialogOpen || !!editingVisitType}
+        onClose={handleCloseDialog}
         maxWidth="sm"
         fullWidth
         fullScreen={isMobile}
@@ -263,7 +241,7 @@ const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>
           <Button 
-            onClick={() => setIsCreateDialogOpen(false)}
+            onClick={handleCloseDialog}
             sx={{ textTransform: 'none' }}
           >
             Cancel

@@ -28,6 +28,7 @@ interface MyTemplatesNavBarProps {
   selectedVisitType?: string | null;
   onCreateTemplate: () => void;
   onBackToVisitTypes?: () => void;
+  onCreateVisitType?: () => void;
   templateCount?: number;
 }
 
@@ -36,6 +37,7 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
   selectedVisitType,
   onCreateTemplate,
   onBackToVisitTypes,
+  onCreateVisitType,
   templateCount = 0
 }) => {
   const theme = useTheme();
@@ -225,37 +227,72 @@ const MyTemplatesNavBar: React.FC<MyTemplatesNavBarProps> = ({
           )}
         </Box>
 
-        {/* Create Template Action */}
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={onCreateTemplate}
-          disabled={currentStep === 'visit-types'}
-          size="small"
-          sx={{
-            backgroundColor: bravoColors.primaryFlat,
-            borderRadius: 1.5,
-            px: { xs: 2, sm: 2.5 },
-            py: { xs: 0.75, sm: 1 },
-            textTransform: 'none',
-            fontWeight: 600,
-            fontSize: { xs: '0.75rem', sm: '0.8rem' },
-            boxShadow: currentStep === 'templates' ? `0 2px 12px ${bravoColors.primaryFlat}40` : 'none',
-            minWidth: { xs: '100%', sm: 'auto' },
-            '&:hover': {
-              backgroundColor: bravoColors.secondary,
-              transform: currentStep === 'templates' ? 'translateY(-1px)' : 'none',
-              boxShadow: currentStep === 'templates' ? `0 4px 16px ${bravoColors.secondary}50` : 'none'
-            },
-            '&:disabled': {
-              backgroundColor: 'action.disabled',
-              color: 'text.disabled'
-            },
-            transition: 'all 0.2s ease'
-          }}
-        >
-          {currentStep === 'visit-types' ? 'Select Visit Type First' : 'Create Template'}
-        </Button>
+        {/* Action Buttons */}
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 1, 
+          flexDirection: { xs: 'column', sm: 'row' },
+          minWidth: { xs: '100%', sm: 'auto' }
+        }}>
+          {currentStep === 'visit-types' && onCreateVisitType && (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={onCreateVisitType}
+              size="small"
+              sx={{
+                borderColor: bravoColors.primaryFlat,
+                color: bravoColors.primaryFlat,
+                borderRadius: 1.5,
+                px: { xs: 2, sm: 2.5 },
+                py: { xs: 0.75, sm: 1 },
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                minWidth: { xs: '100%', sm: 'auto' },
+                '&:hover': {
+                  backgroundColor: `${bravoColors.primaryFlat}10`,
+                  borderColor: bravoColors.secondary,
+                  color: bravoColors.secondary
+                },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Add Visit Type
+            </Button>
+          )}
+          
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={onCreateTemplate}
+            disabled={currentStep === 'visit-types'}
+            size="small"
+            sx={{
+              backgroundColor: bravoColors.primaryFlat,
+              borderRadius: 1.5,
+              px: { xs: 2, sm: 2.5 },
+              py: { xs: 0.75, sm: 1 },
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: { xs: '0.75rem', sm: '0.8rem' },
+              boxShadow: currentStep === 'templates' ? `0 2px 12px ${bravoColors.primaryFlat}40` : 'none',
+              minWidth: { xs: '100%', sm: 'auto' },
+              '&:hover': {
+                backgroundColor: bravoColors.secondary,
+                transform: currentStep === 'templates' ? 'translateY(-1px)' : 'none',
+                boxShadow: currentStep === 'templates' ? `0 4px 16px ${bravoColors.secondary}50` : 'none'
+              },
+              '&:disabled': {
+                backgroundColor: 'action.disabled',
+                color: 'text.disabled'
+              },
+              transition: 'all 0.2s ease'
+            }}
+          >
+            {currentStep === 'visit-types' ? 'Select Visit Type First' : 'Create Template'}
+          </Button>
+        </Box>
       </Box>
     </Paper>
   );

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -59,6 +60,7 @@ const MyTemplatesTab: React.FC = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [selectedVisitType, setSelectedVisitType] = useState<VisitType | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreateVisitTypeDialogOpen, setIsCreateVisitTypeDialogOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [filters, setFilters] = useState({
     visitType: '',
@@ -235,9 +237,14 @@ const MyTemplatesTab: React.FC = () => {
         <MyTemplatesNavBar
           currentStep="visit-types"
           onCreateTemplate={() => {}}
+          onCreateVisitType={() => setIsCreateVisitTypeDialogOpen(true)}
         />
         
-        <VisitTypeManager onVisitTypeSelect={handleVisitTypeSelect} />
+        <VisitTypeManager 
+          onVisitTypeSelect={handleVisitTypeSelect}
+          isCreateDialogOpen={isCreateVisitTypeDialogOpen}
+          onCloseCreateDialog={() => setIsCreateVisitTypeDialogOpen(false)}
+        />
       </Container>
     );
   }
