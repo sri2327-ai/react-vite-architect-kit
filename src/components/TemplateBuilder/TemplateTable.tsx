@@ -59,6 +59,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isExtraSmall = useMediaQuery(theme.breakpoints.down(480));
 
   const getSpecialtyColor = (specialty: string) => {
     const colors = {
@@ -135,7 +136,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
         },
       }}>
         <Table sx={{ 
-          minWidth: { xs: 320, sm: 500, md: 650 },
+          minWidth: { xs: 280, sm: 450, md: 650 },
           width: '100%'
         }}>
           <TableHead>
@@ -148,33 +149,33 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
               <TableCell sx={{ 
                 fontWeight: 700, 
                 color: bravoColors.primaryFlat,
-                fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.95rem' },
-                py: { xs: 1.5, sm: 2, md: 2.5 },
-                pl: { xs: 1.5, sm: 2, md: 3 },
-                pr: { xs: 1, sm: 1.5, md: 2 },
-                minWidth: { xs: 200, sm: 250, md: 300 }
+                fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem' },
+                py: { xs: 1, sm: 1.5, md: 2 },
+                pl: { xs: 1, sm: 1.5, md: 2 },
+                pr: { xs: 0.5, sm: 1, md: 1.5 },
+                minWidth: { xs: 180, sm: 220, md: 280 }
               }}>
                 Template Details
               </TableCell>
               <TableCell sx={{ 
                 fontWeight: 700, 
                 color: bravoColors.primaryFlat,
-                fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.95rem' },
-                py: { xs: 1.5, sm: 2, md: 2.5 },
-                px: { xs: 0.5, sm: 1, md: 1.5 },
+                fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem' },
+                py: { xs: 1, sm: 1.5, md: 2 },
+                px: { xs: 0.25, sm: 0.5, md: 1 },
                 textAlign: 'center',
-                minWidth: { xs: 100, sm: 120, md: 140 }
+                minWidth: { xs: 80, sm: 100, md: 120 }
               }}>
-                {isMobile ? 'Type' : 'Type & Category'}
+                {isExtraSmall ? 'Type' : isMobile ? 'Type' : 'Type & Category'}
               </TableCell>
               <TableCell sx={{ 
                 fontWeight: 700, 
                 color: bravoColors.primaryFlat,
-                fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.95rem' },
-                py: { xs: 1.5, sm: 2, md: 2.5 },
-                px: { xs: 0.5, sm: 1, md: 1.5 },
+                fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem' },
+                py: { xs: 1, sm: 1.5, md: 2 },
+                px: { xs: 0.25, sm: 0.5, md: 1 },
                 textAlign: 'center',
-                minWidth: { xs: 100, sm: 120, md: 140 }
+                minWidth: { xs: 80, sm: 100, md: 120 }
               }} align="center">
                 Actions
               </TableCell>
@@ -199,41 +200,50 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                 }}
               >
                 <TableCell sx={{ 
-                  pl: { xs: 1.5, sm: 2, md: 3 }, 
-                  pr: { xs: 1, sm: 1.5, md: 2 },
-                  py: { xs: 1.5, sm: 2, md: 2.5 }
+                  pl: { xs: 1, sm: 1.5, md: 2 }, 
+                  pr: { xs: 0.5, sm: 1, md: 1.5 },
+                  py: { xs: 1, sm: 1.5, md: 2 }
                 }}>
                   <Box sx={{ 
                     display: 'flex', 
-                    alignItems: 'flex-start', 
-                    gap: { xs: 1, sm: 1.5, md: 2 },
-                    flexDirection: { xs: 'column', sm: 'row' }
+                    alignItems: isExtraSmall ? 'center' : 'flex-start', 
+                    gap: { xs: 0.75, sm: 1, md: 1.5 },
+                    flexDirection: isExtraSmall ? 'column' : 'row'
                   }}>
                     <Avatar
                       sx={{
                         bgcolor: `${bravoColors.primaryFlat}15`,
                         color: bravoColors.primaryFlat,
-                        width: { xs: 36, sm: 40, md: 48 },
-                        height: { xs: 36, sm: 40, md: 48 },
-                        fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
+                        width: { xs: 28, sm: 36, md: 44 },
+                        height: { xs: 28, sm: 36, md: 44 },
+                        fontSize: { xs: '0.8rem', sm: '1rem', md: '1.1rem' },
                         fontWeight: 600,
                         border: `2px solid ${bravoColors.primaryFlat}20`,
-                        alignSelf: { xs: 'flex-start', sm: 'flex-start' }
+                        flexShrink: 0
                       }}
                     >
                       {template.title.charAt(0).toUpperCase()}
                     </Avatar>
                     
-                    <Box sx={{ flex: 1, minWidth: 0, width: '100%' }}>
+                    <Box sx={{ 
+                      flex: 1, 
+                      minWidth: 0, 
+                      width: '100%',
+                      textAlign: isExtraSmall ? 'center' : 'left'
+                    }}>
                       <Typography 
                         variant="h6" 
                         sx={{ 
                           fontWeight: 700, 
                           color: bravoColors.primaryFlat,
-                          lineHeight: 1.3,
-                          mb: 0.5,
-                          fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
-                          wordBreak: 'break-word'
+                          lineHeight: { xs: 1.2, sm: 1.3 },
+                          mb: { xs: 0.25, sm: 0.5 },
+                          fontSize: { xs: '0.8rem', sm: '0.9rem', md: '1rem' },
+                          wordBreak: 'break-word',
+                          display: '-webkit-box',
+                          WebkitLineClamp: { xs: 2, sm: 2, md: 1 },
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
                         }}
                       >
                         {template.title}
@@ -243,34 +253,36 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                         <Box sx={{ 
                           display: 'flex', 
                           alignItems: 'flex-start', 
-                          gap: { xs: 0.5, sm: 1 }, 
-                          mb: { xs: 0.5, sm: 1 },
-                          flexDirection: { xs: 'column', sm: 'row' }
+                          gap: { xs: 0.25, sm: 0.5, md: 0.75 }, 
+                          mb: { xs: 0.25, sm: 0.5, md: 0.75 },
+                          flexDirection: isExtraSmall ? 'column' : 'row'
                         }}>
                           <DescriptionIcon 
                             sx={{ 
-                              fontSize: { xs: '0.9rem', sm: '1rem' }, 
+                              fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.95rem' }, 
                               color: 'text.secondary',
                               mt: { xs: 0, sm: 0.1 },
                               flexShrink: 0,
-                              display: { xs: 'none', sm: 'block' }
+                              display: isExtraSmall ? 'none' : 'block'
                             }} 
                           />
                           <Typography 
                             variant="body2" 
                             color="text.secondary"
                             sx={{ 
-                              lineHeight: 1.4,
-                              fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' },
+                              lineHeight: { xs: 1.2, sm: 1.3, md: 1.4 },
+                              fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
                               display: '-webkit-box',
-                              WebkitLineClamp: { xs: 1, sm: 2 },
+                              WebkitLineClamp: { xs: 1, sm: 1, md: 2 },
                               WebkitBoxOrient: 'vertical',
                               overflow: 'hidden',
                               wordBreak: 'break-word'
                             }}
                           >
-                            {isSmallMobile && template.content.length > 40 
-                              ? `${template.content.substring(0, 40)}...` 
+                            {isExtraSmall && template.content.length > 25 
+                              ? `${template.content.substring(0, 25)}...` 
+                              : isSmallMobile && template.content.length > 40
+                              ? `${template.content.substring(0, 40)}...`
                               : isMobile && template.content.length > 60
                               ? `${template.content.substring(0, 60)}...`
                               : template.content.length > 80 
@@ -284,24 +296,33 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                         <Box sx={{ 
                           display: 'flex', 
                           alignItems: 'center', 
-                          gap: { xs: 0.5, sm: 1 }, 
-                          flexWrap: 'wrap' 
+                          gap: { xs: 0.25, sm: 0.5, md: 0.75 }, 
+                          flexWrap: 'wrap',
+                          justifyContent: isExtraSmall ? 'center' : 'flex-start'
                         }}>
                           <TagIcon sx={{ 
-                            fontSize: { xs: '0.8rem', sm: '0.9rem' }, 
+                            fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' }, 
                             color: 'text.secondary',
-                            display: { xs: 'none', sm: 'block' }
+                            display: isExtraSmall ? 'none' : 'block'
                           }} />
-                          <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
-                            {template.tags.slice(0, isSmallMobile ? 1 : isMobile ? 2 : 3).map((tag, tagIndex) => (
+                          <Stack 
+                            direction="row" 
+                            spacing={0.25} 
+                            sx={{ 
+                              flexWrap: 'wrap', 
+                              gap: { xs: 0.25, sm: 0.5 },
+                              justifyContent: isExtraSmall ? 'center' : 'flex-start'
+                            }}
+                          >
+                            {template.tags.slice(0, isExtraSmall ? 1 : isSmallMobile ? 2 : isMobile ? 2 : 3).map((tag, tagIndex) => (
                               <Chip
                                 key={tagIndex}
                                 label={tag}
                                 size="small"
                                 variant="outlined"
                                 sx={{
-                                  fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.7rem' },
-                                  height: { xs: 18, sm: 20, md: 22 },
+                                  fontSize: { xs: '0.55rem', sm: '0.6rem', md: '0.65rem' },
+                                  height: { xs: 16, sm: 18, md: 20 },
                                   borderColor: `${bravoColors.primaryFlat}40`,
                                   color: bravoColors.primaryFlat,
                                   backgroundColor: `${bravoColors.primaryFlat}08`,
@@ -309,22 +330,22 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                                     backgroundColor: `${bravoColors.primaryFlat}15`
                                   },
                                   '& .MuiChip-label': {
-                                    px: { xs: 0.5, sm: 0.75, md: 1 }
+                                    px: { xs: 0.25, sm: 0.5, md: 0.75 }
                                   }
                                 }}
                               />
                             ))}
-                            {template.tags.length > (isSmallMobile ? 1 : isMobile ? 2 : 3) && (
+                            {template.tags.length > (isExtraSmall ? 1 : isSmallMobile ? 2 : isMobile ? 2 : 3) && (
                               <Chip
-                                label={`+${template.tags.length - (isSmallMobile ? 1 : isMobile ? 2 : 3)}`}
+                                label={`+${template.tags.length - (isExtraSmall ? 1 : isSmallMobile ? 2 : isMobile ? 2 : 3)}`}
                                 size="small"
                                 sx={{
-                                  fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.7rem' },
-                                  height: { xs: 18, sm: 20, md: 22 },
+                                  fontSize: { xs: '0.55rem', sm: '0.6rem', md: '0.65rem' },
+                                  height: { xs: 16, sm: 18, md: 20 },
                                   backgroundColor: 'text.secondary',
                                   color: 'white',
                                   '& .MuiChip-label': {
-                                    px: { xs: 0.5, sm: 0.75, md: 1 }
+                                    px: { xs: 0.25, sm: 0.5, md: 0.75 }
                                   }
                                 }}
                               />
@@ -337,56 +358,65 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                 </TableCell>
                 
                 <TableCell align="center" sx={{ 
-                  py: { xs: 1.5, sm: 2, md: 2.5 },
-                  px: { xs: 0.5, sm: 1, md: 1.5 }
+                  py: { xs: 1, sm: 1.5, md: 2 },
+                  px: { xs: 0.25, sm: 0.5, md: 1 }
                 }}>
                   <Box sx={{ 
                     display: 'flex', 
                     flexDirection: 'column', 
                     alignItems: 'center', 
-                    gap: { xs: 0.5, sm: 1, md: 1.5 }
+                    gap: { xs: 0.25, sm: 0.5, md: 1 }
                   }}>
                     <Box sx={{ 
                       display: 'flex', 
                       alignItems: 'center', 
-                      gap: { xs: 0.5, sm: 0.75, md: 1 },
+                      gap: { xs: 0.25, sm: 0.5, md: 0.75 },
                       backgroundColor: `${getSpecialtyColor(template.specialty)}15`,
-                      borderRadius: { xs: 1.5, sm: 2 },
-                      px: { xs: 1, sm: 1.5, md: 2 },
-                      py: { xs: 0.5, sm: 0.75, md: 1 },
+                      borderRadius: { xs: 1, sm: 1.5, md: 2 },
+                      px: { xs: 0.5, sm: 1, md: 1.5 },
+                      py: { xs: 0.25, sm: 0.5, md: 0.75 },
                       border: `1px solid ${getSpecialtyColor(template.specialty)}30`,
                       flexDirection: { xs: 'column', sm: 'row' },
-                      minWidth: 0
+                      minWidth: 0,
+                      maxWidth: { xs: 70, sm: 90, md: 'none' }
                     }}>
                       <Typography sx={{ 
-                        fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' }
+                        fontSize: { xs: '0.8rem', sm: '1rem', md: '1.1rem' }
                       }}>
                         {getTypeIcon(template.type)}
                       </Typography>
-                      <Box sx={{ textAlign: { xs: 'center', sm: 'left' }, minWidth: 0 }}>
+                      <Box sx={{ textAlign: 'center', minWidth: 0 }}>
                         <Typography
                           variant="subtitle2"
                           sx={{
                             fontWeight: 700,
                             color: getSpecialtyColor(template.specialty),
-                            fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.85rem' },
-                            lineHeight: 1.2,
-                            wordBreak: 'break-word'
+                            fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.8rem' },
+                            lineHeight: 1.1,
+                            wordBreak: 'break-word',
+                            display: '-webkit-box',
+                            WebkitLineClamp: { xs: 2, sm: 1 },
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
                           }}
                         >
                           {template.type}
                         </Typography>
-                        {template.specialty && !isMobile && (
+                        {template.specialty && !isExtraSmall && !isSmallMobile && (
                           <Typography
                             variant="caption"
                             sx={{
                               color: 'text.secondary',
-                              fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.7rem' },
+                              fontSize: { xs: '0.55rem', sm: '0.6rem', md: '0.65rem' },
                               display: 'block',
-                              wordBreak: 'break-word'
+                              wordBreak: 'break-word',
+                              lineHeight: 1.1,
+                              mt: 0.25
                             }}
                           >
-                            {template.specialty}
+                            {template.specialty.length > 12 
+                              ? `${template.specialty.substring(0, 12)}...` 
+                              : template.specialty}
                           </Typography>
                         )}
                       </Box>
@@ -395,25 +425,25 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                 </TableCell>
                 
                 <TableCell align="center" sx={{ 
-                  py: { xs: 1.5, sm: 2, md: 2.5 },
-                  px: { xs: 0.5, sm: 1, md: 1.5 }
+                  py: { xs: 1, sm: 1.5, md: 2 },
+                  px: { xs: 0.25, sm: 0.5, md: 1 }
                 }}>
                   <Stack 
                     direction={{ xs: 'column', sm: 'row' }} 
-                    spacing={{ xs: 0.5, sm: 0.75, md: 1 }} 
+                    spacing={{ xs: 0.25, sm: 0.5, md: 0.75 }} 
                     justifyContent="center"
                     alignItems="center"
                   >
                     <Tooltip title="Preview Template" placement="top">
                       <IconButton
-                        size={isMobile ? "small" : "medium"}
+                        size="small"
                         onClick={() => handleView(template)}
                         sx={{
                           backgroundColor: `${bravoColors.secondary}15`,
                           color: bravoColors.secondary,
                           border: `1px solid ${bravoColors.secondary}30`,
-                          width: { xs: 32, sm: 36, md: 40 },
-                          height: { xs: 32, sm: 36, md: 40 },
+                          width: { xs: 28, sm: 32, md: 36 },
+                          height: { xs: 28, sm: 32, md: 36 },
                           '&:hover': {
                             backgroundColor: bravoColors.secondary,
                             color: 'white',
@@ -423,20 +453,20 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <VisibilityIcon fontSize={isMobile ? "small" : "small"} />
+                        <VisibilityIcon sx={{ fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' } }} />
                       </IconButton>
                     </Tooltip>
                     
                     <Tooltip title="Edit Template" placement="top">
                       <IconButton
-                        size={isMobile ? "small" : "medium"}
+                        size="small"
                         onClick={() => handleEdit(template)}
                         sx={{
                           backgroundColor: `${bravoColors.primaryFlat}15`,
                           color: bravoColors.primaryFlat,
                           border: `1px solid ${bravoColors.primaryFlat}30`,
-                          width: { xs: 32, sm: 36, md: 40 },
-                          height: { xs: 32, sm: 36, md: 40 },
+                          width: { xs: 28, sm: 32, md: 36 },
+                          height: { xs: 28, sm: 32, md: 36 },
                           '&:hover': {
                             backgroundColor: bravoColors.primaryFlat,
                             color: 'white',
@@ -446,20 +476,20 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <EditIcon fontSize={isMobile ? "small" : "small"} />
+                        <EditIcon sx={{ fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' } }} />
                       </IconButton>
                     </Tooltip>
                     
                     <Tooltip title="Duplicate Template" placement="top">
                       <IconButton
-                        size={isMobile ? "small" : "medium"}
+                        size="small"
                         onClick={() => handleCopy(template)}
                         sx={{
                           backgroundColor: 'rgba(0,0,0,0.08)',
                           color: 'text.secondary',
                           border: '1px solid rgba(0,0,0,0.12)',
-                          width: { xs: 32, sm: 36, md: 40 },
-                          height: { xs: 32, sm: 36, md: 40 },
+                          width: { xs: 28, sm: 32, md: 36 },
+                          height: { xs: 28, sm: 32, md: 36 },
                           '&:hover': {
                             backgroundColor: 'rgba(0,0,0,0.15)',
                             color: 'text.primary',
@@ -469,7 +499,7 @@ const TemplateTable: React.FC<TemplateTableProps> = ({
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        <ContentCopyIcon fontSize={isMobile ? "small" : "small"} />
+                        <ContentCopyIcon sx={{ fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' } }} />
                       </IconButton>
                     </Tooltip>
                   </Stack>
