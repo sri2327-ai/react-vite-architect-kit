@@ -597,6 +597,7 @@ const TemplateLibraryTab: React.FC = () => {
       >
         {filteredTemplates.map((template) => (
           <Grid 
+            item
             key={template.id}
             xs={12}
             sm={6}
@@ -690,7 +691,7 @@ const TemplateLibraryTab: React.FC = () => {
                     {template.specialty}
                   </Typography>
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {template.tags.slice(0, { xs: 1, sm: 2, md: 2 }).map((tag) => (
+                    {template.tags.slice(0, isMobile ? 1 : isTablet ? 2 : 2).map((tag) => (
                       <Chip 
                         key={tag} 
                         label={tag} 
