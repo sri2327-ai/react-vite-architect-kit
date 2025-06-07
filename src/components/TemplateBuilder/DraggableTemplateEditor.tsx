@@ -72,6 +72,7 @@ import { CSS } from '@dnd-kit/utilities';
 import AddSectionOverlay from './AddSectionOverlay';
 import SectionConfigDialog from './SectionConfigDialog';
 import SectionPlacementDialog from './SectionPlacementDialog';
+import { bravoColors } from '../../theme/colors';
 
 interface TemplateItem {
   id: string;
@@ -886,7 +887,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         existingSections={items.map(item => ({ id: item.id, name: item.name }))}
       />
 
-      {/* Enhanced Help Dialog */}
+      {/* Enhanced Help Dialog with Improved UX */}
       <Dialog 
         open={helpDialogOpen} 
         onClose={handleHelpClose}
@@ -928,68 +929,78 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
               onChange={(e) => setSelectedHelpOption(e.target.value)}
             >
               {helpOptions.map((option) => (
-                <Card
-                  key={option.value}
-                  sx={{
-                    mb: 2,
-                    border: selectedHelpOption === option.value ? '2px solid #2196f3' : '1px solid #e0e0e0',
-                    borderRadius: 2,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      borderColor: selectedHelpOption === option.value ? '#2196f3' : '#bdbdbd'
-                    }
-                  }}
-                  onClick={() => setSelectedHelpOption(option.value)}
-                >
-                  <CardContent sx={{ py: 2, px: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <FormControlLabel
-                      value={option.value}
-                      control={<Radio sx={{ '&.Mui-checked': { color: '#2196f3' } }} />}
-                      label=""
-                      sx={{ margin: 0 }}
-                    />
-                    {option.icon}
-                    <Typography 
-                      variant="body1" 
-                      sx={{ 
-                        fontWeight: 500,
-                        color: selectedHelpOption === option.value ? '#2196f3' : 'text.primary'
-                      }}
-                    >
-                      {option.label}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <Box key={option.value}>
+                  <Card
+                    sx={{
+                      mb: 2,
+                      border: selectedHelpOption === option.value ? `2px solid ${bravoColors.primaryFlat}` : '1px solid #e0e0e0',
+                      borderRadius: 2,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      background: selectedHelpOption === option.value ? bravoColors.primary : 'transparent',
+                      '&:hover': {
+                        borderColor: selectedHelpOption === option.value ? bravoColors.primaryFlat : '#bdbdbd'
+                      }
+                    }}
+                    onClick={() => setSelectedHelpOption(option.value)}
+                  >
+                    <CardContent sx={{ py: 2, px: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <FormControlLabel
+                        value={option.value}
+                        control={
+                          <Radio 
+                            sx={{ 
+                              '&.Mui-checked': { 
+                                color: selectedHelpOption === option.value ? bravoColors.text.white : bravoColors.primaryFlat 
+                              } 
+                            }} 
+                          />
+                        }
+                        label=""
+                        sx={{ margin: 0 }}
+                      />
+                      {option.icon}
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          fontWeight: 500,
+                          color: selectedHelpOption === option.value ? bravoColors.text.white : 'text.primary'
+                        }}
+                      >
+                        {option.label}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+
+                  {/* Show input field directly below the selected option */}
+                  {selectedHelpOption === option.value && option.requiresInput && (
+                    <Box sx={{ mb: 3, ml: 2 }}>
+                      <Typography 
+                        variant="body1" 
+                        sx={{ mb: 2, fontWeight: 500 }}
+                      >
+                        {option.inputLabel}
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        multiline={option.value === 'format-specific' || option.value === 'other'}
+                        rows={option.value === 'format-specific' || option.value === 'other' ? 4 : 1}
+                        placeholder={option.value === 'other' ? 'Describe the changes you want to make...' : 'Enter your answer'}
+                        value={helpInputValue}
+                        onChange={(e) => setHelpInputValue(e.target.value)}
+                        variant="outlined"
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 2
+                          }
+                        }}
+                      />
+                    </Box>
+                  )}
+                </Box>
               ))}
             </RadioGroup>
           </FormControl>
-
-          {/* Conditional Input Field */}
-          {selectedHelpOption && getSelectedHelpOption()?.requiresInput && (
-            <Box sx={{ mt: 3 }}>
-              <Typography 
-                variant="body1" 
-                sx={{ mb: 2, fontWeight: 500 }}
-              >
-                {getSelectedHelpOption()?.inputLabel}
-              </Typography>
-              <TextField
-                fullWidth
-                multiline={selectedHelpOption === 'format-specific' || selectedHelpOption === 'other'}
-                rows={selectedHelpOption === 'format-specific' || selectedHelpOption === 'other' ? 4 : 1}
-                placeholder={selectedHelpOption === 'other' ? 'Describe the changes you want to make...' : 'Enter your answer'}
-                value={helpInputValue}
-                onChange={(e) => setHelpInputValue(e.target.value)}
-                variant="outlined"
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2
-                  }
-                }}
-              />
-            </Box>
-          )}
         </DialogContent>
         
         <DialogActions sx={{ p: 3, pt: 2 }}>
@@ -1016,9 +1027,9 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
               fontWeight: 600,
               px: 3,
               py: 1,
-              backgroundColor: '#2196f3',
+              background: bravoColors.button.gradient,
               '&:hover': {
-                backgroundColor: '#1976d2'
+                background: bravoColors.button.hover
               }
             }}
           >
