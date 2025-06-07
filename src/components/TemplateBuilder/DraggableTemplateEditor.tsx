@@ -459,6 +459,11 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   const [aiTitle, setAiTitle] = useState('');
   const [pendingSection, setPendingSection] = useState<any>(null);
 
+  // Update items when initialItems change
+  React.useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -548,7 +553,14 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over?.id);
 
-        return arrayMove(items, oldIndex, newIndex);
+        const newItems = arrayMove(items, oldIndex, newIndex);
+        
+        // Call onSave with the updated items
+        if (onSave) {
+          onSave(newItems);
+        }
+        
+        return newItems;
       });
     }
   };
@@ -565,7 +577,14 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         content: section.description,
         description: 'A.I. will write a descriptive block of text following the guidelines below.'
       };
-      setItems([...items, newItem]);
+      
+      const newItems = [...items, newItem];
+      setItems(newItems);
+      
+      // Call onSave with the updated items
+      if (onSave) {
+        onSave(newItems);
+      }
     }
   };
 
@@ -601,7 +620,7 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       setPendingSection(null);
       setPlacementDialogOpen(false);
       
-      // Call onSave if provided
+      // Call onSave with the updated items
       if (onSave) {
         onSave(newItems);
       }
@@ -609,14 +628,18 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   };
 
   const handleDeleteItem = (id: string) => {
+    console.log('Deleting item with id:', id);
     const newItems = items.filter(item => item.id !== id);
     setItems(newItems);
+    
+    // Call onSave with the updated items
     if (onSave) {
       onSave(newItems);
     }
   };
 
   const handleCopyItem = (id: string) => {
+    console.log('Copying item with id:', id);
     const itemToCopy = items.find(item => item.id === id);
     if (itemToCopy) {
       const copiedItem: TemplateItem = {
@@ -626,6 +649,8 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
       };
       const newItems = [...items, copiedItem];
       setItems(newItems);
+      
+      // Call onSave with the updated items
       if (onSave) {
         onSave(newItems);
       }
@@ -633,11 +658,14 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   };
 
   const handleMoveUp = (id: string) => {
+    console.log('Moving up item with id:', id);
     const index = items.findIndex(item => item.id === id);
     if (index > 0) {
       const newItems = [...items];
       [newItems[index - 1], newItems[index]] = [newItems[index], newItems[index - 1]];
       setItems(newItems);
+      
+      // Call onSave with the updated items
       if (onSave) {
         onSave(newItems);
       }
@@ -645,11 +673,14 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   };
 
   const handleMoveDown = (id: string) => {
+    console.log('Moving down item with id:', id);
     const index = items.findIndex(item => item.id === id);
     if (index < items.length - 1) {
       const newItems = [...items];
       [newItems[index], newItems[index + 1]] = [newItems[index + 1], newItems[index]];
       setItems(newItems);
+      
+      // Call onSave with the updated items
       if (onSave) {
         onSave(newItems);
       }
@@ -863,7 +894,6 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
         </Paper>
       )}
 
-      {/* Dialogs */}
       <AddSectionOverlay
         open={addSectionOpen}
         onClose={() => setAddSectionOpen(false)}
