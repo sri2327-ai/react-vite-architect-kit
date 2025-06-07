@@ -312,7 +312,6 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
       }
     }}>
         
-
         {/* Summary Cards - Responsive Grid */}
         <Box sx={{
         display: 'grid',
@@ -551,53 +550,74 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
               </TableContainer>
             </Box>}
 
-          <TablePagination rowsPerPageOptions={[5, 10, 25]} component="div" count={invoices.length} rowsPerPage={rowsPerPage} page={page} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} sx={{
-          borderTop: '1px solid #e0e0e0',
-          '& .MuiTablePagination-toolbar': {
-            px: {
-              xs: 1,
-              sm: 1.5,
-              md: 2
-            },
-            flexWrap: 'wrap',
-            minHeight: {
-              xs: 'auto',
-              md: 52
-            }
-          },
-          '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
-            fontSize: {
-              xs: '0.75rem',
-              sm: '0.875rem',
-              md: '1rem'
-            },
-            margin: {
-              xs: '4px 0',
-              md: 0
-            }
-          },
-          '& .MuiTablePagination-select': {
-            fontSize: {
-              xs: '0.75rem',
-              sm: '0.875rem'
-            }
-          },
-          '& .MuiTablePagination-actions': {
-            ml: {
-              xs: 0,
-              md: 1
-            }
-          },
-          '& .MuiIconButton-root': {
-            padding: {
-              xs: '4px',
-              md: '8px'
-            },
-            '&:hover': {
-              backgroundColor: '#f5f5f5'
-            }
-          }
-        }} />
+          <TablePagination 
+            rowsPerPageOptions={[5, 10, 25]} 
+            component="div" 
+            count={invoices.length} 
+            rowsPerPage={rowsPerPage} 
+            page={page} 
+            onPageChange={handleChangePage} 
+            onRowsPerPageChange={handleChangeRowsPerPage} 
+            sx={{
+              borderTop: '1px solid #e0e0e0',
+              background: 'transparent !important',
+              backgroundColor: 'transparent !important',
+              '& .MuiTablePagination-toolbar': {
+                px: {
+                  xs: 1,
+                  sm: 1.5,
+                  md: 2
+                },
+                flexWrap: 'wrap',
+                minHeight: {
+                  xs: 'auto',
+                  md: 52
+                },
+                background: 'transparent !important',
+                backgroundColor: 'transparent !important',
+              },
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                fontSize: {
+                  xs: '0.75rem',
+                  sm: '0.875rem',
+                  md: '1rem'
+                },
+                margin: {
+                  xs: '4px 0',
+                  md: 0
+                }
+              },
+              '& .MuiTablePagination-select': {
+                fontSize: {
+                  xs: '0.75rem',
+                  sm: '0.875rem'
+                },
+                background: 'transparent !important',
+                backgroundColor: 'transparent !important',
+              },
+              '& .MuiTablePagination-actions': {
+                ml: {
+                  xs: 0,
+                  md: 1
+                }
+              },
+              '& .MuiIconButton-root': {
+                padding: {
+                  xs: '4px',
+                  md: '8px'
+                },
+                background: 'transparent !important',
+                backgroundColor: 'transparent !important',
+                '&:hover': {
+                  backgroundColor: '#f5f5f5'
+                }
+              },
+              '& *': {
+                background: 'transparent !important',
+                backgroundColor: 'transparent !important',
+              }
+            }} 
+          />
         </Paper>
 
         {/* Alert for Overdue/Failed Invoices */}
