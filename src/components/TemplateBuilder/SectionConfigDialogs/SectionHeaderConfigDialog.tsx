@@ -45,65 +45,105 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
       PaperProps={{
         sx: {
           borderRadius: 3,
-          maxHeight: '90vh'
+          maxHeight: '90vh',
+          m: { xs: 1, sm: 2 }
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2 }}>
+      <DialogTitle sx={{ pb: 2, px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={2}>
+          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
             <IconButton 
               onClick={onBack}
+              size="small"
               sx={{
                 backgroundColor: alpha('#000', 0.05),
                 '&:hover': { backgroundColor: alpha('#000', 0.1) }
               }}
             >
-              <ArrowBackIcon />
+              <ArrowBackIcon fontSize="small" />
             </IconButton>
             <Box>
-              <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 700, 
+                  mb: 0.5,
+                  fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                }}
+              >
                 Configure Section Header
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+              >
                 Add a header to organize your template sections
               </Typography>
             </Box>
           </Box>
           <IconButton 
             onClick={onClose}
+            size="small"
             sx={{
               backgroundColor: alpha('#000', 0.05),
               '&:hover': { backgroundColor: alpha('#000', 0.1) }
             }}
           >
-            <CloseIcon />
+            <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
       </DialogTitle>
 
       <Divider />
 
-      <DialogContent sx={{ p: 3 }}>
+      <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
         <Alert 
           severity="info" 
           icon={<TitleIcon />}
           sx={{ 
             mb: 3,
             borderRadius: 2,
-            '& .MuiAlert-message': { fontSize: '0.875rem' }
+            '& .MuiAlert-message': { fontSize: { xs: '0.8rem', sm: '0.875rem' } }
           }}
         >
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              mb: 1, 
+              fontWeight: 600,
+              fontSize: { xs: '0.85rem', sm: '0.9rem' }
+            }}
+          >
             How Section Headers Work
           </Typography>
-          <Typography variant="body2">
+          <Typography 
+            variant="body2"
+            sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+          >
             Section headers help organize your note into clear, distinct sections. Use them to create a logical structure in your notes. This will not impact the A.I. generation.
           </Typography>
         </Alert>
 
-        <Paper sx={{ p: 3, mb: 3, bgcolor: alpha('#e3f2fd', 0.3), borderRadius: 2, border: `1px solid ${alpha('#2196f3', 0.2)}` }}>
-          <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: '#1976d2' }}>
+        <Paper 
+          sx={{ 
+            p: { xs: 2, sm: 3 }, 
+            mb: 3, 
+            bgcolor: alpha('#e3f2fd', 0.3), 
+            borderRadius: 2, 
+            border: `1px solid ${alpha('#2196f3', 0.2)}` 
+          }}
+        >
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              mb: 2, 
+              fontWeight: 600, 
+              color: '#1976d2',
+              fontSize: { xs: '0.85rem', sm: '0.9rem' }
+            }}
+          >
             💡 Common Section Headers
           </Typography>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
@@ -116,13 +156,15 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
                 sx={{
                   textTransform: 'none',
                   borderRadius: 2,
-                  fontSize: '0.75rem',
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
                   borderColor: alpha('#2196f3', 0.3),
                   color: '#1976d2',
                   '&:hover': {
                     borderColor: '#2196f3',
                     backgroundColor: alpha('#2196f3', 0.05)
-                  }
+                  },
+                  px: { xs: 1, sm: 1.5 },
+                  py: { xs: 0.5, sm: 0.75 }
                 }}
               >
                 {example}
@@ -138,6 +180,7 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter the section header name"
           variant="outlined"
+          size="small"
           sx={{
             '& .MuiOutlinedInput-root': {
               borderRadius: 2
@@ -148,16 +191,18 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
 
       <Divider />
 
-      <DialogActions sx={{ p: 3, gap: 2 }}>
+      <DialogActions sx={{ p: { xs: 2, sm: 3 }, gap: { xs: 1, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}>
         <Button 
           onClick={onBack}
           variant="outlined"
           size="large"
+          fullWidth={{ xs: true, sm: false }}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
-            px: 3
+            px: 3,
+            fontSize: { xs: '0.85rem', sm: '0.9rem' }
           }}
         >
           Back
@@ -167,6 +212,7 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
           size="large"
           onClick={handleContinue}
           disabled={!title}
+          fullWidth={{ xs: true, sm: false }}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -180,7 +226,8 @@ const SectionHeaderConfigDialog: React.FC<SectionHeaderConfigDialogProps> = ({
             '&:disabled': {
               boxShadow: 'none'
             },
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            fontSize: { xs: '0.85rem', sm: '0.9rem' }
           }}
         >
           Continue to Placement

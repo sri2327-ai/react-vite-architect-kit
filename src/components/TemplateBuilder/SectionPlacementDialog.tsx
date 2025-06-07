@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -130,8 +131,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           setSelectedPosition(position);
         }}
         sx={{
-          p: 3,
-          mb: 3,
+          p: { xs: 2, sm: 3 },
+          mb: { xs: 2, sm: 3 },
           cursor: 'pointer',
           borderRadius: 4,
           border: `3px solid ${isSelected ? theme.palette.primary.main : 'transparent'}`,
@@ -168,15 +169,15 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           }
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={3}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 2, sm: 3 }}>
           <Box
             className="placement-icon"
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 56,
-              height: 56,
+              width: { xs: 48, sm: 56 },
+              height: { xs: 48, sm: 56 },
               borderRadius: '50%',
               backgroundColor: isSelected 
                 ? theme.palette.primary.main
@@ -199,16 +200,16 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               }
             }}
           >
-            <IconComponent className={isSpecial ? "" : "placement-arrow"} sx={{ fontSize: 28 }} />
+            <IconComponent className={isSpecial ? "" : "placement-arrow"} sx={{ fontSize: { xs: 24, sm: 28 } }} />
           </Box>
           
-          <Box sx={{ flex: 1 }}>
+          <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
             <Typography 
               variant="h6" 
               sx={{ 
                 fontWeight: 700,
                 color: isSelected ? theme.palette.primary.main : theme.palette.text.primary,
-                fontSize: '1.2rem',
+                fontSize: { xs: '1rem', sm: '1.2rem' },
                 mb: 0.5,
                 transition: 'color 0.3s ease'
               }}
@@ -219,8 +220,9 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               variant="body2" 
               sx={{ 
                 color: theme.palette.text.secondary,
-                fontSize: '0.9rem',
-                fontWeight: 500
+                fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                fontWeight: 500,
+                lineHeight: 1.4
               }}
             >
               {description}
@@ -230,17 +232,18 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           {isSelected && (
             <Box
               sx={{
-                width: 32,
-                height: 32,
+                width: { xs: 28, sm: 32 },
+                height: { xs: 28, sm: 32 },
                 borderRadius: '50%',
                 backgroundColor: theme.palette.success.main,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: `0 4px 12px ${alpha(theme.palette.success.main, 0.4)}`
+                boxShadow: `0 4px 12px ${alpha(theme.palette.success.main, 0.4)}`,
+                order: { xs: -1, sm: 0 }
               }}
             >
-              <CheckCircleIcon sx={{ color: 'white', fontSize: 20 }} />
+              <CheckCircleIcon sx={{ color: 'white', fontSize: { xs: 18, sm: 20 } }} />
             </Box>
           )}
         </Stack>
@@ -252,8 +255,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
     <Paper
       elevation={2}
       sx={{
-        p: 3,
-        mb: 3,
+        p: { xs: 2, sm: 3 },
+        mb: { xs: 2, sm: 3 },
         borderRadius: 3,
         backgroundColor: alpha(theme.palette.grey[50], 0.8),
         border: `2px solid ${alpha(theme.palette.divider, 0.1)}`,
@@ -265,32 +268,32 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
         }
       }}
     >
-      <Stack direction="row" alignItems="center" spacing={3}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 2, sm: 3 }}>
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: 48,
-            height: 48,
+            width: { xs: 40, sm: 48 },
+            height: { xs: 40, sm: 48 },
             borderRadius: 3,
             backgroundColor: alpha(theme.palette.grey[400], 0.15),
             color: theme.palette.grey[600],
             border: `2px solid ${alpha(theme.palette.grey[400], 0.2)}`
           }}
         >
-          <DragIndicatorIcon />
+          <DragIndicatorIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
         </Box>
         
-        <Box sx={{ flex: 1 }}>
-          <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 1 }}>
+        <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 1, sm: 2 }} sx={{ mb: 1 }}>
             {getTypeIcon(section.type)}
             <Typography 
               variant="subtitle1" 
               sx={{ 
                 fontWeight: 700,
                 color: theme.palette.text.primary,
-                fontSize: '1.1rem'
+                fontSize: { xs: '0.95rem', sm: '1.1rem' }
               }}
             >
               {section.name}
@@ -299,8 +302,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               label={getTypeLabel(section.type)}
               size="small"
               sx={{
-                height: 24,
-                fontSize: '0.75rem',
+                height: { xs: 22, sm: 24 },
+                fontSize: { xs: '0.7rem', sm: '0.75rem' },
                 fontWeight: 600,
                 backgroundColor: alpha(theme.palette.primary.main, 0.12),
                 color: theme.palette.primary.main,
@@ -313,7 +316,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
             sx={{ 
               color: theme.palette.text.secondary,
               fontStyle: 'italic',
-              fontSize: '0.8rem'
+              fontSize: { xs: '0.75rem', sm: '0.8rem' }
             }}
           >
             Position {index + 1} • Existing section
@@ -332,16 +335,18 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
       PaperProps={{
         sx: { 
           borderRadius: 4,
-          maxHeight: '85vh'
+          maxHeight: '85vh',
+          m: { xs: 1, sm: 2 }
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2 }}>
+      <DialogTitle sx={{ pb: 2, px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={2}>
+          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
             {onBack && (
               <IconButton 
                 onClick={handleBackClick}
+                size="small"
                 sx={{
                   backgroundColor: alpha(theme.palette.grey[500], 0.1),
                   '&:hover': {
@@ -351,20 +356,39 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                   transition: 'all 0.3s ease'
                 }}
               >
-                <ArrowBackIcon />
+                <ArrowBackIcon fontSize="small" />
               </IconButton>
             )}
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5, background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, backgroundClip: 'text', WebkitBackgroundClip: 'text', color: 'transparent' }}>
+              <Typography 
+                variant="h4" 
+                sx={{ 
+                  fontWeight: 800, 
+                  mb: 0.5, 
+                  fontSize: { xs: '1.2rem', sm: '1.5rem', md: '1.75rem' },
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, 
+                  backgroundClip: 'text', 
+                  WebkitBackgroundClip: 'text', 
+                  color: 'transparent' 
+                }}
+              >
                 Choose Section Placement
               </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
+              <Typography 
+                variant="body1" 
+                color="text.secondary" 
+                sx={{ 
+                  fontWeight: 500,
+                  fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1rem' }
+                }}
+              >
                 Select where you'd like to place your new section in the template
               </Typography>
             </Box>
           </Box>
           <IconButton 
             onClick={onClose}
+            size="small"
             sx={{
               backgroundColor: alpha(theme.palette.error.main, 0.1),
               color: theme.palette.error.main,
@@ -375,26 +399,45 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               transition: 'all 0.3s ease'
             }}
           >
-            <CloseIcon />
+            <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ px: 3 }}>
+      <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>
         <Box sx={{ mb: 3 }}>
           <Paper
             elevation={0}
             sx={{
-              p: 3,
+              p: { xs: 2, sm: 3 },
               borderRadius: 3,
               background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)}, ${alpha(theme.palette.primary.main, 0.05)})`,
               border: `2px solid ${alpha(theme.palette.info.main, 0.2)}`
             }}
           >
-            <Typography variant="h6" sx={{ color: theme.palette.info.main, fontWeight: 700, mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: theme.palette.info.main, 
+                fontWeight: 700, 
+                mb: 1, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                fontSize: { xs: '0.95rem', sm: '1.1rem' }
+              }}
+            >
               💡 Quick Tip
             </Typography>
-            <Typography variant="body2" sx={{ color: theme.palette.info.main, fontWeight: 500, lineHeight: 1.6 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: theme.palette.info.main, 
+                fontWeight: 500, 
+                lineHeight: 1.6,
+                fontSize: { xs: '0.8rem', sm: '0.875rem' }
+              }}
+            >
               Click on any placement zone to position your new section. You can place it at the beginning, end, or between any existing sections.
             </Typography>
           </Paper>
@@ -443,16 +486,30 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               elevation={0}
               sx={{
                 textAlign: 'center',
-                py: 8,
+                py: { xs: 6, sm: 8 },
                 borderRadius: 4,
                 border: `3px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
                 backgroundColor: alpha(theme.palette.primary.main, 0.02)
               }}
             >
-              <Typography variant="h5" sx={{ color: theme.palette.text.secondary, mb: 2, fontWeight: 600 }}>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  color: theme.palette.text.secondary, 
+                  mb: 2, 
+                  fontWeight: 600,
+                  fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                }}
+              >
                 This will be your first section
               </Typography>
-              <Typography variant="body1" sx={{ color: theme.palette.text.secondary }}>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  color: theme.palette.text.secondary,
+                  fontSize: { xs: '0.85rem', sm: '0.95rem' }
+                }}
+              >
                 Click "Place at Beginning" above to add your first template section
               </Typography>
             </Paper>
@@ -462,11 +519,12 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
 
       <Divider />
 
-      <DialogActions sx={{ p: 3, gap: 2 }}>
+      <DialogActions sx={{ p: { xs: 2, sm: 3 }, gap: { xs: 1, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}>
         <Button 
           onClick={onClose} 
           variant="outlined"
           size="large"
+          fullWidth={{ xs: true, sm: false }}
           sx={{
             borderRadius: 3,
             textTransform: 'none',
@@ -487,6 +545,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           variant="contained"
           size="large"
           disabled={selectedPosition === null}
+          fullWidth={{ xs: true, sm: false }}
           sx={{
             borderRadius: 3,
             textTransform: 'none',

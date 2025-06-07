@@ -283,26 +283,37 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       maxWidth="md"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 3, maxHeight: '90vh' }
+        sx: { 
+          borderRadius: 3, 
+          maxHeight: '90vh',
+          m: { xs: 1, sm: 2 }
+        }
       }}
     >
-      <DialogTitle sx={{ pb: 2 }}>
+      <DialogTitle sx={{ pb: 2, px: { xs: 2, sm: 3 }, pt: { xs: 2, sm: 3 } }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={1}>
+          <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1 }}>
             {onBack && (
               <IconButton 
                 onClick={handleBack} 
+                size="small"
                 sx={{ 
-                  mr: 1,
+                  mr: { xs: 0.5, sm: 1 },
                   bgcolor: 'action.hover',
                   '&:hover': { bgcolor: 'action.selected' }
                 }}
               >
-                <ArrowBackIcon />
+                <ArrowBackIcon fontSize="small" />
               </IconButton>
             )}
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  fontWeight: 600,
+                  fontSize: { xs: '1rem', sm: '1.25rem' }
+                }}
+              >
                 {isBulletedList ? 'Edit Bulleted List' : 
                  isExamList ? 'Edit Exam List' :
                  isChecklist ? 'Edit Checklist' :
@@ -313,24 +324,27 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                   label="Structured AI Output" 
                   size="small" 
                   variant="outlined"
-                  sx={{ mt: 0.5 }}
+                  sx={{ 
+                    mt: 0.5,
+                    fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                  }}
                 />
               )}
             </Box>
           </Box>
-          <IconButton onClick={onClose}>
-            <CloseIcon />
+          <IconButton onClick={onClose} size="small">
+            <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pb: 2 }}>
+      <DialogContent sx={{ pb: 2, px: { xs: 2, sm: 3 } }}>
         {isBulletedList && getBulletedListGuidance()}
         {isExamList && getExamListGuidance()}
         {isChecklist && getChecklistGuidance()}
         {!isBulletedList && !isExamList && !isChecklist && getGeneralGuidance()}
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
           <TextField
             fullWidth
             label="Section Title"
@@ -344,12 +358,18 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
           
           {isExamList && (
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: { xs: 2, sm: 3 } }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600,
+                    fontSize: { xs: '1rem', sm: '1.25rem' }
+                  }}
+                >
                   Exam Sections
                 </Typography>
                 <Tooltip title="Define what specific aspects of the exam the AI should report on">
-                  <InfoIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                  <InfoIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: 'text.secondary' }} />
                 </Tooltip>
               </Box>
               
@@ -365,16 +385,24 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                   }}
                 >
                   <CardContent sx={{ '&:last-child': { pb: 2 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                         <Chip 
                           label={`Section ${index + 1}`} 
                           size="small" 
                           color="primary" 
                           variant="outlined"
+                          sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
                         />
                         {item.title && (
-                          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              color: 'text.secondary', 
+                              fontWeight: 500,
+                              fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                            }}
+                          >
                             {item.title}
                           </Typography>
                         )}
@@ -389,7 +417,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                               '&:hover': { bgcolor: 'error.lighter' }
                             }}
                           >
-                            <DeleteIcon />
+                            <DeleteIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       )}
@@ -436,11 +464,13 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 startIcon={<AddIcon />}
                 onClick={addExamItem}
                 variant="outlined"
+                fullWidth={{ xs: true, sm: false }}
                 sx={{ 
                   mb: 4, 
                   textTransform: 'none',
                   borderStyle: 'dashed',
-                  '&:hover': { borderStyle: 'solid' }
+                  '&:hover': { borderStyle: 'solid' },
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' }
                 }}
               >
                 Add Another Exam Section
@@ -450,14 +480,27 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               
               <Accordion defaultExpanded sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200' }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 600,
+                      fontSize: { xs: '1rem', sm: '1.25rem' }
+                    }}
+                  >
                     Normal Limits Settings
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <FormControl component="fieldset">
-                      <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600 }}>
+                      <FormLabel 
+                        component="legend" 
+                        sx={{ 
+                          mb: 2, 
+                          fontWeight: 600,
+                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                        }}
+                      >
                         When an exam section is not discussed:
                       </FormLabel>
                       <RadioGroup
@@ -469,8 +512,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Leave it blank</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Section won't appear in the final output</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Leave it blank</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Section won't appear in the final output</Typography>
                             </Box>
                           }
                         />
@@ -479,8 +522,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Default to "Within Normal Limits"</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Use standard normal findings text</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Default to "Within Normal Limits"</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Use standard normal findings text</Typography>
                             </Box>
                           }
                         />
@@ -489,8 +532,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Alert provider to discuss this item</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Add a reminder note for missing sections</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Alert provider to discuss this item</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Add a reminder note for missing sections</Typography>
                             </Box>
                           }
                         />
@@ -498,7 +541,14 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                     </FormControl>
                     
                     <FormControl component="fieldset">
-                      <FormLabel component="legend" sx={{ mb: 2, fontWeight: 600 }}>
+                      <FormLabel 
+                        component="legend" 
+                        sx={{ 
+                          mb: 2, 
+                          fontWeight: 600,
+                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                        }}
+                      >
                         When findings are within normal limits:
                       </FormLabel>
                       <RadioGroup
@@ -510,8 +560,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Summarize the discussion</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>AI generates summary of normal findings</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Summarize the discussion</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>AI generates summary of normal findings</Typography>
                             </Box>
                           }
                         />
@@ -520,8 +570,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Use specified "Normal Limits" text</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Use the text you defined above</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Use specified "Normal Limits" text</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Use the text you defined above</Typography>
                             </Box>
                           }
                         />
@@ -530,8 +580,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           control={<Radio size="small" />} 
                           label={
                             <Box>
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>Highlight abnormal findings only</Typography>
-                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>Focus on what's not normal</Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Highlight abnormal findings only</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Focus on what's not normal</Typography>
                             </Box>
                           }
                         />
@@ -549,8 +599,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         }
                         label={
                           <Box>
-                            <Typography variant="body2" sx={{ fontWeight: 500 }}>Hide empty sections</Typography>
-                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>Don't show sections with no content</Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 500, fontSize: { xs: '0.8rem', sm: '0.875rem' } }}>Hide empty sections</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>Don't show sections with no content</Typography>
                           </Box>
                         }
                       />
@@ -563,25 +613,38 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
 
           {isChecklist && (
             <Box>
-              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  mb: 2, 
+                  fontWeight: 500,
+                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                }}
+              >
                 What buttons do you want to include?
               </Typography>
               
               {checklistItems.map((item, index) => (
                 <Card key={item.id} sx={{ mb: 2, border: '1px solid', borderColor: 'grey.300' }}>
-                  <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                  <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, flexWrap: 'wrap', gap: 1 }}>
+                      <Typography 
+                        variant="subtitle2" 
+                        sx={{ 
+                          fontWeight: 600,
+                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                        }}
+                      >
                         Item {index + 1}
                       </Typography>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                         <IconButton 
                           size="small" 
                           onClick={() => moveChecklistItem(item.id, 'up')}
                           disabled={index === 0}
                           title="Move Up"
                         >
-                          <MoveUpIcon />
+                          <MoveUpIcon fontSize="small" />
                         </IconButton>
                         <IconButton 
                           size="small" 
@@ -589,7 +652,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           disabled={index === checklistItems.length - 1}
                           title="Move Down"
                         >
-                          <MoveDownIcon />
+                          <MoveDownIcon fontSize="small" />
                         </IconButton>
                         {checklistItems.length > 1 && (
                           <IconButton 
@@ -598,7 +661,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                             sx={{ color: 'error.main' }}
                             title="Delete Item"
                           >
-                            <DeleteIcon />
+                            <DeleteIcon fontSize="small" />
                           </IconButton>
                         )}
                       </Box>
@@ -632,7 +695,12 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               <Button
                 startIcon={<AddIcon />}
                 onClick={addChecklistItem}
-                sx={{ mb: 3, textTransform: 'none' }}
+                fullWidth={{ xs: true, sm: false }}
+                sx={{ 
+                  mb: 3, 
+                  textTransform: 'none',
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                }}
               >
                 Add Another Item
               </Button>
@@ -667,15 +735,24 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 1, gap: 1 }}>
-        <Button onClick={onClose} variant="outlined">
+      <DialogActions sx={{ p: { xs: 2, sm: 3 }, pt: 1, gap: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
+        <Button 
+          onClick={onClose} 
+          variant="outlined"
+          fullWidth={{ xs: true, sm: false }}
+          sx={{ fontSize: { xs: '0.85rem', sm: '0.9rem' } }}
+        >
           Cancel
         </Button>
         <Button 
           variant="contained" 
           onClick={handleContinue}
           disabled={!title.trim()}
-          sx={{ minWidth: 120 }}
+          fullWidth={{ xs: true, sm: false }}
+          sx={{ 
+            minWidth: 120,
+            fontSize: { xs: '0.85rem', sm: '0.9rem' }
+          }}
         >
           Continue
         </Button>
