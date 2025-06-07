@@ -1,0 +1,267 @@
+
+import React, { useState } from 'react';
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  useTheme,
+  useMediaQuery
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon
+} from '@mui/icons-material';
+import { bravoColors } from '@/theme/colors';
+import { InputField } from '@/components/form/InputField/InputField';
+import { templateBuilderService } from '@/services/templateBuilderService';
+
+interface VisitType {
+  id: string;
+  name: string;
+  description?: string;
+}
+
+interface VisitTypeManagerProps {
+  onVisitTypeSelect?: (visitType: VisitType) => void;
+}
+
+const VisitTypeManager: React.FC<VisitTypeManagerProps> = ({ onVisitTypeSelect }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  const [visitTypes, setVisitTypes] = useState<VisitType[]>(() => {
+    return templateBuilderService.getVisitTypes().map(vt => ({
+      id: vt.id,
+      name: vt.name,
+      description: `Template for ${vt.name} appointments`
+    }));
+  });
+  
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [editingVisitType, setEditingVisitType] = useState<VisitType | null>(null);
+  const [formData, setFormData] = useState({ name: '', description: '' });
+
+  const handleOpenCreateDialog = () => {
+    setFormData({ name: '', description: '' });
+    setEditingVisitType(null);
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleEditVisitType = (visitType: VisitType) => {
+    setFormData({ name: visitType.name, description: visitType.description || '' });
+    setEditingVisitType(visitType);
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleSaveVisitType = () => {
+    if (!formData.name.trim()) return;
+
+    const visitTypeData = {
+      id: editingVisitType?.id || `vt-${Date.now()}`,
+      name: formData.name,
+      description: formData.description
+    };
+
+    if (editingVisitType) {
+      setVisitTypes(prev => prev.map(vt => vt.id === editingVisitType.id ? visitTypeData : vt));
+    } else {
+      setVisitTypes(prev => [...prev, visitTypeData]);
+    }
+
+    setIsCreateDialogOpen(false);
+    setFormData({ name: '', description: '' });
+    setEditingVisitType(null);
+  };
+
+  const handleDeleteVisitType = (id: string) => {
+    setVisitTypes(prev => prev.filter(vt => vt.id !== id));
+  };
+
+  return (
+    <Box sx={{ mb: 4 }}>
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        mb: 3,
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: 2, sm: 0 }
+      }}>
+        <Typography 
+          variant="h5" 
+          sx={{ 
+            color: bravoColors.primaryFlat, 
+            fontWeight: 600,
+            textAlign: { xs: 'center', sm: 'left' }
+          }}
+        >
+          Visit Types
+        </Typography>
+        
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleOpenCreateDialog}
+          sx={{
+            backgroundColor: bravoColors.secondary,
+            borderRadius: 2,
+            px: 3,
+            py: 1,
+            textTransform: 'none',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            '&:hover': {
+              backgroundColor: bravoColors.primaryFlat,
+            },
+            width: { xs: '100%', sm: 'auto' }
+          }}
+        >
+          Add Visit Type
+        </Button>
+      </Box>
+
+      <Grid container spacing={2}>
+        {visitTypes.map((visitType) => (
+          <Grid key={visitType.id} size={{ xs: 12, sm: 6, md: 4 }}>
+            <Card 
+              sx={{ 
+                height: '100%',
+                border: `1px solid ${bravoColors.primary}20`,
+                borderRadius: 2,
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  borderColor: bravoColors.primaryFlat,
+                  transform: 'translateY(-2px)',
+                  boxShadow: `0 4px 12px ${bravoColors.primaryFlat}20`
+                }
+              }}
+            >
+              <CardContent sx={{ pb: 1 }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600,
+                    color: bravoColors.primaryFlat,
+                    mb: 1
+                  }}
+                >
+                  {visitType.name}
+                </Typography>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary"
+                  sx={{ minHeight: 40 }}
+                >
+                  {visitType.description}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ pt: 0, justifyContent: 'flex-end' }}>
+                <IconButton
+                  size="small"
+                  onClick={() => handleEditVisitType(visitType)}
+                  sx={{ color: bravoColors.primaryFlat }}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => handleDeleteVisitType(visitType.id)}
+                  sx={{ color: 'error.main' }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      {visitTypes.length === 0 && (
+        <Box sx={{
+          textAlign: 'center',
+          py: 6,
+          color: 'text.secondary'
+        }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            No visit types created yet
+          </Typography>
+          <Typography variant="body2">
+            Create your first visit type to start organizing your templates.
+          </Typography>
+        </Box>
+      )}
+
+      <Dialog
+        open={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        fullScreen={isMobile}
+        PaperProps={{
+          sx: {
+            borderRadius: isMobile ? 0 : 2
+          }
+        }}
+      >
+        <DialogTitle>
+          {editingVisitType ? 'Edit Visit Type' : 'Create New Visit Type'}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <InputField
+              name="name"
+              label="Visit Type Name"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="e.g., Office Visit, Follow-up, Annual Physical"
+            />
+            <InputField
+              name="description"
+              label="Description"
+              value={formData.description}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              placeholder="Brief description of this visit type"
+              multiline
+              rows={3}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button 
+            onClick={() => setIsCreateDialogOpen(false)}
+            sx={{ textTransform: 'none' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSaveVisitType}
+            variant="contained"
+            disabled={!formData.name.trim()}
+            sx={{
+              backgroundColor: bravoColors.primaryFlat,
+              textTransform: 'none',
+              '&:hover': {
+                backgroundColor: bravoColors.secondary
+              }
+            }}
+          >
+            {editingVisitType ? 'Update' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+};
+
+export default VisitTypeManager;

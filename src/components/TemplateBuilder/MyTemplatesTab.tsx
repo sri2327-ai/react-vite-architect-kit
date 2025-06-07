@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -7,7 +8,8 @@ import {
   Dialog,
   useTheme,
   useMediaQuery,
-  Container
+  Container,
+  Divider
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
@@ -15,6 +17,7 @@ import TemplateCard from './TemplateCard';
 import TemplateFilters from './TemplateFilters';
 import ImprovedTemplateCreationDialog from './ImprovedTemplateCreationDialog';
 import DraggableTemplateEditor from './DraggableTemplateEditor';
+import VisitTypeManager from './VisitTypeManager';
 import { useTemplateData } from '@/hooks/useTemplateData';
 import { useApiContext } from '@/contexts/ApiContext';
 
@@ -99,6 +102,12 @@ const MyTemplatesTab: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 1, sm: 2, md: 3 } }}>
+      {/* Visit Type Management Section */}
+      <VisitTypeManager />
+      
+      <Divider sx={{ my: 4, borderColor: `${bravoColors.primary}20` }} />
+      
+      {/* Templates Section */}
       <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
         <Box sx={{
           display: 'flex',
