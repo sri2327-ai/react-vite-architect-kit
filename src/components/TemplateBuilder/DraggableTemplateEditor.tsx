@@ -145,6 +145,13 @@ const SortableItem: React.FC<SortableItemProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
+  // Prevent event bubbling for all button clicks
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    e.preventDefault();
+    e.stopPropagation();
+    action();
+  };
+
   return (
     <div ref={setNodeRef} style={style}>
       <Fade in={true} timeout={300}>
@@ -254,7 +261,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   <Tooltip title="Move Up">
                     <IconButton
                       size="small"
-                      onClick={() => onMoveUp(item.id)}
+                      onClick={(e) => handleButtonClick(e, () => onMoveUp(item.id))}
                       disabled={index === 0}
                       sx={{ 
                         backgroundColor: alpha(theme.palette.action.active, 0.08),
@@ -269,7 +276,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   <Tooltip title="Move Down">
                     <IconButton
                       size="small"
-                      onClick={() => onMoveDown(item.id)}
+                      onClick={(e) => handleButtonClick(e, () => onMoveDown(item.id))}
                       disabled={index === totalItems - 1}
                       sx={{ 
                         backgroundColor: alpha(theme.palette.action.active, 0.08),
@@ -284,7 +291,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   <Tooltip title="Duplicate">
                     <IconButton
                       size="small"
-                      onClick={() => onCopy(item.id)}
+                      onClick={(e) => handleButtonClick(e, () => onCopy(item.id))}
                       sx={{ 
                         backgroundColor: alpha(theme.palette.info.main, 0.08),
                         color: theme.palette.info.main,
@@ -298,7 +305,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   <Tooltip title="Delete">
                     <IconButton
                       size="small"
-                      onClick={() => onDelete(item.id)}
+                      onClick={(e) => handleButtonClick(e, () => onDelete(item.id))}
                       sx={{ 
                         backgroundColor: alpha(theme.palette.error.main, 0.08),
                         color: theme.palette.error.main,
@@ -398,7 +405,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                 <Button
                   variant="contained"
                   startIcon={<AutoFixHighIcon />}
-                  onClick={() => onAiEdit(item.id)}
+                  onClick={(e) => handleButtonClick(e, () => onAiEdit(item.id))}
                   sx={{
                     borderRadius: 2,
                     textTransform: 'none',
@@ -417,7 +424,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
                 <Button
                   variant="outlined"
                   startIcon={<HelpIcon />}
-                  onClick={() => onHelp(item.id)}
+                  onClick={(e) => handleButtonClick(e, () => onHelp(item.id))}
                   sx={{
                     borderRadius: 2,
                     textTransform: 'none',
@@ -494,7 +501,11 @@ const DraggableTemplateEditor: React.FC<DraggableTemplateEditorProps> = ({
   }, [initialItems]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
