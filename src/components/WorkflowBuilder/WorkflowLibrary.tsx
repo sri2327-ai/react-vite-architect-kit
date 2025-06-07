@@ -3,7 +3,11 @@ import React from 'react';
 import { Container, Box, Typography } from '@mui/material';
 import { PageHeader } from '@/components/common/Layout';
 
-const WorkflowLibrary: React.FC = () => {
+interface WorkflowLibraryProps {
+  onImportWorkflow?: (workflow: any) => void;
+}
+
+const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) => {
   return (
     <Container 
       maxWidth={false} 

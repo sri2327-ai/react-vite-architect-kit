@@ -3,7 +3,15 @@ import React from 'react';
 import { Container, Box, Typography } from '@mui/material';
 import { PageHeader } from '@/components/common/Layout';
 
-const MyWorkflows: React.FC = () => {
+interface MyWorkflowsProps {
+  importedWorkflows?: any[];
+  setImportedWorkflows?: React.Dispatch<React.SetStateAction<any[]>>;
+}
+
+const MyWorkflows: React.FC<MyWorkflowsProps> = ({ 
+  importedWorkflows = [], 
+  setImportedWorkflows 
+}) => {
   return (
     <Container 
       maxWidth={false} 
