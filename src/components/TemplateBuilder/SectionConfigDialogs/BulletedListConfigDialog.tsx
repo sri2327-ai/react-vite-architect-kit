@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -27,6 +26,7 @@ import {
   Lightbulb as LightbulbIcon
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
+import { useResponsive } from '../../../hooks/useResponsive';
 
 interface BulletedListConfigDialogProps {
   open: boolean;
@@ -41,6 +41,8 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
   onContinue,
   onBack
 }) => {
+  const { isMobile, isTablet } = useResponsive();
+  
   const [title, setTitle] = useState('');
   const [instructions, setInstructions] = useState('');
   const [titleError, setTitleError] = useState('');
@@ -103,44 +105,67 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
       onClose={onClose} 
       maxWidth="md" 
       fullWidth
+      fullScreen={isMobile}
       PaperProps={{
         sx: {
-          borderRadius: 3,
-          maxHeight: '90vh',
-          boxShadow: '0 24px 56px rgba(0,0,0,0.15)'
+          borderRadius: { xs: 0, sm: 3 },
+          maxHeight: { xs: '100vh', sm: '90vh' },
+          boxShadow: '0 24px 56px rgba(0,0,0,0.15)',
+          m: { xs: 0, sm: 2 }
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2, px: 3, pt: 3 }}>
+      <DialogTitle sx={{ 
+        pb: { xs: 1, sm: 2 }, 
+        px: { xs: 2, sm: 3 }, 
+        pt: { xs: 2, sm: 3 },
+        position: { xs: 'sticky', sm: 'static' },
+        top: 0,
+        zIndex: 1,
+        backgroundColor: 'background.paper'
+      }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={2}>
+          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
             <IconButton 
               onClick={onBack}
               size="small"
               sx={{
                 backgroundColor: alpha('#000', 0.05),
-                '&:hover': { backgroundColor: alpha('#000', 0.1) }
+                '&:hover': { backgroundColor: alpha('#000', 0.1) },
+                minWidth: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 }
               }}
             >
               <ArrowBackIcon fontSize="small" />
             </IconButton>
-            <Box display="flex" alignItems="center" gap={1.5}>
+            <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 1.5 }}>
               <Box 
                 sx={{
                   backgroundColor: alpha('#4caf50', 0.1),
-                  p: 1,
+                  p: { xs: 0.75, sm: 1 },
                   borderRadius: 2,
                   display: 'flex',
                   alignItems: 'center'
                 }}
               >
-                <ListIcon sx={{ fontSize: 20, color: '#388e3c' }} />
+                <ListIcon sx={{ fontSize: { xs: 18, sm: 20 }, color: '#388e3c' }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 700, 
+                    mb: 0.5, 
+                    fontSize: { xs: '1rem', sm: '1.1rem' }
+                  }}
+                >
                   Configure Bulleted List Section
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                >
                   AI-generated bulleted content
                 </Typography>
               </Box>
@@ -151,7 +176,9 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
             size="small"
             sx={{
               backgroundColor: alpha('#000', 0.05),
-              '&:hover': { backgroundColor: alpha('#000', 0.1) }
+              '&:hover': { backgroundColor: alpha('#000', 0.1) },
+              minWidth: { xs: 36, sm: 40 },
+              minHeight: { xs: 36, sm: 40 }
             }}
           >
             <CloseIcon fontSize="small" />
@@ -161,8 +188,12 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
 
       <Divider />
 
-      <DialogContent sx={{ p: 3 }}>
-        <Stack spacing={3}>
+      <DialogContent sx={{ 
+        p: { xs: 2, sm: 3 },
+        overflowY: 'auto',
+        flex: 1
+      }}>
+        <Stack spacing={{ xs: 2, sm: 3 }}>
           <Alert 
             severity="info" 
             icon={<ListIcon />}
@@ -220,6 +251,12 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
+              },
+              '& .MuiFormHelperText-root': {
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: { xs: '0.85rem', sm: '0.875rem' }
               }
             }}
           />
@@ -228,7 +265,7 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
             fullWidth
             label="What do you want the A.I. to generate bullets for?"
             multiline
-            rows={5}
+            rows={isMobile ? 3 : isTablet ? 4 : 5}
             value={instructions}
             onChange={(e) => {
               setInstructions(e.target.value);
@@ -242,6 +279,12 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
+              },
+              '& .MuiFormHelperText-root': {
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: { xs: '0.85rem', sm: '0.875rem' }
               }
             }}
           />
@@ -288,16 +331,28 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
 
       <Divider />
 
-      <DialogActions sx={{ p: 3, gap: 2 }}>
+      <DialogActions sx={{ 
+        p: { xs: 2, sm: 3 }, 
+        gap: { xs: 1, sm: 2 },
+        flexDirection: { xs: 'column', sm: 'row' },
+        position: { xs: 'sticky', sm: 'static' },
+        bottom: 0,
+        backgroundColor: 'background.paper',
+        borderTop: { xs: '1px solid', sm: 'none' },
+        borderColor: { xs: 'divider', sm: 'transparent' }
+      }}>
         <Button 
           onClick={onBack}
           variant="outlined"
           size="medium"
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
-            px: 3
+            px: 3,
+            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            py: { xs: 1.5, sm: 1 }
           }}
         >
           Back
@@ -307,6 +362,7 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
           size="medium"
           onClick={handleContinue}
           disabled={!title.trim() || !instructions.trim()}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -320,7 +376,9 @@ const BulletedListConfigDialog: React.FC<BulletedListConfigDialogProps> = ({
             '&:disabled': {
               boxShadow: 'none'
             },
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            py: { xs: 1.5, sm: 1 }
           }}
         >
           Continue to Placement

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -29,6 +28,7 @@ import {
   Lightbulb as LightbulbIcon
 } from '@mui/icons-material';
 import { alpha } from '@mui/material/styles';
+import { useResponsive } from '../../../hooks/useResponsive';
 
 interface ParagraphConfigDialogProps {
   open: boolean;
@@ -43,6 +43,8 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
   onContinue,
   onBack
 }) => {
+  const { isMobile, isTablet } = useResponsive();
+  
   const [title, setTitle] = useState('');
   const [instructions, setInstructions] = useState('');
   const [titleError, setTitleError] = useState('');
@@ -105,44 +107,67 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
       onClose={onClose} 
       maxWidth="md" 
       fullWidth
+      fullScreen={isMobile}
       PaperProps={{
         sx: {
-          borderRadius: 3,
-          maxHeight: '90vh',
-          boxShadow: '0 24px 56px rgba(0,0,0,0.15)'
+          borderRadius: { xs: 0, sm: 3 },
+          maxHeight: { xs: '100vh', sm: '90vh' },
+          boxShadow: '0 24px 56px rgba(0,0,0,0.15)',
+          m: { xs: 0, sm: 2 }
         }
       }}
     >
-      <DialogTitle sx={{ pb: 2, px: 3, pt: 3 }}>
+      <DialogTitle sx={{ 
+        pb: { xs: 1, sm: 2 }, 
+        px: { xs: 2, sm: 3 }, 
+        pt: { xs: 2, sm: 3 },
+        position: { xs: 'sticky', sm: 'static' },
+        top: 0,
+        zIndex: 1,
+        backgroundColor: 'background.paper'
+      }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={2}>
+          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 2 }}>
             <IconButton 
               onClick={onBack}
               size="small"
               sx={{
                 backgroundColor: alpha('#000', 0.05),
-                '&:hover': { backgroundColor: alpha('#000', 0.1) }
+                '&:hover': { backgroundColor: alpha('#000', 0.1) },
+                minWidth: { xs: 36, sm: 40 },
+                minHeight: { xs: 36, sm: 40 }
               }}
             >
               <ArrowBackIcon fontSize="small" />
             </IconButton>
-            <Box display="flex" alignItems="center" gap={1.5}>
+            <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 1.5 }}>
               <Box 
                 sx={{
                   backgroundColor: alpha('#2196f3', 0.1),
-                  p: 1,
+                  p: { xs: 0.75, sm: 1 },
                   borderRadius: 2,
                   display: 'flex',
                   alignItems: 'center'
                 }}
               >
-                <ArticleIcon sx={{ fontSize: 20, color: '#1976d2' }} />
+                <ArticleIcon sx={{ fontSize: { xs: 18, sm: 20 }, color: '#1976d2' }} />
               </Box>
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, fontSize: '1.1rem' }}>
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 700, 
+                    mb: 0.5, 
+                    fontSize: { xs: '1rem', sm: '1.1rem' }
+                  }}
+                >
                   Configure Paragraph Section
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+                >
                   AI-generated paragraph content
                 </Typography>
               </Box>
@@ -153,7 +178,9 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
             size="small"
             sx={{
               backgroundColor: alpha('#000', 0.05),
-              '&:hover': { backgroundColor: alpha('#000', 0.1) }
+              '&:hover': { backgroundColor: alpha('#000', 0.1) },
+              minWidth: { xs: 36, sm: 40 },
+              minHeight: { xs: 36, sm: 40 }
             }}
           >
             <CloseIcon fontSize="small" />
@@ -163,30 +190,59 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
 
       <Divider />
 
-      <DialogContent sx={{ p: 3 }}>
-        <Stack spacing={3}>
+      <DialogContent sx={{ 
+        p: { xs: 2, sm: 3 },
+        overflowY: 'auto',
+        flex: 1
+      }}>
+        <Stack spacing={{ xs: 2, sm: 3 }}>
           <Alert 
             severity="info" 
             icon={<InfoIcon />}
             sx={{ 
               borderRadius: 2,
-              '& .MuiAlert-message': { fontSize: '0.875rem' }
+              '& .MuiAlert-message': { fontSize: { xs: '0.8rem', sm: '0.875rem' } }
             }}
           >
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+            <Typography 
+              variant="subtitle2" 
+              sx={{ 
+                mb: 1, 
+                fontWeight: 600,
+                fontSize: { xs: '0.85rem', sm: '0.9rem' }
+              }}
+            >
               How Paragraph Sections Work
             </Typography>
-            <Typography variant="body2">
+            <Typography 
+              variant="body2"
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+            >
               Tell the AI what you want it to write, as you would instruct a colleague. Be specific about content and desired length.
             </Typography>
           </Alert>
 
           <Box>
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <LightbulbIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+            <Typography 
+              variant="subtitle1" 
+              sx={{ 
+                mb: { xs: 1.5, sm: 2 }, 
+                fontWeight: 600, 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                fontSize: { xs: '0.9rem', sm: '1rem' }
+              }}
+            >
+              <LightbulbIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: 'warning.main' }} />
               Quick Start Templates
             </Typography>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexWrap: 'wrap', 
+              gap: { xs: 0.75, sm: 1 }, 
+              mb: { xs: 2, sm: 3 } 
+            }}>
               {exampleTemplates.map((example) => (
                 <Chip
                   key={example.label}
@@ -196,6 +252,8 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
                   onClick={() => handleExampleClick(example)}
                   sx={{
                     borderRadius: 2,
+                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                    height: { xs: 28, sm: 32 },
                     '&:hover': {
                       backgroundColor: alpha('#2196f3', 0.05),
                       borderColor: '#2196f3'
@@ -222,6 +280,12 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
+              },
+              '& .MuiFormHelperText-root': {
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: { xs: '0.85rem', sm: '0.875rem' }
               }
             }}
           />
@@ -230,7 +294,7 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
             fullWidth
             label="AI Instructions"
             multiline
-            rows={6}
+            rows={isMobile ? 4 : isTablet ? 5 : 6}
             value={instructions}
             onChange={(e) => {
               setInstructions(e.target.value);
@@ -244,18 +308,38 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
             sx={{
               '& .MuiOutlinedInput-root': {
                 borderRadius: 2
+              },
+              '& .MuiFormHelperText-root': {
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: { xs: '0.85rem', sm: '0.875rem' }
               }
             }}
           />
 
-          <Accordion sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200', borderRadius: 2 }}>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+          <Accordion sx={{ 
+            boxShadow: 'none', 
+            border: '1px solid', 
+            borderColor: 'grey.200', 
+            borderRadius: 2 
+          }}>
+            <AccordionSummary 
+              expandIcon={<ExpandMoreIcon />}
+              sx={{ p: { xs: 1.5, sm: 2 } }}
+            >
+              <Typography 
+                variant="subtitle2" 
+                sx={{ 
+                  fontWeight: 600,
+                  fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                }}
+              >
                 💡 Advanced Formatting Tips
               </Typography>
             </AccordionSummary>
-            <AccordionDetails>
-              <Stack spacing={2}>
+            <AccordionDetails sx={{ p: { xs: 1.5, sm: 2 } }}>
+              <Stack spacing={{ xs: 1.5, sm: 2 }}>
                 <Paper sx={{ p: 2, backgroundColor: alpha('#2196f3', 0.05), border: `1px solid ${alpha('#2196f3', 0.2)}` }}>
                   <Typography variant="caption" sx={{ fontWeight: 600, color: '#1976d2' }}>
                     📝 SUGGEST LENGTH
@@ -290,16 +374,28 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
 
       <Divider />
 
-      <DialogActions sx={{ p: 3, gap: 2 }}>
+      <DialogActions sx={{ 
+        p: { xs: 2, sm: 3 }, 
+        gap: { xs: 1, sm: 2 },
+        flexDirection: { xs: 'column', sm: 'row' },
+        position: { xs: 'sticky', sm: 'static' },
+        bottom: 0,
+        backgroundColor: 'background.paper',
+        borderTop: { xs: '1px solid', sm: 'none' },
+        borderColor: { xs: 'divider', sm: 'transparent' }
+      }}>
         <Button 
           onClick={onBack}
           variant="outlined"
           size="medium"
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
-            px: 3
+            px: 3,
+            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            py: { xs: 1.5, sm: 1 }
           }}
         >
           Back
@@ -309,6 +405,7 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
           size="medium"
           onClick={handleContinue}
           disabled={!title.trim() || !instructions.trim()}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
@@ -322,7 +419,9 @@ const ParagraphConfigDialog: React.FC<ParagraphConfigDialogProps> = ({
             '&:disabled': {
               boxShadow: 'none'
             },
-            transition: 'all 0.3s ease'
+            transition: 'all 0.3s ease',
+            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            py: { xs: 1.5, sm: 1 }
           }}
         >
           Continue to Placement

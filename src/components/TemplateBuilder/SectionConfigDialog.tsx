@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -70,7 +69,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
   sectionType,
   sectionName
 }) => {
-  const { isMobile } = useResponsive();
+  const { isMobile, isTablet, isMobileView } = useResponsive();
   const [title, setTitle] = useState(sectionName);
   const [instructions, setInstructions] = useState('');
   const [examItems, setExamItems] = useState<ExamItem[]>([
@@ -211,7 +210,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             EXAMPLE
           </Typography>
           <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
-            "Create a bullet for each medication that was discussed. Each bullet should follow this format: {'{Medication Name}'} - {'{Dosage}'}, {'{Frequency}'}"
+            "Create a bullet for each medication that was discussed. Each bullet should follow this format: {'{Medication Name}'} - {'{Dosage}'}"
           </Typography>
         </Box>
       </Box>
@@ -285,25 +284,37 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
       onClose={onClose}
       maxWidth="md"
       fullWidth
+      fullScreen={isMobile}
       PaperProps={{
         sx: { 
-          borderRadius: 3, 
-          maxHeight: '90vh',
-          m: { xs: 0.5, sm: 2 }
+          borderRadius: { xs: 0, sm: 3 }, 
+          maxHeight: { xs: '100vh', sm: '90vh' },
+          m: { xs: 0, sm: 2 },
+          width: { xs: '100%', sm: 'auto' }
         }
       }}
     >
-      <DialogTitle sx={{ pb: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 }, pt: { xs: 1.5, sm: 3 } }}>
+      <DialogTitle sx={{ 
+        pb: { xs: 1, sm: 2 }, 
+        px: { xs: 2, sm: 3 }, 
+        pt: { xs: 2, sm: 3 },
+        position: { xs: 'sticky', sm: 'static' },
+        top: 0,
+        zIndex: 1,
+        backgroundColor: 'background.paper'
+      }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 1 }}>
+          <Box display="flex" alignItems="center" gap={{ xs: 1, sm: 1 }}>
             {onBack && (
               <IconButton 
                 onClick={handleBack} 
                 size="small"
                 sx={{ 
-                  mr: { xs: 0.5, sm: 1 },
+                  mr: { xs: 1, sm: 1 },
                   bgcolor: 'action.hover',
-                  '&:hover': { bgcolor: 'action.selected' }
+                  '&:hover': { bgcolor: 'action.selected' },
+                  minWidth: { xs: 36, sm: 40 },
+                  minHeight: { xs: 36, sm: 40 }
                 }}
               >
                 <ArrowBackIcon fontSize="small" />
@@ -314,7 +325,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 variant="h6" 
                 sx={{ 
                   fontWeight: 600,
-                  fontSize: { xs: '0.95rem', sm: '1.25rem' }
+                  fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' },
+                  lineHeight: { xs: 1.2, sm: 1.3 }
                 }}
               >
                 {isBulletedList ? 'Edit Bulleted List' : 
@@ -329,25 +341,38 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                   variant="outlined"
                   sx={{ 
                     mt: 0.5,
-                    fontSize: { xs: '0.65rem', sm: '0.75rem' }
+                    fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                    height: { xs: 20, sm: 24 }
                   }}
                 />
               )}
             </Box>
           </Box>
-          <IconButton onClick={onClose} size="small">
+          <IconButton 
+            onClick={onClose} 
+            size="small"
+            sx={{
+              minWidth: { xs: 36, sm: 40 },
+              minHeight: { xs: 36, sm: 40 }
+            }}
+          >
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ pb: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 } }}>
+      <DialogContent sx={{ 
+        pb: { xs: 1, sm: 2 }, 
+        px: { xs: 2, sm: 3 },
+        overflowY: 'auto',
+        flex: 1
+      }}>
         {isBulletedList && getBulletedListGuidance()}
         {isExamList && getExamListGuidance()}
         {isChecklist && getChecklistGuidance()}
         {!isBulletedList && !isExamList && !isChecklist && getGeneralGuidance()}
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 3 } }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
           <TextField
             fullWidth
             label="Section Title"
@@ -360,24 +385,27 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
             sx={{
               '& .MuiFormHelperText-root': {
                 fontSize: { xs: '0.7rem', sm: '0.75rem' }
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: { xs: '0.85rem', sm: '0.875rem' }
               }
             }}
           />
           
           {isExamList && (
             <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: { xs: 1.5, sm: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: { xs: 2, sm: 3 } }}>
                 <Typography 
                   variant="h6" 
                   sx={{ 
                     fontWeight: 600,
-                    fontSize: { xs: '0.9rem', sm: '1.25rem' }
+                    fontSize: { xs: '0.95rem', sm: '1.1rem', md: '1.25rem' }
                   }}
                 >
                   Exam Sections
                 </Typography>
                 <Tooltip title="Define what specific aspects of the exam the AI should report on">
-                  <InfoIcon sx={{ fontSize: { xs: 14, sm: 18 }, color: 'text.secondary' }} />
+                  <InfoIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: 'text.secondary' }} />
                 </Tooltip>
               </Box>
               
@@ -392,15 +420,32 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                     transition: 'border-color 0.2s'
                   }}
                 >
-                  <CardContent sx={{ '&:last-child': { pb: { xs: 1.5, sm: 2 } }, p: { xs: 1.5, sm: 2 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 1.5, sm: 2 }, flexWrap: 'wrap', gap: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                  <CardContent sx={{ 
+                    '&:last-child': { pb: { xs: 2, sm: 2 } }, 
+                    p: { xs: 2, sm: 2 } 
+                  }}>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      mb: { xs: 1.5, sm: 2 }, 
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      gap: { xs: 1, sm: 1 },
+                      alignItems: { xs: 'flex-start', sm: 'center' }
+                    }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 1, 
+                        flexWrap: 'wrap',
+                        width: { xs: '100%', sm: 'auto' }
+                      }}>
                         <Chip 
                           label={`Section ${index + 1}`} 
                           size="small" 
                           color="primary" 
                           variant="outlined"
-                          sx={{ fontSize: { xs: '0.65rem', sm: '0.75rem' } }}
+                          sx={{ fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' } }}
                         />
                         {item.title && (
                           <Typography 
@@ -408,7 +453,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                             sx={{ 
                               color: 'text.secondary', 
                               fontWeight: 500,
-                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                              fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' }
                             }}
                           >
                             {item.title}
@@ -422,7 +467,9 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                             onClick={() => removeExamItem(item.id)}
                             sx={{ 
                               color: 'error.main',
-                              '&:hover': { bgcolor: 'error.lighter' }
+                              '&:hover': { bgcolor: 'error.lighter' },
+                              minWidth: { xs: 32, sm: 36 },
+                              minHeight: { xs: 32, sm: 36 }
                             }}
                           >
                             <DeleteIcon fontSize="small" />
@@ -440,6 +487,11 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         variant="outlined"
                         size="small"
                         placeholder="e.g., Heart, Lungs, Abdomen..."
+                        sx={{
+                          '& .MuiInputLabel-root': {
+                            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                          }
+                        }}
                       />
                       
                       <TextField
@@ -448,10 +500,15 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         value={item.instructions}
                         onChange={(e) => updateExamItem(item.id, 'instructions', e.target.value)}
                         multiline
-                        rows={isMobile ? 2 : 2}
+                        rows={isMobile ? 2 : 3}
                         variant="outlined"
                         size="small"
                         placeholder="Tell the AI what to focus on for this section..."
+                        sx={{
+                          '& .MuiInputLabel-root': {
+                            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                          }
+                        }}
                       />
                       
                       <TextField
@@ -462,6 +519,11 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         variant="outlined"
                         size="small"
                         placeholder="Text to use when findings are within normal limits..."
+                        sx={{
+                          '& .MuiInputLabel-root': {
+                            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                          }
+                        }}
                       />
                     </Box>
                   </CardContent>
@@ -472,19 +534,20 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                 startIcon={<AddIcon />}
                 onClick={addExamItem}
                 variant="outlined"
-                fullWidth={isMobile}
+                fullWidth
                 sx={{ 
-                  mb: { xs: 2, sm: 4 }, 
+                  mb: { xs: 3, sm: 4 }, 
                   textTransform: 'none',
                   borderStyle: 'dashed',
                   '&:hover': { borderStyle: 'solid' },
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                  py: { xs: 1, sm: 1.5 }
                 }}
               >
                 Add Another Exam Section
               </Button>
               
-              <Divider sx={{ my: { xs: 2, sm: 4 } }} />
+              <Divider sx={{ my: { xs: 3, sm: 4 } }} />
               
               <Accordion defaultExpanded sx={{ boxShadow: 'none', border: '1px solid', borderColor: 'grey.200' }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ p: { xs: 1, sm: 2 } }}>
@@ -624,33 +687,55 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               <Typography 
                 variant="body1" 
                 sx={{ 
-                  mb: { xs: 1.5, sm: 2 }, 
+                  mb: { xs: 2, sm: 2 }, 
                   fontWeight: 500,
-                  fontSize: { xs: '0.85rem', sm: '1rem' }
+                  fontSize: { xs: '0.9rem', sm: '1rem' }
                 }}
               >
                 What buttons do you want to include?
               </Typography>
               
               {checklistItems.map((item, index) => (
-                <Card key={item.id} sx={{ mb: { xs: 1.5, sm: 2 }, border: '1px solid', borderColor: 'grey.300' }}>
-                  <CardContent sx={{ p: { xs: 1.5, sm: 3 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: { xs: 1.5, sm: 2 }, flexWrap: 'wrap', gap: 1 }}>
+                <Card 
+                  key={item.id} 
+                  sx={{ 
+                    mb: { xs: 1.5, sm: 2 }, 
+                    border: '1px solid', 
+                    borderColor: 'grey.300' 
+                  }}
+                >
+                  <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      justifyContent: 'space-between', 
+                      alignItems: 'center', 
+                      mb: { xs: 1.5, sm: 2 }, 
+                      flexDirection: { xs: 'column', sm: 'row' },
+                      gap: { xs: 1, sm: 1 },
+                      alignItems: { xs: 'flex-start', sm: 'center' }
+                    }}>
                       <Typography 
                         variant="subtitle2" 
                         sx={{ 
                           fontWeight: 600,
-                          fontSize: { xs: '0.8rem', sm: '0.9rem' }
+                          fontSize: { xs: '0.85rem', sm: '0.9rem' }
                         }}
                       >
                         Item {index + 1}
                       </Typography>
-                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        gap: 1, 
+                        flexWrap: 'wrap',
+                        width: { xs: '100%', sm: 'auto' },
+                        justifyContent: { xs: 'flex-end', sm: 'flex-start' }
+                      }}>
                         <IconButton 
                           size="small" 
                           onClick={() => moveChecklistItem(item.id, 'up')}
                           disabled={index === 0}
                           title="Move Up"
+                          sx={{ minWidth: { xs: 32, sm: 36 }, minHeight: { xs: 32, sm: 36 } }}
                         >
                           <MoveUpIcon fontSize="small" />
                         </IconButton>
@@ -659,6 +744,7 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           onClick={() => moveChecklistItem(item.id, 'down')}
                           disabled={index === checklistItems.length - 1}
                           title="Move Down"
+                          sx={{ minWidth: { xs: 32, sm: 36 }, minHeight: { xs: 32, sm: 36 } }}
                         >
                           <MoveDownIcon fontSize="small" />
                         </IconButton>
@@ -666,7 +752,11 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                           <IconButton 
                             size="small" 
                             onClick={() => removeChecklistItem(item.id)}
-                            sx={{ color: 'error.main' }}
+                            sx={{ 
+                              color: 'error.main',
+                              minWidth: { xs: 32, sm: 36 }, 
+                              minHeight: { xs: 32, sm: 36 } 
+                            }}
                             title="Delete Item"
                           >
                             <DeleteIcon fontSize="small" />
@@ -683,6 +773,11 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         onChange={(e) => updateChecklistItem(item.id, 'buttonName', e.target.value)}
                         variant="outlined"
                         size="small"
+                        sx={{
+                          '& .MuiInputLabel-root': {
+                            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                          }
+                        }}
                       />
                       
                       <TextField
@@ -694,6 +789,11 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                         rows={isMobile ? 2 : 3}
                         variant="outlined"
                         size="small"
+                        sx={{
+                          '& .MuiInputLabel-root': {
+                            fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                          }
+                        }}
                       />
                     </Box>
                   </CardContent>
@@ -703,11 +803,12 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
               <Button
                 startIcon={<AddIcon />}
                 onClick={addChecklistItem}
-                fullWidth={isMobile}
+                fullWidth
                 sx={{ 
                   mb: { xs: 2, sm: 3 }, 
                   textTransform: 'none',
-                  fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                  py: { xs: 1, sm: 1.5 }
                 }}
               >
                 Add Another Item
@@ -743,12 +844,25 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: { xs: 1.5, sm: 3 }, pt: { xs: 1, sm: 1 }, gap: { xs: 1, sm: 1 }, flexDirection: { xs: 'column', sm: 'row' } }}>
+      <DialogActions sx={{ 
+        p: { xs: 2, sm: 3 }, 
+        pt: { xs: 1, sm: 1 }, 
+        gap: { xs: 1, sm: 1 }, 
+        flexDirection: { xs: 'column', sm: 'row' },
+        position: { xs: 'sticky', sm: 'static' },
+        bottom: 0,
+        backgroundColor: 'background.paper',
+        borderTop: { xs: '1px solid', sm: 'none' },
+        borderColor: { xs: 'divider', sm: 'transparent' }
+      }}>
         <Button 
           onClick={onClose} 
           variant="outlined"
           fullWidth={isMobile}
-          sx={{ fontSize: { xs: '0.8rem', sm: '0.9rem' } }}
+          sx={{ 
+            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            py: { xs: 1.5, sm: 1 }
+          }}
         >
           Cancel
         </Button>
@@ -759,7 +873,8 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
           fullWidth={isMobile}
           sx={{ 
             minWidth: 120,
-            fontSize: { xs: '0.8rem', sm: '0.9rem' }
+            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            py: { xs: 1.5, sm: 1 }
           }}
         >
           Continue
