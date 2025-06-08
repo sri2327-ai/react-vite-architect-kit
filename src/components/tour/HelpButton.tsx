@@ -13,7 +13,7 @@ import {
   Help,
   PlayArrow,
   AutoStories,
-  WorkflowIcon,
+  Settings,
   Refresh
 } from '@mui/icons-material';
 import { useTour } from '@/contexts/TourContext';
@@ -97,7 +97,7 @@ export const HelpButton: React.FC = () => {
 
         <MenuItem onClick={() => handleStartTour(workflowBuilderTour)}>
           <ListItemIcon>
-            <WorkflowIcon fontSize="small" />
+            <Settings fontSize="small" />
           </ListItemIcon>
           <ListItemText>
             <Typography variant="body2">
