@@ -77,10 +77,10 @@ export const templateBuilderTour: Tour = {
       placement: 'top'
     },
     {
-      id: 'create-visit-type',
-      title: 'Step 3: Create New Visit Type',
-      content: 'You can create new visit types by clicking the "Create Visit Type" button. This allows you to organize templates by different appointment types.',
-      target: '.MuiButton-contained',
+      id: 'workflow-steps',
+      title: 'Step 3: Workflow Navigation',
+      content: 'This shows your current progress in the template workflow. You can navigate between visit type selection and template management.',
+      target: '.MuiStepper-root',
       placement: 'bottom'
     },
     {
@@ -91,10 +91,10 @@ export const templateBuilderTour: Tour = {
       placement: 'top'
     },
     {
-      id: 'create-template-button',
+      id: 'create-template-action',
       title: 'Step 5: Create New Template',
-      content: 'Click "Create Template" to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
-      target: '.MuiButton-root:has-text("Create Template"), .MuiButton-contained:first-of-type',
+      content: 'Click this button to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
+      target: 'button[data-testid="create-template-button"], .MuiButton-contained',
       placement: 'bottom'
     },
     {
@@ -122,7 +122,7 @@ export const templateBuilderTour: Tour = {
       id: 'back-navigation',
       title: 'Step 9: Navigation',
       content: 'Use the back button to return to the visit type selection or previous screens. The header shows your current location in the builder.',
-      target: '.MuiIconButton-root:first-of-type',
+      target: 'button[aria-label="Back"], .MuiIconButton-root',
       placement: 'bottom'
     }
   ]
@@ -158,10 +158,10 @@ export const workflowBuilderTour: Tour = {
       placement: 'top'
     },
     {
-      id: 'create-workflow',
+      id: 'create-workflow-button',
       title: 'Step 4: Create New Workflow',
       content: 'Click "Create Workflow" to start building a new automated workflow. You can configure triggers, actions, and EHR integrations.',
-      target: '.MuiButton-contained',
+      target: 'button[data-testid="create-workflow"], .MuiButton-contained',
       placement: 'bottom'
     },
     {
@@ -203,14 +203,14 @@ export const workflowBuilderTour: Tour = {
       id: 'import-workflow',
       title: 'Step 10: Import Workflows',
       content: 'Found a workflow you like? Click "Import Workflow" to add it to your collection. You can then customize it to fit your specific practice needs.',
-      target: '.MuiButton-contained:contains("Import")',
+      target: 'button[data-testid="import-workflow"], .MuiButton-contained',
       placement: 'bottom'
     },
     {
       id: 'workflow-testing',
       title: 'Step 11: Test Workflow',
       content: 'Before activating a workflow, use the test feature to ensure it works correctly with sample data. This helps prevent issues in live environments.',
-      target: '.MuiButton-outlined:contains("Test")',
+      target: 'button[data-testid="test-workflow"], .MuiButton-outlined',
       placement: 'bottom'
     }
   ]
