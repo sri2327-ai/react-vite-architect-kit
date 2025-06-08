@@ -70,59 +70,59 @@ export const templateBuilderTour: Tour = {
       placement: 'bottom'
     },
     {
-      id: 'visit-type-selection',
-      title: 'Step 2: Select Visit Type',
-      content: 'First, select a visit type to work with. Each visit type can have its own set of templates. Click on any visit type card to continue.',
-      target: '[data-tour-id="visit-type-selection"]',
-      placement: 'top'
-    },
-    {
       id: 'workflow-steps',
-      title: 'Step 3: Workflow Navigation',
+      title: 'Step 2: Workflow Navigation',
       content: 'This shows your current progress in the template workflow. You can navigate between visit type selection and template management.',
       target: '[data-tour-id="workflow-steps"]',
       placement: 'bottom'
     },
     {
-      id: 'template-list',
-      title: 'Step 4: View Templates',
-      content: 'After selecting a visit type, you\'ll see all templates associated with that visit type. Each template shows its name, specialty, and last modified date.',
-      target: '[data-tour-id="template-list"]',
+      id: 'visit-type-selection',
+      title: 'Step 3: Select Visit Type',
+      content: 'First, select a visit type to work with. Each visit type can have its own set of templates. Click on any visit type card to continue to the next step.',
+      target: '[data-tour-id="visit-type-selection"]',
       placement: 'top'
+    },
+    {
+      id: 'template-list-info',
+      title: 'Step 4: Template Management View',
+      content: 'After selecting a visit type, you\'ll see the template management view. Here you can view, create, edit, and organize templates for the selected visit type.',
+      target: 'body',
+      placement: 'bottom'
     },
     {
       id: 'create-template-action',
       title: 'Step 5: Create New Template',
-      content: 'Click this button to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
+      content: 'Click the "Create Template" button to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
       target: '[data-testid="create-template-button"]',
       placement: 'bottom'
     },
     {
       id: 'template-filters',
       title: 'Step 6: Filter Templates',
-      content: 'Use the specialty filter to find specific templates quickly. You can filter by specialty to narrow down your template list.',
+      content: 'Use the specialty filter to find specific templates quickly. You can filter by specialty to narrow down your template list when you have multiple templates.',
       target: '[data-tour-id="template-filters"]',
       placement: 'bottom'
     },
     {
-      id: 'template-actions',
-      title: 'Step 7: Template Actions',
-      content: 'Each template in the table has action buttons: View (eye icon) to preview, Edit (pencil icon) to modify, and Copy (duplicate icon) to create a copy.',
-      target: '.MuiDataGrid-cell--withRenderer',
-      placement: 'left'
-    },
-    {
-      id: 'template-editor',
-      title: 'Step 8: Template Editor',
-      content: 'When editing a template, you\'ll see the drag-and-drop editor where you can add sections, configure fields, and customize your template layout.',
-      target: '[data-tour-id="template-editor"]',
+      id: 'template-list',
+      title: 'Step 7: Template Table',
+      content: 'This table shows all templates for the selected visit type. Each template displays its name, specialty, and last modified date.',
+      target: '[data-tour-id="template-list"]',
       placement: 'top'
     },
     {
+      id: 'template-actions-info',
+      title: 'Step 8: Template Actions',
+      content: 'Each template has action buttons: View (eye icon) to preview, Edit (pencil icon) to modify, and Copy (duplicate icon) to create a copy.',
+      target: '[data-tour-id="template-list"]',
+      placement: 'left'
+    },
+    {
       id: 'back-navigation',
-      title: 'Step 9: Navigation',
+      title: 'Step 9: Navigation Controls',
       content: 'Use the back button to return to the visit type selection or previous screens. The header shows your current location in the builder.',
-      target: 'button[aria-label="Back"]',
+      target: '.MuiIconButton-root',
       placement: 'bottom'
     }
   ]
@@ -147,7 +147,7 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-tabs',
       title: 'Step 2: Workflow Sections',
       content: 'The workflow builder has two main sections: "My Workflows" where you manage your custom workflows, and "Workflow Library" where you can browse and import pre-built workflows.',
-      target: '.MuiTabs-root',
+      target: '[data-tour-id="workflow-tabs"]',
       placement: 'bottom'
     },
     {
@@ -168,28 +168,28 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-status',
       title: 'Step 5: Workflow Status',
       content: 'Each workflow has a status indicator showing whether it\'s active or inactive. You can toggle workflows on/off using the switch controls.',
-      target: '.MuiSwitch-root',
+      target: '[data-tour-id="workflow-status"]',
       placement: 'left'
     },
     {
       id: 'workflow-actions',
       title: 'Step 6: Workflow Actions',
       content: 'Use the action buttons to configure EHR settings, set up triggers, map templates to visit types, and configure provider-specific settings.',
-      target: '.MuiButton-root',
+      target: '[data-tour-id="workflow-actions"]',
       placement: 'top'
     },
     {
       id: 'ehr-configuration',
       title: 'Step 7: EHR Integration',
       content: 'Configure your Electronic Health Records system integration. Select your EHR provider and set up connection parameters for seamless data flow.',
-      target: '.MuiButton-outlined',
+      target: '[data-tour-id="ehr-config"]',
       placement: 'bottom'
     },
     {
       id: 'template-mapping',
       title: 'Step 8: Template Mapping',
       content: 'Map your templates to different visit types and providers. This ensures the right template is automatically selected for each patient encounter.',
-      target: '.MuiButton-text',
+      target: '[data-tour-id="template-mapping"]',
       placement: 'top'
     },
     {

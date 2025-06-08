@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Box, Container } from '@mui/material';
+import { Box, Container, Tabs, Tab } from '@mui/material';
 import WorkflowLibrary from './WorkflowLibrary';
 import MyWorkflows from './MyWorkflows';
 import { templateBuilderService } from '../../services/templateBuilderService';
@@ -47,13 +47,25 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ activeTab = 'my-workf
     setCurrentTab('my-workflows');
   };
 
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+    setCurrentTab(newValue);
+  };
+
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }} data-tour-id="workflow-overview">
       {/* Header */}
       <TemplateBuilderHeader 
-        title={currentTab === 'my-workflows' ? 'My Workflows' : 'Workflow Library'} 
+        title="Workflow Builder" 
         showBackButton={false}
       />
+      
+      {/* Tab Navigation */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3 }} data-tour-id="workflow-tabs">
+        <Tabs value={currentTab} onChange={handleTabChange}>
+          <Tab label="My Workflows" value="my-workflows" />
+          <Tab label="Workflow Library" value="workflow-library" />
+        </Tabs>
+      </Box>
       
       {/* Content */}
       <Container maxWidth="xl" sx={{ flex: 1, overflow: 'auto', p: 0 }}>
