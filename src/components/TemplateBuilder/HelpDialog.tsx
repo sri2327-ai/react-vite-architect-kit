@@ -24,6 +24,7 @@ import {
   Close as CloseIcon
 } from '@mui/icons-material';
 import { bravoColors } from '@/theme/colors';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface HelpDialogProps {
   open: boolean;
@@ -33,6 +34,7 @@ interface HelpDialogProps {
 
 const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
   const theme = useTheme();
+  const { isMobile, isTablet } = useResponsive();
   const [selectedOption, setSelectedOption] = useState('change-narrative');
   const [paragraphCount, setParagraphCount] = useState(2);
   const [formatSpecificRequest, setFormatSpecificRequest] = useState('');
@@ -68,37 +70,67 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      fullScreen={isMobile}
       PaperProps={{
         sx: {
-          borderRadius: 3,
-          maxHeight: '90vh'
+          borderRadius: { xs: 0, sm: 3 },
+          maxHeight: { xs: '100vh', sm: '90vh' },
+          m: { xs: 0, sm: 2 }
         }
       }}
     >
       <DialogTitle sx={{ 
-        pb: 2,
-        borderBottom: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`
+        pb: { xs: 1, sm: 2 },
+        px: { xs: 2, sm: 3 },
+        pt: { xs: 2, sm: 3 },
+        borderBottom: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
+        position: { xs: 'sticky', sm: 'static' },
+        top: 0,
+        zIndex: 1,
+        backgroundColor: 'background.paper'
       }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
           <Box
             sx={{
-              width: 40,
-              height: 40,
+              width: { xs: 36, sm: 40 },
+              height: { xs: 36, sm: 40 },
               borderRadius: 2,
               backgroundColor: alpha(bravoColors.secondary, 0.1),
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              flexShrink: 0
             }}
           >
-            <AutoFixHighIcon sx={{ color: bravoColors.secondary, fontSize: 24 }} />
+            <AutoFixHighIcon sx={{ 
+              color: bravoColors.secondary, 
+              fontSize: { xs: 20, sm: 24 } 
+            }} />
           </Box>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 700, color: bravoColors.primaryFlat }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 700, 
+                color: bravoColors.primaryFlat,
+                fontSize: { xs: '1rem', sm: '1.1rem' },
+                lineHeight: 1.2
+              }}
+            >
               Edit Auto-Generated Section
             </Typography>
             {itemName && (
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                color="text.secondary"
+                sx={{ 
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                  mt: 0.5,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}
+              >
                 Section: {itemName}
               </Typography>
             )}
@@ -106,48 +138,82 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ py: 3 }}>
-        <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
+      <DialogContent sx={{ 
+        py: { xs: 2, sm: 3 },
+        px: { xs: 2, sm: 3 },
+        overflowY: 'auto',
+        flex: 1
+      }}>
+        <Typography 
+          variant="body1" 
+          sx={{ 
+            mb: { xs: 2, sm: 3 }, 
+            color: 'text.secondary',
+            fontSize: { xs: '0.875rem', sm: '1rem' }
+          }}
+        >
           Select an option to modify how this section is generated:
         </Typography>
 
         <FormControl component="fieldset" fullWidth>
-          <FormLabel component="legend" sx={{ 
-            fontWeight: 600, 
-            color: bravoColors.primaryFlat,
-            mb: 2
-          }}>
+          <FormLabel 
+            component="legend" 
+            sx={{ 
+              fontWeight: 600, 
+              color: bravoColors.primaryFlat,
+              mb: { xs: 1.5, sm: 2 },
+              fontSize: { xs: '0.9rem', sm: '1rem' }
+            }}
+          >
             Select an option:
           </FormLabel>
           
           <RadioGroup
             value={selectedOption}
             onChange={handleOptionChange}
-            sx={{ mb: 3 }}
+            sx={{ mb: { xs: 2, sm: 3 } }}
           >
             <FormControlLabel 
               value="change-narrative" 
               control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
-              label="Change to Narrative"
-              sx={{ mb: 1 }}
+              label={
+                <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  Change to Narrative
+                </Typography>
+              }
+              sx={{ mb: { xs: 0.5, sm: 1 } }}
             />
+            
             <FormControlLabel 
               value="increase-detail" 
               control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
-              label="Increase Detail"
-              sx={{ mb: 1 }}
+              label={
+                <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  Increase Detail
+                </Typography>
+              }
+              sx={{ mb: { xs: 0.5, sm: 1 } }}
             />
             {showParagraphSelector && selectedOption === 'increase-detail' && (
-              <Box sx={{ ml: 4, mb: 2, mt: 1 }}>
-                <Typography variant="subtitle2" sx={{ 
-                  fontWeight: 600, 
-                  color: bravoColors.primaryFlat,
-                  mb: 2
-                }}>
+              <Box sx={{ 
+                ml: { xs: 3, sm: 4 }, 
+                mb: { xs: 1.5, sm: 2 }, 
+                mt: { xs: 0.5, sm: 1 },
+                mr: { xs: 1, sm: 2 }
+              }}>
+                <Typography 
+                  variant="subtitle2" 
+                  sx={{ 
+                    fontWeight: 600, 
+                    color: bravoColors.primaryFlat,
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                  }}
+                >
                   How many paragraphs do you prefer?
                 </Typography>
                 
-                <Box sx={{ px: 2 }}>
+                <Box sx={{ px: { xs: 1, sm: 2 } }}>
                   <Slider
                     value={paragraphCount}
                     onChange={handleParagraphChange}
@@ -165,13 +231,31 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
                     sx={{
                       color: bravoColors.secondary,
                       '& .MuiSlider-markLabel': {
-                        fontSize: '0.75rem'
+                        fontSize: { xs: '0.65rem', sm: '0.75rem' }
+                      },
+                      '& .MuiSlider-thumb': {
+                        width: { xs: 18, sm: 20 },
+                        height: { xs: 18, sm: 20 }
+                      },
+                      '& .MuiSlider-track': {
+                        height: { xs: 4, sm: 6 }
+                      },
+                      '& .MuiSlider-rail': {
+                        height: { xs: 4, sm: 6 }
                       }
                     }}
                   />
                 </Box>
                 
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ 
+                    mt: 1, 
+                    textAlign: 'center',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }}
+                >
                   Currently selected: {paragraphCount} paragraph{paragraphCount > 1 ? 's' : ''}
                 </Typography>
               </Box>
@@ -180,20 +264,33 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
             <FormControlLabel 
               value="decrease-detail" 
               control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
-              label="Decrease Detail"
-              sx={{ mb: 1 }}
+              label={
+                <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  Decrease Detail
+                </Typography>
+              }
+              sx={{ mb: { xs: 0.5, sm: 1 } }}
             />
             {showParagraphSelector && selectedOption === 'decrease-detail' && (
-              <Box sx={{ ml: 4, mb: 2, mt: 1 }}>
-                <Typography variant="subtitle2" sx={{ 
-                  fontWeight: 600, 
-                  color: bravoColors.primaryFlat,
-                  mb: 2
-                }}>
+              <Box sx={{ 
+                ml: { xs: 3, sm: 4 }, 
+                mb: { xs: 1.5, sm: 2 }, 
+                mt: { xs: 0.5, sm: 1 },
+                mr: { xs: 1, sm: 2 }
+              }}>
+                <Typography 
+                  variant="subtitle2" 
+                  sx={{ 
+                    fontWeight: 600, 
+                    color: bravoColors.primaryFlat,
+                    mb: { xs: 1.5, sm: 2 },
+                    fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                  }}
+                >
                   How many paragraphs do you prefer?
                 </Typography>
                 
-                <Box sx={{ px: 2 }}>
+                <Box sx={{ px: { xs: 1, sm: 2 } }}>
                   <Slider
                     value={paragraphCount}
                     onChange={handleParagraphChange}
@@ -211,13 +308,31 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
                     sx={{
                       color: bravoColors.secondary,
                       '& .MuiSlider-markLabel': {
-                        fontSize: '0.75rem'
+                        fontSize: { xs: '0.65rem', sm: '0.75rem' }
+                      },
+                      '& .MuiSlider-thumb': {
+                        width: { xs: 18, sm: 20 },
+                        height: { xs: 18, sm: 20 }
+                      },
+                      '& .MuiSlider-track': {
+                        height: { xs: 4, sm: 6 }
+                      },
+                      '& .MuiSlider-rail': {
+                        height: { xs: 4, sm: 6 }
                       }
                     }}
                   />
                 </Box>
                 
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1, textAlign: 'center' }}>
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary" 
+                  sx={{ 
+                    mt: 1, 
+                    textAlign: 'center',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                  }}
+                >
                   Currently selected: {paragraphCount} paragraph{paragraphCount > 1 ? 's' : ''}
                 </Typography>
               </Box>
@@ -226,15 +341,24 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
             <FormControlLabel 
               value="format-specific" 
               control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
-              label="Format Specific"
-              sx={{ mb: 1 }}
+              label={
+                <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  Format Specific
+                </Typography>
+              }
+              sx={{ mb: { xs: 0.5, sm: 1 } }}
             />
             {showFormatSpecificTextArea && (
-              <Box sx={{ ml: 4, mb: 2, mt: 1 }}>
+              <Box sx={{ 
+                ml: { xs: 3, sm: 4 }, 
+                mb: { xs: 1.5, sm: 2 }, 
+                mt: { xs: 0.5, sm: 1 },
+                mr: { xs: 1, sm: 2 }
+              }}>
                 <TextField
                   fullWidth
                   multiline
-                  rows={3}
+                  rows={isMobile ? 2 : 3}
                   label="Describe your format requirements"
                   value={formatSpecificRequest}
                   onChange={(e) => setFormatSpecificRequest(e.target.value)}
@@ -244,10 +368,17 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
                     '& .MuiOutlinedInput-root': {
                       '&.Mui-focused fieldset': {
                         borderColor: bravoColors.primaryFlat
-                      }
+                      },
+                      borderRadius: 2
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
                       color: bravoColors.primaryFlat
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: { xs: '0.85rem', sm: '0.875rem' }
+                    },
+                    '& .MuiInputBase-input': {
+                      fontSize: { xs: '0.875rem', sm: '1rem' }
                     }
                   }}
                 />
@@ -257,15 +388,24 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
             <FormControlLabel 
               value="other" 
               control={<Radio sx={{ color: bravoColors.primaryFlat }} />} 
-              label="Other"
-              sx={{ mb: 1 }}
+              label={
+                <Typography sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  Other
+                </Typography>
+              }
+              sx={{ mb: { xs: 0.5, sm: 1 } }}
             />
             {showOtherTextArea && (
-              <Box sx={{ ml: 4, mb: 2, mt: 1 }}>
+              <Box sx={{ 
+                ml: { xs: 3, sm: 4 }, 
+                mb: { xs: 1.5, sm: 2 }, 
+                mt: { xs: 0.5, sm: 1 },
+                mr: { xs: 1, sm: 2 }
+              }}>
                 <TextField
                   fullWidth
                   multiline
-                  rows={3}
+                  rows={isMobile ? 2 : 3}
                   label="Describe your specific request"
                   value={otherRequest}
                   onChange={(e) => setOtherRequest(e.target.value)}
@@ -275,10 +415,17 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
                     '& .MuiOutlinedInput-root': {
                       '&.Mui-focused fieldset': {
                         borderColor: bravoColors.primaryFlat
-                      }
+                      },
+                      borderRadius: 2
                     },
                     '& .MuiInputLabel-root.Mui-focused': {
                       color: bravoColors.primaryFlat
+                    },
+                    '& .MuiInputLabel-root': {
+                      fontSize: { xs: '0.85rem', sm: '0.875rem' }
+                    },
+                    '& .MuiInputBase-input': {
+                      fontSize: { xs: '0.875rem', sm: '1rem' }
                     }
                   }}
                 />
@@ -288,16 +435,30 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
         </FormControl>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, pt: 0, gap: 2 }}>
+      <DialogActions sx={{ 
+        p: { xs: 2, sm: 3 }, 
+        pt: 0, 
+        gap: { xs: 1, sm: 2 },
+        flexDirection: { xs: 'column', sm: 'row' },
+        position: { xs: 'sticky', sm: 'static' },
+        bottom: 0,
+        backgroundColor: 'background.paper',
+        borderTop: { xs: '1px solid', sm: 'none' },
+        borderColor: { xs: 'divider', sm: 'transparent' }
+      }}>
         <Button 
           variant="outlined"
           onClick={onClose}
+          fullWidth={isMobile}
           sx={{
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
             borderColor: alpha(bravoColors.primaryFlat, 0.5),
             color: bravoColors.primaryFlat,
+            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            py: { xs: 1.5, sm: 1 },
+            px: { xs: 2, sm: 3 },
             '&:hover': {
               borderColor: bravoColors.primaryFlat,
               backgroundColor: alpha(bravoColors.primaryFlat, 0.05)
@@ -309,13 +470,16 @@ const HelpDialog: React.FC<HelpDialogProps> = ({ open, onClose, itemName }) => {
         <Button 
           variant="contained" 
           onClick={handleGenerate}
-          startIcon={<AutoFixHighIcon />}
+          startIcon={<AutoFixHighIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />}
+          fullWidth={isMobile}
           sx={{
             backgroundColor: bravoColors.secondary,
             borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
-            px: 4,
+            px: { xs: 3, sm: 4 },
+            fontSize: { xs: '0.85rem', sm: '0.9rem' },
+            py: { xs: 1.5, sm: 1 },
             '&:hover': {
               backgroundColor: bravoColors.primaryFlat
             }
