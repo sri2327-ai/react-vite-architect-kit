@@ -1,869 +1,430 @@
 
-import React, { useState } from 'react';
-import { 
-  Box, 
-  Drawer, 
-  Typography, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  IconButton, 
-  useTheme, 
-  useMediaQuery, 
-  Container,
-  Tooltip,
-  Backdrop,
-  Fade,
-  Slide,
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  CssBaseline,
+  Drawer,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Typography,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  useTheme,
+  useMediaQuery,
   Avatar,
-  Divider,
-  Paper,
-  Collapse
-} from '@mui/material';
-import { 
-  LayoutTemplate, 
-  Workflow, 
-  User, 
-  History,
-  ChevronLeft,
-  ChevronRight,
   Menu,
-  X,
-  LogOut,
-  ChevronDown,
-  ChevronUp,
-  LibraryBig,
-  FolderOpen
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+  MenuItem,
+  Divider,
+  Badge,
+  Container
+} from '@mui/material';
+import {
+  Menu as MenuIcon,
+  Description as DescriptionIcon,
+  AccountTree as WorkflowIcon,
+  Person as PersonIcon,
+  Help as HelpIcon,
+  Settings as SettingsIcon,
+  Logout as LogoutIcon,
+  Notifications as NotificationsIcon,
+  ChevronLeft as ChevronLeftIcon,
+  Home as HomeIcon
+} from '@mui/icons-material';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { bravoColors } from '@/theme/colors';
-import { useAuthStore } from '@/features/auth/stores/authStore';
-import TemplateBuilder from '@/components/TemplateBuilder/TemplateBuilder';
-import Profile from '@/components/Profile/Profile';
-import BillingHistory from '@/components/BillingHistory/BillingHistory';
-import WorkflowBuilder from '@/components/WorkflowBuilder/WorkflowBuilder';
-import { useProfileData } from '@/hooks/useProfileData';
-import { useApiContext } from '@/contexts/ApiContext';
-import { HelpButton } from '@/components/tour';
+import { TourOverlay } from '@/components/tour/TourOverlay';
+import HelpButton from '@/components/tour/HelpButton';
 import { useResponsive } from '@/hooks/useResponsive';
 
-const DRAWER_WIDTH = 280;
-const COLLAPSED_DRAWER_WIDTH = 72;
+const drawerWidth = 280;
 
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  component?: React.ComponentType<any>;
-  badge?: string;
-  requiresEHR?: boolean;
-  children?: SubMenuItem[];
-}
-
-interface SubMenuItem {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  component: React.ComponentType<any>;
-  activeTab: string;
-}
-
-export const Dashboard: React.FC = () => {
-  const [activeMenuItem, setActiveMenuItem] = useState<string>('my-templates');
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [expandedItems, setExpandedItems] = useState<string[]>(['template-builder', 'workflow-builder']);
-  
+const Dashboard: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
-  const { useApiData } = useApiContext();
-  const { profile } = useProfileData(useApiData);
+  const location = useLocation();
   const { isMobile, isTablet, isMobileView } = useResponsive();
-
-  // Define menu items with children for accordions
-  const allMenuItems: MenuItem[] = [
-    {
-      id: 'template-builder',
-      label: 'Template Builder',
-      icon: <LayoutTemplate size={22} />,
-      children: [
-        {
-          id: 'my-templates',
-          label: 'My Templates',
-          icon: <FolderOpen size={20} />,
-          component: TemplateBuilder,
-          activeTab: 'my-templates'
-        },
-        {
-          id: 'template-library',
-          label: 'Template Library',
-          icon: <LibraryBig size={20} />,
-          component: TemplateBuilder,
-          activeTab: 'template-library'
-        }
-      ]
-    },
-    {
-      id: 'workflow-builder',
-      label: 'Workflow Builder',
-      icon: <Workflow size={22} />,
-      badge: 'New',
-      requiresEHR: true,
-      children: [
-        {
-          id: 'my-workflows',
-          label: 'My Workflows',
-          icon: <FolderOpen size={20} />,
-          component: WorkflowBuilder,
-          activeTab: 'my-workflows'
-        },
-        {
-          id: 'workflow-library',
-          label: 'Workflow Library',
-          icon: <LibraryBig size={20} />,
-          component: WorkflowBuilder,
-          activeTab: 'workflow-library'
-        }
-      ]
-    },
-    {
-      id: 'profile',
-      label: 'Profile',
-      icon: <User size={22} />,
-      component: Profile
-    },
-    {
-      id: 'billing-history',
-      label: 'Billing History',
-      icon: <History size={22} />,
-      component: BillingHistory
-    }
-  ];
-
-  // Filter menu items based on EHR mode
-  const menuItems = allMenuItems.filter(item => 
-    !item.requiresEHR || (item.requiresEHR && profile?.ehrMode)
-  );
-
-  // Get all available menu items (including children)
-  const getAllMenuItems = () => {
-    const items: Array<MenuItem | SubMenuItem> = [];
-    menuItems.forEach(item => {
-      if (item.children) {
-        item.children.forEach(child => items.push(child));
-      } else {
-        items.push(item);
-      }
-    });
-    return items;
-  };
-
-  const handleMenuItemClick = (itemId: string) => {
-    setActiveMenuItem(itemId);
-    if (isMobileView) {
-      setMobileOpen(false);
-    }
-  };
-
-  const handleAccordionToggle = (itemId: string) => {
-    setExpandedItems(prev => 
-      prev.includes(itemId) 
-        ? prev.filter(id => id !== itemId)
-        : [...prev, itemId]
-    );
-  };
+  
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleDrawerToggle = () => {
-    if (isMobileView) {
-      setMobileOpen(!mobileOpen);
-    } else {
-      setIsCollapsed(!isCollapsed);
-    }
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleProfileClose = () => {
+    setAnchorEl(null);
   };
 
   const handleLogout = () => {
-    logout();
+    handleProfileClose();
+    // Add logout logic here
     navigate('/login');
   };
 
-  const getActiveComponent = () => {
-    const allItems = getAllMenuItems();
-    const activeItem = allItems.find(item => item.id === activeMenuItem);
-    if (activeItem && 'activeTab' in activeItem) {
-      return () => <activeItem.component activeTab={activeItem.activeTab} />;
+  const menuItems = [
+    { 
+      text: 'Dashboard', 
+      icon: <HomeIcon />, 
+      path: '/dashboard',
+      tourId: 'nav-dashboard'
+    },
+    { 
+      text: 'Templates', 
+      icon: <DescriptionIcon />, 
+      path: '/dashboard/templates',
+      tourId: 'nav-templates'
+    },
+    { 
+      text: 'Workflows', 
+      icon: <WorkflowIcon />, 
+      path: '/dashboard/workflows',
+      tourId: 'nav-workflows'
+    },
+    { 
+      text: 'Profile', 
+      icon: <PersonIcon />, 
+      path: '/dashboard/profile',
+      tourId: 'nav-profile'
+    },
+  ];
+
+  const isSelected = (path: string) => {
+    if (path === '/dashboard') {
+      return location.pathname === '/dashboard';
     }
-    return activeItem?.component || TemplateBuilder;
+    return location.pathname.startsWith(path);
   };
 
-  const ActiveComponent = getActiveComponent();
-  const drawerWidth = isCollapsed ? COLLAPSED_DRAWER_WIDTH : DRAWER_WIDTH;
-
-  const DrawerContent = () => (
-    <Box sx={{ 
-      height: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      background: isMobileView 
-        ? 'linear-gradient(180deg, #143151 0%, #1a3a5c 50%, #387E89 100%)'
-        : bravoColors.primary,
-      overflow: 'hidden',
-      position: 'relative'
-    }}>
-      {/* Mobile Header */}
-      {isMobileView ? (
-        <Box 
-          data-tour-id="dashboard-header"
-          sx={{
-            p: { xs: 2, sm: 3 },
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-            minHeight: { xs: 70, sm: 80 },
-            position: 'relative',
-            zIndex: 1
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
-            <Avatar
-              sx={{
-                width: { xs: 32, sm: 36 },
-                height: { xs: 32, sm: 36 },
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                border: '2px solid rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                fontWeight: 600,
-                fontSize: { xs: '0.8rem', sm: '0.9rem' }
-              }}
-            >
-              {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
-            </Avatar>
-            <Box>
-              <Typography 
-                variant="subtitle2" 
-                sx={{ 
-                  color: 'white', 
-                  fontWeight: 600, 
-                  fontSize: { xs: '0.8rem', sm: '0.9rem' }, 
-                  lineHeight: 1.2 
-                }}
-              >
-                {profile?.firstName} {profile?.lastName}
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: 'rgba(255, 255, 255, 0.6)', 
-                  fontSize: { xs: '0.7rem', sm: '0.75rem' }, 
-                  lineHeight: 1.2 
-                }}
-              >
-                {profile?.email}
-              </Typography>
-            </Box>
-          </Box>
-          
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <HelpButton />
-            <IconButton
-              onClick={() => setMobileOpen(false)}
-              sx={{
-                color: 'white',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px',
-                padding: { xs: 1, sm: 1.5 },
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                  transform: 'rotate(90deg)'
-                }
-              }}
-            >
-              <X size={isMobile ? 18 : 20} />
-            </IconButton>
-          </Box>
-        </Box>
-      ) : (
-        /* Desktop Header with Logo and Profile */
-        <Box 
-          data-tour-id="dashboard-header"
-          sx={{
-            p: isCollapsed ? 2 : 3,
-            borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-            minHeight: isCollapsed ? 80 : 100,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            position: 'relative',
-            zIndex: 1
-          }}
-        >
-          {!isCollapsed ? (
-            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <Box
-                component="img"
-                src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
-                alt="S10.AI Logo"
-                sx={{
-                  height: 40,
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-                  transition: 'transform 0.3s ease',
-                  mb: 2,
-                  '&:hover': {
-                    transform: 'scale(1.05)'
-                  }
-                }}
-              />
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
-                <Avatar
-                  sx={{
-                    width: 28,
-                    height: 28,
-                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                    fontWeight: 600,
-                    fontSize: '0.75rem'
-                  }}
-                >
-                  {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
-                </Avatar>
-                <Box>
-                  <Typography variant="caption" sx={{ 
-                    color: 'white', 
-                    fontWeight: 600, 
-                    fontSize: '0.8rem', 
-                    lineHeight: 1.2,
-                    display: 'block'
-                  }}>
-                    {profile?.firstName} {profile?.lastName}
-                  </Typography>
-                  <Typography variant="caption" sx={{ 
-                    color: 'rgba(255, 255, 255, 0.6)', 
-                    fontSize: '0.7rem', 
-                    lineHeight: 1.2 
-                  }}>
-                    {profile?.email}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-          ) : (
-            <Tooltip title={`${profile?.firstName} ${profile?.lastName}`} placement="right" arrow>
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
-                  border: '2px solid rgba(255, 255, 255, 0.2)',
-                  color: 'white',
-                  fontWeight: 600,
-                  fontSize: '0.8rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'scale(1.1)',
-                    backgroundColor: 'rgba(255, 255, 255, 0.25)'
-                  }
-                }}
-                onClick={() => setIsCollapsed(false)}
-              >
-                {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
-              </Avatar>
-            </Tooltip>
-          )}
-        </Box>
-      )}
-
-      {/* Enhanced Navigation Menu with Accordions */}
-      <Box 
-        data-tour-id="sidebar-navigation"
-        sx={{ 
-          flex: 1, 
-          py: 2, 
-          px: { xs: 1.5, sm: 1 }, 
-          overflow: 'auto',
-          position: 'relative',
-          zIndex: 1,
-          '&::-webkit-scrollbar': {
-            width: '4px'
-          },
-          '&::-webkit-scrollbar-track': {
-            background: 'rgba(255, 255, 255, 0.05)'
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: 'rgba(255, 255, 255, 0.2)',
-            borderRadius: '2px'
-          }
+  const drawer = (
+    <Box 
+      sx={{ 
+        height: '100%',
+        background: `linear-gradient(135deg, ${bravoColors.primary[600]} 0%, ${bravoColors.primary[800]} 100%)`,
+        color: 'white',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+      data-tour-id="sidebar-navigation"
+    >
+      {/* Logo/Header Section */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          px: 3,
+          py: 2.5,
+          background: `linear-gradient(135deg, ${bravoColors.primary[700]} 0%, ${bravoColors.primary[900]} 100%)`,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
         }}
       >
-        <List sx={{ px: 0, py: 1 }}>
-          {menuItems.map((item, index) => (
-            <Box key={item.id}>
-              {item.children ? (
-                // Accordion Item
-                <Box>
-                  <ListItem disablePadding sx={{ mb: 1 }}>
-                    <Tooltip 
-                      title={isCollapsed && !isMobileView ? item.label : ''} 
-                      placement="right" 
-                      arrow
-                    >
-                      <ListItemButton
-                        data-tour-id={item.id === 'template-builder' ? 'nav-templates' : item.id === 'workflow-builder' ? 'nav-workflows' : `nav-${item.id}`}
-                        onClick={() => !isCollapsed ? handleAccordionToggle(item.id) : setIsCollapsed(false)}
-                        sx={{
-                          borderRadius: { xs: '14px', sm: '12px' },
-                          mx: { xs: 1, sm: 1 },
-                          minHeight: { xs: 50, sm: 52 },
-                          justifyContent: isCollapsed && !isMobileView ? 'center' : 'flex-start',
-                          px: isCollapsed && !isMobileView ? 2 : { xs: 2, sm: 2.5 },
-                          py: { xs: 1.25, sm: 1.25 },
-                          color: 'rgba(255, 255, 255, 0.75)',
-                          backgroundColor: 'transparent',
-                          position: 'relative',
-                          overflow: 'hidden',
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                          '&:hover': {
-                            backgroundColor: 'transparent',
-                            color: 'rgba(255, 255, 255, 0.95)',
-                            transform: isMobileView ? 'translateY(-1px)' : 'translateX(2px)',
-                            '&::before': {
-                              background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)'
-                            }
-                          },
-                          '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background: 'transparent',
-                            borderRadius: 'inherit',
-                            transition: 'all 0.3s ease'
-                          }
-                        }}
-                      >
-                        <ListItemIcon sx={{
-                          minWidth: isCollapsed && !isMobileView ? 0 : { xs: 36, sm: 40 },
-                          color: 'inherit',
-                          justifyContent: 'center',
-                          position: 'relative',
-                          zIndex: 1,
-                          transition: 'transform 0.2s ease',
-                          '&:hover': {
-                            transform: 'scale(1.05)'
-                          }
-                        }}>
-                          {item.icon}
-                        </ListItemIcon>
-                        {(!isCollapsed || isMobileView) && (
-                          <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                            <ListItemText
-                              primary={
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                  <span>{item.label}</span>
-                                  {item.badge && (
-                                    <Paper
-                                      elevation={0}
-                                      sx={{
-                                        backgroundColor: '#4CAF50',
-                                        color: 'white',
-                                        px: 1,
-                                        py: 0.25,
-                                        borderRadius: '10px',
-                                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
-                                        fontWeight: 600,
-                                        letterSpacing: '0.3px'
-                                      }}
-                                    >
-                                      {item.badge}
-                                    </Paper>
-                                  )}
-                                </Box>
-                              }
-                              primaryTypographyProps={{
-                                fontSize: { xs: '0.85rem', sm: '0.9rem' },
-                                fontWeight: 500,
-                                color: 'inherit',
-                                position: 'relative',
-                                zIndex: 1
-                              }}
-                            />
-                            <Box sx={{ position: 'relative', zIndex: 1 }}>
-                              {expandedItems.includes(item.id) ? 
-                                <ChevronUp size={18} /> : 
-                                <ChevronDown size={18} />
-                              }
-                            </Box>
-                          </Box>
-                        )}
-                      </ListItemButton>
-                    </Tooltip>
-                  </ListItem>
-                  
-                  {/* Submenu Items */}
-                  {(!isCollapsed || isMobileView) && (
-                    <Collapse in={expandedItems.includes(item.id)} timeout="auto" unmountOnExit>
-                      <List sx={{ pl: { xs: 1.5, sm: 2 }, py: 0 }}>
-                        {item.children.map((child) => (
-                          <ListItem key={child.id} disablePadding sx={{ mb: 0.5 }}>
-                            <ListItemButton
-                              onClick={() => handleMenuItemClick(child.id)}
-                              selected={activeMenuItem === child.id}
-                              sx={{
-                                borderRadius: { xs: '10px', sm: '10px' },
-                                mx: { xs: 0.5, sm: 0.5 },
-                                minHeight: { xs: 42, sm: 44 },
-                                px: { xs: 1.5, sm: 2 },
-                                py: { xs: 0.75, sm: 0.75 },
-                                color: 'rgba(255, 255, 255, 0.65)',
-                                backgroundColor: 'transparent',
-                                position: 'relative',
-                                overflow: 'hidden',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                '&::before': {
-                                  content: '""',
-                                  position: 'absolute',
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  bottom: 0,
-                                  background: activeMenuItem === child.id 
-                                    ? 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)'
-                                    : 'transparent',
-                                  borderRadius: 'inherit',
-                                  transition: 'all 0.3s ease'
-                                },
-                                '&.Mui-selected': {
-                                  backgroundColor: 'transparent',
-                                  color: 'white',
-                                  transform: isMobileView ? 'none' : 'translateX(4px)',
-                                  boxShadow: isMobileView 
-                                    ? '0 2px 8px rgba(0,0,0,0.1)'
-                                    : '0 2px 6px rgba(0,0,0,0.1)',
-                                  '&:hover': {
-                                    backgroundColor: 'transparent',
-                                    transform: isMobileView ? 'translateY(-1px)' : 'translateX(6px)',
-                                    '&::before': {
-                                      background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
-                                    }
-                                  }
-                                },
-                                '&:hover': {
-                                  backgroundColor: 'transparent',
-                                  color: 'rgba(255, 255, 255, 0.9)',
-                                  transform: isMobileView ? 'translateY(-1px)' : 'translateX(2px)',
-                                  '&::before': {
-                                    background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 100%)'
-                                  }
-                                }
-                              }}
-                            >
-                              <ListItemIcon sx={{
-                                minWidth: { xs: 30, sm: 32 },
-                                color: 'inherit',
-                                justifyContent: 'center',
-                                position: 'relative',
-                                zIndex: 1
-                              }}>
-                                {child.icon}
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={child.label}
-                                primaryTypographyProps={{
-                                  fontSize: { xs: '0.8rem', sm: '0.8rem' },
-                                  fontWeight: activeMenuItem === child.id ? 600 : 400,
-                                  color: 'inherit',
-                                  position: 'relative',
-                                  zIndex: 1
-                                }}
-                              />
-                            </ListItemButton>
-                          </ListItem>
-                        ))}
-                      </List>
-                    </Collapse>
-                  )}
-                </Box>
-              ) : (
-                // Regular Menu Item
-                <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
-                  <Tooltip 
-                    title={isCollapsed && !isMobileView ? item.label : ''} 
-                    placement="right" 
-                    arrow
-                  >
-                    <ListItemButton
-                      data-tour-id={`nav-${item.id}`}
-                      onClick={() => handleMenuItemClick(item.id)}
-                      selected={activeMenuItem === item.id}
-                      sx={{
-                        borderRadius: { xs: '14px', sm: '12px' },
-                        mx: { xs: 1, sm: 1 },
-                        minHeight: { xs: 50, sm: 52 },
-                        justifyContent: isCollapsed && !isMobileView ? 'center' : 'flex-start',
-                        px: isCollapsed && !isMobileView ? 2 : { xs: 2, sm: 2.5 },
-                        py: { xs: 1.25, sm: 1.25 },
-                        color: 'rgba(255, 255, 255, 0.75)',
-                        backgroundColor: 'transparent',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        '&::before': {
-                          content: '""',
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          bottom: 0,
-                          background: activeMenuItem === item.id 
-                            ? 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.08) 100%)'
-                            : 'transparent',
-                          borderRadius: 'inherit',
-                          transition: 'all 0.3s ease'
-                        },
-                        '&.Mui-selected': {
-                          backgroundColor: 'transparent',
-                          color: 'white',
-                          transform: isMobileView ? 'none' : 'translateX(4px)',
-                          boxShadow: isMobileView 
-                            ? '0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15)'
-                            : '0 4px 12px rgba(0,0,0,0.15)',
-                          border: isMobileView ? '1px solid rgba(255,255,255,0.15)' : 'none',
-                          '&:hover': {
-                            backgroundColor: 'transparent',
-                            transform: isMobileView ? 'translateY(-1px)' : 'translateX(6px)',
-                            '&::before': {
-                              background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
-                            }
-                          }
-                        },
-                        '&:hover': {
-                          backgroundColor: 'transparent',
-                          color: 'rgba(255, 255, 255, 0.95)',
-                          transform: isMobileView ? 'translateY(-1px)' : 'translateX(2px)',
-                          '&::before': {
-                            background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)'
-                          }
-                        }
-                      }}
-                    >
-                      <ListItemIcon sx={{
-                        minWidth: isCollapsed && !isMobileView ? 0 : { xs: 36, sm: 40 },
-                        color: 'inherit',
-                        justifyContent: 'center',
-                        position: 'relative',
-                        zIndex: 1,
-                        transition: 'transform 0.2s ease',
-                        '&:hover': {
-                          transform: 'scale(1.05)'
-                        }
-                      }}>
-                        {item.icon}
-                      </ListItemIcon>
-                      {(!isCollapsed || isMobileView) && (
-                        <ListItemText
-                          primary={item.label}
-                          primaryTypographyProps={{
-                            fontSize: { xs: '0.85rem', sm: '0.9rem' },
-                            fontWeight: activeMenuItem === item.id ? 600 : 500,
-                            color: 'inherit',
-                            position: 'relative',
-                            zIndex: 1
-                          }}
-                        />
-                      )}
-                    </ListItemButton>
-                  </Tooltip>
-                </ListItem>
-              )}
-            </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              borderRadius: 2,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backdropFilter: 'blur(10px)'
+            }}
+          >
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                fontWeight: 'bold',
+                color: 'white',
+                fontSize: '1.2rem'
+              }}
+            >
+              S10
+            </Typography>
+          </Box>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: 600,
+              color: 'white',
+              fontSize: '1.1rem'
+            }}
+          >
+            S10.AI
+          </Typography>
+        </Box>
+        
+        {/* Desktop Collapse Button */}
+        {!isMobileView && (
+          <IconButton
+            data-tour-id="collapse-sidebar"
+            onClick={handleDrawerToggle}
+            sx={{
+              color: 'rgba(255, 255, 255, 0.8)',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: 'white'
+              }
+            }}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+        )}
+      </Box>
+
+      {/* Navigation Menu */}
+      <Box sx={{ flex: 1, py: 2 }}>
+        <List sx={{ px: 2 }}>
+          {menuItems.map((item) => (
+            <ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
+              <ListItemButton
+                data-tour-id={item.tourId}
+                onClick={() => {
+                  navigate(item.path);
+                  if (isMobileView) {
+                    setMobileOpen(false);
+                  }
+                }}
+                selected={isSelected(item.path)}
+                sx={{
+                  borderRadius: 2,
+                  mx: 0,
+                  py: 1.5,
+                  px: 2,
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    color: 'white',
+                    '& .MuiListItemIcon-root': {
+                      color: 'white'
+                    }
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                    color: 'white',
+                    '& .MuiListItemIcon-root': {
+                      color: 'white'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    }
+                  },
+                  transition: 'all 0.2s ease-in-out'
+                }}
+              >
+                <ListItemIcon 
+                  sx={{ 
+                    color: 'inherit',
+                    minWidth: 36
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.text} 
+                  sx={{
+                    '& .MuiListItemText-primary': {
+                      fontSize: '0.95rem',
+                      fontWeight: isSelected(item.path) ? 600 : 500
+                    }
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
           ))}
         </List>
       </Box>
 
-      {/* Enhanced Footer */}
-      <Box sx={{ 
-        p: 2, 
-        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-        position: 'relative',
-        zIndex: 1
-      }}>
-        {isMobileView && (
-          <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', gap: 1.5 }}>
-              <Tooltip title="Logout" arrow>
-                <IconButton
-                  onClick={handleLogout}
-                  sx={{
-                    flex: 1,
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    borderRadius: '12px',
-                    color: 'rgba(255, 255, 255, 0.7)',
-                    py: 1.5,
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      backgroundColor: 'rgba(244, 67, 54, 0.15)',
-                      color: '#f44336',
-                      transform: 'translateY(-1px)'
-                    }
-                  }}
-                >
-                  <LogOut size={18} />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
-        )}
-
-        {!isMobileView && (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
-            <HelpButton />
-            <Tooltip title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} placement="top" arrow>
-              <Paper
-                elevation={0}
-                sx={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '14px',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
-                  overflow: 'hidden'
-                }}
-              >
-                <IconButton
-                  data-tour-id="collapse-sidebar"
-                  onClick={handleDrawerToggle}
-                  sx={{
-                    color: 'rgba(255, 255, 255, 0.8)',
-                    padding: 1.5,
-                    borderRadius: '14px',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      color: 'white',
-                      transform: 'scale(1.05)'
-                    }
-                  }}
-                >
-                  {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-                </IconButton>
-              </Paper>
-            </Tooltip>
-          </Box>
-        )}
+      {/* Help Section */}
+      <Box sx={{ px: 3, py: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <HelpButton />
       </Box>
     </Box>
   );
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', width: '100%' }}>
-      {/* Mobile/Tablet Menu Button - Fixed visibility */}
-      {isMobileView && (
-        <Fade in={!mobileOpen}>
-          <Paper
-            elevation={6}
-            sx={{
-              position: 'fixed',
-              top: { xs: 16, sm: 20 },
-              left: { xs: 16, sm: 20 },
-              zIndex: 1300,
-              display: { xs: 'block', md: 'none' },
-              background: 'linear-gradient(135deg, #143151 0%, #387E89 100%)',
-              borderRadius: '16px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
-            }}
-          >
-            <IconButton
-              onClick={handleDrawerToggle}
-              sx={{
-                color: 'white',
-                padding: { xs: 1.5, sm: 1.75 },
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:hover': {
-                  transform: 'scale(1.05)',
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)'
-                },
-                '&:active': {
-                  transform: 'scale(0.98)'
-                }
+    <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
+      <CssBaseline />
+      
+      {/* App Bar */}
+      <AppBar
+        position="fixed"
+        sx={{
+          width: { 
+            xs: '100%',
+            lg: mobileOpen ? '100%' : `calc(100% - ${drawerWidth}px)` 
+          },
+          ml: { 
+            xs: 0,
+            lg: mobileOpen ? 0 : `${drawerWidth}px` 
+          },
+          backgroundColor: 'background.paper',
+          color: 'text.primary',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)',
+          borderBottom: '1px solid',
+          borderBottomColor: 'divider',
+          zIndex: theme.zIndex.drawer + 1,
+          transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {/* Mobile Menu Button */}
+            {isMobileView && (
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                edge="start"
+                onClick={handleDrawerToggle}
+                sx={{ 
+                  mr: 2,
+                  color: 'text.primary'
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
+            
+            <Typography 
+              variant="h6" 
+              noWrap 
+              component="div"
+              sx={{ 
+                fontWeight: 600,
+                color: 'text.primary',
+                fontSize: '1.1rem'
               }}
             >
-              <Menu size={isMobile ? 20 : 22} />
-            </IconButton>
-          </Paper>
-        </Fade>
-      )}
+              Clinical Assistant
+            </Typography>
+          </Box>
 
-      {/* Desktop Sidebar */}
-      <Box component="nav" sx={{ 
-        width: { xs: 0, md: drawerWidth }, 
-        flexShrink: 0,
-        display: { xs: 'none', md: 'block' }
-      }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* Notifications */}
+            <IconButton sx={{ color: 'text.secondary' }}>
+              <Badge badgeContent={3} color="primary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+
+            {/* Profile Menu */}
+            <IconButton onClick={handleProfileClick} sx={{ p: 0, ml: 1 }}>
+              <Avatar 
+                sx={{ 
+                  width: 36, 
+                  height: 36,
+                  backgroundColor: bravoColors.primary[500],
+                  fontSize: '0.9rem',
+                  fontWeight: 600
+                }}
+              >
+                DR
+              </Avatar>
+            </IconButton>
+            
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleProfileClose}
+              onClick={handleProfileClose}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  mt: 1.5,
+                  minWidth: 200,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'divider'
+                }
+              }}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+              <MenuItem onClick={() => navigate('/dashboard/profile')}>
+                <PersonIcon sx={{ mr: 2, fontSize: 20 }} />
+                Profile
+              </MenuItem>
+              <MenuItem>
+                <SettingsIcon sx={{ mr: 2, fontSize: 20 }} />
+                Settings
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                <LogoutIcon sx={{ mr: 2, fontSize: 20 }} />
+                Logout
+              </MenuItem>
+            </Menu>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* Navigation Drawer */}
+      <Box
+        component="nav"
+        sx={{ 
+          width: { lg: mobileOpen ? 0 : drawerWidth }, 
+          flexShrink: { lg: 0 },
+          transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+        }}
+      >
+        {/* Mobile drawer */}
         <Drawer
-          variant="permanent"
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
           sx={{
+            display: { xs: 'block', lg: 'none' },
+            '& .MuiDrawer-paper': { 
+              boxSizing: 'border-box', 
+              width: isMobile ? '85vw' : '350px',
+              maxWidth: '400px',
+              border: 'none',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+        
+        {/* Desktop drawer */}
+        <Drawer
+          variant="persistent"
+          open={!mobileOpen}
+          sx={{
+            display: { xs: 'none', lg: 'block' },
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              background: bravoColors.primary,
-              transition: theme.transitions.create('width', {
-                easing: theme.transitions.easing.easeInOut,
-                duration: theme.transitions.duration.standard
-              }),
-              overflowX: 'hidden',
               border: 'none',
-              boxShadow: '8px 0 32px rgba(0, 0, 0, 0.12)'
-            }
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              transition: theme.transitions.create('transform', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+              }),
+              transform: mobileOpen ? 'translateX(-100%)' : 'translateX(0)',
+            },
           }}
-          open
         >
-          <DrawerContent />
+          {drawer}
         </Drawer>
       </Box>
-
-      {/* Mobile/Tablet Drawer */}
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        ModalProps={{
-          keepMounted: true
-        }}
-        sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': {
-            boxSizing: 'border-box',
-            width: isMobile ? '100vw' : '320px',
-            height: '100vh',
-            background: 'linear-gradient(180deg, #143151 0%, #1a3a5c 50%, #387E89 100%)',
-            border: 'none'
-          },
-          '& .MuiBackdrop-root': {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)'
-          }
-        }}
-        SlideProps={{
-          direction: 'right'
-        }}
-      >
-        <Slide direction="right" in={mobileOpen} mountOnEnter unmountOnExit>
-          <Box>
-            <DrawerContent />
-          </Box>
-        </Slide>
-      </Drawer>
 
       {/* Main Content */}
       <Box
@@ -871,32 +432,36 @@ export const Dashboard: React.FC = () => {
         sx={{
           flexGrow: 1,
           width: { 
-            xs: '100vw', 
-            md: `calc(100% - ${drawerWidth}px)` 
+            xs: '100%',
+            lg: mobileOpen ? '100%' : `calc(100% - ${drawerWidth}px)` 
           },
-          backgroundColor: bravoColors.background.light,
           minHeight: '100vh',
-          overflow: 'auto',
-          pt: { xs: 0, md: 0 },
-          position: 'relative'
+          backgroundColor: 'background.default',
+          transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
         }}
       >
+        {/* Toolbar spacer */}
+        <Toolbar />
+        
+        {/* Page Content */}
         <Container 
-          maxWidth="xl" 
+          maxWidth={false}
           sx={{ 
-            height: '100%', 
-            p: { xs: 1, sm: 2, md: 0 },
-            width: '100%',
-            maxWidth: '100% !important'
+            py: { xs: 2, sm: 3 },
+            px: { xs: 2, sm: 3, md: 4 },
+            height: 'calc(100vh - 64px)',
+            overflow: 'auto'
           }}
         >
-          {activeMenuItem === 'billing-history' ? (
-            <BillingHistory sidebarCollapsed={isCollapsed} />
-          ) : (
-            <ActiveComponent />
-          )}
+          <Outlet />
         </Container>
       </Box>
+
+      {/* Tour Overlay */}
+      <TourOverlay />
     </Box>
   );
 };
