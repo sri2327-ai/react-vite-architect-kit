@@ -47,7 +47,7 @@ interface SectionPlacementDialogProps {
   onPlaceSection: (position: number) => void;
   onBack?: () => void;
   existingSections: Array<{ id: string; name: string; type?: string; }>;
-  pendingSection?: any; // The section that will be placed
+  pendingSection?: any;
 }
 
 const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
@@ -125,7 +125,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
 
     return (
       <Paper
-        elevation={isActive ? 12 : 3}
+        elevation={isActive ? 8 : 2}
         onMouseEnter={() => setHoveredPosition(position)}
         onMouseLeave={() => setHoveredPosition(null)}
         onClick={() => {
@@ -133,87 +133,59 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           setSelectedPosition(position);
         }}
         sx={{
-          p: { xs: 1.5, sm: 3 },
-          mb: { xs: 1.5, sm: 3 },
+          p: { xs: 1.5, sm: 2 },
+          mb: { xs: 1, sm: 1.5 },
           cursor: 'pointer',
-          borderRadius: 4,
-          border: `3px solid ${isSelected ? theme.palette.primary.main : 'transparent'}`,
+          borderRadius: 2,
+          border: `2px solid ${isSelected ? theme.palette.primary.main : 'transparent'}`,
           backgroundColor: isSelected 
-            ? alpha(theme.palette.primary.main, 0.12)
+            ? alpha(theme.palette.primary.main, 0.08)
             : isHovered 
-              ? alpha(theme.palette.primary.main, 0.06)
+              ? alpha(theme.palette.primary.main, 0.04)
               : 'white',
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          transform: isActive ? 'translateY(-4px) scale(1.02)' : 'translateY(0) scale(1)',
+          transition: 'all 0.2s ease',
+          transform: isActive ? 'translateY(-1px)' : 'translateY(0)',
           boxShadow: isActive 
-            ? `0 12px 40px ${alpha(theme.palette.primary.main, 0.3)}`
-            : `0 4px 12px ${alpha(theme.palette.grey[500], 0.15)}`,
+            ? `0 4px 20px ${alpha(theme.palette.primary.main, 0.15)}`
+            : `0 1px 3px ${alpha(theme.palette.grey[500], 0.12)}`,
           '&:hover': {
             '& .placement-icon': {
-              transform: 'scale(1.15) rotate(5deg)',
+              transform: 'scale(1.05)',
               color: theme.palette.primary.main
-            },
-            '& .placement-arrow': {
-              animation: 'bounce 1s infinite'
             }
-          },
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 4,
-            background: isSelected ? theme.palette.primary.main : 'transparent',
-            transition: 'all 0.3s ease'
           }
         }}
       >
-        <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 1.5, sm: 3 }}>
+        <Stack direction="row" alignItems="center" spacing={2}>
           <Box
             className="placement-icon"
             sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: { xs: 40, sm: 56 },
-              height: { xs: 40, sm: 56 },
-              borderRadius: '50%',
+              width: { xs: 36, sm: 40 },
+              height: { xs: 36, sm: 40 },
+              borderRadius: 2,
               backgroundColor: isSelected 
                 ? theme.palette.primary.main
-                : alpha(theme.palette.primary.main, 0.12),
+                : alpha(theme.palette.primary.main, 0.1),
               color: isSelected ? 'white' : theme.palette.primary.main,
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              border: `3px solid ${isSelected ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.3)}`,
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: -4,
-                borderRadius: '50%',
-                padding: 2,
-                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                maskComposite: 'xor',
-                opacity: isSelected ? 1 : 0,
-                transition: 'opacity 0.3s ease'
-              }
+              transition: 'all 0.2s ease',
+              flexShrink: 0
             }}
           >
-            <IconComponent className={isSpecial ? "" : "placement-arrow"} sx={{ fontSize: { xs: 20, sm: 28 } }} />
+            <IconComponent sx={{ fontSize: { xs: 18, sm: 20 } }} />
           </Box>
           
-          <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography 
-              variant="h6" 
+              variant="subtitle2" 
               sx={{ 
-                fontWeight: 700,
+                fontWeight: 600,
                 color: isSelected ? theme.palette.primary.main : theme.palette.text.primary,
-                fontSize: { xs: '0.9rem', sm: '1.2rem' },
-                mb: 0.5,
-                transition: 'color 0.3s ease'
+                fontSize: { xs: '0.85rem', sm: '0.9rem' },
+                mb: 0.25,
+                transition: 'color 0.2s ease'
               }}
             >
               {label}
@@ -222,9 +194,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               variant="body2" 
               sx={{ 
                 color: theme.palette.text.secondary,
-                fontSize: { xs: '0.75rem', sm: '0.9rem' },
-                fontWeight: 500,
-                lineHeight: 1.4
+                fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                lineHeight: 1.3
               }}
             >
               {description}
@@ -232,21 +203,12 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           </Box>
 
           {isSelected && (
-            <Box
-              sx={{
-                width: { xs: 24, sm: 32 },
-                height: { xs: 24, sm: 32 },
-                borderRadius: '50%',
-                backgroundColor: theme.palette.success.main,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: `0 4px 12px ${alpha(theme.palette.success.main, 0.4)}`,
-                order: { xs: -1, sm: 0 }
-              }}
-            >
-              <CheckCircleIcon sx={{ color: 'white', fontSize: { xs: 16, sm: 20 } }} />
-            </Box>
+            <CheckCircleIcon 
+              sx={{ 
+                color: theme.palette.success.main,
+                fontSize: { xs: 20, sm: 24 }
+              }} 
+            />
           )}
         </Stack>
       </Paper>
@@ -255,47 +217,41 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
 
   const ExistingSection = ({ section, index }: { section: { id: string; name: string; type?: string }; index: number }) => (
     <Paper
-      elevation={2}
+      elevation={1}
       sx={{
-        p: { xs: 1.5, sm: 3 },
-        mb: { xs: 1.5, sm: 3 },
-        borderRadius: 3,
-        backgroundColor: alpha(theme.palette.grey[50], 0.8),
-        border: `2px solid ${alpha(theme.palette.divider, 0.1)}`,
-        transition: 'all 0.3s ease',
-        '&:hover': {
-          backgroundColor: alpha(theme.palette.grey[100], 0.8),
-          transform: 'translateY(-1px)',
-          boxShadow: `0 6px 20px ${alpha(theme.palette.grey[500], 0.15)}`
-        }
+        p: { xs: 1.5, sm: 2 },
+        mb: { xs: 1, sm: 1.5 },
+        borderRadius: 2,
+        backgroundColor: alpha(theme.palette.grey[100], 0.5),
+        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`
       }}
     >
-      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 1.5, sm: 3 }}>
+      <Stack direction="row" alignItems="center" spacing={2}>
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: { xs: 32, sm: 48 },
-            height: { xs: 32, sm: 48 },
-            borderRadius: 3,
+            width: { xs: 32, sm: 36 },
+            height: { xs: 32, sm: 36 },
+            borderRadius: 1.5,
             backgroundColor: alpha(theme.palette.grey[400], 0.15),
             color: theme.palette.grey[600],
-            border: `2px solid ${alpha(theme.palette.grey[400], 0.2)}`
+            flexShrink: 0
           }}
         >
-          <DragIndicatorIcon sx={{ fontSize: { xs: 16, sm: 24 } }} />
+          <DragIndicatorIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
         </Box>
         
-        <Box sx={{ flex: 1, textAlign: { xs: 'center', sm: 'left' } }}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={{ xs: 1, sm: 2 }} sx={{ mb: 1 }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
             {getTypeIcon(section.type)}
             <Typography 
-              variant="subtitle1" 
+              variant="subtitle2" 
               sx={{ 
-                fontWeight: 700,
+                fontWeight: 600,
                 color: theme.palette.text.primary,
-                fontSize: { xs: '0.85rem', sm: '1.1rem' }
+                fontSize: { xs: '0.8rem', sm: '0.85rem' }
               }}
             >
               {section.name}
@@ -304,12 +260,11 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
               label={getTypeLabel(section.type)}
               size="small"
               sx={{
-                height: { xs: 20, sm: 24 },
-                fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                height: 20,
+                fontSize: '0.65rem',
                 fontWeight: 600,
-                backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                color: theme.palette.primary.main,
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`
+                backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                color: theme.palette.primary.main
               }}
             />
           </Stack>
@@ -317,34 +272,81 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
             variant="caption" 
             sx={{ 
               color: theme.palette.text.secondary,
-              fontStyle: 'italic',
-              fontSize: { xs: '0.7rem', sm: '0.8rem' }
+              fontSize: { xs: '0.7rem', sm: '0.75rem' }
             }}
           >
-            Position {index + 1} • Existing section
+            Position {index + 1}
           </Typography>
         </Box>
       </Stack>
     </Paper>
   );
 
+  // Generate placement options dynamically
+  const renderPlacementOptions = () => {
+    const options = [];
+    
+    // Add "Place at Beginning" option
+    options.push(
+      <PlacementZone 
+        key="beginning"
+        position={0} 
+        label="Place at Beginning"
+        description={existingSections.length === 0 
+          ? "This will be your first section"
+          : "Place before all existing sections"
+        }
+        icon={VerticalAlignTopIcon}
+        isSpecial={true}
+      />
+    );
+
+    // Add existing sections with placement options between them
+    existingSections.forEach((section, index) => {
+      // Add the existing section
+      options.push(
+        <ExistingSection key={section.id} section={section} index={index} />
+      );
+      
+      // Add placement option after this section
+      const nextPosition = index + 1;
+      const isLast = index === existingSections.length - 1;
+      
+      options.push(
+        <PlacementZone 
+          key={`after-${index}`}
+          position={nextPosition} 
+          label={isLast ? "Place at End" : `Place After "${section.name}"`}
+          description={isLast 
+            ? "Place after all existing sections"
+            : `Insert after "${section.name}"`
+          }
+          icon={isLast ? VerticalAlignBottomIcon : VerticalAlignCenterIcon}
+          isSpecial={isLast}
+        />
+      );
+    });
+
+    return options;
+  };
+
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth="md"
+      maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: { 
-          borderRadius: 4,
-          maxHeight: '85vh',
-          m: { xs: 0.5, sm: 2 }
+          borderRadius: 3,
+          maxHeight: '80vh',
+          m: { xs: 1, sm: 2 }
         }
       }}
     >
-      <DialogTitle sx={{ pb: { xs: 1, sm: 2 }, px: { xs: 1.5, sm: 3 }, pt: { xs: 1.5, sm: 3 } }}>
+      <DialogTitle sx={{ pb: 1, px: 3, pt: 2 }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={{ xs: 0.5, sm: 2 }}>
+          <Box display="flex" alignItems="center" gap={1}>
             {onBack && (
               <IconButton 
                 onClick={handleBackClick}
@@ -352,10 +354,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
                 sx={{
                   backgroundColor: alpha(theme.palette.grey[500], 0.1),
                   '&:hover': {
-                    backgroundColor: alpha(theme.palette.grey[500], 0.2),
-                    transform: 'translateX(-2px)'
-                  },
-                  transition: 'all 0.3s ease'
+                    backgroundColor: alpha(theme.palette.grey[500], 0.2)
+                  }
                 }}
               >
                 <ArrowBackIcon fontSize="small" />
@@ -363,28 +363,23 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
             )}
             <Box>
               <Typography 
-                variant="h4" 
+                variant="h6" 
                 sx={{ 
-                  fontWeight: 800, 
-                  mb: 0.5, 
-                  fontSize: { xs: '1.1rem', sm: '1.5rem', md: '1.75rem' },
-                  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, 
-                  backgroundClip: 'text', 
-                  WebkitBackgroundClip: 'text', 
-                  color: 'transparent' 
+                  fontWeight: 700,
+                  fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                  color: theme.palette.primary.main
                 }}
               >
-                Choose Section Placement
+                Choose Placement
               </Typography>
               <Typography 
-                variant="body1" 
+                variant="body2" 
                 color="text.secondary" 
                 sx={{ 
-                  fontWeight: 500,
-                  fontSize: { xs: '0.8rem', sm: '0.95rem', md: '1rem' }
+                  fontSize: { xs: '0.8rem', sm: '0.85rem' }
                 }}
               >
-                Select where you'd like to place your new section in the template
+                Select where to place your section
               </Typography>
             </Box>
           </Box>
@@ -392,13 +387,11 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
             onClick={onClose}
             size="small"
             sx={{
-              backgroundColor: alpha(theme.palette.error.main, 0.1),
-              color: theme.palette.error.main,
+              color: theme.palette.text.secondary,
               '&:hover': {
-                backgroundColor: alpha(theme.palette.error.main, 0.2),
-                transform: 'rotate(90deg)'
-              },
-              transition: 'all 0.3s ease'
+                backgroundColor: alpha(theme.palette.error.main, 0.1),
+                color: theme.palette.error.main
+              }
             }}
           >
             <CloseIcon fontSize="small" />
@@ -406,139 +399,92 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
         </Box>
       </DialogTitle>
 
-      <DialogContent sx={{ px: { xs: 1.5, sm: 3 } }}>
-        <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        {pendingSection && (
           <Paper
             elevation={0}
             sx={{
-              p: { xs: 1.5, sm: 3 },
-              borderRadius: 3,
-              background: `linear-gradient(135deg, ${alpha(theme.palette.info.main, 0.08)}, ${alpha(theme.palette.primary.main, 0.05)})`,
-              border: `2px solid ${alpha(theme.palette.info.main, 0.2)}`
+              p: 2,
+              mb: 2,
+              borderRadius: 2,
+              background: alpha(theme.palette.info.main, 0.05),
+              border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`
             }}
           >
             <Typography 
-              variant="h6" 
+              variant="subtitle2" 
               sx={{ 
                 color: theme.palette.info.main, 
-                fontWeight: 700, 
-                mb: 1, 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: 1,
-                fontSize: { xs: '0.9rem', sm: '1.1rem' }
+                fontWeight: 600, 
+                mb: 0.5,
+                fontSize: '0.85rem'
               }}
             >
-              💡 Quick Tip
+              📍 Section to Place: {pendingSection.name}
             </Typography>
             <Typography 
               variant="body2" 
               sx={{ 
                 color: theme.palette.info.main, 
-                fontWeight: 500, 
-                lineHeight: 1.6,
-                fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                fontSize: '0.75rem',
+                opacity: 0.8
               }}
             >
-              Click on any placement zone to position your new section. You can place it at the beginning, end, or between any existing sections.
+              {pendingSection.description}
             </Typography>
           </Paper>
-        </Box>
+        )}
 
-        <Box>
-          {/* Place at Beginning */}
-          <PlacementZone 
-            position={0} 
-            label="Place at Beginning"
-            description={existingSections.length === 0 
-              ? "Your new section will be the first section in the template"
-              : "Your new section will be placed before all existing sections"
-            }
-            icon={VerticalAlignTopIcon}
-            isSpecial={true}
-          />
-
-          {/* Existing sections with placement options between them */}
-          {existingSections.map((section, index) => (
-            <React.Fragment key={section.id}>
-              <ExistingSection section={section} index={index} />
-              
-              {/* Place between this section and the next (or at end if last section) */}
-              {index < existingSections.length - 1 ? (
-                <PlacementZone 
-                  position={index + 1} 
-                  label={`Place Between "${section.name}" and "${existingSections[index + 1].name}"`}
-                  description="Your new section will be inserted between these sections"
-                  icon={VerticalAlignCenterIcon}
-                />
-              ) : (
-                <PlacementZone 
-                  position={index + 1} 
-                  label="Place at End"
-                  description="Your new section will be placed after all existing sections"
-                  icon={VerticalAlignBottomIcon}
-                  isSpecial={true}
-                />
-              )}
-            </React.Fragment>
-          ))}
-
-          {existingSections.length === 0 && (
-            <Paper
-              elevation={0}
-              sx={{
-                textAlign: 'center',
-                py: { xs: 4, sm: 8 },
-                borderRadius: 4,
-                border: `3px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
-                backgroundColor: alpha(theme.palette.primary.main, 0.02)
-              }}
-            >
-              <Typography 
-                variant="h5" 
-                sx={{ 
-                  color: theme.palette.text.secondary, 
-                  mb: 2, 
-                  fontWeight: 600,
-                  fontSize: { xs: '1rem', sm: '1.25rem' }
+        <Box sx={{ maxHeight: '50vh', overflowY: 'auto', pr: 1 }}>
+          {existingSections.length === 0 ? (
+            <Box>
+              <PlacementZone 
+                position={0} 
+                label="Place as First Section"
+                description="This will be your first template section"
+                icon={VerticalAlignTopIcon}
+                isSpecial={true}
+              />
+              <Paper
+                elevation={0}
+                sx={{
+                  textAlign: 'center',
+                  py: 4,
+                  borderRadius: 2,
+                  border: `2px dashed ${alpha(theme.palette.primary.main, 0.2)}`,
+                  backgroundColor: alpha(theme.palette.primary.main, 0.02)
                 }}
               >
-                This will be your first section
-              </Typography>
-              <Typography 
-                variant="body1" 
-                sx={{ 
-                  color: theme.palette.text.secondary,
-                  fontSize: { xs: '0.8rem', sm: '0.95rem' }
-                }}
-              >
-                Click "Place at Beginning" above to add your first template section
-              </Typography>
-            </Paper>
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    color: theme.palette.text.secondary, 
+                    fontWeight: 500,
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  🎉 Your template is empty - this will be the first section!
+                </Typography>
+              </Paper>
+            </Box>
+          ) : (
+            renderPlacementOptions()
           )}
         </Box>
       </DialogContent>
 
       <Divider />
 
-      <DialogActions sx={{ p: { xs: 1.5, sm: 3 }, gap: { xs: 1, sm: 2 }, flexDirection: { xs: 'column', sm: 'row' } }}>
+      <DialogActions sx={{ p: 3, gap: 1.5 }}>
         <Button 
           onClick={onClose} 
           variant="outlined"
           size="medium"
-          fullWidth={isMobile}
           sx={{
-            borderRadius: 3,
+            borderRadius: 2,
             textTransform: 'none',
             fontWeight: 600,
-            px: 4,
-            borderWidth: 2,
-            '&:hover': {
-              borderWidth: 2,
-              transform: 'translateY(-1px)'
-            },
-            transition: 'all 0.3s ease',
-            fontSize: { xs: '0.8rem', sm: '0.9rem' }
+            px: 3
           }}
         >
           Cancel
@@ -548,48 +494,22 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
           variant="contained"
           size="medium"
           disabled={selectedPosition === null}
-          fullWidth={isMobile}
           sx={{
-            borderRadius: 3,
+            borderRadius: 2,
             textTransform: 'none',
-            fontWeight: 700,
-            px: 5,
-            py: 1.5,
-            fontSize: { xs: '0.85rem', sm: '1rem' },
+            fontWeight: 600,
+            px: 4,
             background: selectedPosition !== null 
               ? `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
-              : theme.palette.action.disabledBackground,
-            boxShadow: selectedPosition !== null ? '0 6px 20px rgba(0,0,0,0.15)' : 'none',
-            '&:hover': {
-              boxShadow: selectedPosition !== null ? '0 8px 25px rgba(0,0,0,0.25)' : 'none',
-              transform: selectedPosition !== null ? 'translateY(-2px) scale(1.02)' : 'none'
-            },
+              : undefined,
             '&:disabled': {
-              boxShadow: 'none',
               background: theme.palette.action.disabledBackground
-            },
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+            }
           }}
         >
-          {selectedPosition !== null ? '✨ Place Section Here' : 'Select Position First'}
+          {selectedPosition !== null ? '✨ Place Here' : 'Select Position'}
         </Button>
       </DialogActions>
-
-      <style>
-        {`
-          @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-              transform: translateY(0);
-            }
-            40% {
-              transform: translateY(-10px);
-            }
-            60% {
-              transform: translateY(-5px);
-            }
-          }
-        `}
-      </style>
     </Dialog>
   );
 };
