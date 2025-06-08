@@ -145,9 +145,9 @@ const SortableItem: React.FC<SortableItemProps> = ({
         <Paper
           elevation={isDragging ? 8 : 2}
           sx={{
-            p: { xs: 2, sm: 3 },
-            mb: 2,
-            borderRadius: 3,
+            p: { xs: 1.5, sm: 2, md: 3 },
+            mb: { xs: 1.5, sm: 2 },
+            borderRadius: { xs: 2, sm: 2.5, md: 3 },
             border: `2px solid ${isDragging ? bravoColors.primaryFlat : 'transparent'}`,
             background: isDragging 
               ? `linear-gradient(135deg, ${alpha(bravoColors.primaryFlat, 0.05)} 0%, ${alpha(bravoColors.secondary, 0.05)} 100%)`
@@ -158,7 +158,9 @@ const SortableItem: React.FC<SortableItemProps> = ({
               boxShadow: `0 8px 32px ${alpha(bravoColors.primaryFlat, 0.15)}`,
             },
             position: 'relative',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            width: '100%',
+            maxWidth: '100%'
           }}
         >
           {/* Header Section */}
@@ -166,11 +168,20 @@ const SortableItem: React.FC<SortableItemProps> = ({
             display: 'flex', 
             alignItems: 'flex-start', 
             justifyContent: 'space-between',
-            mb: 2,
-            gap: { xs: 1, sm: 2 }
+            mb: { xs: 1.5, sm: 2 },
+            gap: { xs: 1, sm: 1.5, md: 2 },
+            flexWrap: { xs: 'wrap', md: 'nowrap' },
+            width: '100%'
           }}>
             {/* Left Section - Drag Handle & Info */}
-            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: { xs: 1, sm: 2 }, flex: 1, minWidth: 0 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'flex-start', 
+              gap: { xs: 1, sm: 1.5, md: 2 }, 
+              flex: 1, 
+              minWidth: 0,
+              width: { xs: '100%', md: 'auto' }
+            }}>
               {/* Drag Handle */}
               <Box
                 {...attributes}
@@ -180,9 +191,9 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: { xs: 36, sm: 40 },
-                  height: { xs: 36, sm: 40 },
-                  borderRadius: 2,
+                  width: { xs: 32, sm: 36, md: 40 },
+                  height: { xs: 32, sm: 36, md: 40 },
+                  borderRadius: { xs: 1.5, sm: 2 },
                   backgroundColor: alpha(bravoColors.primaryFlat, 0.08),
                   color: bravoColors.primaryFlat,
                   transition: 'all 0.2s ease',
@@ -197,20 +208,36 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   }
                 }}
               >
-                <DragIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+                <DragIcon sx={{ fontSize: { xs: 16, sm: 18, md: 20 } }} />
               </Box>
 
               {/* Content Info */}
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, flexWrap: 'wrap' }}>
+              <Box sx={{ 
+                flex: 1, 
+                minWidth: 0,
+                width: '100%',
+                overflow: 'hidden'
+              }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: { xs: 0.5, sm: 1 }, 
+                  mb: { xs: 0.5, sm: 1 }, 
+                  flexWrap: 'wrap',
+                  width: '100%'
+                }}>
                   <Typography 
                     variant="h6" 
                     sx={{ 
                       fontWeight: 700,
                       color: bravoColors.primaryFlat,
-                      fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' },
+                      fontSize: { xs: '0.85rem', sm: '0.95rem', md: '1.1rem' },
                       lineHeight: 1.2,
-                      wordBreak: 'break-word'
+                      wordBreak: 'break-word',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      flex: '1 1 auto',
+                      minWidth: 0
                     }}
                   >
                     {item.name}
@@ -222,8 +249,9 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       backgroundColor: alpha(bravoColors.secondary, 0.15),
                       color: bravoColors.secondary,
                       fontWeight: 600,
-                      fontSize: { xs: '0.65rem', sm: '0.75rem' },
-                      height: { xs: 20, sm: 24 }
+                      fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.75rem' },
+                      height: { xs: 18, sm: 20, md: 24 },
+                      flexShrink: 0
                     }}
                   />
                 </Box>
@@ -233,10 +261,15 @@ const SortableItem: React.FC<SortableItemProps> = ({
                     variant="body2" 
                     color="text.secondary"
                     sx={{ 
-                      mb: 1.5,
-                      fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
+                      mb: { xs: 1, sm: 1.5 },
+                      fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.9rem' },
                       lineHeight: 1.4,
-                      wordBreak: 'break-word'
+                      wordBreak: 'break-word',
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: { xs: 2, sm: 3 },
+                      WebkitBoxOrient: 'vertical',
+                      textOverflow: 'ellipsis'
                     }}
                   >
                     {item.description}
@@ -247,20 +280,27 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   <Paper 
                     elevation={0}
                     sx={{ 
-                      p: { xs: 1.5, sm: 2 }, 
+                      p: { xs: 1, sm: 1.5, md: 2 }, 
                       backgroundColor: alpha(bravoColors.primaryFlat, 0.02),
                       border: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
-                      borderRadius: 2,
-                      mb: 2
+                      borderRadius: { xs: 1.5, sm: 2 },
+                      mb: { xs: 1.5, sm: 2 },
+                      width: '100%',
+                      overflow: 'hidden'
                     }}
                   >
                     <Typography 
                       variant="body2"
                       sx={{ 
-                        fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.85rem' },
+                        fontSize: { xs: '0.65rem', sm: '0.75rem', md: '0.85rem' },
                         lineHeight: 1.4,
                         wordBreak: 'break-word',
-                        fontFamily: 'monospace'
+                        fontFamily: 'monospace',
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                        WebkitLineClamp: { xs: 3, sm: 4, md: 5 },
+                        WebkitBoxOrient: 'vertical',
+                        textOverflow: 'ellipsis'
                       }}
                     >
                       {item.content}
@@ -271,10 +311,14 @@ const SortableItem: React.FC<SortableItemProps> = ({
                 {/* Action Buttons Row */}
                 <Stack 
                   direction="row" 
-                  spacing={{ xs: 0.5, sm: 1 }} 
+                  spacing={{ xs: 0.5, sm: 0.75, md: 1 }} 
                   sx={{ 
                     flexWrap: 'wrap',
-                    gap: { xs: 0.5, sm: 1 }
+                    gap: { xs: 0.5, sm: 0.75, md: 1 },
+                    width: '100%',
+                    '& > *': {
+                      flexShrink: 0
+                    }
                   }}
                 >
                   <span>
@@ -287,12 +331,12 @@ const SortableItem: React.FC<SortableItemProps> = ({
                           backgroundColor: alpha(theme.palette.action.active, 0.08),
                           '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.15) },
                           '&:disabled': { opacity: 0.3 },
-                          minWidth: { xs: 36, sm: 40 },
-                          height: { xs: 36, sm: 40 },
-                          borderRadius: { xs: 1.5, sm: 2 }
+                          minWidth: { xs: 32, sm: 36, md: 40 },
+                          height: { xs: 32, sm: 36, md: 40 },
+                          borderRadius: { xs: 1, sm: 1.5, md: 2 }
                         }}
                       >
-                        <UpIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
+                        <UpIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                       </IconButton>
                     </Tooltip>
                   </span>
@@ -307,12 +351,12 @@ const SortableItem: React.FC<SortableItemProps> = ({
                           backgroundColor: alpha(theme.palette.action.active, 0.08),
                           '&:hover': { backgroundColor: alpha(theme.palette.action.active, 0.15) },
                           '&:disabled': { opacity: 0.3 },
-                          minWidth: { xs: 36, sm: 40 },
-                          height: { xs: 36, sm: 40 },
-                          borderRadius: { xs: 1.5, sm: 2 }
+                          minWidth: { xs: 32, sm: 36, md: 40 },
+                          height: { xs: 32, sm: 36, md: 40 },
+                          borderRadius: { xs: 1, sm: 1.5, md: 2 }
                         }}
                       >
-                        <DownIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
+                        <DownIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                       </IconButton>
                     </Tooltip>
                   </span>
@@ -325,12 +369,12 @@ const SortableItem: React.FC<SortableItemProps> = ({
                         backgroundColor: alpha(theme.palette.info.main, 0.08),
                         color: theme.palette.info.main,
                         '&:hover': { backgroundColor: alpha(theme.palette.info.main, 0.15) },
-                        minWidth: { xs: 36, sm: 40 },
-                        height: { xs: 36, sm: 40 },
-                        borderRadius: { xs: 1.5, sm: 2 }
+                        minWidth: { xs: 32, sm: 36, md: 40 },
+                        height: { xs: 32, sm: 36, md: 40 },
+                        borderRadius: { xs: 1, sm: 1.5, md: 2 }
                       }}
                     >
-                      <CopyIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
+                      <CopyIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                     </IconButton>
                   </Tooltip>
                   
@@ -342,40 +386,49 @@ const SortableItem: React.FC<SortableItemProps> = ({
                         backgroundColor: alpha(theme.palette.error.main, 0.08),
                         color: theme.palette.error.main,
                         '&:hover': { backgroundColor: alpha(theme.palette.error.main, 0.15) },
-                        minWidth: { xs: 36, sm: 40 },
-                        height: { xs: 36, sm: 40 },
-                        borderRadius: { xs: 1.5, sm: 2 }
+                        minWidth: { xs: 32, sm: 36, md: 40 },
+                        height: { xs: 32, sm: 36, md: 40 },
+                        borderRadius: { xs: 1, sm: 1.5, md: 2 }
                       }}
                     >
-                      <DeleteIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />
+                      <DeleteIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                     </IconButton>
                   </Tooltip>
                 </Stack>
               </Box>
             </Box>
 
-            {/* Right Section - Primary Actions */}
+            {/* Right Section - Primary Actions - Hidden on mobile, shown on tablet+ */}
             {!isMobile && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-end', flexShrink: 0 }}>
+              <Box sx={{ 
+                display: 'flex', 
+                flexDirection: { sm: 'row', md: 'column' }, 
+                gap: { sm: 1, md: 1 }, 
+                alignItems: 'flex-end', 
+                flexShrink: 0,
+                width: { sm: 'auto', md: 'auto' },
+                mt: { sm: 0, md: 0 }
+              }}>
                 <Button
                   variant="outlined"
                   size="small"
-                  startIcon={<EditIcon sx={{ fontSize: { sm: 16, md: 18 } }} />}
+                  startIcon={<EditIcon sx={{ fontSize: { sm: 14, md: 16, lg: 18 } }} />}
                   onClick={(e) => handleButtonClick(e, () => onEdit(item.id))}
                   sx={{
-                    borderRadius: { sm: 2, md: 2.5 },
+                    borderRadius: { sm: 1.5, md: 2, lg: 2.5 },
                     textTransform: 'none',
                     fontWeight: 600,
-                    minWidth: { sm: 90, md: 100, lg: 110 },
-                    minHeight: { sm: 32, md: 36, lg: 40 },
-                    fontSize: { sm: '0.75rem', md: '0.8rem', lg: '0.85rem' },
-                    px: { sm: 2, md: 2.5, lg: 3 },
+                    minWidth: { sm: 80, md: 90, lg: 100 },
+                    minHeight: { sm: 30, md: 32, lg: 36 },
+                    fontSize: { sm: '0.7rem', md: '0.75rem', lg: '0.8rem' },
+                    px: { sm: 1.5, md: 2, lg: 2.5 },
                     borderColor: bravoColors.primaryFlat,
                     color: bravoColors.primaryFlat,
                     '&:hover': {
                       borderColor: bravoColors.secondary,
                       backgroundColor: alpha(bravoColors.secondary, 0.08)
-                    }
+                    },
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   Edit
@@ -384,25 +437,26 @@ const SortableItem: React.FC<SortableItemProps> = ({
                 <Button
                   variant="outlined"
                   size="small"
-                  startIcon={<AutoFixHighIcon sx={{ fontSize: { sm: 16, md: 18 } }} />}
+                  startIcon={<AutoFixHighIcon sx={{ fontSize: { sm: 14, md: 16, lg: 18 } }} />}
                   onClick={(e) => handleButtonClick(e, () => onHelp(item.id))}
                   sx={{
-                    borderRadius: { sm: 2, md: 2.5 },
+                    borderRadius: { sm: 1.5, md: 2, lg: 2.5 },
                     textTransform: 'none',
                     fontWeight: 600,
-                    minWidth: { sm: 90, md: 100, lg: 110 },
-                    minHeight: { sm: 32, md: 36, lg: 40 },
-                    fontSize: { sm: '0.75rem', md: '0.8rem', lg: '0.85rem' },
-                    px: { sm: 2, md: 2.5, lg: 3 },
+                    minWidth: { sm: 80, md: 90, lg: 100 },
+                    minHeight: { sm: 30, md: 32, lg: 36 },
+                    fontSize: { sm: '0.7rem', md: '0.75rem', lg: '0.8rem' },
+                    px: { sm: 1.5, md: 2, lg: 2.5 },
                     borderColor: bravoColors.secondary,
                     color: bravoColors.secondary,
                     '&:hover': {
                       borderColor: bravoColors.primaryFlat,
                       backgroundColor: alpha(bravoColors.primaryFlat, 0.08)
-                    }
+                    },
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  Help Me
+                  {isTablet ? 'Help' : 'Help Me'}
                 </Button>
               </Box>
             )}
@@ -413,25 +467,27 @@ const SortableItem: React.FC<SortableItemProps> = ({
             <Box sx={{ 
               display: 'flex', 
               gap: 1, 
-              mt: 2,
-              pt: 2,
-              borderTop: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`
+              mt: 1.5,
+              pt: 1.5,
+              borderTop: `1px solid ${alpha(bravoColors.primaryFlat, 0.1)}`,
+              width: '100%'
             }}>
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={<EditIcon sx={{ fontSize: 16 }} />}
+                startIcon={<EditIcon sx={{ fontSize: 14 }} />}
                 onClick={(e) => handleButtonClick(e, () => onEdit(item.id))}
                 sx={{
                   flex: 1,
-                  borderRadius: 2,
+                  borderRadius: 1.5,
                   textTransform: 'none',
                   fontWeight: 600,
-                  fontSize: '0.8rem',
-                  minHeight: 40,
-                  px: 2,
+                  fontSize: '0.75rem',
+                  minHeight: 36,
+                  px: 1.5,
                   borderColor: bravoColors.primaryFlat,
-                  color: bravoColors.primaryFlat
+                  color: bravoColors.primaryFlat,
+                  whiteSpace: 'nowrap'
                 }}
               >
                 Edit
@@ -440,21 +496,22 @@ const SortableItem: React.FC<SortableItemProps> = ({
               <Button
                 variant="outlined"
                 size="small"
-                startIcon={<AutoFixHighIcon sx={{ fontSize: 16 }} />}
+                startIcon={<AutoFixHighIcon sx={{ fontSize: 14 }} />}
                 onClick={(e) => handleButtonClick(e, () => onHelp(item.id))}
                 sx={{
                   flex: 1,
-                  borderRadius: 2,
+                  borderRadius: 1.5,
                   textTransform: 'none',
                   fontWeight: 600,
-                  fontSize: '0.8rem',
-                  minHeight: 40,
-                  px: 2,
+                  fontSize: '0.75rem',
+                  minHeight: 36,
+                  px: 1.5,
                   borderColor: bravoColors.secondary,
-                  color: bravoColors.secondary
+                  color: bravoColors.secondary,
+                  whiteSpace: 'nowrap'
                 }}
               >
-                Help Me
+                Help
               </Button>
             </Box>
           )}
