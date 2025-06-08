@@ -1,90 +1,59 @@
 
 import React from 'react';
-import {
-  Box,
-  Typography,
-  IconButton,
-  useTheme,
-  useMediaQuery
-} from '@mui/material';
+import { Box, Typography, IconButton } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
-import { bravoColors } from '@/theme/colors';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface TemplateBuilderHeaderProps {
   title: string;
   onBack?: () => void;
   showBackButton?: boolean;
-  children?: React.ReactNode;
 }
 
 const TemplateBuilderHeader: React.FC<TemplateBuilderHeaderProps> = ({
   title,
   onBack,
-  showBackButton = false,
-  children
+  showBackButton = false
 }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobileView } = useResponsive();
 
   return (
-    <Box
-      sx={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        backgroundColor: 'white',
-        borderBottom: '1px solid #e0e0e0',
-        px: { xs: 2, sm: 3, md: 4 },
-        py: { xs: 1.5, sm: 2 },
-        display: 'flex',
-        alignItems: 'center',
-        gap: { xs: 1, sm: 2 },
-        minHeight: { xs: 64, sm: 72, md: 80 },
-        ml: { xs: showBackButton ? 7 : 0, md: 0 }, // Offset for mobile menu button
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
-      }}
-    >
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: showBackButton ? 'flex-start' : { xs: 'center', sm: 'center', md: 'flex-start' },
+      px: { xs: 1, sm: 2, md: 3 },
+      py: { xs: 1.5, sm: 2, md: 2.5 },
+      borderBottom: '1px solid',
+      borderColor: 'divider',
+      backgroundColor: 'background.paper',
+      position: 'relative'
+    }}>
       {showBackButton && (
-        <IconButton 
+        <IconButton
           onClick={onBack}
-          size={isMobile ? 'small' : 'medium'}
-          sx={{ 
-            color: bravoColors.primaryFlat,
-            flexShrink: 0,
-            '&:hover': {
-              backgroundColor: `${bravoColors.primaryFlat}10`
-            }
+          sx={{
+            mr: { xs: 1, sm: 2 },
+            p: { xs: 0.5, sm: 1 }
           }}
         >
           <ArrowBackIcon />
         </IconButton>
       )}
       
-      <Typography 
-        variant={isMobile ? "h6" : "h5"}
-        sx={{ 
-          color: bravoColors.primaryFlat, 
-          fontWeight: 700,
-          fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.5rem' },
-          lineHeight: 1.2,
-          wordBreak: 'break-word',
-          flex: 1,
-          minWidth: 0
+      <Typography
+        variant="h5"
+        component="h1"
+        sx={{
+          fontWeight: 600,
+          fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
+          textAlign: { xs: 'center', sm: 'center', md: showBackButton ? 'left' : 'center' },
+          flex: showBackButton ? 1 : 'none',
+          color: 'text.primary'
         }}
       >
         {title}
       </Typography>
-      
-      {children && (
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: { xs: 1, sm: 1.5 },
-          flexShrink: 0
-        }}>
-          {children}
-        </Box>
-      )}
     </Box>
   );
 };
