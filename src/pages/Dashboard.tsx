@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -763,8 +762,8 @@ export const Dashboard: React.FC = () => {
 
   return (
     <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', width: '100%' }}>
-      {/* Mobile Menu Button with Gradient */}
-      {isMobile && (
+      {/* Mobile/Tablet Menu Button - Fixed visibility */}
+      {isMobileView && (
         <Fade in={!mobileOpen}>
           <Paper
             elevation={6}
@@ -832,7 +831,7 @@ export const Dashboard: React.FC = () => {
         </Drawer>
       </Box>
 
-      {/* Mobile Drawer */}
+      {/* Mobile/Tablet Drawer */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -844,7 +843,7 @@ export const Dashboard: React.FC = () => {
           display: { xs: 'block', md: 'none' },
           '& .MuiDrawer-paper': {
             boxSizing: 'border-box',
-            width: '100vw',
+            width: isMobile ? '100vw' : '320px',
             height: '100vh',
             background: 'linear-gradient(180deg, #143151 0%, #1a3a5c 50%, #387E89 100%)',
             border: 'none'
