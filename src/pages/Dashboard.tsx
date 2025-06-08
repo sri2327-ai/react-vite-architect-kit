@@ -738,6 +738,7 @@ export const Dashboard: React.FC = () => {
                 }}
               >
                 <IconButton
+                  data-tour-id="collapse-sidebar"
                   onClick={handleDrawerToggle}
                   sx={{
                     color: 'rgba(255, 255, 255, 0.8)',

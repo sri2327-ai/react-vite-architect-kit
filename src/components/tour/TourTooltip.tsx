@@ -58,6 +58,21 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         return;
       }
     }
+
+    // For edit template step, click the edit button on first template
+    if (step.id === 'edit-template') {
+      const editButton = document.querySelector('[data-testid="edit-template-button"]');
+      if (editButton) {
+        console.log('Template builder tour: Clicking edit template button');
+        (editButton as HTMLElement).click();
+        // Wait for navigation then advance
+        setTimeout(() => {
+          nextStep();
+        }, 1500);
+        return;
+      }
+    }
+
     nextStep();
   };
 

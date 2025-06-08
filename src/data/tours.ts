@@ -136,6 +136,29 @@ export const templateBuilderTour: Tour = {
       target: '[data-tour-id="template-list"]',
       placement: 'left',
       spotlightClicks: true
+    },
+    {
+      id: 'edit-template',
+      title: 'Edit Template',
+      content: 'Now let\'s explore template editing. Click the Edit button (pencil icon) on any template to open the template editor.',
+      target: '[data-tour-id="template-list"]',
+      placement: 'top',
+      spotlightClicks: true
+    },
+    {
+      id: 'template-editor-overview',
+      title: 'Template Editor',
+      content: 'Welcome to the template editor! This is where you can customize your clinical note template by adding sections, modifying content, and arranging the layout.',
+      target: 'body',
+      placement: 'bottom'
+    },
+    {
+      id: 'add-section-button',
+      title: 'Add Template Sections',
+      content: 'Click the "Add Section" button to add new sections to your template. You can choose from various section types like paragraphs, checklists, and exam findings.',
+      target: '[data-testid="add-section-button"]',
+      placement: 'bottom',
+      spotlightClicks: true
     }
   ]
 };
