@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Box,
@@ -96,16 +97,15 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
   const handleNext = () => {
     const tourId = state.activeTour?.id;
+    console.log(`Tour: Handling next step for tour ${tourId}, step ${step.id}`);
     
     // Handle navigation based on tour type and step
     if (tourId === 'template-builder-tour') {
       if (step.id === 'template-overview') {
         console.log('Template builder tour: Navigating to template builder');
-        const success = navigateToModule('template-builder');
-        if (success) {
-          setTimeout(() => nextStep(), 1000);
-          return;
-        }
+        navigateToModule('template-builder');
+        setTimeout(() => nextStep(), 1000);
+        return;
       }
       
       if (step.id === 'visit-type-selection') {
@@ -145,11 +145,9 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     if (tourId === 'workflow-builder-tour') {
       if (step.id === 'workflow-overview') {
         console.log('Workflow builder tour: Navigating to workflow builder');
-        const success = navigateToModule('workflow-builder');
-        if (success) {
-          setTimeout(() => nextStep(), 1000);
-          return;
-        }
+        navigateToModule('workflow-builder');
+        setTimeout(() => nextStep(), 1000);
+        return;
       }
       
       if (step.id === 'workflow-library-switch') {
@@ -171,12 +169,10 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     }
     
     if (tourId === 'welcome-tour') {
-      // For welcome tour, we should always continue to the next step
-      // Navigation is optional - if it fails, we still continue the tour
+      // For welcome tour, handle navigation but always continue
       if (step.id === 'template-builder') {
         console.log('Welcome tour: Attempting to navigate to template builder');
         navigateToModule('template-builder');
-        // Always continue regardless of navigation success
         setTimeout(() => nextStep(), 500);
         return;
       }
@@ -184,7 +180,6 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       if (step.id === 'workflow-builder') {
         console.log('Welcome tour: Attempting to navigate to workflow builder');
         navigateToModule('workflow-builder');
-        // Always continue regardless of navigation success
         setTimeout(() => nextStep(), 500);
         return;
       }
@@ -192,14 +187,13 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       if (step.id === 'profile-settings') {
         console.log('Welcome tour: Attempting to navigate to profile');
         navigateToModule('profile');
-        // Always continue regardless of navigation success
         setTimeout(() => nextStep(), 500);
         return;
       }
     }
 
-    // Default next step - this should always be called for welcome tour
-    console.log('Tour: Proceeding to next step');
+    // Default next step - always proceed for any unhandled step
+    console.log('Tour: Proceeding to next step (default handler)');
     nextStep();
   };
 
