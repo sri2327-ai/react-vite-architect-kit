@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -319,49 +318,64 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
     const options = [];
     
     console.log('SectionPlacementDialog: Rendering placement options for sections:', existingSections);
+    console.log('SectionPlacementDialog: existingSections length:', existingSections?.length || 0);
     
-    // Add "Place at Beginning" option
-    options.push(
-      <PlacementZone 
-        key="beginning"
-        position={0} 
-        label="Place at Beginning"
-        description={existingSections.length === 0 
-          ? "This will be your first section"
-          : "Place before all existing sections"
-        }
-        icon={VerticalAlignTopIcon}
-        isSpecial={true}
-      />
-    );
-
-    // Add existing sections with placement options between them
-    existingSections.forEach((section, index) => {
-      console.log(`SectionPlacementDialog: Adding existing section ${index}:`, section);
-      
-      // Add the existing section
-      options.push(
-        <ExistingSection key={section.id} section={section} index={index} />
-      );
-      
-      // Add placement option after this section
-      const nextPosition = index + 1;
-      const isLast = index === existingSections.length - 1;
-      
+    // Check if we actually have existing sections
+    const hasExistingSections = existingSections && existingSections.length > 0;
+    
+    if (!hasExistingSections) {
+      // No existing sections - show the first section option
       options.push(
         <PlacementZone 
-          key={`after-${index}`}
-          position={nextPosition} 
-          label={isLast ? "Place at End" : `Place After "${section.name}"`}
-          description={isLast 
-            ? "Place after all existing sections"
-            : `Insert after "${section.name}"`
-          }
-          icon={isLast ? VerticalAlignBottomIcon : VerticalAlignCenterIcon}
-          isSpecial={isLast}
+          key="first-section"
+          position={0} 
+          label="Place as First Section"
+          description="This will be your first template section"
+          icon={VerticalAlignTopIcon}
+          isSpecial={true}
         />
       );
-    });
+    } else {
+      // There are existing sections - show placement at beginning
+      options.push(
+        <PlacementZone 
+          key="beginning"
+          position={0} 
+          label="Place at Beginning"
+          description="Place before all existing sections"
+          icon={VerticalAlignTopIcon}
+          isSpecial={true}
+        />
+      );
+
+      // Add existing sections with placement options between them
+      existingSections.forEach((section, index) => {
+        console.log(`SectionPlacementDialog: Adding existing section ${index}:`, section);
+        
+        // Add the existing section
+        options.push(
+          <ExistingSection key={section.id} section={section} index={index} />
+        );
+        
+        // Add placement option after this section
+        const nextPosition = index + 1;
+        const isLast = index === existingSections.length - 1;
+        
+        options.push(
+          <PlacementZone 
+            key={`after-${index}`}
+            position={nextPosition} 
+            label={isLast ? "Place at End" : `Place After "${section.name}"`}
+            description={isLast 
+              ? "Place after all existing sections"
+              : `Insert after "${section.name}"`
+            }
+            icon={isLast ? VerticalAlignBottomIcon : VerticalAlignCenterIcon}
+            isSpecial={isLast}
+          />
+        );
+      });
+    }
 
     console.log(`SectionPlacementDialog: Generated ${options.length} placement options`);
     return options;
