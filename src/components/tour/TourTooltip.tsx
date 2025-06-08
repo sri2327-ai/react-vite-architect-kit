@@ -26,6 +26,8 @@ interface TourTooltipProps {
   allowSkip?: boolean;
   isMobile?: boolean;
   isTablet?: boolean;
+  drawerOpen?: boolean;
+  customZIndex?: number;
 }
 
 export const TourTooltip: React.FC<TourTooltipProps> = ({
@@ -36,21 +38,30 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   showProgress = true,
   allowSkip = true,
   isMobile = false,
-  isTablet = false
+  isTablet = false,
+  drawerOpen = false,
+  customZIndex = 10001
 }) => {
   const { nextStep, prevStep, skipTour, endTour } = useTour();
 
   const getTooltipPosition = () => {
     const placement = step.placement || 'bottom';
-    const margin = isMobile ? 12 : isTablet ? 16 : 20;
-    const tooltipWidth = isMobile 
-      ? Math.min(320, window.innerWidth - 24) 
-      : isTablet 
-        ? Math.min(360, window.innerWidth - 32)
-        : Math.min(400, window.innerWidth - 40);
+    const margin = isMobile ? 16 : isTablet ? 20 : 24;
     
-    // Dynamic height estimation based on content
-    const baseHeight = isMobile ? 200 : isTablet ? 220 : 240;
+    // Adjust tooltip width based on drawer state and screen size
+    let tooltipWidth: number;
+    if (drawerOpen && isMobile) {
+      tooltipWidth = Math.min(280, window.innerWidth - 32);
+    } else if (isMobile) {
+      tooltipWidth = Math.min(320, window.innerWidth - 24);
+    } else if (isTablet) {
+      tooltipWidth = Math.min(360, window.innerWidth - 32);
+    } else {
+      tooltipWidth = Math.min(400, window.innerWidth - 40);
+    }
+    
+    // Dynamic height estimation based on content and drawer state
+    const baseHeight = isMobile ? (drawerOpen ? 180 : 200) : isTablet ? 220 : 240;
     const progressHeight = showProgress ? (isMobile ? 40 : 50) : 0;
     const buttonsHeight = isMobile ? 80 : 60;
     const tooltipHeight = baseHeight + progressHeight + buttonsHeight;
@@ -79,24 +90,28 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         break;
     }
 
-    // Viewport constraints
+    // Viewport constraints with drawer consideration
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const minMargin = isMobile ? 12 : 16;
+    const minMargin = isMobile ? (drawerOpen ? 16 : 12) : 16;
+
+    // Adjust for drawer if open
+    const drawerWidth = drawerOpen && isMobile ? 280 : 0;
+    const availableWidth = viewportWidth - drawerWidth;
 
     // Check if tooltip fits and adjust placement if needed
-    if (left < minMargin) {
-      left = minMargin;
+    if (left < minMargin + drawerWidth) {
+      left = minMargin + drawerWidth;
       if (placement === 'left') {
-        left = targetRect.right + margin;
+        left = Math.min(targetRect.right + margin, availableWidth - tooltipWidth - minMargin);
         actualPlacement = 'right';
       }
     }
     
-    if (left + tooltipWidth > viewportWidth - minMargin) {
-      left = viewportWidth - tooltipWidth - minMargin;
+    if (left + tooltipWidth > availableWidth - minMargin) {
+      left = availableWidth - tooltipWidth - minMargin;
       if (placement === 'right') {
-        left = targetRect.left - tooltipWidth - margin;
+        left = Math.max(targetRect.left - tooltipWidth - margin, minMargin + drawerWidth);
         actualPlacement = 'left';
       }
     }
@@ -117,8 +132,8 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       }
     }
 
-    // Final boundary check
-    left = Math.max(minMargin, Math.min(left, viewportWidth - tooltipWidth - minMargin));
+    // Final boundary check with drawer consideration
+    left = Math.max(minMargin + drawerWidth, Math.min(left, availableWidth - tooltipWidth - minMargin));
     top = Math.max(minMargin, Math.min(top, viewportHeight - tooltipHeight - minMargin));
 
     return { top, left, width: tooltipWidth, placement: actualPlacement };
@@ -129,23 +144,25 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
   return (
     <Paper
-      elevation={isMobile ? 12 : 16}
+      elevation={isMobile ? (drawerOpen ? 16 : 12) : 16}
       sx={{
         position: 'absolute',
         top: position.top,
         left: position.left,
         width: position.width,
-        maxWidth: `calc(100vw - ${isMobile ? 24 : 32}px)`,
-        p: isMobile ? 2 : isTablet ? 2.5 : 3,
-        zIndex: 10001,
+        maxWidth: `calc(100vw - ${isMobile ? (drawerOpen ? 48 : 24) : 32}px)`,
+        p: isMobile ? (drawerOpen ? 1.5 : 2) : isTablet ? 2.5 : 3,
+        zIndex: customZIndex,
         pointerEvents: 'auto',
         borderRadius: isMobile ? 2 : 3,
         backgroundColor: 'background.paper',
         border: isMobile ? '1px solid' : 'none',
         borderColor: 'divider',
-        boxShadow: isMobile 
-          ? '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)'
-          : '0 12px 48px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1)'
+        boxShadow: drawerOpen 
+          ? '0 16px 64px rgba(0,0,0,0.25), 0 8px 32px rgba(0,0,0,0.15)'
+          : isMobile 
+            ? '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)'
+            : '0 12px 48px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1)'
       }}
     >
       {/* Header with close button */}
@@ -153,14 +170,14 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'flex-start', 
-        mb: isMobile ? 1.5 : isTablet ? 2 : 2.5,
+        mb: isMobile ? (drawerOpen ? 1 : 1.5) : isTablet ? 2 : 2.5,
         gap: 1
       }}>
         <Typography 
           variant={isMobile ? "subtitle1" : "h6"} 
           sx={{ 
             fontWeight: 600, 
-            fontSize: isMobile ? '1rem' : isTablet ? '1.1rem' : '1.2rem',
+            fontSize: isMobile ? (drawerOpen ? '0.9rem' : '1rem') : isTablet ? '1.1rem' : '1.2rem',
             lineHeight: 1.3,
             color: 'text.primary',
             flex: 1,
@@ -188,7 +205,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
       {/* Progress indicator */}
       {showProgress && (
-        <Box sx={{ mb: isMobile ? 2 : isTablet ? 2.5 : 3 }}>
+        <Box sx={{ mb: isMobile ? (drawerOpen ? 1.5 : 2) : isTablet ? 2.5 : 3 }}>
           <Box sx={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
@@ -196,12 +213,12 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
             mb: 1 
           }}>
             <Typography variant="caption" color="text.secondary" sx={{
-              fontSize: isMobile ? '0.75rem' : '0.8rem'
+              fontSize: isMobile ? (drawerOpen ? '0.7rem' : '0.75rem') : '0.8rem'
             }}>
               Step {stepIndex + 1} of {totalSteps}
             </Typography>
             <Typography variant="caption" color="text.secondary" sx={{
-              fontSize: isMobile ? '0.75rem' : '0.8rem',
+              fontSize: isMobile ? (drawerOpen ? '0.7rem' : '0.75rem') : '0.8rem',
               fontWeight: 500
             }}>
               {Math.round(progress)}%
@@ -212,7 +229,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
             value={progress}
             sx={{ 
               borderRadius: 2, 
-              height: isMobile ? 6 : 8,
+              height: isMobile ? (drawerOpen ? 4 : 6) : 8,
               backgroundColor: 'action.hover'
             }}
           />
@@ -223,9 +240,9 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       <Typography 
         variant="body2" 
         sx={{ 
-          mb: isMobile ? 2.5 : isTablet ? 3 : 3.5, 
+          mb: isMobile ? (drawerOpen ? 2 : 2.5) : isTablet ? 3 : 3.5, 
           lineHeight: 1.5,
-          fontSize: isMobile ? '0.875rem' : isTablet ? '0.9rem' : '0.95rem',
+          fontSize: isMobile ? (drawerOpen ? '0.8rem' : '0.875rem') : isTablet ? '0.9rem' : '0.95rem',
           color: 'text.secondary'
         }}
       >
@@ -235,7 +252,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       {/* Actions */}
       <Stack 
         direction={isMobile ? 'column' : 'row'} 
-        spacing={isMobile ? 1.5 : 1} 
+        spacing={isMobile ? (drawerOpen ? 1 : 1.5) : 1} 
         justifyContent="space-between"
         alignItems={isMobile ? 'stretch' : 'center'}
       >
@@ -258,7 +275,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         {/* Right side actions */}
         <Box sx={{ 
           display: 'flex', 
-          gap: 1, 
+          gap: isMobile ? (drawerOpen ? 0.5 : 1) : 1, 
           flexDirection: isMobile ? 'column' : 'row',
           flex: isMobile ? 1 : 'none',
           alignItems: 'stretch'
@@ -267,7 +284,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
           {isMobile && stepIndex > 0 && (
             <Button
               variant="outlined"
-              size="medium"
+              size={drawerOpen ? "small" : "medium"}
               startIcon={<NavigateBefore />}
               onClick={prevStep}
               fullWidth
@@ -280,14 +297,14 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
           {allowSkip && (
             <Button
               variant="text"
-              size={isMobile ? "medium" : isTablet ? "medium" : "small"}
+              size={isMobile ? (drawerOpen ? "small" : "medium") : isTablet ? "medium" : "small"}
               startIcon={<SkipNext />}
               onClick={skipTour}
               color="inherit"
               fullWidth={isMobile}
               sx={{
                 minWidth: isMobile ? 'auto' : 100,
-                px: isMobile ? 2 : 1.5
+                px: isMobile ? (drawerOpen ? 1.5 : 2) : 1.5
               }}
             >
               Skip Tour
@@ -297,13 +314,13 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
           {/* Next/Finish button */}
           <Button
             variant="contained"
-            size={isMobile ? "medium" : isTablet ? "medium" : "small"}
+            size={isMobile ? (drawerOpen ? "small" : "medium") : isTablet ? "medium" : "small"}
             endIcon={stepIndex < totalSteps - 1 ? <NavigateNext /> : undefined}
             onClick={nextStep}
             fullWidth={isMobile}
             sx={{
               minWidth: isMobile ? 'auto' : 100,
-              px: isMobile ? 2 : isTablet ? 2 : 1.5,
+              px: isMobile ? (drawerOpen ? 1.5 : 2) : isTablet ? 2 : 1.5,
               fontWeight: 600
             }}
           >
