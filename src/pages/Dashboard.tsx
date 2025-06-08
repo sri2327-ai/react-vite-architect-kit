@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -46,6 +47,7 @@ import WorkflowBuilder from '@/components/WorkflowBuilder/WorkflowBuilder';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useApiContext } from '@/contexts/ApiContext';
 import { HelpButton } from '@/components/tour';
+import { useResponsive } from '@/hooks/useResponsive';
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -79,8 +81,7 @@ export const Dashboard: React.FC = () => {
   const { logout } = useAuthStore();
   const { useApiData } = useApiContext();
   const { profile } = useProfileData(useApiData);
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+  const { isMobile, isTablet, isMobileView } = useResponsive();
 
   // Define menu items with children for accordions
   const allMenuItems: MenuItem[] = [
@@ -216,35 +217,50 @@ export const Dashboard: React.FC = () => {
         <Box 
           data-tour-id="dashboard-header"
           sx={{
-            p: 3,
+            p: { xs: 2, sm: 3 },
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-            minHeight: 80,
+            minHeight: { xs: 70, sm: 80 },
             position: 'relative',
             zIndex: 1
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
             <Avatar
               sx={{
-                width: 36,
-                height: 36,
+                width: { xs: 32, sm: 36 },
+                height: { xs: 32, sm: 36 },
                 backgroundColor: 'rgba(255, 255, 255, 0.15)',
                 border: '2px solid rgba(255, 255, 255, 0.2)',
                 color: 'white',
                 fontWeight: 600,
-                fontSize: '0.9rem'
+                fontSize: { xs: '0.8rem', sm: '0.9rem' }
               }}
             >
               {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
             </Avatar>
             <Box>
-              <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.2 }}>
+              <Typography 
+                variant="subtitle2" 
+                sx={{ 
+                  color: 'white', 
+                  fontWeight: 600, 
+                  fontSize: { xs: '0.8rem', sm: '0.9rem' }, 
+                  lineHeight: 1.2 
+                }}
+              >
                 {profile?.firstName} {profile?.lastName}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.75rem', lineHeight: 1.2 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.6)', 
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' }, 
+                  lineHeight: 1.2 
+                }}
+              >
                 {profile?.email}
               </Typography>
             </Box>
@@ -258,7 +274,7 @@ export const Dashboard: React.FC = () => {
                 color: 'white',
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',
                 borderRadius: '12px',
-                padding: 1.5,
+                padding: { xs: 1, sm: 1.5 },
                 transition: 'all 0.3s ease',
                 '&:hover': {
                   backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -266,7 +282,7 @@ export const Dashboard: React.FC = () => {
                 }
               }}
             >
-              <X size={20} />
+              <X size={isMobile ? 18 : 20} />
             </IconButton>
           </Box>
         </Box>
@@ -287,7 +303,7 @@ export const Dashboard: React.FC = () => {
           }}
         >
           {!isCollapsed ? (
-            <>
+            <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <Box
                 component="img"
                 src="/lovable-uploads/ed53daea-0c4e-4932-ad15-c29208c6a5ff.png"
@@ -336,7 +352,7 @@ export const Dashboard: React.FC = () => {
                   </Typography>
                 </Box>
               </Box>
-            </>
+            </Box>
           ) : (
             <Tooltip title={`${profile?.firstName} ${profile?.lastName}`} placement="right" arrow>
               <Avatar
@@ -370,7 +386,7 @@ export const Dashboard: React.FC = () => {
         sx={{ 
           flex: 1, 
           py: 2, 
-          px: isMobile ? 1.5 : 1, 
+          px: { xs: 1.5, sm: 1 }, 
           overflow: 'auto',
           position: 'relative',
           zIndex: 1,
@@ -388,10 +404,10 @@ export const Dashboard: React.FC = () => {
       >
         <List sx={{ px: 0, py: 1 }}>
           {menuItems.map((item, index) => (
-            <React.Fragment key={item.id}>
+            <Box key={item.id}>
               {item.children ? (
                 // Accordion Item
-                <>
+                <Box>
                   <ListItem disablePadding sx={{ mb: 1 }}>
                     <Tooltip 
                       title={isCollapsed && !isMobile ? item.label : ''} 
@@ -402,12 +418,12 @@ export const Dashboard: React.FC = () => {
                         data-tour-id={item.id === 'template-builder' ? 'nav-templates' : item.id === 'workflow-builder' ? 'nav-workflows' : `nav-${item.id}`}
                         onClick={() => !isCollapsed ? handleAccordionToggle(item.id) : setIsCollapsed(false)}
                         sx={{
-                          borderRadius: isMobile ? '14px' : '12px',
-                          mx: isMobile ? 1 : 1,
-                          minHeight: isMobile ? 56 : 52,
+                          borderRadius: { xs: '14px', sm: '12px' },
+                          mx: { xs: 1, sm: 1 },
+                          minHeight: { xs: 50, sm: 52 },
                           justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
-                          px: isCollapsed && !isMobile ? 2 : isMobile ? 2.5 : 2.5,
-                          py: isMobile ? 1.5 : 1.25,
+                          px: isCollapsed && !isMobile ? 2 : { xs: 2, sm: 2.5 },
+                          py: { xs: 1.25, sm: 1.25 },
                           color: 'rgba(255, 255, 255, 0.75)',
                           backgroundColor: 'transparent',
                           position: 'relative',
@@ -435,7 +451,7 @@ export const Dashboard: React.FC = () => {
                         }}
                       >
                         <ListItemIcon sx={{
-                          minWidth: isCollapsed && !isMobile ? 0 : (isMobile ? 44 : 40),
+                          minWidth: isCollapsed && !isMobile ? 0 : { xs: 36, sm: 40 },
                           color: 'inherit',
                           justifyContent: 'center',
                           position: 'relative',
@@ -448,7 +464,7 @@ export const Dashboard: React.FC = () => {
                           {item.icon}
                         </ListItemIcon>
                         {(!isCollapsed || isMobile) && (
-                          <>
+                          <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                             <ListItemText
                               primary={
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -462,7 +478,7 @@ export const Dashboard: React.FC = () => {
                                         px: 1,
                                         py: 0.25,
                                         borderRadius: '10px',
-                                        fontSize: '0.65rem',
+                                        fontSize: { xs: '0.6rem', sm: '0.65rem' },
                                         fontWeight: 600,
                                         letterSpacing: '0.3px'
                                       }}
@@ -473,7 +489,7 @@ export const Dashboard: React.FC = () => {
                                 </Box>
                               }
                               primaryTypographyProps={{
-                                fontSize: isMobile ? '0.95rem' : '0.9rem',
+                                fontSize: { xs: '0.85rem', sm: '0.9rem' },
                                 fontWeight: 500,
                                 color: 'inherit',
                                 position: 'relative',
@@ -486,7 +502,7 @@ export const Dashboard: React.FC = () => {
                                 <ChevronDown size={18} />
                               }
                             </Box>
-                          </>
+                          </Box>
                         )}
                       </ListItemButton>
                     </Tooltip>
@@ -495,18 +511,18 @@ export const Dashboard: React.FC = () => {
                   {/* Submenu Items */}
                   {(!isCollapsed || isMobile) && (
                     <Collapse in={expandedItems.includes(item.id)} timeout="auto" unmountOnExit>
-                      <List sx={{ pl: 2, py: 0 }}>
+                      <List sx={{ pl: { xs: 1.5, sm: 2 }, py: 0 }}>
                         {item.children.map((child) => (
                           <ListItem key={child.id} disablePadding sx={{ mb: 0.5 }}>
                             <ListItemButton
                               onClick={() => handleMenuItemClick(child.id)}
                               selected={activeMenuItem === child.id}
                               sx={{
-                                borderRadius: isMobile ? '12px' : '10px',
-                                mx: isMobile ? 1 : 0.5,
-                                minHeight: isMobile ? 48 : 44,
-                                px: isMobile ? 2 : 2,
-                                py: isMobile ? 1 : 0.75,
+                                borderRadius: { xs: '10px', sm: '10px' },
+                                mx: { xs: 0.5, sm: 0.5 },
+                                minHeight: { xs: 42, sm: 44 },
+                                px: { xs: 1.5, sm: 2 },
+                                py: { xs: 0.75, sm: 0.75 },
                                 color: 'rgba(255, 255, 255, 0.65)',
                                 backgroundColor: 'transparent',
                                 position: 'relative',
@@ -551,7 +567,7 @@ export const Dashboard: React.FC = () => {
                               }}
                             >
                               <ListItemIcon sx={{
-                                minWidth: isMobile ? 36 : 32,
+                                minWidth: { xs: 30, sm: 32 },
                                 color: 'inherit',
                                 justifyContent: 'center',
                                 position: 'relative',
@@ -562,7 +578,7 @@ export const Dashboard: React.FC = () => {
                               <ListItemText
                                 primary={child.label}
                                 primaryTypographyProps={{
-                                  fontSize: isMobile ? '0.85rem' : '0.8rem',
+                                  fontSize: { xs: '0.8rem', sm: '0.8rem' },
                                   fontWeight: activeMenuItem === child.id ? 600 : 400,
                                   color: 'inherit',
                                   position: 'relative',
@@ -575,7 +591,7 @@ export const Dashboard: React.FC = () => {
                       </List>
                     </Collapse>
                   )}
-                </>
+                </Box>
               ) : (
                 // Regular Menu Item
                 <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
@@ -589,12 +605,12 @@ export const Dashboard: React.FC = () => {
                       onClick={() => handleMenuItemClick(item.id)}
                       selected={activeMenuItem === item.id}
                       sx={{
-                        borderRadius: isMobile ? '14px' : '12px',
-                        mx: isMobile ? 1 : 1,
-                        minHeight: isMobile ? 56 : 52,
+                        borderRadius: { xs: '14px', sm: '12px' },
+                        mx: { xs: 1, sm: 1 },
+                        minHeight: { xs: 50, sm: 52 },
                         justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
-                        px: isCollapsed && !isMobile ? 2 : isMobile ? 2.5 : 2.5,
-                        py: isMobile ? 1.5 : 1.25,
+                        px: isCollapsed && !isMobile ? 2 : { xs: 2, sm: 2.5 },
+                        py: { xs: 1.25, sm: 1.25 },
                         color: 'rgba(255, 255, 255, 0.75)',
                         backgroundColor: 'transparent',
                         position: 'relative',
@@ -640,7 +656,7 @@ export const Dashboard: React.FC = () => {
                       }}
                     >
                       <ListItemIcon sx={{
-                        minWidth: isCollapsed && !isMobile ? 0 : (isMobile ? 44 : 40),
+                        minWidth: isCollapsed && !isMobile ? 0 : { xs: 36, sm: 40 },
                         color: 'inherit',
                         justifyContent: 'center',
                         position: 'relative',
@@ -656,7 +672,7 @@ export const Dashboard: React.FC = () => {
                         <ListItemText
                           primary={item.label}
                           primaryTypographyProps={{
-                            fontSize: isMobile ? '0.95rem' : '0.9rem',
+                            fontSize: { xs: '0.85rem', sm: '0.9rem' },
                             fontWeight: activeMenuItem === item.id ? 600 : 500,
                             color: 'inherit',
                             position: 'relative',
@@ -668,7 +684,7 @@ export const Dashboard: React.FC = () => {
                   </Tooltip>
                 </ListItem>
               )}
-            </React.Fragment>
+            </Box>
           ))}
         </List>
       </Box>
@@ -746,7 +762,7 @@ export const Dashboard: React.FC = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden', width: '100%' }}>
       {/* Mobile Menu Button with Gradient */}
       {isMobile && (
         <Fade in={!mobileOpen}>
@@ -754,8 +770,8 @@ export const Dashboard: React.FC = () => {
             elevation={6}
             sx={{
               position: 'fixed',
-              top: 20,
-              left: 20,
+              top: { xs: 16, sm: 20 },
+              left: { xs: 16, sm: 20 },
               zIndex: 1300,
               display: { xs: 'block', md: 'none' },
               background: 'linear-gradient(135deg, #143151 0%, #387E89 100%)',
@@ -769,7 +785,7 @@ export const Dashboard: React.FC = () => {
               onClick={handleDrawerToggle}
               sx={{
                 color: 'white',
-                padding: 1.75,
+                padding: { xs: 1.5, sm: 1.75 },
                 borderRadius: '16px',
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -782,7 +798,7 @@ export const Dashboard: React.FC = () => {
                 }
               }}
             >
-              <Menu size={22} />
+              <Menu size={isMobile ? 20 : 22} />
             </IconButton>
           </Paper>
         </Fade>
@@ -816,6 +832,7 @@ export const Dashboard: React.FC = () => {
         </Drawer>
       </Box>
 
+      {/* Mobile Drawer */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
@@ -847,6 +864,7 @@ export const Dashboard: React.FC = () => {
         </Slide>
       </Drawer>
 
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
@@ -862,7 +880,15 @@ export const Dashboard: React.FC = () => {
           position: 'relative'
         }}
       >
-        <Container maxWidth="xl" sx={{ height: '100%', p: 0 }}>
+        <Container 
+          maxWidth="xl" 
+          sx={{ 
+            height: '100%', 
+            p: { xs: 1, sm: 2, md: 0 },
+            width: '100%',
+            maxWidth: '100% !important'
+          }}
+        >
           {activeMenuItem === 'billing-history' ? (
             <BillingHistory sidebarCollapsed={isCollapsed} />
           ) : (
