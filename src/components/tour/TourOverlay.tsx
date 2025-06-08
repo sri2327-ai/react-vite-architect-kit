@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, Backdrop } from '@mui/material';
+import { Box, Backdrop, useTheme, useMediaQuery } from '@mui/material';
 import { useTour } from '@/contexts/TourContext';
 import { TourTooltip } from './TourTooltip';
 
@@ -13,6 +13,8 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   const { state } = useTour();
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const findTargetElement = useCallback(() => {
     if (!state.activeTour || !state.isRunning) return null;
@@ -21,7 +23,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     if (!currentStep) return null;
 
     // Check if target is already a CSS selector (starts with '[', '.', '#', etc.)
-    const isSelector = currentStep.target.match(/^[\[\.\#]/) || currentStep.target.includes(' ');
+    const isSelector = currentStep.target.startsWith('[') || currentStep.target.startsWith('.') || currentStep.target.startsWith('#') || currentStep.target.includes(' ');
     
     let element: HTMLElement | null = null;
     
@@ -77,6 +79,9 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   const currentStep = state.activeTour.steps[state.currentStepIndex];
   if (!currentStep) return null;
 
+  // Responsive spotlight padding
+  const spotlightPadding = isMobile ? 4 : 8;
+
   return createPortal(
     <Box
       sx={{
@@ -103,14 +108,14 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       <Box
         sx={{
           position: 'absolute',
-          top: targetRect.top - 8,
-          left: targetRect.left - 8,
-          width: targetRect.width + 16,
-          height: targetRect.height + 16,
+          top: targetRect.top - spotlightPadding,
+          left: targetRect.left - spotlightPadding,
+          width: targetRect.width + (spotlightPadding * 2),
+          height: targetRect.height + (spotlightPadding * 2),
           backgroundColor: 'transparent',
           border: '2px solid',
           borderColor: 'primary.main',
-          borderRadius: 2,
+          borderRadius: isMobile ? 1 : 2,
           boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
           pointerEvents: 'none',
           zIndex: 10000
@@ -125,6 +130,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         totalSteps={state.activeTour.steps.length}
         showProgress={state.activeTour.showProgress}
         allowSkip={state.activeTour.allowSkip}
+        isMobile={isMobile}
       />
     </Box>,
     document.body

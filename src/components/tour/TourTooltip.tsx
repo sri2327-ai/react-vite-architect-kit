@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Box,
@@ -23,6 +24,7 @@ interface TourTooltipProps {
   totalSteps: number;
   showProgress?: boolean;
   allowSkip?: boolean;
+  isMobile?: boolean;
 }
 
 export const TourTooltip: React.FC<TourTooltipProps> = ({
@@ -31,15 +33,16 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   stepIndex,
   totalSteps,
   showProgress = true,
-  allowSkip = true
+  allowSkip = true,
+  isMobile = false
 }) => {
   const { nextStep, prevStep, skipTour, endTour } = useTour();
 
   const getTooltipPosition = () => {
     const placement = step.placement || 'bottom';
-    const margin = 16;
-    const tooltipWidth = 320;
-    const tooltipHeight = 200; // Approximate
+    const margin = isMobile ? 8 : 16;
+    const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 32) : 320;
+    const tooltipHeight = isMobile ? 180 : 200; // Approximate
 
     let top = 0;
     let left = 0;
@@ -70,7 +73,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     left = Math.max(margin, Math.min(left, viewportWidth - tooltipWidth - margin));
     top = Math.max(margin, Math.min(top, viewportHeight - tooltipHeight - margin));
 
-    return { top, left };
+    return { top, left, width: tooltipWidth };
   };
 
   const position = getTooltipPosition();
@@ -83,17 +86,21 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         position: 'absolute',
         top: position.top,
         left: position.left,
-        width: 320,
+        width: position.width,
         maxWidth: 'calc(100vw - 32px)',
-        p: 3,
+        p: isMobile ? 2 : 3,
         zIndex: 10001,
         pointerEvents: 'auto',
-        borderRadius: 2
+        borderRadius: isMobile ? 1 : 2
       }}
     >
       {/* Header with close button */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: isMobile ? 1.5 : 2 }}>
+        <Typography variant="h6" sx={{ 
+          fontWeight: 600, 
+          fontSize: isMobile ? '1rem' : '1.1rem',
+          lineHeight: 1.3
+        }}>
           {step.title}
         </Typography>
         <IconButton
@@ -107,7 +114,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
       {/* Progress indicator */}
       {showProgress && (
-        <Box sx={{ mb: 2 }}>
+        <Box sx={{ mb: isMobile ? 1.5 : 2 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
             <Typography variant="caption" color="text.secondary">
               Step {stepIndex + 1} of {totalSteps}
@@ -125,26 +132,49 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       )}
 
       {/* Content */}
-      <Typography variant="body2" sx={{ mb: 3, lineHeight: 1.5 }}>
+      <Typography variant="body2" sx={{ 
+        mb: isMobile ? 2 : 3, 
+        lineHeight: 1.5,
+        fontSize: isMobile ? '0.85rem' : '0.875rem'
+      }}>
         {step.content}
       </Typography>
 
       {/* Actions */}
-      <Stack direction="row" spacing={1} justifyContent="space-between">
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          {stepIndex > 0 && (
+      <Stack 
+        direction={isMobile ? 'column' : 'row'} 
+        spacing={isMobile ? 1 : 1} 
+        justifyContent="space-between"
+        sx={{ gap: isMobile ? 1 : 0 }}
+      >
+        {!isMobile && (
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {stepIndex > 0 && (
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<NavigateBefore />}
+                onClick={prevStep}
+              >
+                Back
+              </Button>
+            )}
+          </Box>
+        )}
+
+        <Box sx={{ display: 'flex', gap: 1, flexDirection: isMobile ? 'column' : 'row' }}>
+          {isMobile && stepIndex > 0 && (
             <Button
               variant="outlined"
               size="small"
               startIcon={<NavigateBefore />}
               onClick={prevStep}
+              fullWidth={isMobile}
             >
               Back
             </Button>
           )}
-        </Box>
-
-        <Box sx={{ display: 'flex', gap: 1 }}>
+          
           {allowSkip && (
             <Button
               variant="text"
@@ -152,15 +182,18 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
               startIcon={<SkipNext />}
               onClick={skipTour}
               color="inherit"
+              fullWidth={isMobile}
             >
               Skip Tour
             </Button>
           )}
+          
           <Button
             variant="contained"
             size="small"
             endIcon={stepIndex < totalSteps - 1 ? <NavigateNext /> : undefined}
             onClick={nextStep}
+            fullWidth={isMobile}
           >
             {stepIndex < totalSteps - 1 ? 'Next' : 'Finish'}
           </Button>

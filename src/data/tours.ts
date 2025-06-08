@@ -63,32 +63,18 @@ export const templateBuilderTour: Tour = {
   allowSkip: true,
   steps: [
     {
-      id: 'template-overview',
-      title: 'Template Builder Overview',
-      content: 'Here you can create, edit, and manage your clinical note templates. Templates help you document patient encounters quickly and consistently.',
-      target: '[data-tour-id="template-builder-header"]',
-      placement: 'bottom'
+      id: 'template-navigation',
+      title: 'Template Builder Access',
+      content: 'Click on Template Builder in the navigation menu to access the template creation tools. You can create custom templates or browse our library.',
+      target: '[data-tour-id="nav-templates"]',
+      placement: 'right'
     },
     {
-      id: 'my-templates',
-      title: 'My Templates',
-      content: 'View and manage all your custom templates here. You can edit existing templates or create new ones.',
-      target: '[data-tour-id="my-templates-tab"]',
-      placement: 'bottom'
-    },
-    {
-      id: 'template-library',
-      title: 'Template Library',
-      content: 'Browse our collection of pre-built templates created by medical professionals. You can import and customize these for your practice.',
-      target: '[data-tour-id="template-library-tab"]',
-      placement: 'bottom'
-    },
-    {
-      id: 'create-template',
-      title: 'Create New Template',
-      content: 'Click here to start building a new template. You can add various sections like patient history, examination findings, and treatment plans.',
-      target: '[data-tour-id="create-template-button"]',
-      placement: 'left'
+      id: 'template-features',
+      title: 'Template Features',
+      content: 'Templates help you document patient encounters quickly and consistently. You can add sections like patient history, examination findings, and treatment plans.',
+      target: '[data-tour-id="nav-templates"]',
+      placement: 'right'
     }
   ]
 };
@@ -102,25 +88,18 @@ export const workflowBuilderTour: Tour = {
   allowSkip: true,
   steps: [
     {
-      id: 'workflow-overview',
-      title: 'Workflow Builder Overview',
-      content: 'Create automated workflows to streamline your documentation process and integrate with your EHR system.',
-      target: '[data-tour-id="workflow-builder-header"]',
-      placement: 'bottom'
+      id: 'workflow-navigation',
+      title: 'Workflow Builder Access',
+      content: 'Click on Workflow Builder in the navigation menu to access workflow creation tools. Create automated workflows to streamline your documentation process.',
+      target: '[data-tour-id="nav-workflows"]',
+      placement: 'right'
     },
     {
-      id: 'my-workflows',
-      title: 'My Workflows',
-      content: 'Manage your custom workflows here. Workflows help automate repetitive tasks and ensure consistency in your documentation.',
-      target: '[data-tour-id="my-workflows-tab"]',
-      placement: 'bottom'
-    },
-    {
-      id: 'workflow-library',
-      title: 'Workflow Library',
-      content: 'Explore pre-built workflows for common clinical scenarios. You can import and customize these for your specific needs.',
-      target: '[data-tour-id="workflow-library-tab"]',
-      placement: 'bottom'
+      id: 'workflow-features',
+      title: 'Workflow Features',
+      content: 'Workflows help automate repetitive tasks and ensure consistency in your documentation. You can integrate with your EHR system for seamless operation.',
+      target: '[data-tour-id="nav-workflows"]',
+      placement: 'right'
     }
   ]
 };
