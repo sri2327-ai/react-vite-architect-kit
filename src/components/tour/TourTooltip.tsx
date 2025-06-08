@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Box,
@@ -8,7 +7,7 @@ import {
   IconButton,
   LinearProgress,
   useTheme,
-  Grid,
+  Grid2 as Grid,
   Card,
   CardContent
 } from '@mui/material';
@@ -236,7 +235,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       <Box sx={{ mt: 2, mb: 3 }}>
         <Grid container spacing={2}>
           {quickLinks.map((link, index) => (
-            <Grid item xs={6} key={index}>
+            <Grid xs={6} key={index}>
               <Card
                 sx={{
                   cursor: 'pointer',
