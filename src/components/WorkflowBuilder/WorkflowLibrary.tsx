@@ -354,271 +354,273 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
-      {/* Dynamic Search and Filter Controls */}
-      <Box sx={{ mb: { xs: 3, sm: 4 } }}>
-        <Box sx={{ 
-          display: 'flex',
-          flexDirection: { xs: 'column', sm: 'row' },
-          gap: 2,
-          mb: 2
-        }}>
-          <TextField
-            fullWidth
-            placeholder="Search workflows..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            size="small"
-            InputProps={{
-              startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
-            }}
-            sx={{
-              flex: { sm: 2 },
-              '& .MuiOutlinedInput-root': {
-                backgroundColor: 'background.paper'
-              }
-            }}
-          />
-          <FormControl 
-            size="small" 
-            sx={{ 
-              minWidth: { xs: '100%', sm: 150 },
-              flex: { sm: 1 }
-            }}
-          >
-            <InputLabel>Category</InputLabel>
-            <Select
-              value={selectedCategory}
-              label="Category"
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              startAdornment={<CategoryIcon sx={{ mr: 1, color: 'text.secondary' }} />}
+    <Box sx={{ flex: 1, overflow: 'auto' }}>
+      <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
+        {/* Dynamic Search and Filter Controls */}
+        <Box sx={{ mb: { xs: 3, sm: 4 } }}>
+          <Box sx={{ 
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2,
+            mb: 2
+          }}>
+            <TextField
+              fullWidth
+              placeholder="Search workflows..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              size="small"
+              InputProps={{
+                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
+              }}
+              sx={{
+                flex: { sm: 2 },
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: 'background.paper'
+                }
+              }}
+            />
+            <FormControl 
+              size="small" 
+              sx={{ 
+                minWidth: { xs: '100%', sm: 150 },
+                flex: { sm: 1 }
+              }}
             >
-              <MenuItem value="all">All Categories</MenuItem>
-              {dynamicCategories.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl 
-            size="small" 
-            sx={{ 
-              minWidth: { xs: '100%', sm: 150 },
-              flex: { sm: 1 }
-            }}
-          >
-            <InputLabel>EHR System</InputLabel>
-            <Select
-              value={selectedEHR}
-              label="EHR System"
-              onChange={(e) => setSelectedEHR(e.target.value)}
-              startAdornment={<EHRIcon sx={{ mr: 1, color: 'text.secondary' }} />}
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={selectedCategory}
+                label="Category"
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                startAdornment={<CategoryIcon sx={{ mr: 1, color: 'text.secondary' }} />}
+              >
+                <MenuItem value="all">All Categories</MenuItem>
+                {dynamicCategories.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl 
+              size="small" 
+              sx={{ 
+                minWidth: { xs: '100%', sm: 150 },
+                flex: { sm: 1 }
+              }}
             >
-              <MenuItem value="all">All Systems</MenuItem>
-              {dynamicEHRSystems.map((ehr) => (
-                <MenuItem key={ehr} value={ehr}>
-                  {ehr}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              <InputLabel>EHR System</InputLabel>
+              <Select
+                value={selectedEHR}
+                label="EHR System"
+                onChange={(e) => setSelectedEHR(e.target.value)}
+                startAdornment={<EHRIcon sx={{ mr: 1, color: 'text.secondary' }} />}
+              >
+                <MenuItem value="all">All Systems</MenuItem>
+                {dynamicEHRSystems.map((ehr) => (
+                  <MenuItem key={ehr} value={ehr}>
+                    {ehr}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </Box>
-      </Box>
 
-      {/* Workflow Cards Grid */}
-      <Box sx={{ 
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(auto-fit, minmax(350px, 1fr))',
-          md: 'repeat(auto-fit, minmax(400px, 1fr))',
-          lg: 'repeat(auto-fit, minmax(450px, 1fr))'
-        },
-        gap: { xs: 2, sm: 3 },
-        mb: 4
-      }}>
-        {filteredWorkflows.map((workflow) => (
-          <Card 
-            key={workflow.id}
-            sx={{ 
-              height: '100%', 
-              display: 'flex', 
-              flexDirection: 'column',
-              border: '1px solid',
-              borderColor: 'divider',
-              borderRadius: { xs: 2, sm: 3 },
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                boxShadow: { xs: 3, sm: 6 },
-                transform: { xs: 'none', sm: 'translateY(-2px)' }
-              }
-            }}
-          >
-            <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
-              {/* Header Section */}
-              <Box sx={{ 
+        {/* Workflow Cards Grid */}
+        <Box sx={{ 
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            sm: 'repeat(auto-fit, minmax(350px, 1fr))',
+            md: 'repeat(auto-fit, minmax(400px, 1fr))',
+            lg: 'repeat(auto-fit, minmax(450px, 1fr))'
+          },
+          gap: { xs: 2, sm: 3 },
+          mb: 4
+        }}>
+          {filteredWorkflows.map((workflow) => (
+            <Card 
+              key={workflow.id}
+              sx={{ 
+                height: '100%', 
                 display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'flex-start', 
-                mb: { xs: 2, sm: 3 } 
-              }}>
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography 
-                    variant="h6" 
-                    component="h3" 
-                    sx={{ 
-                      fontWeight: 600, 
-                      color: 'text.primary',
-                      fontSize: { xs: '1.125rem', sm: '1.25rem' }
-                    }}
-                  >
-                    {workflow.name}
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary" 
-                    sx={{ 
-                      mb: 1, 
-                      fontSize: { xs: '0.875rem', sm: '1rem' },
-                      lineHeight: 1.6
-                    }}
-                  >
-                    {workflow.description}
-                  </Typography>
-                  <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
-                    <Chip 
-                      label={workflow.category} 
-                      size="small" 
-                      color="info" 
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
-                    />
-                    <Chip 
-                      label={workflow.ehrSystem} 
-                      size="small" 
-                      color="primary" 
-                      variant="outlined"
-                      sx={{ fontSize: '0.75rem' }}
-                    />
-                  </Stack>
-                </Box>
-              </Box>
-
-              {/* Workflow Highlights */}
-              <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-                <Typography 
-                  variant="subtitle2" 
-                  sx={{ 
-                    mb: 1, 
-                    fontWeight: 600,
-                    fontSize: { xs: '0.875rem', sm: '1rem' }
-                  }}
-                >
-                  Workflow Highlights
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TimeIcon sx={{ color: 'text.secondary', fontSize: '1rem' }} />
+                flexDirection: 'column',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: { xs: 2, sm: 3 },
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  boxShadow: { xs: 3, sm: 6 },
+                  transform: { xs: 'none', sm: 'translateY(-2px)' }
+                }
+              }}
+            >
+              <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+                {/* Header Section */}
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'flex-start', 
+                  mb: { xs: 2, sm: 3 } 
+                }}>
+                  <Box sx={{ flexGrow: 1 }}>
                     <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
-                      Avg. Time Saved: {workflow.avgTimeSaved}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CheckCircleIcon sx={{ color: 'success.main', fontSize: '1rem' }} />
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
-                      Success Rate: {workflow.successRate}%
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <TrendingIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
-                    <Typography 
-                      variant="body2" 
-                      color="text.secondary"
-                      sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
-                    >
-                      Trending Score: {workflow.trendingScore}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-
-              {/* Workflow Steps Preview */}
-              <Box>
-                <Typography 
-                  variant="subtitle2" 
-                  sx={{ 
-                    mb: 1, 
-                    fontWeight: 600,
-                    fontSize: { xs: '0.875rem', sm: '1rem' }
-                  }}
-                >
-                  Workflow Steps
-                </Typography>
-                <List dense sx={{ py: 0 }}>
-                  {workflow.blocks.slice(0, 3).map((block) => (
-                    <ListItem key={block.id} disableGutters sx={{ py: 0 }}>
-                      <ListItemIcon sx={{ minWidth: 'auto', mr: 1 }}>
-                        <AssignmentIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
-                      </ListItemIcon>
-                      <ListItemText 
-                        primary={block.name} 
-                        secondary={block.description}
-                        primaryTypographyProps={{
-                          fontSize: isMobile ? '0.875rem' : '1rem'
-                        }}
-                        secondaryTypographyProps={{
-                          fontSize: isMobile ? '0.75rem' : '0.875rem'
-                        }}
-                      />
-                    </ListItem>
-                  ))}
-                  {workflow.blocks.length > 3 && (
-                    <Typography 
-                      variant="caption" 
-                      color="text.secondary" 
+                      variant="h6" 
+                      component="h3" 
                       sx={{ 
-                        display: 'block', 
-                        textAlign: 'right',
-                        fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                        fontWeight: 600, 
+                        color: 'text.primary',
+                        fontSize: { xs: '1.125rem', sm: '1.25rem' }
                       }}
                     >
-                      +{workflow.blocks.length - 3} more steps
+                      {workflow.name}
                     </Typography>
-                  )}
-                </List>
-              </Box>
-            </CardContent>
-            <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<ImportIcon />}
-                fullWidth
-                onClick={() => handleImport(workflow)}
-                sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
-              >
-                Import Workflow
-              </Button>
-            </Box>
-          </Card>
-        ))}
-      </Box>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary" 
+                      sx={{ 
+                        mb: 1, 
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
+                        lineHeight: 1.6
+                      }}
+                    >
+                      {workflow.description}
+                    </Typography>
+                    <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+                      <Chip 
+                        label={workflow.category} 
+                        size="small" 
+                        color="info" 
+                        variant="outlined"
+                        sx={{ fontSize: '0.75rem' }}
+                      />
+                      <Chip 
+                        label={workflow.ehrSystem} 
+                        size="small" 
+                        color="primary" 
+                        variant="outlined"
+                        sx={{ fontSize: '0.75rem' }}
+                      />
+                    </Stack>
+                  </Box>
+                </Box>
 
-      {filteredWorkflows.length === 0 && (
-        <Alert severity="warning" sx={{ mt: 3, fontSize: '1rem' }}>
-          No workflows match your search criteria. Please adjust your search or filters.
-        </Alert>
-      )}
-    </Container>
+                {/* Workflow Highlights */}
+                <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+                  <Typography 
+                    variant="subtitle2" 
+                    sx={{ 
+                      mb: 1, 
+                      fontWeight: 600,
+                      fontSize: { xs: '0.875rem', sm: '1rem' }
+                    }}
+                  >
+                    Workflow Highlights
+                  </Typography>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TimeIcon sx={{ color: 'text.secondary', fontSize: '1rem' }} />
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                      >
+                        Avg. Time Saved: {workflow.avgTimeSaved}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CheckCircleIcon sx={{ color: 'success.main', fontSize: '1rem' }} />
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                      >
+                        Success Rate: {workflow.successRate}%
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <TrendingIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary"
+                        sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}
+                      >
+                        Trending Score: {workflow.trendingScore}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
+
+                {/* Workflow Steps Preview */}
+                <Box>
+                  <Typography 
+                    variant="subtitle2" 
+                    sx={{ 
+                      mb: 1, 
+                      fontWeight: 600,
+                      fontSize: { xs: '0.875rem', sm: '1rem' }
+                    }}
+                  >
+                    Workflow Steps
+                  </Typography>
+                  <List dense sx={{ py: 0 }}>
+                    {workflow.blocks.slice(0, 3).map((block) => (
+                      <ListItem key={block.id} disableGutters sx={{ py: 0 }}>
+                        <ListItemIcon sx={{ minWidth: 'auto', mr: 1 }}>
+                          <AssignmentIcon sx={{ color: 'primary.main', fontSize: '1rem' }} />
+                        </ListItemIcon>
+                        <ListItemText 
+                          primary={block.name} 
+                          secondary={block.description}
+                          primaryTypographyProps={{
+                            fontSize: isMobile ? '0.875rem' : '1rem'
+                          }}
+                          secondaryTypographyProps={{
+                            fontSize: isMobile ? '0.75rem' : '0.875rem'
+                          }}
+                        />
+                      </ListItem>
+                    ))}
+                    {workflow.blocks.length > 3 && (
+                      <Typography 
+                        variant="caption" 
+                        color="text.secondary" 
+                        sx={{ 
+                          display: 'block', 
+                          textAlign: 'right',
+                          fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                        }}
+                      >
+                        +{workflow.blocks.length - 3} more steps
+                      </Typography>
+                    )}
+                  </List>
+                </Box>
+              </CardContent>
+              <Box sx={{ p: { xs: 1.5, sm: 2 } }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  startIcon={<ImportIcon />}
+                  fullWidth
+                  onClick={() => handleImport(workflow)}
+                  sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                >
+                  Import Workflow
+                </Button>
+              </Box>
+            </Card>
+          ))}
+        </Box>
+
+        {filteredWorkflows.length === 0 && (
+          <Alert severity="warning" sx={{ mt: 3, fontSize: '1rem' }}>
+            No workflows match your search criteria. Please adjust your search or filters.
+          </Alert>
+        )}
+      </Container>
+    </Box>
   );
 };
 
