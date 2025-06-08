@@ -41,36 +41,79 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       return null;
     }
 
-    const isSelector = currentStep.target.startsWith('[') || 
-                     currentStep.target.startsWith('.') || 
-                     currentStep.target.startsWith('#') || 
-                     currentStep.target.includes(' ');
-    
+    // Enhanced element selection with multiple fallback strategies
     let element: HTMLElement | null = null;
     
-    if (isSelector) {
+    // First try the exact target selector
+    try {
       element = document.querySelector(currentStep.target) as HTMLElement;
-    } else {
-      element = document.querySelector(`[data-tour-id="${currentStep.target}"]`) as HTMLElement;
+      if (element) {
+        console.log(`Found element with exact selector: ${currentStep.target}`);
+        return element;
+      }
+    } catch (e) {
+      console.warn(`Invalid selector: ${currentStep.target}`);
     }
     
-    // Enhanced fallback logic for tour navigation
-    if (!element) {
-      const fallbackSelectors = [
-        `[data-tour-id="${currentStep.target}"]`,
-        `[data-testid="${currentStep.target}"]`,
-        `[data-tour-id="nav-${currentStep.target}"]`,
-        `[data-testid="nav-${currentStep.target}"]`,
-        `.${currentStep.target}`,
-        `#${currentStep.target}`
-      ];
+    // Enhanced fallback logic with multiple strategies
+    const targetValue = currentStep.target.replace(/\[data-tour-id="|\[data-testid="|\]|"/g, '');
+    
+    const fallbackSelectors = [
+      // Data attributes
+      `[data-tour-id="${targetValue}"]`,
+      `[data-testid="${targetValue}"]`,
+      `[data-tour-id="nav-${targetValue}"]`,
+      `[data-testid="nav-${targetValue}"]`,
       
-      for (const selector of fallbackSelectors) {
-        element = document.querySelector(selector) as HTMLElement;
+      // Aria attributes
+      `[aria-label*="${targetValue}"]`,
+      `[aria-labelledby*="${targetValue}"]`,
+      
+      // Common navigation patterns
+      `[href*="${targetValue}"]`,
+      `a[href*="${targetValue}"]`,
+      
+      // CSS classes and IDs
+      `.${targetValue}`,
+      `#${targetValue}`,
+      `.nav-${targetValue}`,
+      `#nav-${targetValue}`,
+      
+      // Button and interactive elements
+      `button[aria-label*="${targetValue}"]`,
+      `button:contains("${targetValue}")`,
+      
+      // Container patterns
+      `[class*="${targetValue}"]`,
+      `[id*="${targetValue}"]`,
+      
+      // Last resort - text content matching
+      `//*[contains(text(), "${targetValue}")]`
+    ];
+    
+    for (const selector of fallbackSelectors) {
+      try {
+        if (selector.startsWith('//')) {
+          // XPath selector
+          const result = document.evaluate(
+            selector,
+            document,
+            null,
+            XPathResult.FIRST_ORDERED_NODE_TYPE,
+            null
+          );
+          element = result.singleNodeValue as HTMLElement;
+        } else {
+          element = document.querySelector(selector) as HTMLElement;
+        }
+        
         if (element) {
           console.log(`Found element with fallback selector: ${selector}`);
           break;
         }
+      } catch (e) {
+        // Skip invalid selectors
+        continue;
       }
     }
     
@@ -87,39 +130,53 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       setTargetRect(rect);
       setRetryCount(0);
       
-      // Enhanced scrolling logic
+      // Enhanced scrolling logic with better viewport detection
       if (element !== document.body) {
-        const isInViewport = rect.top >= 0 && 
+        const viewportPadding = 100;
+        const isInViewport = rect.top >= viewportPadding && 
                             rect.left >= 0 && 
-                            rect.bottom <= window.innerHeight && 
+                            rect.bottom <= window.innerHeight - viewportPadding && 
                             rect.right <= window.innerWidth;
         
         if (!isInViewport) {
-          // Check if element is in a scrollable container
+          // Check for scrollable containers
           const scrollableParent = element.closest('[data-tour-scrollable]') || 
                                   element.closest('.MuiContainer-root') ||
-                                  element.closest('[role="main"]');
+                                  element.closest('[role="main"]') ||
+                                  element.closest('.overflow-auto') ||
+                                  element.closest('.scroll-container');
           
-          if (scrollableParent) {
+          if (scrollableParent && scrollableParent !== document.body) {
+            // Scroll within container
             element.scrollIntoView({ 
               behavior: 'smooth', 
               block: 'center', 
               inline: 'center' 
             });
           } else {
-            element.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'center', 
-              inline: 'center' 
+            // Scroll the window
+            const elementRect = element.getBoundingClientRect();
+            const absoluteElementTop = elementRect.top + window.pageYOffset;
+            const middle = absoluteElementTop - (window.innerHeight / 2);
+            
+            window.scrollTo({
+              top: middle,
+              behavior: 'smooth'
             });
           }
+          
+          // Update rect after scrolling
+          setTimeout(() => {
+            const newRect = element.getBoundingClientRect();
+            setTargetRect(newRect);
+          }, 1000);
         }
       }
     } else {
-      // Enhanced retry logic with exponential backoff
-      if (retryCount < 8) {
-        const delay = Math.min(2000, 200 * Math.pow(1.5, retryCount));
-        console.log(`Tour target not found, retrying in ${delay}ms (attempt ${retryCount + 1}/8)`);
+      // Enhanced retry logic with progressive delays
+      if (retryCount < 10) {
+        const delay = Math.min(3000, 200 * Math.pow(1.3, retryCount));
+        console.log(`Tour target not found, retrying in ${delay}ms (attempt ${retryCount + 1}/10)`);
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
         }, delay);
@@ -148,7 +205,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   }, [state.isRunning, isMobile, isTablet]);
 
   useEffect(() => {
-    // Enhanced DOM ready check
+    // Enhanced DOM ready check with mutation observer
     const checkAndUpdate = () => {
       if (document.readyState === 'complete') {
         updateTargetRect();
@@ -159,6 +216,24 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     };
 
     checkAndUpdate();
+
+    // Watch for DOM changes that might affect target elements
+    const observer = new MutationObserver((mutations) => {
+      const hasRelevantChanges = mutations.some(mutation => 
+        mutation.type === 'childList' && mutation.addedNodes.length > 0
+      );
+      
+      if (hasRelevantChanges) {
+        setTimeout(updateTargetRect, 100);
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    return () => observer.disconnect();
   }, [updateTargetRect]);
 
   useEffect(() => {
