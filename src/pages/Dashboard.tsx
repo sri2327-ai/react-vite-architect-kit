@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -319,7 +318,7 @@ export const Dashboard: React.FC = () => {
                   }
                 }}
               />
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 1, width: '100%', justifyContent: 'center' }}>
                 <Avatar
                   sx={{
                     width: 28,
@@ -333,7 +332,7 @@ export const Dashboard: React.FC = () => {
                 >
                   {profile?.firstName?.charAt(0)}{profile?.lastName?.charAt(0)}
                 </Avatar>
-                <Box>
+                <Box sx={{ flex: 1 }}>
                   <Typography variant="caption" sx={{ 
                     color: 'white', 
                     fontWeight: 600, 
@@ -351,6 +350,7 @@ export const Dashboard: React.FC = () => {
                     {profile?.email}
                   </Typography>
                 </Box>
+                <HelpButton />
               </Box>
             </Box>
           ) : (
@@ -546,8 +546,9 @@ export const Dashboard: React.FC = () => {
                                   color: 'white',
                                   transform: isMobileView ? 'none' : 'translateX(4px)',
                                   boxShadow: isMobileView 
-                                    ? '0 2px 8px rgba(0,0,0,0.1)'
-                                    : '0 2px 6px rgba(0,0,0,0.1)',
+                                    ? '0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15)'
+                                    : '0 4px 12px rgba(0,0,0,0.15)',
+                                  border: isMobileView ? '1px solid rgba(255,255,255,0.15)' : 'none',
                                   '&:hover': {
                                     backgroundColor: 'transparent',
                                     transform: isMobileView ? 'translateY(-1px)' : 'translateX(6px)',
@@ -724,8 +725,7 @@ export const Dashboard: React.FC = () => {
         )}
 
         {!isMobileView && (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
-            <HelpButton />
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <Tooltip title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} placement="top" arrow>
               <Paper
                 elevation={0}
