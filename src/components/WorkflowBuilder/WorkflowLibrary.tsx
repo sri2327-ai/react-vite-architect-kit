@@ -27,7 +27,11 @@ import {
   AccordionDetails,
   useTheme,
   useMediaQuery,
-  Grid
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import {
@@ -53,8 +57,11 @@ import {
   Speed as SpeedIcon,
   Analytics as AnalyticsIcon,
   LocalHospital as HospitalIcon,
-  Business as BusinessIcon
+  Business as BusinessIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
+import { bravoColors } from '@/theme/colors';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface WorkflowBlock {
   id: string;
@@ -81,6 +88,152 @@ interface Workflow {
 interface WorkflowLibraryProps {
   onImportWorkflow: (workflow: Workflow) => void;
 }
+
+interface ImportConfirmDialogProps {
+  open: boolean;
+  workflow: Workflow | null;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
+const ImportConfirmDialog: React.FC<ImportConfirmDialogProps> = ({ 
+  open, 
+  workflow, 
+  onClose, 
+  onConfirm 
+}) => {
+  const { isMobile } = useResponsive();
+
+  const handleConfirm = () => {
+    onConfirm();
+    onClose();
+  };
+
+  return (
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      maxWidth="sm" 
+      fullWidth
+      fullScreen={isMobile}
+      PaperProps={{
+        sx: {
+          borderRadius: isMobile ? 0 : 2,
+          m: isMobile ? 0 : 2
+        }
+      }}
+    >
+      <DialogTitle sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        fontSize: { xs: '1.1rem', sm: '1.25rem' },
+        pb: { xs: 1, sm: 2 }
+      }}>
+        Import Workflow
+        <Button 
+          onClick={onClose}
+          color="inherit"
+          size="small"
+          sx={{ minWidth: 'auto', p: 1 }}
+        >
+          <CloseIcon />
+        </Button>
+      </DialogTitle>
+      
+      <DialogContent sx={{ px: { xs: 2, sm: 3 } }}>
+        <Box sx={{ mt: { xs: 1, sm: 2 } }}>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              mb: { xs: 2, sm: 3 },
+              fontSize: { xs: '0.9rem', sm: '1rem' }
+            }}
+          >
+            Are you sure you want to import the workflow "{workflow?.name}" into your My Workflows?
+          </Typography>
+          
+          {workflow && (
+            <Box sx={{ 
+              backgroundColor: 'grey.50', 
+              p: { xs: 2, sm: 2.5 }, 
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: 'divider'
+            }}>
+              <Typography variant="h6" sx={{ mb: 1, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
+                {workflow.name}
+              </Typography>
+              <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                sx={{ 
+                  mb: 2,
+                  fontSize: { xs: '0.85rem', sm: '0.9rem' }
+                }}
+              >
+                {workflow.description}
+              </Typography>
+              <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                <Chip 
+                  label={workflow.category} 
+                  size="small" 
+                  color="info" 
+                  variant="outlined"
+                  sx={{ fontSize: '0.75rem' }}
+                />
+                <Chip 
+                  label={workflow.ehrSystem} 
+                  size="small" 
+                  color="primary" 
+                  variant="outlined"
+                  sx={{ fontSize: '0.75rem' }}
+                />
+              </Stack>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+              >
+                {workflow.blocks.length} workflow steps • {workflow.avgTimeSaved} time saved
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      </DialogContent>
+      
+      <DialogActions sx={{ 
+        p: { xs: 2, sm: 3 },
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: 1, sm: 0 }
+      }}>
+        <Button 
+          onClick={onClose} 
+          color="inherit"
+          fullWidth={isMobile}
+          sx={{ order: { xs: 2, sm: 1 } }}
+        >
+          Cancel
+        </Button>
+        <Button 
+          onClick={handleConfirm} 
+          variant="contained"
+          startIcon={<ImportIcon />}
+          fullWidth={isMobile}
+          sx={{
+            backgroundColor: bravoColors.primaryFlat,
+            order: { xs: 1, sm: 2 },
+            '&:hover': {
+              backgroundColor: bravoColors.secondary
+            }
+          }}
+        >
+          Import Workflow
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 const workflowData: Workflow[] = [
   {
@@ -335,6 +488,8 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedEHR, setSelectedEHR] = useState('all');
   const [hoveredWorkflow, setHoveredWorkflow] = useState<string | null>(null);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [selectedWorkflow, setSelectedWorkflow] = useState<Workflow | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -349,8 +504,15 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
     return searchMatch && categoryMatch && ehrMatch;
   });
 
-  const handleImport = (workflow: Workflow) => {
-    onImportWorkflow(workflow);
+  const handleImportClick = (workflow: Workflow) => {
+    setSelectedWorkflow(workflow);
+    setImportDialogOpen(true);
+  };
+
+  const handleConfirmImport = () => {
+    if (selectedWorkflow) {
+      onImportWorkflow(selectedWorkflow);
+    }
   };
 
   return (
@@ -604,7 +766,7 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
                   color="primary"
                   startIcon={<ImportIcon />}
                   fullWidth
-                  onClick={() => handleImport(workflow)}
+                  onClick={() => handleImportClick(workflow)}
                   sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
                 >
                   Import Workflow
@@ -619,6 +781,13 @@ const WorkflowLibrary: React.FC<WorkflowLibraryProps> = ({ onImportWorkflow }) =
             No workflows match your search criteria. Please adjust your search or filters.
           </Alert>
         )}
+
+        <ImportConfirmDialog
+          open={importDialogOpen}
+          workflow={selectedWorkflow}
+          onClose={() => setImportDialogOpen(false)}
+          onConfirm={handleConfirmImport}
+        />
       </Container>
     </Box>
   );
