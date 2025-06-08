@@ -138,82 +138,93 @@ const Profile: React.FC = () => {
     label: string;
     value: string | boolean;
     chip?: boolean;
-  }) => <Box sx={{
-    display: 'flex',
-    alignItems: 'center',
-    py: {
-      xs: 1.5,
-      sm: 2,
-      md: 1.5
-    },
-    px: {
-      xs: 1.5,
-      sm: 2
-    },
-    borderBottom: '1px solid',
-    borderColor: 'divider',
-    '&:last-child': {
-      borderBottom: 'none'
-    },
-    minHeight: {
-      xs: 56,
-      sm: 64
-    }
-  }}>
-      <Box sx={{
+  }) => (
+    <Box sx={{
       display: 'flex',
       alignItems: 'center',
-      width: {
-        xs: 36,
-        sm: 40,
-        md: 44
+      py: {
+        xs: 1.5,
+        sm: 2,
+        md: 1.5
       },
-      mr: {
+      px: {
         xs: 1.5,
         sm: 2
       },
-      color: 'primary.main',
-      flexShrink: 0
+      borderBottom: '1px solid',
+      borderColor: 'divider',
+      '&:last-child': {
+        borderBottom: 'none'
+      },
+      minHeight: {
+        xs: 56,
+        sm: 64
+      }
     }}>
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        width: {
+          xs: 36,
+          sm: 40,
+          md: 44
+        },
+        mr: {
+          xs: 1.5,
+          sm: 2
+        },
+        color: 'primary.main',
+        flexShrink: 0
+      }}>
         {icon}
       </Box>
       <Box sx={{
-      flex: 1,
-      minWidth: 0
-    }}>
-        <Typography variant="caption" color="text.secondary" sx={{
-        fontSize: {
-          xs: '0.7rem',
-          sm: '0.75rem'
-        },
-        fontWeight: 500,
-        display: 'block'
+        flex: 1,
+        minWidth: 0
       }}>
+        <Typography variant="caption" color="text.secondary" sx={{
+          fontSize: {
+            xs: '0.7rem',
+            sm: '0.75rem'
+          },
+          fontWeight: 500,
+          display: 'block'
+        }}>
           {label}
         </Typography>
-        {chip && typeof value === 'boolean' ? <Chip label={value ? 'EHR Connected' : 'No EHR Connection'} color={value ? 'success' : 'default'} size="small" sx={{
-        mt: 0.5,
-        fontSize: {
-          xs: '0.7rem',
-          sm: '0.75rem'
-        },
-        height: {
-          xs: 24,
-          sm: 28
-        }
-      }} /> : <Typography variant="body2" sx={{
-        fontWeight: 500,
-        mt: 0.5,
-        fontSize: {
-          xs: '0.85rem',
-          sm: '0.875rem'
-        },
-        wordBreak: 'break-word'
-      }}>
+        {chip && typeof value === 'boolean' ? (
+          <Chip 
+            label={value ? 'EHR Connected' : 'No EHR Connection'} 
+            color={value ? 'success' : 'default'} 
+            size="small" 
+            sx={{
+              mt: 0.5,
+              fontSize: {
+                xs: '0.7rem',
+                sm: '0.75rem'
+              },
+              height: {
+                xs: 24,
+                sm: 28
+              }
+            }} 
+          />
+        ) : (
+          <Typography variant="body2" sx={{
+            fontWeight: 500,
+            mt: 0.5,
+            fontSize: {
+              xs: '0.85rem',
+              sm: '0.875rem'
+            },
+            wordBreak: 'break-word'
+          }}>
             {String(value)}
-          </Typography>}
+          </Typography>
+        )}
       </Box>
-    </Box>;
+    </Box>
+  );
   
   const QuickLinkCard = ({
     href,
@@ -225,105 +236,117 @@ const Profile: React.FC = () => {
     icon: React.ReactNode;
     title: string;
     description: string;
-  }) => <Card component={Link} href={href} target="_blank" rel="noopener noreferrer" sx={{
-    textDecoration: 'none',
-    transition: 'all 0.2s ease-in-out',
-    cursor: 'pointer',
-    height: '100%',
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: 4
-    }
-  }}>
+  }) => (
+    <Card 
+      component={Link} 
+      href={href} 
+      target="_blank" 
+      rel="noopener noreferrer" 
+      sx={{
+        textDecoration: 'none',
+        transition: 'all 0.2s ease-in-out',
+        cursor: 'pointer',
+        height: '100%',
+        '&:hover': {
+          transform: 'translateY(-2px)',
+          boxShadow: 4
+        }
+      }}
+    >
       <CardContent sx={{
-      p: {
-        xs: 1.5,
-        sm: 2,
-        md: 2.5
-      },
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center'
-    }}>
-        <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: {
+        p: {
           xs: 1.5,
-          sm: 2
+          sm: 2,
+          md: 2.5
         },
-        width: '100%'
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center'
       }}>
         <Box sx={{
-          color: 'primary.main',
-          flexShrink: 0,
-          '& svg': {
-            fontSize: {
-              xs: '1.2rem',
-              sm: '1.5rem'
+          display: 'flex',
+          alignItems: 'center',
+          gap: {
+            xs: 1.5,
+            sm: 2
+          },
+          width: '100%'
+        }}>
+          <Box sx={{
+            color: 'primary.main',
+            flexShrink: 0,
+            '& svg': {
+              fontSize: {
+                xs: '1.2rem',
+                sm: '1.5rem'
+              }
             }
-          }
-        }}>
-          {icon}
+          }}>
+            {icon}
+          </Box>
+          <Box sx={{
+            flex: 1,
+            minWidth: 0
+          }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{
+              mb: 0.5,
+              fontSize: {
+                xs: '0.85rem',
+                sm: '0.875rem'
+              },
+              lineHeight: 1.2
+            }}>
+              {title}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{
+              fontSize: {
+                xs: '0.7rem',
+                sm: '0.75rem'
+              },
+              lineHeight: 1.2
+            }}>
+              {description}
+            </Typography>
+          </Box>
+          <OpenInNewIcon fontSize="small" color="action" sx={{
+            flexShrink: 0,
+            fontSize: {
+              xs: '1rem',
+              sm: '1.2rem'
+            }
+          }} />
         </Box>
-        <Box sx={{
-          flex: 1,
-          minWidth: 0
-        }}>
-          <Typography variant="subtitle2" fontWeight={600} sx={{
-          mb: 0.5,
-          fontSize: {
-            xs: '0.85rem',
-            sm: '0.875rem'
-          },
-          lineHeight: 1.2
-        }}>
-          {title}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{
-          fontSize: {
-            xs: '0.7rem',
-            sm: '0.75rem'
-          },
-          lineHeight: 1.2
-        }}>
-          {description}
-        </Typography>
-        </Box>
-        <OpenInNewIcon fontSize="small" color="action" sx={{
-          flexShrink: 0,
-          fontSize: {
-            xs: '1rem',
-            sm: '1.2rem'
-          }
-        }} />
-      </Box>
-    </CardContent>
-  </Card>;
+      </CardContent>
+    </Card>
+  );
   
   if (loading) {
-    return <Box sx={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '50vh',
-      p: 3
-    }}>
+    return (
+      <Box sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '50vh',
+        p: 3
+      }}>
         <CircularProgress />
-      </Box>;
+      </Box>
+    );
   }
   
   if (error) {
-    return <Box sx={{
-      p: {
-        xs: 2,
-        sm: 3
-      }
-    }}>
+    return (
+      <Box sx={{
+        p: {
+          xs: 2,
+          sm: 3
+        }
+      }}>
         <Alert severity="error">
           Failed to load profile data: {error}
         </Alert>
-      </Box>;
+      </Box>
+    );
   }
   
   return (
@@ -368,16 +391,16 @@ const Profile: React.FC = () => {
         maxWidth: '100%'
       }}>
         <Box sx={{
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr',
-          lg: '2fr 1fr'
-        },
-        gap: {
-          xs: 2,
-          sm: 3
-        }
-      }}>
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: '1fr',
+            lg: '2fr 1fr'
+          },
+          gap: {
+            xs: 2,
+            sm: 3
+          }
+        }}>
           {/* Personal Information */}
           <Box>
             <Paper sx={{
@@ -826,6 +849,69 @@ const Profile: React.FC = () => {
           </Typography>
         </Paper>
       </Box>
+
+      {/* MFA Dialog */}
+      <Dialog open={showMfaDialog} onClose={() => setShowMfaDialog(false)}>
+        <DialogTitle>Enable Multi-Factor Authentication</DialogTitle>
+        <DialogContent>
+          {!mfaOtpSent ? (
+            <Typography>
+              We'll send a verification code to your email address to set up MFA.
+            </Typography>
+          ) : (
+            <Box>
+              <Typography gutterBottom>
+                Enter the verification code sent to your email:
+              </Typography>
+              <TextField
+                fullWidth
+                value={mfaOtp}
+                onChange={(e) => setMfaOtp(e.target.value)}
+                placeholder="Enter verification code"
+                sx={{ mt: 2 }}
+              />
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowMfaDialog(false)}>Cancel</Button>
+          {!mfaOtpSent ? (
+            <Button onClick={sendMfaOtp} disabled={mfaLoading}>
+              {mfaLoading ? <CircularProgress size={20} /> : 'Send Code'}
+            </Button>
+          ) : (
+            <Button onClick={verifyMfaOtp} disabled={mfaLoading || !mfaOtp}>
+              {mfaLoading ? <CircularProgress size={20} /> : 'Verify'}
+            </Button>
+          )}
+        </DialogActions>
+      </Dialog>
+
+      {/* Logout Dialog */}
+      <Dialog open={showLogoutDialog} onClose={() => setShowLogoutDialog(false)}>
+        <DialogTitle>Confirm Logout</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to logout?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowLogoutDialog(false)}>Cancel</Button>
+          <Button onClick={handleLogout} color="primary">Logout</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Cancel Subscription Dialog */}
+      <Dialog open={showCancelDialog} onClose={() => setShowCancelDialog(false)}>
+        <DialogTitle>Manage Subscription</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to cancel your subscription? Your data will be preserved.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowCancelDialog(false)}>Cancel</Button>
+          <Button onClick={handleCancelSubscription} color="error">Continue</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
