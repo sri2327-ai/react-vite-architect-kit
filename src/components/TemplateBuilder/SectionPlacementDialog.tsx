@@ -68,6 +68,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
     if (selectedPosition !== null) {
       console.log('SectionPlacementDialog: Placing section at position:', selectedPosition);
       console.log('SectionPlacementDialog: Pending section data:', pendingSection);
+      console.log('SectionPlacementDialog: Existing sections:', existingSections);
       
       onPlaceSection(selectedPosition);
       setSelectedPosition(null);
@@ -317,6 +318,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
   const renderPlacementOptions = () => {
     const options = [];
     
+    console.log('SectionPlacementDialog: Rendering placement options for sections:', existingSections);
+    
     // Add "Place at Beginning" option
     options.push(
       <PlacementZone 
@@ -334,6 +337,8 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
 
     // Add existing sections with placement options between them
     existingSections.forEach((section, index) => {
+      console.log(`SectionPlacementDialog: Adding existing section ${index}:`, section);
+      
       // Add the existing section
       options.push(
         <ExistingSection key={section.id} section={section} index={index} />
@@ -358,6 +363,7 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
       );
     });
 
+    console.log(`SectionPlacementDialog: Generated ${options.length} placement options`);
     return options;
   };
 
@@ -605,4 +611,3 @@ const SectionPlacementDialog: React.FC<SectionPlacementDialogProps> = ({
 };
 
 export default SectionPlacementDialog;
-
