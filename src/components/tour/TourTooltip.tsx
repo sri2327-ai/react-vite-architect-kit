@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import {
   Box,
@@ -173,32 +171,35 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     }
     
     if (tourId === 'welcome-tour') {
+      // For welcome tour, we should always continue to the next step
+      // Navigation is optional - if it fails, we still continue the tour
       if (step.id === 'template-builder') {
-        const success = navigateToModule('template-builder');
-        if (success) {
-          setTimeout(() => nextStep(), 1000);
-          return;
-        }
+        console.log('Welcome tour: Attempting to navigate to template builder');
+        navigateToModule('template-builder');
+        // Always continue regardless of navigation success
+        setTimeout(() => nextStep(), 500);
+        return;
       }
       
       if (step.id === 'workflow-builder') {
-        const success = navigateToModule('workflow-builder');
-        if (success) {
-          setTimeout(() => nextStep(), 1000);
-          return;
-        }
+        console.log('Welcome tour: Attempting to navigate to workflow builder');
+        navigateToModule('workflow-builder');
+        // Always continue regardless of navigation success
+        setTimeout(() => nextStep(), 500);
+        return;
       }
       
       if (step.id === 'profile-settings') {
-        const success = navigateToModule('profile');
-        if (success) {
-          setTimeout(() => nextStep(), 1000);
-          return;
-        }
+        console.log('Welcome tour: Attempting to navigate to profile');
+        navigateToModule('profile');
+        // Always continue regardless of navigation success
+        setTimeout(() => nextStep(), 500);
+        return;
       }
     }
 
-    // Default next step
+    // Default next step - this should always be called for welcome tour
+    console.log('Tour: Proceeding to next step');
     nextStep();
   };
 
@@ -493,4 +494,3 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     </Paper>
   );
 };
-
