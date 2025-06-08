@@ -25,6 +25,7 @@ interface TourTooltipProps {
   showProgress?: boolean;
   allowSkip?: boolean;
   isMobile?: boolean;
+  isTablet?: boolean;
 }
 
 export const TourTooltip: React.FC<TourTooltipProps> = ({
@@ -34,19 +35,31 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   totalSteps,
   showProgress = true,
   allowSkip = true,
-  isMobile = false
+  isMobile = false,
+  isTablet = false
 }) => {
   const { nextStep, prevStep, skipTour, endTour } = useTour();
 
   const getTooltipPosition = () => {
     const placement = step.placement || 'bottom';
-    const margin = isMobile ? 8 : 16;
-    const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 32) : 320;
-    const tooltipHeight = isMobile ? 180 : 200; // Approximate
+    const margin = isMobile ? 12 : isTablet ? 16 : 20;
+    const tooltipWidth = isMobile 
+      ? Math.min(320, window.innerWidth - 24) 
+      : isTablet 
+        ? Math.min(360, window.innerWidth - 32)
+        : Math.min(400, window.innerWidth - 40);
+    
+    // Dynamic height estimation based on content
+    const baseHeight = isMobile ? 200 : isTablet ? 220 : 240;
+    const progressHeight = showProgress ? (isMobile ? 40 : 50) : 0;
+    const buttonsHeight = isMobile ? 80 : 60;
+    const tooltipHeight = baseHeight + progressHeight + buttonsHeight;
 
     let top = 0;
     let left = 0;
+    let actualPlacement = placement;
 
+    // Calculate initial position
     switch (placement) {
       case 'top':
         top = targetRect.top - tooltipHeight - margin;
@@ -66,14 +79,49 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         break;
     }
 
-    // Keep tooltip in viewport
+    // Viewport constraints
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
+    const minMargin = isMobile ? 12 : 16;
 
-    left = Math.max(margin, Math.min(left, viewportWidth - tooltipWidth - margin));
-    top = Math.max(margin, Math.min(top, viewportHeight - tooltipHeight - margin));
+    // Check if tooltip fits and adjust placement if needed
+    if (left < minMargin) {
+      left = minMargin;
+      if (placement === 'left') {
+        left = targetRect.right + margin;
+        actualPlacement = 'right';
+      }
+    }
+    
+    if (left + tooltipWidth > viewportWidth - minMargin) {
+      left = viewportWidth - tooltipWidth - minMargin;
+      if (placement === 'right') {
+        left = targetRect.left - tooltipWidth - margin;
+        actualPlacement = 'left';
+      }
+    }
 
-    return { top, left, width: tooltipWidth };
+    if (top < minMargin) {
+      top = minMargin;
+      if (placement === 'top') {
+        top = targetRect.bottom + margin;
+        actualPlacement = 'bottom';
+      }
+    }
+    
+    if (top + tooltipHeight > viewportHeight - minMargin) {
+      top = viewportHeight - tooltipHeight - minMargin;
+      if (placement === 'bottom') {
+        top = targetRect.top - tooltipHeight - margin;
+        actualPlacement = 'top';
+      }
+    }
+
+    // Final boundary check
+    left = Math.max(minMargin, Math.min(left, viewportWidth - tooltipWidth - minMargin));
+    top = Math.max(minMargin, Math.min(top, viewportHeight - tooltipHeight - minMargin));
+
+    return { top, left, width: tooltipWidth, placement: actualPlacement };
   };
 
   const position = getTooltipPosition();
@@ -81,32 +129,58 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
   return (
     <Paper
-      elevation={8}
+      elevation={isMobile ? 12 : 16}
       sx={{
         position: 'absolute',
         top: position.top,
         left: position.left,
         width: position.width,
-        maxWidth: 'calc(100vw - 32px)',
-        p: isMobile ? 2 : 3,
+        maxWidth: `calc(100vw - ${isMobile ? 24 : 32}px)`,
+        p: isMobile ? 2 : isTablet ? 2.5 : 3,
         zIndex: 10001,
         pointerEvents: 'auto',
-        borderRadius: isMobile ? 1 : 2
+        borderRadius: isMobile ? 2 : 3,
+        backgroundColor: 'background.paper',
+        border: isMobile ? '1px solid' : 'none',
+        borderColor: 'divider',
+        boxShadow: isMobile 
+          ? '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)'
+          : '0 12px 48px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1)'
       }}
     >
       {/* Header with close button */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: isMobile ? 1.5 : 2 }}>
-        <Typography variant="h6" sx={{ 
-          fontWeight: 600, 
-          fontSize: isMobile ? '1rem' : '1.1rem',
-          lineHeight: 1.3
-        }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start', 
+        mb: isMobile ? 1.5 : isTablet ? 2 : 2.5,
+        gap: 1
+      }}>
+        <Typography 
+          variant={isMobile ? "subtitle1" : "h6"} 
+          sx={{ 
+            fontWeight: 600, 
+            fontSize: isMobile ? '1rem' : isTablet ? '1.1rem' : '1.2rem',
+            lineHeight: 1.3,
+            color: 'text.primary',
+            flex: 1,
+            pr: 1
+          }}
+        >
           {step.title}
         </Typography>
         <IconButton
           size="small"
           onClick={endTour}
-          sx={{ mt: -1, mr: -1 }}
+          sx={{ 
+            mt: -0.5, 
+            mr: -0.5,
+            color: 'text.secondary',
+            '&:hover': {
+              color: 'text.primary',
+              backgroundColor: 'action.hover'
+            }
+          }}
         >
           <Close fontSize="small" />
         </IconButton>
@@ -114,86 +188,124 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
       {/* Progress indicator */}
       {showProgress && (
-        <Box sx={{ mb: isMobile ? 1.5 : 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-            <Typography variant="caption" color="text.secondary">
+        <Box sx={{ mb: isMobile ? 2 : isTablet ? 2.5 : 3 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center', 
+            mb: 1 
+          }}>
+            <Typography variant="caption" color="text.secondary" sx={{
+              fontSize: isMobile ? '0.75rem' : '0.8rem'
+            }}>
               Step {stepIndex + 1} of {totalSteps}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{
+              fontSize: isMobile ? '0.75rem' : '0.8rem',
+              fontWeight: 500
+            }}>
               {Math.round(progress)}%
             </Typography>
           </Box>
           <LinearProgress
             variant="determinate"
             value={progress}
-            sx={{ borderRadius: 1, height: 4 }}
+            sx={{ 
+              borderRadius: 2, 
+              height: isMobile ? 6 : 8,
+              backgroundColor: 'action.hover'
+            }}
           />
         </Box>
       )}
 
       {/* Content */}
-      <Typography variant="body2" sx={{ 
-        mb: isMobile ? 2 : 3, 
-        lineHeight: 1.5,
-        fontSize: isMobile ? '0.85rem' : '0.875rem'
-      }}>
+      <Typography 
+        variant="body2" 
+        sx={{ 
+          mb: isMobile ? 2.5 : isTablet ? 3 : 3.5, 
+          lineHeight: 1.5,
+          fontSize: isMobile ? '0.875rem' : isTablet ? '0.9rem' : '0.95rem',
+          color: 'text.secondary'
+        }}
+      >
         {step.content}
       </Typography>
 
       {/* Actions */}
       <Stack 
         direction={isMobile ? 'column' : 'row'} 
-        spacing={isMobile ? 1 : 1} 
+        spacing={isMobile ? 1.5 : 1} 
         justifyContent="space-between"
-        sx={{ gap: isMobile ? 1 : 0 }}
+        alignItems={isMobile ? 'stretch' : 'center'}
       >
-        {!isMobile && (
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {stepIndex > 0 && (
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<NavigateBefore />}
-                onClick={prevStep}
-              >
-                Back
-              </Button>
-            )}
-          </Box>
+        {/* Back button for desktop */}
+        {!isMobile && stepIndex > 0 && (
+          <Button
+            variant="outlined"
+            size={isTablet ? "medium" : "small"}
+            startIcon={<NavigateBefore />}
+            onClick={prevStep}
+            sx={{
+              minWidth: 'auto',
+              px: isTablet ? 2 : 1.5
+            }}
+          >
+            Back
+          </Button>
         )}
 
-        <Box sx={{ display: 'flex', gap: 1, flexDirection: isMobile ? 'column' : 'row' }}>
+        {/* Right side actions */}
+        <Box sx={{ 
+          display: 'flex', 
+          gap: 1, 
+          flexDirection: isMobile ? 'column' : 'row',
+          flex: isMobile ? 1 : 'none',
+          alignItems: 'stretch'
+        }}>
+          {/* Back button for mobile */}
           {isMobile && stepIndex > 0 && (
             <Button
               variant="outlined"
-              size="small"
+              size="medium"
               startIcon={<NavigateBefore />}
               onClick={prevStep}
-              fullWidth={isMobile}
+              fullWidth
             >
               Back
             </Button>
           )}
           
+          {/* Skip button */}
           {allowSkip && (
             <Button
               variant="text"
-              size="small"
+              size={isMobile ? "medium" : isTablet ? "medium" : "small"}
               startIcon={<SkipNext />}
               onClick={skipTour}
               color="inherit"
               fullWidth={isMobile}
+              sx={{
+                minWidth: isMobile ? 'auto' : 100,
+                px: isMobile ? 2 : 1.5
+              }}
             >
               Skip Tour
             </Button>
           )}
           
+          {/* Next/Finish button */}
           <Button
             variant="contained"
-            size="small"
+            size={isMobile ? "medium" : isTablet ? "medium" : "small"}
             endIcon={stepIndex < totalSteps - 1 ? <NavigateNext /> : undefined}
             onClick={nextStep}
             fullWidth={isMobile}
+            sx={{
+              minWidth: isMobile ? 'auto' : 100,
+              px: isMobile ? 2 : isTablet ? 2 : 1.5,
+              fontWeight: 600
+            }}
           >
             {stepIndex < totalSteps - 1 ? 'Next' : 'Finish'}
           </Button>

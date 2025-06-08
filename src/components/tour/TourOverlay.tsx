@@ -15,6 +15,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
 
   const findTargetElement = useCallback(() => {
     if (!state.activeTour || !state.isRunning) return null;
@@ -38,7 +39,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     return element;
   }, [state.activeTour, state.currentStepIndex, state.isRunning]);
 
-  useEffect(() => {
+  const updateTargetRect = useCallback(() => {
     const element = findTargetElement();
     setTargetElement(element);
     
@@ -46,17 +47,26 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       const rect = element.getBoundingClientRect();
       setTargetRect(rect);
       
-      // Scroll element into view if needed
+      // Scroll element into view if needed - adjusted for mobile
+      const behavior = isMobile ? 'auto' : 'smooth';
       element.scrollIntoView({ 
-        behavior: 'smooth', 
+        behavior, 
         block: 'center', 
         inline: 'center' 
       });
     }
-  }, [findTargetElement]);
+  }, [findTargetElement, isMobile]);
+
+  useEffect(() => {
+    updateTargetRect();
+  }, [updateTargetRect]);
 
   useEffect(() => {
     const handleResize = () => {
+      updateTargetRect();
+    };
+
+    const handleScroll = () => {
       if (targetElement) {
         const rect = targetElement.getBoundingClientRect();
         setTargetRect(rect);
@@ -64,13 +74,13 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     };
 
     window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleResize);
+    window.addEventListener('scroll', handleScroll, true);
     
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleResize);
+      window.removeEventListener('scroll', handleScroll, true);
     };
-  }, [targetElement]);
+  }, [targetElement, updateTargetRect]);
 
   if (!state.isRunning || !state.activeTour || !targetElement || !targetRect) {
     return null;
@@ -80,7 +90,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   if (!currentStep) return null;
 
   // Responsive spotlight padding
-  const spotlightPadding = isMobile ? 4 : 8;
+  const spotlightPadding = isMobile ? 8 : isTablet ? 10 : 12;
 
   return createPortal(
     <Box
@@ -99,7 +109,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         open={true}
         sx={{
           zIndex: 9999,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
           pointerEvents: currentStep.spotlightClicks ? 'none' : 'auto'
         }}
       />
@@ -108,15 +118,21 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       <Box
         sx={{
           position: 'absolute',
-          top: targetRect.top - spotlightPadding,
-          left: targetRect.left - spotlightPadding,
-          width: targetRect.width + (spotlightPadding * 2),
-          height: targetRect.height + (spotlightPadding * 2),
+          top: Math.max(0, targetRect.top - spotlightPadding),
+          left: Math.max(0, targetRect.left - spotlightPadding),
+          width: Math.min(
+            targetRect.width + (spotlightPadding * 2),
+            window.innerWidth - Math.max(0, targetRect.left - spotlightPadding)
+          ),
+          height: Math.min(
+            targetRect.height + (spotlightPadding * 2),
+            window.innerHeight - Math.max(0, targetRect.top - spotlightPadding)
+          ),
           backgroundColor: 'transparent',
-          border: '2px solid',
+          border: `${isMobile ? 2 : 3}px solid`,
           borderColor: 'primary.main',
           borderRadius: isMobile ? 1 : 2,
-          boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)',
+          boxShadow: `0 0 0 ${isMobile ? '9999px' : '9999px'} rgba(0, 0, 0, 0.6)`,
           pointerEvents: 'none',
           zIndex: 10000
         }}
@@ -131,6 +147,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         showProgress={state.activeTour.showProgress}
         allowSkip={state.activeTour.allowSkip}
         isMobile={isMobile}
+        isTablet={isTablet}
       />
     </Box>,
     document.body
