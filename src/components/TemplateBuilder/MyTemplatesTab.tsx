@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Box,
@@ -220,6 +221,7 @@ const MyTemplatesTab: React.FC = () => {
           width: '100%',
           maxWidth: '100vw'
         }}
+        data-tour-id="template-editor"
       >
         <TemplateBuilderHeader
           title={`Edit Template: ${selectedTemplate.name}`}
@@ -257,6 +259,7 @@ const MyTemplatesTab: React.FC = () => {
           width: '100%',
           maxWidth: '100vw'
         }}
+        data-tour-id="template-overview"
       >
         <TemplateBuilderHeader
           title="My Templates"
@@ -266,7 +269,7 @@ const MyTemplatesTab: React.FC = () => {
           px: { xs: 1, sm: 2, md: 3 },
           py: { xs: 1, sm: 2 }
         }}>
-          <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+          <Box sx={{ mb: { xs: 2, sm: 3 } }} data-tour-id="workflow-steps">
             <MyTemplatesNavBar
               currentStep="visit-types"
               onCreateTemplate={() => {}}
@@ -274,11 +277,13 @@ const MyTemplatesTab: React.FC = () => {
             />
           </Box>
           
-          <VisitTypeManager 
-            onVisitTypeSelect={handleVisitTypeSelect}
-            isCreateDialogOpen={isCreateVisitTypeDialogOpen}
-            onCloseCreateDialog={() => setIsCreateVisitTypeDialogOpen(false)}
-          />
+          <Box data-tour-id="visit-type-selection">
+            <VisitTypeManager 
+              onVisitTypeSelect={handleVisitTypeSelect}
+              isCreateDialogOpen={isCreateVisitTypeDialogOpen}
+              onCloseCreateDialog={() => setIsCreateVisitTypeDialogOpen(false)}
+            />
+          </Box>
         </Box>
       </Container>
     );
@@ -315,7 +320,7 @@ const MyTemplatesTab: React.FC = () => {
           />
         </Box>
 
-        <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
+        <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }} data-tour-id="template-filters">
           <TemplateFilters
             selectedSpecialty={filters.specialty}
             onSpecialtyChange={(value: string) => setFilters(prev => ({ ...prev, specialty: value }))}
@@ -338,7 +343,7 @@ const MyTemplatesTab: React.FC = () => {
           '& .MuiDataGrid-root': {
             minWidth: { xs: '320px', sm: '100%' }
           }
-        }}>
+        }} data-tour-id="template-list">
           <TemplateTable
             templates={filteredTemplates.map((template: Template) => ({
               id: parseInt(template.id.replace('template-', '')) || Math.random(),
@@ -402,6 +407,15 @@ const MyTemplatesTab: React.FC = () => {
                 ? 'Try adjusting your filters to see more templates.'
                 : `Create your first template for ${selectedVisitType?.name} to get started.`}
             </Typography>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setIsCreateDialogOpen(true)}
+              data-testid="create-template-button"
+              sx={{ mt: 2 }}
+            >
+              Create Template
+            </Button>
           </Box>
         )}
       </Box>

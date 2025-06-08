@@ -48,7 +48,7 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ activeTab = 'my-workf
   };
 
   return (
-    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }} data-tour-id="workflow-overview">
       {/* Header */}
       <TemplateBuilderHeader 
         title={currentTab === 'my-workflows' ? 'My Workflows' : 'Workflow Library'} 
@@ -59,13 +59,17 @@ const WorkflowBuilder: React.FC<WorkflowBuilderProps> = ({ activeTab = 'my-workf
       <Container maxWidth="xl" sx={{ flex: 1, overflow: 'auto', p: 0 }}>
         <Box sx={{ height: '100%', overflow: 'auto' }}>
           {currentTab === 'my-workflows' && (
-            <MyWorkflows 
-              importedWorkflows={importedWorkflows} 
-              setImportedWorkflows={setImportedWorkflows} 
-            />
+            <Box data-tour-id="my-workflows-view">
+              <MyWorkflows 
+                importedWorkflows={importedWorkflows} 
+                setImportedWorkflows={setImportedWorkflows} 
+              />
+            </Box>
           )}
           {currentTab === 'workflow-library' && (
-            <WorkflowLibrary onImportWorkflow={handleImportWorkflow} />
+            <Box data-tour-id="workflow-library">
+              <WorkflowLibrary onImportWorkflow={handleImportWorkflow} />
+            </Box>
           )}
         </Box>
       </Container>

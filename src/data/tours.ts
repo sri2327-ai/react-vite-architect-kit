@@ -66,42 +66,42 @@ export const templateBuilderTour: Tour = {
       id: 'template-overview',
       title: 'Step 1: Template Builder Overview',
       content: 'Welcome to the Template Builder! Here you can create, edit, and manage your clinical note templates. This is your central hub for template management.',
-      target: '.MuiContainer-root',
+      target: '[data-tour-id="template-overview"]',
       placement: 'bottom'
     },
     {
       id: 'visit-type-selection',
       title: 'Step 2: Select Visit Type',
       content: 'First, select a visit type to work with. Each visit type can have its own set of templates. Click on any visit type card to continue.',
-      target: '.MuiCard-root',
+      target: '[data-tour-id="visit-type-selection"]',
       placement: 'top'
     },
     {
       id: 'workflow-steps',
       title: 'Step 3: Workflow Navigation',
       content: 'This shows your current progress in the template workflow. You can navigate between visit type selection and template management.',
-      target: '.MuiStepper-root',
+      target: '[data-tour-id="workflow-steps"]',
       placement: 'bottom'
     },
     {
       id: 'template-list',
       title: 'Step 4: View Templates',
       content: 'After selecting a visit type, you\'ll see all templates associated with that visit type. Each template shows its name, specialty, and last modified date.',
-      target: '.MuiDataGrid-root',
+      target: '[data-tour-id="template-list"]',
       placement: 'top'
     },
     {
       id: 'create-template-action',
       title: 'Step 5: Create New Template',
       content: 'Click this button to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
-      target: 'button[data-testid="create-template-button"], .MuiButton-contained',
+      target: '[data-testid="create-template-button"]',
       placement: 'bottom'
     },
     {
       id: 'template-filters',
       title: 'Step 6: Filter Templates',
       content: 'Use the specialty filter to find specific templates quickly. You can filter by specialty to narrow down your template list.',
-      target: '.MuiTextField-root',
+      target: '[data-tour-id="template-filters"]',
       placement: 'bottom'
     },
     {
@@ -115,14 +115,14 @@ export const templateBuilderTour: Tour = {
       id: 'template-editor',
       title: 'Step 8: Template Editor',
       content: 'When editing a template, you\'ll see the drag-and-drop editor where you can add sections, configure fields, and customize your template layout.',
-      target: '.MuiBox-root',
+      target: '[data-tour-id="template-editor"]',
       placement: 'top'
     },
     {
       id: 'back-navigation',
       title: 'Step 9: Navigation',
       content: 'Use the back button to return to the visit type selection or previous screens. The header shows your current location in the builder.',
-      target: 'button[aria-label="Back"], .MuiIconButton-root',
+      target: 'button[aria-label="Back"]',
       placement: 'bottom'
     }
   ]
@@ -140,7 +140,7 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-overview',
       title: 'Step 1: Workflow Builder Overview',
       content: 'Welcome to the Workflow Builder! Here you can create automated workflows that integrate with your EHR system to streamline your clinical documentation process.',
-      target: '.MuiContainer-root',
+      target: '[data-tour-id="workflow-overview"]',
       placement: 'bottom'
     },
     {
@@ -154,14 +154,14 @@ export const workflowBuilderTour: Tour = {
       id: 'my-workflows-view',
       title: 'Step 3: My Workflows View',
       content: 'In the My Workflows section, you can see all your created workflows. Each workflow shows its status, EHR system, and configuration details.',
-      target: '.MuiCard-root',
+      target: '[data-tour-id="my-workflows-view"]',
       placement: 'top'
     },
     {
       id: 'create-workflow-button',
       title: 'Step 4: Create New Workflow',
       content: 'Click "Create Workflow" to start building a new automated workflow. You can configure triggers, actions, and EHR integrations.',
-      target: 'button[data-testid="create-workflow"], .MuiButton-contained',
+      target: '[data-testid="create-workflow"]',
       placement: 'bottom'
     },
     {
@@ -196,21 +196,21 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-library',
       title: 'Step 9: Browse Library',
       content: 'Switch to the Workflow Library to explore pre-built workflows for different EHR systems and specialties. Import and customize these workflows to accelerate your setup.',
-      target: '.MuiTab-root:last-child',
+      target: '[data-tour-id="workflow-library"]',
       placement: 'bottom'
     },
     {
       id: 'import-workflow',
       title: 'Step 10: Import Workflows',
       content: 'Found a workflow you like? Click "Import Workflow" to add it to your collection. You can then customize it to fit your specific practice needs.',
-      target: 'button[data-testid="import-workflow"], .MuiButton-contained',
+      target: '[data-testid="import-workflow"]',
       placement: 'bottom'
     },
     {
       id: 'workflow-testing',
       title: 'Step 11: Test Workflow',
       content: 'Before activating a workflow, use the test feature to ensure it works correctly with sample data. This helps prevent issues in live environments.',
-      target: 'button[data-testid="test-workflow"], .MuiButton-outlined',
+      target: '[data-testid="test-workflow"]',
       placement: 'bottom'
     }
   ]
