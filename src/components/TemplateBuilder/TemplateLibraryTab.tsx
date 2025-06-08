@@ -497,22 +497,22 @@ const TemplateLibraryTab: React.FC = () => {
       <Container 
         maxWidth={false}
         sx={{ 
-          py: { xs: 2, sm: 3, md: 4 }, 
-          px: { xs: 1, sm: 2, md: 3 },
+          py: { xs: 2, sm: 3, md: 4, lg: 5 }, 
+          px: { xs: 1, sm: 2, md: 3, lg: 4 },
           width: '100%',
           maxWidth: '100%',
           flex: 1,
           overflow: 'auto'
         }}
       >
-        <Box sx={{ mb: { xs: 3, sm: 4, md: 5 } }}>
+        <Box sx={{ mb: { xs: 3, sm: 4, md: 5, lg: 6 } }}>
           <Typography 
             variant="body1" 
             color="text.secondary"
             sx={{ 
-              mb: { xs: 3, sm: 4 },
+              mb: { xs: 3, sm: 4, md: 5 },
               textAlign: { xs: 'center', sm: 'left' },
-              fontSize: { xs: '0.9rem', sm: '1rem' }
+              fontSize: { xs: '0.9rem', sm: '1rem', md: '1.1rem' }
             }}
           >
             Browse and import professionally designed templates for your practice
@@ -521,8 +521,8 @@ const TemplateLibraryTab: React.FC = () => {
           {/* Filters */}
           <Stack 
             direction={{ xs: 'column', sm: 'row' }} 
-            spacing={{ xs: 2, sm: 3 }}
-            sx={{ mb: { xs: 3, sm: 4 } }}
+            spacing={{ xs: 2, sm: 3, md: 4 }}
+            sx={{ mb: { xs: 3, sm: 4, md: 5 } }}
           >
             <TextField
               fullWidth
@@ -538,14 +538,14 @@ const TemplateLibraryTab: React.FC = () => {
                 ),
               }}
               sx={{
-                maxWidth: { sm: 300 },
+                maxWidth: { sm: 350, md: 400 },
                 '& .MuiOutlinedInput-root': {
                   borderRadius: 2
                 }
               }}
             />
             
-            <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 150 } }}>
+            <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 150, md: 180 } }}>
               <InputLabel>Specialty</InputLabel>
               <Select
                 value={selectedSpecialty}
@@ -562,7 +562,7 @@ const TemplateLibraryTab: React.FC = () => {
               </Select>
             </FormControl>
 
-            <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 120 } }}>
+            <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 120, md: 150 } }}>
               <InputLabel>Type</InputLabel>
               <Select
                 value={selectedType}
@@ -581,19 +581,27 @@ const TemplateLibraryTab: React.FC = () => {
           </Stack>
         </Box>
 
-        {/* Templates Grid - Using Box with CSS Grid instead of MUI Grid */}
+        {/* Templates Grid - Improved spacing for desktop/laptop */}
         <Box 
           sx={{
             display: 'grid',
             gridTemplateColumns: {
               xs: '1fr',
               sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)',
-              lg: 'repeat(4, 1fr)',
+              md: 'repeat(2, 1fr)',
+              lg: 'repeat(3, 1fr)',
               xl: 'repeat(4, 1fr)'
             },
-            gap: { xs: 2, sm: 2.5, md: 3 },
-            width: '100%'
+            gap: { 
+              xs: 2, 
+              sm: 3, 
+              md: 4, 
+              lg: 5,
+              xl: 6 
+            },
+            width: '100%',
+            maxWidth: { lg: '1600px', xl: '1800px' },
+            mx: 'auto'
           }}
         >
           {filteredTemplates.map((template) => (
@@ -604,31 +612,32 @@ const TemplateLibraryTab: React.FC = () => {
                 width: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                borderRadius: 2,
+                borderRadius: { xs: 2, md: 3 },
                 border: '1px solid',
                 borderColor: 'divider',
                 transition: 'all 0.3s ease',
+                minHeight: { xs: 'auto', md: '420px', lg: '450px' },
                 '&:hover': {
-                  transform: { xs: 'none', sm: 'translateY(-2px)' },
-                  boxShadow: theme.shadows[4],
+                  transform: { xs: 'none', sm: 'translateY(-4px)', md: 'translateY(-6px)' },
+                  boxShadow: { xs: theme.shadows[2], sm: theme.shadows[6], md: theme.shadows[8] },
                   borderColor: bravoColors.primaryFlat
                 }
               }}
             >
               <CardContent sx={{ 
                 flexGrow: 1, 
-                p: { xs: 2, sm: 2.5, md: 3 },
+                p: { xs: 2, sm: 2.5, md: 3, lg: 4 },
                 display: 'flex',
                 flexDirection: 'column'
               }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: { xs: 2, md: 3 } }}>
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography 
                       variant="h6" 
                       sx={{ 
                         fontWeight: 600,
-                        mb: 1,
-                        fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' },
+                        mb: { xs: 1, md: 1.5 },
+                        fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem', lg: '1.3rem' },
                         lineHeight: 1.3
                       }}
                     >
@@ -641,8 +650,8 @@ const TemplateLibraryTab: React.FC = () => {
                         sx={{ 
                           backgroundColor: `${bravoColors.primaryFlat}20`,
                           color: bravoColors.primaryFlat,
-                          fontSize: { xs: '0.7rem', sm: '0.75rem' },
-                          height: { xs: 22, sm: 24 }
+                          fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
+                          height: { xs: 22, sm: 24, md: 26 }
                         }} 
                       />
                     )}
@@ -653,12 +662,12 @@ const TemplateLibraryTab: React.FC = () => {
                   variant="body2" 
                   color="text.secondary" 
                   sx={{ 
-                    mb: 2,
-                    fontSize: { xs: '0.85rem', sm: '0.875rem', md: '0.9rem' },
-                    lineHeight: 1.4,
+                    mb: { xs: 2, md: 3 },
+                    fontSize: { xs: '0.85rem', sm: '0.875rem', md: '0.95rem', lg: '1rem' },
+                    lineHeight: 1.5,
                     flexGrow: 1,
                     display: '-webkit-box',
-                    WebkitLineClamp: { xs: 2, sm: 3, md: 3 },
+                    WebkitLineClamp: { xs: 2, sm: 3, md: 4 },
                     WebkitBoxOrient: 'vertical',
                     overflow: 'hidden'
                   }}
@@ -666,20 +675,20 @@ const TemplateLibraryTab: React.FC = () => {
                   {template.description}
                 </Typography>
 
-                <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: { xs: 2, md: 3 } }}>
                   <Typography 
                     variant="caption" 
                     color="text.secondary" 
                     sx={{ 
                       display: 'block', 
-                      mb: 1, 
-                      fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                      mb: { xs: 1, md: 1.5 }, 
+                      fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' },
                       fontWeight: 500
                     }}
                   >
                     {template.specialty}
                   </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.5, md: 1 } }}>
                     {template.tags.slice(0, isMobile ? 1 : 2).map((tag) => (
                       <Chip 
                         key={tag} 
@@ -687,8 +696,8 @@ const TemplateLibraryTab: React.FC = () => {
                         size="small" 
                         variant="outlined"
                         sx={{ 
-                          fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                          height: { xs: 20, sm: 22 }
+                          fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                          height: { xs: 20, sm: 22, md: 24 }
                         }} 
                       />
                     ))}
@@ -698,8 +707,8 @@ const TemplateLibraryTab: React.FC = () => {
                         size="small" 
                         variant="outlined"
                         sx={{ 
-                          fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                          height: { xs: 20, sm: 22 }
+                          fontSize: { xs: '0.65rem', sm: '0.7rem', md: '0.75rem' },
+                          height: { xs: 20, sm: 22, md: 24 }
                         }} 
                       />
                     )}
@@ -707,19 +716,19 @@ const TemplateLibraryTab: React.FC = () => {
                 </Box>
 
                 {template.rating && (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
-                    <StarIcon sx={{ fontSize: { xs: 14, sm: 16 }, color: '#ffa726' }} />
-                    <Typography variant="caption" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: { xs: 1, md: 1.5 } }}>
+                    <StarIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 }, color: '#ffa726' }} />
+                    <Typography variant="caption" sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.8rem' } }}>
                       {template.rating} ({template.downloads})
                     </Typography>
                   </Box>
                 )}
               </CardContent>
 
-              <CardActions sx={{ p: { xs: 2, sm: 2.5, md: 3 }, pt: 0 }}>
+              <CardActions sx={{ p: { xs: 2, sm: 2.5, md: 3, lg: 4 }, pt: 0 }}>
                 <Stack 
                   direction={{ xs: 'column', sm: 'row' }} 
-                  spacing={{ xs: 1, sm: 1.5 }} 
+                  spacing={{ xs: 1, sm: 1.5, md: 2 }} 
                   sx={{ width: '100%' }}
                 >
                   <Button
@@ -731,8 +740,8 @@ const TemplateLibraryTab: React.FC = () => {
                       borderRadius: 2,
                       textTransform: 'none',
                       flex: { xs: 'none', sm: 1 },
-                      fontSize: { xs: '0.8rem', sm: '0.85rem' },
-                      py: { xs: 0.75, sm: 1 }
+                      fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.9rem' },
+                      py: { xs: 0.75, sm: 1, md: 1.25 }
                     }}
                   >
                     Preview
@@ -747,8 +756,8 @@ const TemplateLibraryTab: React.FC = () => {
                       borderRadius: 2,
                       textTransform: 'none',
                       flex: { xs: 'none', sm: 1 },
-                      fontSize: { xs: '0.8rem', sm: '0.85rem' },
-                      py: { xs: 0.75, sm: 1 },
+                      fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.9rem' },
+                      py: { xs: 0.75, sm: 1, md: 1.25 },
                       '&:hover': {
                         backgroundColor: bravoColors.secondary
                       }
@@ -765,13 +774,13 @@ const TemplateLibraryTab: React.FC = () => {
         {filteredTemplates.length === 0 && (
           <Box sx={{
             textAlign: 'center',
-            py: { xs: 4, sm: 6 },
+            py: { xs: 4, sm: 6, md: 8 },
             color: 'text.secondary'
           }}>
-            <Typography variant="h6" sx={{ mb: 1, fontSize: { xs: '1rem', sm: '1.1rem' } }}>
+            <Typography variant="h6" sx={{ mb: 1, fontSize: { xs: '1rem', sm: '1.1rem', md: '1.2rem' } }}>
               No templates found
             </Typography>
-            <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.85rem' } }}>
+            <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.9rem' } }}>
               Try adjusting your search criteria to find more templates.
             </Typography>
           </Box>
