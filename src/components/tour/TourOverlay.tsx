@@ -26,7 +26,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
 
     console.log('Looking for target:', currentStep.target);
 
-    // Special handling for body target (used for screen transitions)
+    // Special handling for body target
     if (currentStep.target === 'body') {
       return document.body;
     }
@@ -54,6 +54,26 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       element = document.querySelector(`[data-tour-id="${currentStep.target}"]`) as HTMLElement;
     }
     
+    // Enhanced fallback logic for tour navigation
+    if (!element) {
+      const fallbackSelectors = [
+        `[data-tour-id="${currentStep.target}"]`,
+        `[data-testid="${currentStep.target}"]`,
+        `[data-tour-id="nav-${currentStep.target}"]`,
+        `[data-testid="nav-${currentStep.target}"]`,
+        `.${currentStep.target}`,
+        `#${currentStep.target}`
+      ];
+      
+      for (const selector of fallbackSelectors) {
+        element = document.querySelector(selector) as HTMLElement;
+        if (element) {
+          console.log(`Found element with fallback selector: ${selector}`);
+          break;
+        }
+      }
+    }
+    
     console.log('Found element:', element);
     return element;
   }, [state.activeTour, state.currentStepIndex, state.isRunning]);
@@ -67,7 +87,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       setTargetRect(rect);
       setRetryCount(0);
       
-      // Only scroll if not targeting body and element is not in viewport
+      // Enhanced scrolling logic
       if (element !== document.body) {
         const isInViewport = rect.top >= 0 && 
                             rect.left >= 0 && 
@@ -75,22 +95,35 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
                             rect.right <= window.innerWidth;
         
         if (!isInViewport) {
-          element.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center', 
-            inline: 'center' 
-          });
+          // Check if element is in a scrollable container
+          const scrollableParent = element.closest('[data-tour-scrollable]') || 
+                                  element.closest('.MuiContainer-root') ||
+                                  element.closest('[role="main"]');
+          
+          if (scrollableParent) {
+            element.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center', 
+              inline: 'center' 
+            });
+          } else {
+            element.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center', 
+              inline: 'center' 
+            });
+          }
         }
       }
     } else {
-      // Element not found, retry with increasing delays
-      if (retryCount < 5) {
-        const delay = Math.min(1000, 200 * (retryCount + 1));
+      // Enhanced retry logic with exponential backoff
+      if (retryCount < 8) {
+        const delay = Math.min(2000, 200 * Math.pow(1.5, retryCount));
+        console.log(`Tour target not found, retrying in ${delay}ms (attempt ${retryCount + 1}/8)`);
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
         }, delay);
       } else {
-        // If we can't find the element after retries, use body as fallback
         console.warn(`Tour target not found after retries, using body fallback: ${state.activeTour?.steps[state.currentStepIndex]?.target}`);
         setTargetElement(document.body);
         const rect = document.body.getBoundingClientRect();
@@ -104,7 +137,6 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   useEffect(() => {
     if (state.isRunning && (isMobile || isTablet)) {
       const timer = setTimeout(() => {
-        // Close mobile drawer
         const mobileDrawerBackdrop = document.querySelector('.MuiDrawer-root .MuiBackdrop-root') as HTMLElement;
         if (mobileDrawerBackdrop) {
           mobileDrawerBackdrop.click();
@@ -116,13 +148,17 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   }, [state.isRunning, isMobile, isTablet]);
 
   useEffect(() => {
-    // Wait for DOM to be ready before finding targets
-    if (document.readyState === 'complete') {
-      updateTargetRect();
-    } else {
-      const timer = setTimeout(updateTargetRect, 100);
-      return () => clearTimeout(timer);
-    }
+    // Enhanced DOM ready check
+    const checkAndUpdate = () => {
+      if (document.readyState === 'complete') {
+        updateTargetRect();
+      } else {
+        const timer = setTimeout(updateTargetRect, 100);
+        return () => clearTimeout(timer);
+      }
+    };
+
+    checkAndUpdate();
   }, [updateTargetRect]);
 
   useEffect(() => {
@@ -183,7 +219,6 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
           pointerEvents: 'auto'
         }}
         onClick={() => {
-          // Allow backdrop clicks to close tour only if allowSkip is true
           if (state.activeTour?.allowSkip) {
             endTour();
           }

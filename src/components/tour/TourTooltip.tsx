@@ -40,55 +40,142 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   allowSkip = true,
   customZIndex = 10001
 }) => {
-  const { nextStep, prevStep, endTour } = useTour();
+  const { nextStep, prevStep, endTour, state } = useTour();
   const theme = useTheme();
   const { isMobile, isTablet, isMobileView } = useResponsive();
 
+  const navigateToModule = (moduleId: string) => {
+    console.log(`Tour: Navigating to module ${moduleId}`);
+    
+    // Find and click the navigation item
+    const navItem = document.querySelector(`[data-tour-id="${moduleId}"]`);
+    if (navItem) {
+      (navItem as HTMLElement).click();
+      return true;
+    }
+    
+    // Fallback: try alternative selectors
+    const altSelectors = [
+      `[data-tour-id="nav-${moduleId}"]`,
+      `[data-testid="${moduleId}"]`,
+      `[data-testid="nav-${moduleId}"]`
+    ];
+    
+    for (const selector of altSelectors) {
+      const element = document.querySelector(selector);
+      if (element) {
+        (element as HTMLElement).click();
+        return true;
+      }
+    }
+    
+    return false;
+  };
+
   const handleNext = () => {
-    // For template builder tour step 3, click the first visit type card
-    if (step.id === 'visit-type-selection') {
-      const visitTypeCard = document.querySelector('[data-tour-id="visit-type-selection"] .MuiCard-root');
-      if (visitTypeCard) {
-        console.log('Template builder tour: Clicking first visit type card');
-        (visitTypeCard as HTMLElement).click();
-        // Wait for navigation then advance
-        setTimeout(() => {
-          nextStep();
-        }, 1000);
+    const tourId = state.activeTour?.id;
+    
+    // Handle navigation based on tour type and step
+    if (tourId === 'template-builder-tour') {
+      // Template builder tour navigation logic
+      if (step.id === 'template-overview' || step.id === 'workflow-steps') {
+        // Navigate to template builder if not already there
+        const templateNavItem = document.querySelector('[data-tour-id="nav-templates"]') || 
+                               document.querySelector('[data-tour-id="template-builder"]');
+        if (templateNavItem) {
+          (templateNavItem as HTMLElement).click();
+          setTimeout(() => nextStep(), 500);
+          return;
+        }
+      }
+      
+      if (step.id === 'visit-type-selection') {
+        // Click the first visit type card to proceed
+        const visitTypeCard = document.querySelector('[data-tour-id="visit-type-selection"] .MuiCard-root');
+        if (visitTypeCard) {
+          console.log('Template builder tour: Clicking first visit type card');
+          (visitTypeCard as HTMLElement).click();
+          setTimeout(() => nextStep(), 1000);
+          return;
+        }
+      }
+
+      if (step.id === 'edit-template') {
+        // Click the edit button on first template
+        const editButton = document.querySelector('[data-testid="edit-template-button"]');
+        if (editButton) {
+          console.log('Template builder tour: Clicking edit template button');
+          (editButton as HTMLElement).click();
+          setTimeout(() => nextStep(), 1500);
+          return;
+        }
+      }
+    }
+    
+    if (tourId === 'workflow-builder-tour') {
+      // Workflow builder tour navigation logic
+      if (step.id === 'workflow-overview' || step.id === 'workflow-tabs') {
+        // Navigate to workflow builder if not already there
+        const workflowNavItem = document.querySelector('[data-tour-id="nav-workflows"]') || 
+                               document.querySelector('[data-tour-id="workflow-builder"]');
+        if (workflowNavItem) {
+          (workflowNavItem as HTMLElement).click();
+          setTimeout(() => nextStep(), 500);
+          return;
+        }
+      }
+      
+      if (step.id === 'workflow-library-switch') {
+        // Click on workflow library tab
+        const libraryTab = document.querySelector('[data-tour-id="workflow-tabs"] [role="tab"]:last-child');
+        if (libraryTab) {
+          console.log('Workflow tour: Switching to library tab');
+          (libraryTab as HTMLElement).click();
+          setTimeout(() => nextStep(), 500);
+          return;
+        }
+      }
+    }
+    
+    if (tourId === 'welcome-tour') {
+      // Welcome tour navigation logic
+      if (step.id === 'template-builder') {
+        // Navigate to template builder
+        navigateToModule('template-builder');
+        setTimeout(() => nextStep(), 500);
+        return;
+      }
+      
+      if (step.id === 'workflow-builder') {
+        // Navigate to workflow builder
+        navigateToModule('workflow-builder');
+        setTimeout(() => nextStep(), 500);
+        return;
+      }
+      
+      if (step.id === 'profile-settings') {
+        // Navigate to profile
+        navigateToModule('profile');
+        setTimeout(() => nextStep(), 500);
         return;
       }
     }
 
-    // For edit template step, click the edit button on first template
-    if (step.id === 'edit-template') {
-      const editButton = document.querySelector('[data-testid="edit-template-button"]');
-      if (editButton) {
-        console.log('Template builder tour: Clicking edit template button');
-        (editButton as HTMLElement).click();
-        // Wait for navigation then advance
-        setTimeout(() => {
-          nextStep();
-        }, 1500);
-        return;
-      }
-    }
-
+    // Default next step
     nextStep();
   };
 
   const getTooltipPosition = () => {
     const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 32) : 
                        isTablet ? Math.min(320, window.innerWidth - 32) : 350;
-    const tooltipHeight = 280; // Increased for better content fit
+    const tooltipHeight = 280;
     const padding = isMobile ? 12 : 16;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
-    // Smart positioning logic
     let top = targetRect.bottom + padding;
     let left = targetRect.left + (targetRect.width / 2) - (tooltipWidth / 2);
     
-    // Handle placement based on step placement preference
     switch (step.placement) {
       case 'top':
         top = targetRect.top - tooltipHeight - padding;
@@ -106,40 +193,30 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         break;
     }
     
-    // Responsive positioning adjustments with better boundaries
     if (isMobileView) {
-      // Mobile-first approach - always center horizontally and position vertically for best visibility
       left = Math.max(16, Math.min(left, viewportWidth - tooltipWidth - 16));
       
-      // Vertical positioning - prefer bottom but avoid going off screen
       if (targetRect.bottom + tooltipHeight + padding > viewportHeight - 50) {
         if (targetRect.top - tooltipHeight - padding > 50) {
-          // Place above if there's room
           top = targetRect.top - tooltipHeight - padding;
         } else {
-          // Place in safe center area if neither top nor bottom works well
           top = Math.max(50, Math.min(top, viewportHeight - tooltipHeight - 50));
         }
       }
     } else {
-      // Desktop/tablet positioning with better boundary checks
-      // Horizontal boundaries
       if (left < padding) {
         left = padding;
       } else if (left + tooltipWidth > viewportWidth - padding) {
         left = viewportWidth - tooltipWidth - padding;
       }
       
-      // Vertical boundaries  
       if (top < 50) {
-        top = 50; // Account for header space
+        top = 50;
       } else if (top + tooltipHeight > viewportHeight - 50) {
-        // Try placing above target
         const topPlacement = targetRect.top - tooltipHeight - padding;
         if (topPlacement > 50) {
           top = topPlacement;
         } else {
-          // Center in viewport if neither works well
           top = Math.max(50, (viewportHeight - tooltipHeight) / 2);
         }
       }
