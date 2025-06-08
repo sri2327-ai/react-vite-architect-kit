@@ -64,11 +64,12 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   const getTooltipPosition = () => {
     const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 32) : 
                        isTablet ? Math.min(320, window.innerWidth - 32) : 350;
-    const tooltipHeight = 250; // Approximate height
-    const padding = isMobile ? 8 : 16;
+    const tooltipHeight = 280; // Increased for better content fit
+    const padding = isMobile ? 12 : 16;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     
+    // Smart positioning logic
     let top = targetRect.bottom + padding;
     let left = targetRect.left + (targetRect.width / 2) - (tooltipWidth / 2);
     
@@ -90,52 +91,73 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         break;
     }
     
-    // Mobile-specific positioning adjustments
+    // Responsive positioning adjustments with better boundaries
     if (isMobileView) {
-      // On mobile, prefer bottom placement and center horizontally
-      if (targetRect.bottom + tooltipHeight + padding < viewportHeight) {
-        top = targetRect.bottom + padding;
-      } else if (targetRect.top - tooltipHeight - padding > 0) {
-        top = targetRect.top - tooltipHeight - padding;
-      } else {
-        // If neither top nor bottom works, place in center
-        top = (viewportHeight - tooltipHeight) / 2;
+      // Mobile-first approach - always center horizontally and position vertically for best visibility
+      left = Math.max(16, Math.min(left, viewportWidth - tooltipWidth - 16));
+      
+      // Vertical positioning - prefer bottom but avoid going off screen
+      if (targetRect.bottom + tooltipHeight + padding > viewportHeight - 50) {
+        if (targetRect.top - tooltipHeight - padding > 50) {
+          // Place above if there's room
+          top = targetRect.top - tooltipHeight - padding;
+        } else {
+          // Place in safe center area if neither top nor bottom works well
+          top = Math.max(50, Math.min(top, viewportHeight - tooltipHeight - 50));
+        }
       }
-      left = (viewportWidth - tooltipWidth) / 2;
     } else {
-      // Desktop/tablet positioning with viewport boundary checks
-      if (left < padding) left = padding;
-      if (left + tooltipWidth > viewportWidth - padding) {
+      // Desktop/tablet positioning with better boundary checks
+      // Horizontal boundaries
+      if (left < padding) {
+        left = padding;
+      } else if (left + tooltipWidth > viewportWidth - padding) {
         left = viewportWidth - tooltipWidth - padding;
       }
-      if (top < padding) top = padding;
-      if (top + tooltipHeight > viewportHeight - padding) {
-        top = viewportHeight - tooltipHeight - padding;
+      
+      // Vertical boundaries  
+      if (top < 50) {
+        top = 50; // Account for header space
+      } else if (top + tooltipHeight > viewportHeight - 50) {
+        // Try placing above target
+        const topPlacement = targetRect.top - tooltipHeight - padding;
+        if (topPlacement > 50) {
+          top = topPlacement;
+        } else {
+          // Center in viewport if neither works well
+          top = Math.max(50, (viewportHeight - tooltipHeight) / 2);
+        }
       }
     }
     
-    return { top, left, width: tooltipWidth };
+    return { 
+      top: Math.max(16, top), 
+      left: Math.max(16, left), 
+      width: Math.min(tooltipWidth, viewportWidth - 32) 
+    };
   };
 
   const position = getTooltipPosition();
 
   return (
     <Paper
-      elevation={8}
+      elevation={12}
       sx={{
         position: 'fixed',
         top: position.top,
         left: position.left,
         width: position.width,
-        maxWidth: 'calc(100vw - 16px)',
-        maxHeight: 'calc(100vh - 32px)',
-        p: isMobile ? 2 : 3,
+        maxWidth: 'calc(100vw - 32px)',
+        maxHeight: 'calc(100vh - 100px)',
+        p: isMobile ? 2.5 : 3,
         zIndex: customZIndex,
         pointerEvents: 'auto',
-        borderRadius: isMobile ? 1 : 2,
+        borderRadius: isMobile ? 2 : 3,
         border: `2px solid ${theme.palette.primary.main}`,
         backgroundColor: 'background.paper',
-        overflow: 'auto'
+        overflow: 'auto',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1)',
+        backdropFilter: 'blur(10px)'
       }}
     >
       {/* Header */}
@@ -143,7 +165,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'flex-start', 
-        mb: isMobile ? 1.5 : 2 
+        mb: isMobile ? 2 : 2.5 
       }}>
         <Typography 
           variant={isMobile ? "subtitle1" : "h6"} 
@@ -151,7 +173,8 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
             fontWeight: 600, 
             flex: 1, 
             pr: 1,
-            fontSize: isMobile ? '1rem' : '1.25rem'
+            fontSize: isMobile ? '1rem' : '1.25rem',
+            lineHeight: 1.3
           }}
         >
           {step.title}
@@ -160,7 +183,12 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
           <IconButton
             size="small"
             onClick={endTour}
-            sx={{ color: 'text.secondary' }}
+            sx={{ 
+              color: 'text.secondary',
+              '&:hover': {
+                backgroundColor: 'action.hover'
+              }
+            }}
           >
             <CloseIcon fontSize="small" />
           </IconButton>
@@ -169,19 +197,27 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
       {/* Progress bar */}
       {showProgress && (
-        <Box sx={{ mb: isMobile ? 1.5 : 2 }}>
+        <Box sx={{ mb: isMobile ? 2 : 2.5 }}>
           <LinearProgress
             variant="determinate"
             value={(stepIndex + 1) / totalSteps * 100}
-            sx={{ height: 4, borderRadius: 2 }}
+            sx={{ 
+              height: 6, 
+              borderRadius: 3,
+              backgroundColor: 'action.hover',
+              '& .MuiLinearProgress-bar': {
+                borderRadius: 3
+              }
+            }}
           />
           <Typography 
             variant="caption" 
             color="text.secondary" 
             sx={{ 
-              mt: 0.5, 
+              mt: 1, 
               display: 'block',
-              fontSize: isMobile ? '0.7rem' : '0.75rem'
+              fontSize: isMobile ? '0.75rem' : '0.8rem',
+              fontWeight: 500
             }}
           >
             Step {stepIndex + 1} of {totalSteps}
@@ -194,9 +230,9 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         variant="body2" 
         color="text.secondary" 
         sx={{ 
-          mb: isMobile ? 2 : 3, 
-          lineHeight: 1.5,
-          fontSize: isMobile ? '0.85rem' : '0.875rem'
+          mb: isMobile ? 2.5 : 3, 
+          lineHeight: 1.6,
+          fontSize: isMobile ? '0.9rem' : '0.95rem'
         }}
       >
         {step.content}
@@ -208,18 +244,19 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         justifyContent: 'space-between', 
         alignItems: 'center',
         flexDirection: isMobile ? 'column' : 'row',
-        gap: isMobile ? 1 : 0
+        gap: isMobile ? 1.5 : 0
       }}>
         <Button
           variant="outlined"
-          size="small"
+          size={isMobile ? "medium" : "small"}
           onClick={prevStep}
           disabled={stepIndex === 0}
           startIcon={!isMobile ? <ArrowBackIcon /> : undefined}
           sx={{ 
             textTransform: 'none',
             minWidth: isMobile ? '100%' : 'auto',
-            order: isMobile ? 2 : 1
+            order: isMobile ? 2 : 1,
+            fontWeight: 500
           }}
         >
           {isMobile ? '← Back' : 'Back'}
@@ -227,13 +264,18 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
         <Button
           variant="contained"
-          size="small"
+          size={isMobile ? "medium" : "small"}
           onClick={handleNext}
           endIcon={!isMobile ? <ArrowForwardIcon /> : undefined}
           sx={{ 
             textTransform: 'none',
             minWidth: isMobile ? '100%' : 'auto',
-            order: isMobile ? 1 : 2
+            order: isMobile ? 1 : 2,
+            fontWeight: 600,
+            boxShadow: 2,
+            '&:hover': {
+              boxShadow: 4
+            }
           }}
         >
           {stepIndex === totalSteps - 1 ? 'Finish' : (isMobile ? 'Next →' : 'Next')}

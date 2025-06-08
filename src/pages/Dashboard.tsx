@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -162,7 +163,7 @@ export const Dashboard: React.FC = () => {
 
   const handleMenuItemClick = (itemId: string) => {
     setActiveMenuItem(itemId);
-    if (isMobile) {
+    if (isMobileView) {
       setMobileOpen(false);
     }
   };
@@ -176,7 +177,7 @@ export const Dashboard: React.FC = () => {
   };
 
   const handleDrawerToggle = () => {
-    if (isMobile) {
+    if (isMobileView) {
       setMobileOpen(!mobileOpen);
     } else {
       setIsCollapsed(!isCollapsed);
@@ -205,14 +206,14 @@ export const Dashboard: React.FC = () => {
       height: '100vh', 
       display: 'flex', 
       flexDirection: 'column',
-      background: isMobile 
+      background: isMobileView 
         ? 'linear-gradient(180deg, #143151 0%, #1a3a5c 50%, #387E89 100%)'
         : bravoColors.primary,
       overflow: 'hidden',
       position: 'relative'
     }}>
       {/* Mobile Header */}
-      {isMobile ? (
+      {isMobileView ? (
         <Box 
           data-tour-id="dashboard-header"
           sx={{
@@ -409,7 +410,7 @@ export const Dashboard: React.FC = () => {
                 <Box>
                   <ListItem disablePadding sx={{ mb: 1 }}>
                     <Tooltip 
-                      title={isCollapsed && !isMobile ? item.label : ''} 
+                      title={isCollapsed && !isMobileView ? item.label : ''} 
                       placement="right" 
                       arrow
                     >
@@ -420,8 +421,8 @@ export const Dashboard: React.FC = () => {
                           borderRadius: { xs: '14px', sm: '12px' },
                           mx: { xs: 1, sm: 1 },
                           minHeight: { xs: 50, sm: 52 },
-                          justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
-                          px: isCollapsed && !isMobile ? 2 : { xs: 2, sm: 2.5 },
+                          justifyContent: isCollapsed && !isMobileView ? 'center' : 'flex-start',
+                          px: isCollapsed && !isMobileView ? 2 : { xs: 2, sm: 2.5 },
                           py: { xs: 1.25, sm: 1.25 },
                           color: 'rgba(255, 255, 255, 0.75)',
                           backgroundColor: 'transparent',
@@ -431,7 +432,7 @@ export const Dashboard: React.FC = () => {
                           '&:hover': {
                             backgroundColor: 'transparent',
                             color: 'rgba(255, 255, 255, 0.95)',
-                            transform: isMobile ? 'translateY(-1px)' : 'translateX(2px)',
+                            transform: isMobileView ? 'translateY(-1px)' : 'translateX(2px)',
                             '&::before': {
                               background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)'
                             }
@@ -450,7 +451,7 @@ export const Dashboard: React.FC = () => {
                         }}
                       >
                         <ListItemIcon sx={{
-                          minWidth: isCollapsed && !isMobile ? 0 : { xs: 36, sm: 40 },
+                          minWidth: isCollapsed && !isMobileView ? 0 : { xs: 36, sm: 40 },
                           color: 'inherit',
                           justifyContent: 'center',
                           position: 'relative',
@@ -462,7 +463,7 @@ export const Dashboard: React.FC = () => {
                         }}>
                           {item.icon}
                         </ListItemIcon>
-                        {(!isCollapsed || isMobile) && (
+                        {(!isCollapsed || isMobileView) && (
                           <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                             <ListItemText
                               primary={
@@ -508,7 +509,7 @@ export const Dashboard: React.FC = () => {
                   </ListItem>
                   
                   {/* Submenu Items */}
-                  {(!isCollapsed || isMobile) && (
+                  {(!isCollapsed || isMobileView) && (
                     <Collapse in={expandedItems.includes(item.id)} timeout="auto" unmountOnExit>
                       <List sx={{ pl: { xs: 1.5, sm: 2 }, py: 0 }}>
                         {item.children.map((child) => (
@@ -543,13 +544,13 @@ export const Dashboard: React.FC = () => {
                                 '&.Mui-selected': {
                                   backgroundColor: 'transparent',
                                   color: 'white',
-                                  transform: isMobile ? 'none' : 'translateX(4px)',
-                                  boxShadow: isMobile 
+                                  transform: isMobileView ? 'none' : 'translateX(4px)',
+                                  boxShadow: isMobileView 
                                     ? '0 2px 8px rgba(0,0,0,0.1)'
                                     : '0 2px 6px rgba(0,0,0,0.1)',
                                   '&:hover': {
                                     backgroundColor: 'transparent',
-                                    transform: isMobile ? 'translateY(-1px)' : 'translateX(6px)',
+                                    transform: isMobileView ? 'translateY(-1px)' : 'translateX(6px)',
                                     '&::before': {
                                       background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
                                     }
@@ -558,7 +559,7 @@ export const Dashboard: React.FC = () => {
                                 '&:hover': {
                                   backgroundColor: 'transparent',
                                   color: 'rgba(255, 255, 255, 0.9)',
-                                  transform: isMobile ? 'translateY(-1px)' : 'translateX(2px)',
+                                  transform: isMobileView ? 'translateY(-1px)' : 'translateX(2px)',
                                   '&::before': {
                                     background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 100%)'
                                   }
@@ -595,7 +596,7 @@ export const Dashboard: React.FC = () => {
                 // Regular Menu Item
                 <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
                   <Tooltip 
-                    title={isCollapsed && !isMobile ? item.label : ''} 
+                    title={isCollapsed && !isMobileView ? item.label : ''} 
                     placement="right" 
                     arrow
                   >
@@ -607,8 +608,8 @@ export const Dashboard: React.FC = () => {
                         borderRadius: { xs: '14px', sm: '12px' },
                         mx: { xs: 1, sm: 1 },
                         minHeight: { xs: 50, sm: 52 },
-                        justifyContent: isCollapsed && !isMobile ? 'center' : 'flex-start',
-                        px: isCollapsed && !isMobile ? 2 : { xs: 2, sm: 2.5 },
+                        justifyContent: isCollapsed && !isMobileView ? 'center' : 'flex-start',
+                        px: isCollapsed && !isMobileView ? 2 : { xs: 2, sm: 2.5 },
                         py: { xs: 1.25, sm: 1.25 },
                         color: 'rgba(255, 255, 255, 0.75)',
                         backgroundColor: 'transparent',
@@ -631,14 +632,14 @@ export const Dashboard: React.FC = () => {
                         '&.Mui-selected': {
                           backgroundColor: 'transparent',
                           color: 'white',
-                          transform: isMobile ? 'none' : 'translateX(4px)',
-                          boxShadow: isMobile 
+                          transform: isMobileView ? 'none' : 'translateX(4px)',
+                          boxShadow: isMobileView 
                             ? '0 4px 16px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.15)'
                             : '0 4px 12px rgba(0,0,0,0.15)',
-                          border: isMobile ? '1px solid rgba(255,255,255,0.15)' : 'none',
+                          border: isMobileView ? '1px solid rgba(255,255,255,0.15)' : 'none',
                           '&:hover': {
                             backgroundColor: 'transparent',
-                            transform: isMobile ? 'translateY(-1px)' : 'translateX(6px)',
+                            transform: isMobileView ? 'translateY(-1px)' : 'translateX(6px)',
                             '&::before': {
                               background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.1) 100%)'
                             }
@@ -647,7 +648,7 @@ export const Dashboard: React.FC = () => {
                         '&:hover': {
                           backgroundColor: 'transparent',
                           color: 'rgba(255, 255, 255, 0.95)',
-                          transform: isMobile ? 'translateY(-1px)' : 'translateX(2px)',
+                          transform: isMobileView ? 'translateY(-1px)' : 'translateX(2px)',
                           '&::before': {
                             background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 100%)'
                           }
@@ -655,7 +656,7 @@ export const Dashboard: React.FC = () => {
                       }}
                     >
                       <ListItemIcon sx={{
-                        minWidth: isCollapsed && !isMobile ? 0 : { xs: 36, sm: 40 },
+                        minWidth: isCollapsed && !isMobileView ? 0 : { xs: 36, sm: 40 },
                         color: 'inherit',
                         justifyContent: 'center',
                         position: 'relative',
@@ -667,7 +668,7 @@ export const Dashboard: React.FC = () => {
                       }}>
                         {item.icon}
                       </ListItemIcon>
-                      {(!isCollapsed || isMobile) && (
+                      {(!isCollapsed || isMobileView) && (
                         <ListItemText
                           primary={item.label}
                           primaryTypographyProps={{
@@ -695,7 +696,7 @@ export const Dashboard: React.FC = () => {
         position: 'relative',
         zIndex: 1
       }}>
-        {isMobile && (
+        {isMobileView && (
           <Box sx={{ mb: 2 }}>
             <Box sx={{ display: 'flex', gap: 1.5 }}>
               <Tooltip title="Logout" arrow>
@@ -722,7 +723,7 @@ export const Dashboard: React.FC = () => {
           </Box>
         )}
 
-        {!isMobile && (
+        {!isMobileView && (
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
             <HelpButton />
             <Tooltip title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} placement="top" arrow>
