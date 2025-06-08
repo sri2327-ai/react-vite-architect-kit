@@ -104,7 +104,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     <Paper
       elevation={8}
       sx={{
-        position: 'absolute',
+        position: 'fixed',
         top: position.top,
         left: position.left,
         width: isMobile ? 280 : 320,

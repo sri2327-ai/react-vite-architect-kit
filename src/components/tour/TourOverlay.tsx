@@ -24,8 +24,15 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     const currentStep = state.activeTour.steps[state.currentStepIndex];
     if (!currentStep) return null;
 
+    console.log('Looking for target:', currentStep.target);
+
     // Special handling for body target (used for screen transitions)
     if (currentStep.target === 'body') {
+      return document.body;
+    }
+
+    if (!currentStep.target) {
+      console.warn('Step target is undefined:', currentStep);
       return document.body;
     }
 
@@ -39,6 +46,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       element = document.querySelector(`[data-tour-id="${currentStep.target}"]`) as HTMLElement;
     }
     
+    console.log('Found element:', element);
     return element;
   }, [state.activeTour, state.currentStepIndex, state.isRunning]);
 
@@ -75,20 +83,17 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       }
     } else {
       // Element not found, retry with a delay
-      if (retryCount < 10) { // Max 10 retries (5 seconds)
+      if (retryCount < 3) { // Reduced retry attempts
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
         }, 500);
       } else {
-        // If we can't find the element after retries, show tour on body
-        console.warn(`Tour target not found: ${state.activeTour?.steps[state.currentStepIndex]?.target}`);
-        setTargetElement(document.body);
-        const rect = document.body.getBoundingClientRect();
-        setTargetRect(rect);
-        setRetryCount(0);
+        // If we can't find the element after retries, end the tour
+        console.warn(`Tour target not found after retries: ${state.activeTour?.steps[state.currentStepIndex]?.target}`);
+        endTour();
       }
     }
-  }, [findTargetElement, isMobile, retryCount, state.activeTour, state.currentStepIndex]);
+  }, [findTargetElement, isMobile, retryCount, state.activeTour, state.currentStepIndex, endTour]);
 
   // Auto-close drawer when tour starts
   useEffect(() => {
@@ -177,6 +182,12 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
           zIndex: overlayZIndex,
           backgroundColor: 'rgba(0, 0, 0, 0.6)',
           pointerEvents: currentStep.spotlightClicks ? 'none' : 'auto'
+        }}
+        onClick={(e) => {
+          // Allow clicks to pass through when spotlightClicks is enabled
+          if (currentStep.spotlightClicks) {
+            e.stopPropagation();
+          }
         }}
       />
       
