@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Card, CardContent, Button, Chip, IconButton, Menu, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, TextField, FormControlLabel, Checkbox, Alert, LinearProgress, Stepper, Step, StepLabel, Tabs, Tab, List, ListItem, ListItemText, ListItemSecondaryAction, Divider, FormControl, InputLabel, Select, Accordion, AccordionSummary, AccordionDetails, Stack, Paper, useTheme, useMediaQuery } from '@mui/material';
-import { PlayArrow as PlayIcon, MoreVert as MoreIcon, Download as ImportIcon, Edit as EditIcon, Delete as DeleteIcon, CheckCircle as CheckIcon, Error as ErrorIcon, Warning as WarningIcon, Settings as SettingsIcon, Map as MapIcon, Assignment as AssignmentIcon, ExpandMore as ExpandMoreIcon, AccountTree as WorkflowIcon, Schedule as ScheduleIcon, Person as PersonIcon, LocationOn as LocationIcon, Note as NoteIcon, History as HistoryIcon, Checklist as ChecklistIcon, Computer as EHRIcon, AccessTime as TimeIcon, LocalHospital as ClinicIcon, Psychology as AIIcon, Security as SecurityIcon, ArrowBack as ArrowBackIcon, ArrowForward as ArrowForwardIcon } from '@mui/icons-material';
+import { PlayArrow as PlayIcon, MoreVert as MoreIcon, Download as ImportIcon, Edit as EditIcon, Delete as DeleteIcon, CheckCircle as CheckIcon, Error as ErrorIcon, Warning as WarningIcon, Settings as SettingsIcon, Map as MapIcon, Assignment as AssignmentIcon, ExpandMore as ExpandMoreIcon, AccountTree as WorkflowIcon, Schedule as ScheduleIcon, Person as PersonIcon, LocationOn as LocationIcon, Note as NoteIcon, History as HistoryIcon, Checklist as ChecklistIcon, Computer as EHRIcon, AccessTime as TimeIcon, LocalHospital as ClinicIcon, Psychology as AIIcon, Security as SecurityIcon, ArrowBack as ArrowBackIcon, ArrowForward as ArrowForwardIcon, Close as CloseIcon } from '@mui/icons-material';
 import { templateBuilderService } from '../../services/templateBuilderService';
 interface WorkflowBlock {
   id: string;
@@ -715,28 +715,28 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
                       minWidth: 0
                     }}>
                               <Typography variant="body2" sx={{
-                        fontWeight: 500,
-                        fontSize: {
-                          xs: '0.75rem',
-                          sm: '0.875rem'
-                        },
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}>
+                                fontWeight: 500,
+                                fontSize: {
+                                  xs: '0.75rem',
+                                  sm: '0.875rem'
+                                },
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}>
                                 {block.name}
                               </Typography>
                               <Chip label={getBlockTypeLabel(block.type)} size="small" variant="outlined" sx={{
-                        height: {
-                          xs: 14,
-                          sm: 16
-                        },
-                        fontSize: {
-                          xs: '0.6rem',
-                          sm: '0.65rem'
-                        },
-                        mt: 0.5
-                      }} />
+                                height: {
+                                  xs: 14,
+                                  sm: 16
+                                },
+                                fontSize: {
+                                  xs: '0.6rem',
+                                  sm: '0.65rem'
+                                },
+                                mt: 0.5
+                              }} />
                             </Box>
                             {block.isEditable && <SettingsIcon sx={{
                       fontSize: {
@@ -1233,7 +1233,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
         pb: {
           xs: 1,
           sm: 2
-        }
+        },
+        position: 'relative'
       }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
             <SettingsIcon color="primary" sx={{ fontSize: { xs: 20, sm: 24 } }} />
@@ -1246,6 +1247,19 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
               Configure Workflow: {selectedWorkflow?.name}
             </Typography>
           </Box>
+          
+          {/* Close Button */}
+          <IconButton
+            onClick={() => setConfigureDialog(false)}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: 'text.secondary'
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
           
           {/* Configuration Steps */}
           <Stepper activeStep={configurationStep} alternativeLabel={!isSmallMobile} orientation={isSmallMobile ? "horizontal" : "horizontal"} sx={{
@@ -1736,17 +1750,8 @@ const MyWorkflows: React.FC<MyWorkflowsProps> = ({
           sm: 0
         }
       }}>
-          <Button onClick={() => setConfigureDialog(false)} fullWidth={isSmallMobile} sx={{
-            fontSize: {
-              xs: '0.875rem',
-              sm: '1rem'
-            }
-          }}>
-            Cancel
-          </Button>
-          
           {/* Step Navigation */}
-          <Box sx={{ display: 'flex', gap: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
+          <Box sx={{ display: 'flex', gap: 1, flexDirection: { xs: 'column', sm: 'row' }, width: '100%', justifyContent: 'flex-end' }}>
             {configurationStep > 0 && (
               <Button 
                 onClick={handlePreviousConfigurationStep}
