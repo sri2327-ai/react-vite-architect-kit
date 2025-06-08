@@ -1,7 +1,8 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, Backdrop, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Backdrop, useTheme, useMediaQuery, Paper, Typography, IconButton } from '@mui/material';
+import { Close } from '@mui/icons-material';
 import { useTour } from '@/contexts/TourContext';
 import { TourTooltip } from './TourTooltip';
 
@@ -10,7 +11,7 @@ interface TourOverlayProps {
 }
 
 export const TourOverlay: React.FC<TourOverlayProps> = () => {
-  const { state } = useTour();
+  const { state, endTour } = useTour();
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -24,36 +25,31 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     const currentStep = state.activeTour.steps[state.currentStepIndex];
     if (!currentStep) return null;
 
-    // Check if target is already a CSS selector (starts with '[', '.', '#', etc.)
     const isSelector = currentStep.target.startsWith('[') || currentStep.target.startsWith('.') || currentStep.target.startsWith('#') || currentStep.target.includes(' ');
     
     let element: HTMLElement | null = null;
     
     if (isSelector) {
-      // Use the target as-is if it's already a CSS selector
       element = document.querySelector(currentStep.target) as HTMLElement;
     } else {
-      // Try data-tour-id first for simple identifiers
       element = document.querySelector(`[data-tour-id="${currentStep.target}"]`) as HTMLElement;
     }
     
     return element;
   }, [state.activeTour, state.currentStepIndex, state.isRunning]);
 
-  // Check if mobile drawer is open
   const checkDrawerState = useCallback(() => {
-    if (!isMobile) {
+    if (!isMobile && !isTablet) {
       setDrawerOpen(false);
       return;
     }
 
-    // Check if the mobile drawer is open by looking for the backdrop or drawer element
     const mobileDrawer = document.querySelector('.MuiDrawer-root .MuiBackdrop-root');
     const drawerPaper = document.querySelector('.MuiDrawer-root[style*="visibility: visible"]');
     const isOpen = !!(mobileDrawer || drawerPaper);
     
     setDrawerOpen(isOpen);
-  }, [isMobile]);
+  }, [isMobile, isTablet]);
 
   const updateTargetRect = useCallback(() => {
     const element = findTargetElement();
@@ -63,15 +59,17 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       const rect = element.getBoundingClientRect();
       setTargetRect(rect);
       
-      // Scroll element into view if needed - adjusted for mobile
-      const behavior = isMobile ? 'auto' : 'smooth';
-      element.scrollIntoView({ 
-        behavior, 
-        block: 'center', 
-        inline: 'center' 
-      });
+      // Don't auto-scroll when drawer is open to avoid conflicts
+      if (!drawerOpen) {
+        const behavior = isMobile ? 'auto' : 'smooth';
+        element.scrollIntoView({ 
+          behavior, 
+          block: 'center', 
+          inline: 'center' 
+        });
+      }
     }
-  }, [findTargetElement, isMobile]);
+  }, [findTargetElement, isMobile, drawerOpen]);
 
   useEffect(() => {
     updateTargetRect();
@@ -85,13 +83,12 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     };
 
     const handleScroll = () => {
-      if (targetElement) {
+      if (targetElement && !drawerOpen) {
         const rect = targetElement.getBoundingClientRect();
         setTargetRect(rect);
       }
     };
 
-    // Listen for drawer state changes
     const handleMutation = () => {
       checkDrawerState();
     };
@@ -112,36 +109,96 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       window.removeEventListener('scroll', handleScroll, true);
       observer.disconnect();
     };
-  }, [targetElement, updateTargetRect, checkDrawerState]);
+  }, [targetElement, updateTargetRect, checkDrawerState, drawerOpen]);
 
-  // Close mobile drawer when tour starts if it's open
-  useEffect(() => {
-    if (state.isRunning && drawerOpen && isMobile) {
-      // Try to close the drawer by clicking the backdrop or close button
-      const backdrop = document.querySelector('.MuiDrawer-root .MuiBackdrop-root') as HTMLElement;
-      const closeButton = document.querySelector('[data-testid="mobile-close-button"]') as HTMLElement;
-      
-      if (backdrop) {
-        backdrop.click();
-      } else if (closeButton) {
-        closeButton.click();
-      }
-    }
-  }, [state.isRunning, drawerOpen, isMobile]);
-
-  if (!state.isRunning || !state.activeTour || !targetElement || !targetRect) {
+  if (!state.isRunning || !state.activeTour) {
     return null;
   }
 
   const currentStep = state.activeTour.steps[state.currentStepIndex];
   if (!currentStep) return null;
 
-  // Responsive spotlight padding
-  const spotlightPadding = isMobile ? 8 : isTablet ? 10 : 12;
+  // For mobile/tablet with drawer open, use a simple notification approach
+  if ((isMobile || isTablet) && drawerOpen) {
+    return createPortal(
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1400, // Higher than drawer
+          pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'flex-start',
+          justifyContent: 'center',
+          pt: 3,
+          px: 2
+        }}
+      >
+        <Paper
+          elevation={8}
+          sx={{
+            pointerEvents: 'auto',
+            maxWidth: 340,
+            width: '100%',
+            p: 2.5,
+            borderRadius: 3,
+            backgroundColor: 'background.paper',
+            border: '2px solid',
+            borderColor: 'primary.main',
+            boxShadow: '0 12px 48px rgba(0,0,0,0.25)',
+            animation: 'slideInDown 0.3s ease-out'
+          }}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'primary.main', flex: 1, pr: 1 }}>
+              {currentStep.title}
+            </Typography>
+            <IconButton
+              size="small"
+              onClick={endTour}
+              sx={{ 
+                mt: -0.5,
+                color: 'text.secondary',
+                '&:hover': { color: 'text.primary' }
+              }}
+            >
+              <Close fontSize="small" />
+            </IconButton>
+          </Box>
+          
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.5 }}>
+            {currentStep.content}
+          </Typography>
 
-  // Adjust z-index based on drawer state
-  const overlayZIndex = drawerOpen ? 1350 : 9999; // Higher than drawer's z-index (1300)
-  const tooltipZIndex = drawerOpen ? 1351 : 10001;
+          <Typography variant="caption" sx={{ 
+            color: 'primary.main', 
+            fontWeight: 600,
+            display: 'block',
+            textAlign: 'center',
+            p: 1,
+            backgroundColor: 'primary.main',
+            color: 'primary.contrastText',
+            borderRadius: 1
+          }}>
+            Step {state.currentStepIndex + 1} of {state.activeTour.steps.length} - Look for the highlighted item in the menu
+          </Typography>
+        </Paper>
+      </Box>,
+      document.body
+    );
+  }
+
+  // For desktop or mobile/tablet without drawer, use the normal spotlight approach
+  if (!targetElement || !targetRect) {
+    return null;
+  }
+
+  const spotlightPadding = isMobile ? 8 : isTablet ? 10 : 12;
+  const overlayZIndex = 9999;
+  const tooltipZIndex = 10001;
 
   return createPortal(
     <Box
@@ -160,7 +217,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         open={true}
         sx={{
           zIndex: overlayZIndex,
-          backgroundColor: drawerOpen ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.6)',
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
           pointerEvents: currentStep.spotlightClicks ? 'none' : 'auto'
         }}
       />
@@ -183,7 +240,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
           border: `${isMobile ? 2 : 3}px solid`,
           borderColor: 'primary.main',
           borderRadius: isMobile ? 1 : 2,
-          boxShadow: `0 0 0 ${isMobile ? '9999px' : '9999px'} ${drawerOpen ? 'rgba(0, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.6)'}`,
+          boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.6)`,
           pointerEvents: 'none',
           zIndex: overlayZIndex + 1
         }}
@@ -199,7 +256,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         allowSkip={state.activeTour.allowSkip}
         isMobile={isMobile}
         isTablet={isTablet}
-        drawerOpen={drawerOpen}
+        drawerOpen={false}
         customZIndex={tooltipZIndex}
       />
     </Box>,
