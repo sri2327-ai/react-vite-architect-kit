@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -427,7 +428,6 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                     <Box sx={{ 
                       display: 'flex', 
                       justifyContent: 'space-between', 
-                      alignItems: 'center', 
                       mb: { xs: 1.5, sm: 2 }, 
                       flexDirection: { xs: 'column', sm: 'row' },
                       gap: { xs: 1, sm: 1 },
@@ -708,7 +708,6 @@ const SectionConfigDialog: React.FC<SectionConfigDialogProps> = ({
                     <Box sx={{ 
                       display: 'flex', 
                       justifyContent: 'space-between', 
-                      alignItems: 'center', 
                       mb: { xs: 1.5, sm: 2 }, 
                       flexDirection: { xs: 'column', sm: 'row' },
                       gap: { xs: 1, sm: 1 },
