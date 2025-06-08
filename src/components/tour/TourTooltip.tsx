@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import {
   Box,
@@ -8,7 +9,6 @@ import {
   IconButton,
   LinearProgress,
   useTheme,
-  Grid,
   Card,
   CardContent
 } from '@mui/material';
@@ -234,9 +234,21 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
     return (
       <Box sx={{ mt: 2, mb: 3 }}>
-        <Grid container spacing={2}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 2
+          }}
+        >
           {quickLinks.map((link, index) => (
-            <Grid item xs={6} key={index}>
+            <Box
+              key={index}
+              sx={{
+                width: 'calc(50% - 8px)',
+                minWidth: '140px'
+              }}
+            >
               <Card
                 sx={{
                   cursor: 'pointer',
@@ -260,9 +272,9 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                   </Typography>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Box>
     );
   };
@@ -481,3 +493,4 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     </Paper>
   );
 };
+
