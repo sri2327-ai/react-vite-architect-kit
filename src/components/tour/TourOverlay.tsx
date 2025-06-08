@@ -127,36 +127,23 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     };
   }, [targetElement, updateTargetRect]);
 
-  // Handle special cases for template builder tour
-  useEffect(() => {
+  // Handle navigation for template builder tour step 3
+  const handleTourNavigation = useCallback(() => {
     if (state.activeTour?.id === 'template-builder-tour' && state.isRunning) {
       const currentStep = state.activeTour.steps[state.currentStepIndex];
       
-      // For step 3 (visit-type-selection), listen for clicks on visit type cards
       if (currentStep?.id === 'visit-type-selection') {
-        const handleVisitTypeClick = (event: Event) => {
-          const target = event.target as HTMLElement;
-          // Check if clicked element is a visit type card or inside one
-          const visitTypeCard = target.closest('[data-testid*="visit-type-card"], .MuiCard-root, .visit-type-card');
-          
-          if (visitTypeCard) {
-            console.log('Template builder tour: Visit type card clicked, advancing tour');
-            // Small delay to allow navigation to complete
-            setTimeout(() => {
-              nextStep();
-            }, 1000);
-          }
-        };
-
-        // Listen for clicks on the document
-        document.addEventListener('click', handleVisitTypeClick);
-        
-        return () => {
-          document.removeEventListener('click', handleVisitTypeClick);
-        };
+        // Find the first visit type card and click it
+        const visitTypeCard = document.querySelector('[data-tour-id="visit-type-selection"] .MuiCard-root');
+        if (visitTypeCard) {
+          console.log('Template builder tour: Clicking first visit type card');
+          (visitTypeCard as HTMLElement).click();
+          return true;
+        }
       }
     }
-  }, [state.activeTour, state.currentStepIndex, state.isRunning, nextStep]);
+    return false;
+  }, [state.activeTour, state.currentStepIndex, state.isRunning]);
 
   if (!state.isRunning || !state.activeTour) {
     return null;
@@ -231,6 +218,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         isTablet={isTablet}
         drawerOpen={false}
         customZIndex={tooltipZIndex}
+        onCustomNavigation={handleTourNavigation}
       />
     </Box>,
     document.body

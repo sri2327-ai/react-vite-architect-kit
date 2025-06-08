@@ -5,17 +5,18 @@ import {
   Paper,
   Typography,
   Button,
-  LinearProgress,
   IconButton,
-  Stack
+  LinearProgress,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
-  NavigateNext,
-  NavigateBefore,
-  Close,
-  SkipNext
+  Close as CloseIcon,
+  ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon
 } from '@mui/icons-material';
-import { useTour, TourStep } from '@/contexts/TourContext';
+import { useTour } from '@/contexts/TourContext';
+import { TourStep } from '@/contexts/TourContext';
 
 interface TourTooltipProps {
   step: TourStep;
@@ -24,10 +25,11 @@ interface TourTooltipProps {
   totalSteps: number;
   showProgress?: boolean;
   allowSkip?: boolean;
-  isMobile?: boolean;
-  isTablet?: boolean;
-  drawerOpen?: boolean;
+  isMobile: boolean;
+  isTablet: boolean;
+  drawerOpen: boolean;
   customZIndex?: number;
+  onCustomNavigation?: () => boolean;
 }
 
 export const TourTooltip: React.FC<TourTooltipProps> = ({
@@ -37,287 +39,142 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   totalSteps,
   showProgress = true,
   allowSkip = true,
-  isMobile = false,
-  isTablet = false,
-  drawerOpen = false,
-  customZIndex = 10001
+  isMobile,
+  isTablet,
+  customZIndex = 10001,
+  onCustomNavigation
 }) => {
-  const { nextStep, prevStep, skipTour, endTour } = useTour();
+  const { nextStep, prevStep, endTour } = useTour();
+  const theme = useTheme();
+
+  const handleNext = () => {
+    // Check if we need custom navigation (for template builder step 3)
+    if (onCustomNavigation && onCustomNavigation()) {
+      // Custom navigation handled, wait a bit then advance
+      setTimeout(() => {
+        nextStep();
+      }, 1500);
+    } else {
+      nextStep();
+    }
+  };
 
   const getTooltipPosition = () => {
-    const placement = step.placement || 'bottom';
-    const margin = isMobile ? 16 : isTablet ? 20 : 24;
+    const tooltipWidth = isMobile ? 280 : 320;
+    const tooltipHeight = 200; // Approximate height
+    const padding = 16;
     
-    let tooltipWidth: number;
-    if (isMobile) {
-      tooltipWidth = Math.min(300, window.innerWidth - 24);
-    } else if (isTablet) {
-      tooltipWidth = Math.min(350, window.innerWidth - 32);
-    } else {
-      tooltipWidth = Math.min(380, window.innerWidth - 40);
-    }
+    let top = targetRect.bottom + padding;
+    let left = targetRect.left + (targetRect.width / 2) - (tooltipWidth / 2);
     
-    const baseHeight = isMobile ? 180 : isTablet ? 200 : 220;
-    const progressHeight = showProgress ? (isMobile ? 40 : 50) : 0;
-    const buttonsHeight = isMobile ? 70 : 60;
-    const tooltipHeight = baseHeight + progressHeight + buttonsHeight;
-
-    let top = 0;
-    let left = 0;
-    let actualPlacement = placement;
-
-    // Calculate initial position
-    switch (placement) {
+    // Handle placement based on step placement preference
+    switch (step.placement) {
       case 'top':
-        top = targetRect.top - tooltipHeight - margin;
-        left = targetRect.left + (targetRect.width / 2) - (tooltipWidth / 2);
+        top = targetRect.top - tooltipHeight - padding;
         break;
       case 'bottom':
-        top = targetRect.bottom + margin;
-        left = targetRect.left + (targetRect.width / 2) - (tooltipWidth / 2);
+        top = targetRect.bottom + padding;
         break;
       case 'left':
         top = targetRect.top + (targetRect.height / 2) - (tooltipHeight / 2);
-        left = targetRect.left - tooltipWidth - margin;
+        left = targetRect.left - tooltipWidth - padding;
         break;
       case 'right':
         top = targetRect.top + (targetRect.height / 2) - (tooltipHeight / 2);
-        left = targetRect.right + margin;
+        left = targetRect.right + padding;
         break;
     }
-
-    // Viewport constraints
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    const minMargin = isMobile ? 12 : 16;
-
-    // Check if tooltip fits and adjust placement if needed
-    if (left < minMargin) {
-      left = minMargin;
-      if (placement === 'left') {
-        left = Math.min(targetRect.right + margin, viewportWidth - tooltipWidth - minMargin);
-        actualPlacement = 'right';
-      }
+    
+    // Ensure tooltip stays within viewport
+    if (left < padding) left = padding;
+    if (left + tooltipWidth > window.innerWidth - padding) {
+      left = window.innerWidth - tooltipWidth - padding;
+    }
+    if (top < padding) top = padding;
+    if (top + tooltipHeight > window.innerHeight - padding) {
+      top = window.innerHeight - tooltipHeight - padding;
     }
     
-    if (left + tooltipWidth > viewportWidth - minMargin) {
-      left = viewportWidth - tooltipWidth - minMargin;
-      if (placement === 'right') {
-        left = Math.max(targetRect.left - tooltipWidth - margin, minMargin);
-        actualPlacement = 'left';
-      }
-    }
-
-    if (top < minMargin) {
-      top = minMargin;
-      if (placement === 'top') {
-        top = targetRect.bottom + margin;
-        actualPlacement = 'bottom';
-      }
-    }
-    
-    if (top + tooltipHeight > viewportHeight - minMargin) {
-      top = viewportHeight - tooltipHeight - minMargin;
-      if (placement === 'bottom') {
-        top = targetRect.top - tooltipHeight - margin;
-        actualPlacement = 'top';
-      }
-    }
-
-    // Final boundary check
-    left = Math.max(minMargin, Math.min(left, viewportWidth - tooltipWidth - minMargin));
-    top = Math.max(minMargin, Math.min(top, viewportHeight - tooltipHeight - minMargin));
-
-    return { top, left, width: tooltipWidth, placement: actualPlacement };
+    return { top, left };
   };
 
   const position = getTooltipPosition();
-  const progress = ((stepIndex + 1) / totalSteps) * 100;
 
   return (
     <Paper
-      elevation={isMobile ? 12 : 16}
+      elevation={8}
       sx={{
         position: 'absolute',
         top: position.top,
         left: position.left,
-        width: position.width,
-        maxWidth: `calc(100vw - ${isMobile ? 24 : 32}px)`,
-        p: isMobile ? 2 : isTablet ? 2.5 : 3,
+        width: isMobile ? 280 : 320,
+        maxWidth: 'calc(100vw - 32px)',
+        p: 3,
         zIndex: customZIndex,
         pointerEvents: 'auto',
-        borderRadius: isMobile ? 2 : 3,
-        backgroundColor: 'background.paper',
-        border: isMobile ? '1px solid' : 'none',
-        borderColor: 'divider',
-        boxShadow: isMobile 
-          ? '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)'
-          : '0 12px 48px rgba(0,0,0,0.15), 0 4px 16px rgba(0,0,0,0.1)'
+        borderRadius: 2,
+        border: `2px solid ${theme.palette.primary.main}`,
+        backgroundColor: 'background.paper'
       }}
     >
-      {/* Header with close button */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'flex-start', 
-        mb: isMobile ? 1.5 : isTablet ? 2 : 2.5,
-        gap: 1
-      }}>
-        <Typography 
-          variant={isMobile ? "subtitle1" : "h6"} 
-          sx={{ 
-            fontWeight: 600, 
-            fontSize: isMobile ? '1rem' : isTablet ? '1.1rem' : '1.2rem',
-            lineHeight: 1.3,
-            color: 'text.primary',
-            flex: 1,
-            pr: 1
-          }}
-        >
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+        <Typography variant="h6" sx={{ fontWeight: 600, flex: 1, pr: 1 }}>
           {step.title}
         </Typography>
-        <IconButton
-          size="small"
-          onClick={endTour}
-          sx={{ 
-            mt: -0.5, 
-            mr: -0.5,
-            color: 'text.secondary',
-            '&:hover': {
-              color: 'text.primary',
-              backgroundColor: 'action.hover'
-            }
-          }}
-        >
-          <Close fontSize="small" />
-        </IconButton>
+        {allowSkip && (
+          <IconButton
+            size="small"
+            onClick={endTour}
+            sx={{ color: 'text.secondary' }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
 
-      {/* Progress indicator */}
+      {/* Progress bar */}
       {showProgress && (
-        <Box sx={{ mb: isMobile ? 2 : isTablet ? 2.5 : 3 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            mb: 1 
-          }}>
-            <Typography variant="caption" color="text.secondary" sx={{
-              fontSize: isMobile ? '0.75rem' : '0.8rem'
-            }}>
-              Step {stepIndex + 1} of {totalSteps}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{
-              fontSize: isMobile ? '0.75rem' : '0.8rem',
-              fontWeight: 500
-            }}>
-              {Math.round(progress)}%
-            </Typography>
-          </Box>
+        <Box sx={{ mb: 2 }}>
           <LinearProgress
             variant="determinate"
-            value={progress}
-            sx={{ 
-              borderRadius: 2, 
-              height: isMobile ? 6 : 8,
-              backgroundColor: 'action.hover'
-            }}
+            value={(stepIndex + 1) / totalSteps * 100}
+            sx={{ height: 4, borderRadius: 2 }}
           />
+          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+            Step {stepIndex + 1} of {totalSteps}
+          </Typography>
         </Box>
       )}
 
       {/* Content */}
-      <Typography 
-        variant="body2" 
-        sx={{ 
-          mb: isMobile ? 2.5 : isTablet ? 3 : 3.5, 
-          lineHeight: 1.5,
-          fontSize: isMobile ? '0.875rem' : isTablet ? '0.9rem' : '0.95rem',
-          color: 'text.secondary'
-        }}
-      >
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.5 }}>
         {step.content}
       </Typography>
 
-      {/* Actions */}
-      <Stack 
-        direction={isMobile ? 'column' : 'row'} 
-        spacing={isMobile ? 1.5 : 1} 
-        justifyContent="space-between"
-        alignItems={isMobile ? 'stretch' : 'center'}
-      >
-        {/* Back button for desktop */}
-        {!isMobile && stepIndex > 0 && (
-          <Button
-            variant="outlined"
-            size={isTablet ? "medium" : "small"}
-            startIcon={<NavigateBefore />}
-            onClick={prevStep}
-            sx={{
-              minWidth: 'auto',
-              px: isTablet ? 2 : 1.5
-            }}
-          >
-            Back
-          </Button>
-        )}
+      {/* Navigation buttons */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={prevStep}
+          disabled={stepIndex === 0}
+          startIcon={<ArrowBackIcon />}
+          sx={{ textTransform: 'none' }}
+        >
+          Back
+        </Button>
 
-        {/* Right side actions */}
-        <Box sx={{ 
-          display: 'flex', 
-          gap: isMobile ? 1 : 1, 
-          flexDirection: isMobile ? 'column' : 'row',
-          flex: isMobile ? 1 : 'none',
-          alignItems: 'stretch'
-        }}>
-          {/* Back button for mobile */}
-          {isMobile && stepIndex > 0 && (
-            <Button
-              variant="outlined"
-              size="medium"
-              startIcon={<NavigateBefore />}
-              onClick={prevStep}
-              fullWidth
-            >
-              Back
-            </Button>
-          )}
-          
-          {/* Skip button */}
-          {allowSkip && (
-            <Button
-              variant="text"
-              size={isMobile ? "medium" : isTablet ? "medium" : "small"}
-              startIcon={<SkipNext />}
-              onClick={skipTour}
-              color="inherit"
-              fullWidth={isMobile}
-              sx={{
-                minWidth: isMobile ? 'auto' : 100,
-                px: isMobile ? 2 : 1.5
-              }}
-            >
-              Skip Tour
-            </Button>
-          )}
-          
-          {/* Next/Finish button */}
-          <Button
-            variant="contained"
-            size={isMobile ? "medium" : isTablet ? "medium" : "small"}
-            endIcon={stepIndex < totalSteps - 1 ? <NavigateNext /> : undefined}
-            onClick={nextStep}
-            fullWidth={isMobile}
-            sx={{
-              minWidth: isMobile ? 'auto' : 100,
-              px: isMobile ? 2 : isTablet ? 2 : 1.5,
-              fontWeight: 600
-            }}
-          >
-            {stepIndex < totalSteps - 1 ? 'Next' : 'Finish'}
-          </Button>
-        </Box>
-      </Stack>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={handleNext}
+          endIcon={<ArrowForwardIcon />}
+          sx={{ textTransform: 'none' }}
+        >
+          {stepIndex === totalSteps - 1 ? 'Finish' : 'Next'}
+        </Button>
+      </Box>
     </Paper>
   );
 };

@@ -1,4 +1,3 @@
-
 import { Tour } from '@/contexts/TourContext';
 
 export const welcomeTour: Tour = {
@@ -79,10 +78,9 @@ export const templateBuilderTour: Tour = {
     {
       id: 'visit-type-selection',
       title: 'Step 3: Select Visit Type',
-      content: 'Now click on any visit type card to proceed to the template management screen. The tour will automatically advance once you make a selection.',
+      content: 'Click "Next" and I\'ll automatically select a visit type for you to proceed to the template management screen.',
       target: '[data-tour-id="visit-type-selection"]',
-      placement: 'top',
-      spotlightClicks: true
+      placement: 'top'
     },
     {
       id: 'template-management-screen',
