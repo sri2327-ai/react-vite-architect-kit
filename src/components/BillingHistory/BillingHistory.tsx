@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Box, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, TablePagination, IconButton, Link, Tooltip, Alert, Card, CardContent, useTheme, useMediaQuery, Collapse, Button, Container } from '@mui/material';
 import { Receipt as ReceiptIcon, Download as DownloadIcon, OpenInNew as OpenInNewIcon, Payment as PaymentIcon, Schedule as ScheduleIcon, CheckCircle as CheckCircleIcon, Error as ErrorIcon, Warning as WarningIcon, ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon, CreditCard as CreditCardIcon, TrendingUp as TrendingUpIcon } from '@mui/icons-material';
+import { useResponsive } from '../../hooks/useResponsive';
+
 interface Invoice {
   id: string;
   date: string;
@@ -11,9 +13,11 @@ interface Invoice {
   amount: number;
   description: string;
 }
+
 interface BillingHistoryProps {
   sidebarCollapsed?: boolean;
 }
+
 const BillingHistory: React.FC<BillingHistoryProps> = ({
   sidebarCollapsed = false
 }) => {
@@ -24,6 +28,7 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
   const isSmallTablet = useMediaQuery(theme.breakpoints.down('lg'));
+  const { isMobileView } = useResponsive();
 
   // Adaptive layout decisions
   const useCardView = isMobile || isTablet;
@@ -193,41 +198,41 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
               },
               wordBreak: 'break-word'
             }}>
-                {invoice.invoiceNumber}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{
+              {invoice.invoiceNumber}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{
               fontSize: {
                 xs: '0.7rem',
                 sm: '0.75rem'
               }
             }}>
-                {formatDate(invoice.date)}
-              </Typography>
-            </Box>
-            <Box sx={{
+              {formatDate(invoice.date)}
+            </Typography>
+          </Box>
+          <Box sx={{
             display: 'flex',
             alignItems: 'center',
             gap: 1,
             flexShrink: 0
           }}>
-              <Typography variant="h6" fontWeight={600} color="primary.main" sx={{
+            <Typography variant="h6" fontWeight={600} color="primary.main" sx={{
               fontSize: {
                 xs: '1rem',
                 sm: '1.25rem'
               }
             }}>
-                {formatAmount(invoice.amount)}
-              </Typography>
-              <Button size="small" onClick={() => setExpandedCard(isExpanded ? null : invoice.id)} sx={{
+              {formatAmount(invoice.amount)}
+            </Typography>
+            <Button size="small" onClick={() => setExpandedCard(isExpanded ? null : invoice.id)} sx={{
               minWidth: 'auto',
               p: 0.5
             }}>
-                {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              </Button>
-            </Box>
+              {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </Button>
           </Box>
-          
-          <Box sx={{
+        </Box>
+        
+        <Box sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -235,177 +240,205 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
           flexWrap: 'wrap',
           gap: 1
         }}>
-            {getStatusChip(invoice.status)}
-            <Typography variant="caption" color="text.secondary" sx={{
-            fontSize: {
-              xs: '0.7rem',
-              sm: '0.75rem'
-            }
-          }}>
-              Due: {formatDate(invoice.dueDate)}
-            </Typography>
-          </Box>
-          
-          <Collapse in={isExpanded}>
-            <Box sx={{
-            mt: 2,
-            pt: 2,
-            borderTop: '1px solid',
-            borderColor: 'divider'
-          }}>
-              <Typography variant="body2" color="text.secondary" sx={{
-              mb: 2,
-              fontSize: {
-                xs: '0.8rem',
-                sm: '0.875rem'
-              }
-            }}>
-                {invoice.description}
-              </Typography>
-              <Box sx={{
-              display: 'flex',
-              gap: 1,
-              flexDirection: {
-                xs: 'column',
-                sm: 'row'
-              }
-            }}>
-                <Button size="small" variant="outlined" startIcon={<OpenInNewIcon />} component={Link} href={invoice.zohoInvoiceUrl} target="_blank" rel="noopener noreferrer" sx={{
-                flex: 1,
-                fontSize: {
-                  xs: '0.75rem',
-                  sm: '0.875rem'
-                }
-              }}>
-                  View
-                </Button>
-                <Button size="small" variant="outlined" startIcon={<DownloadIcon />} onClick={() => console.log('Download PDF for', invoice.invoiceNumber)} sx={{
-                flex: 1,
-                fontSize: {
-                  xs: '0.75rem',
-                  sm: '0.875rem'
-                }
-              }}>
-                  Download
-                </Button>
-              </Box>
-            </Box>
-          </Collapse>
-        </CardContent>
-      </Card>;
-  };
-  return <Box sx={{
-    width: '100%',
-    maxWidth: '100%',
-    minHeight: '100vh',
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column'
-  }}>
-      <Container maxWidth="xl" sx={{
-      flex: 1,
-      overflow: 'auto',
-      p: {
-        xs: 1,
-        sm: 2,
-        md: 3
-      }
-    }}>
-        
-        {/* Summary Cards - Responsive Grid */}
-        <Box sx={{
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: 'repeat(2, 1fr)',
-          sm: 'repeat(2, 1fr)',
-          md: 'repeat(4, 1fr)'
-        },
-        gap: {
-          xs: 1.5,
-          sm: 2,
-          md: 3
-        },
-        mb: {
-          xs: 3,
-          md: 4
-        }
-      }}>
-          {summaryStats.map((stat, index) => <Card key={index} sx={{
-          height: '100%',
-          borderRadius: 2,
-          transition: 'all 0.2s ease-in-out',
-          '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: 4
+          {getStatusChip(invoice.status)}
+          <Typography variant="caption" color="text.secondary" sx={{
+          fontSize: {
+            xs: '0.7rem',
+            sm: '0.75rem'
           }
         }}>
-              <CardContent sx={{
-            p: {
-              xs: 1.5,
-              sm: 2,
-              md: 2.5
-            },
+          Due: {formatDate(invoice.dueDate)}
+        </Typography>
+        </Box>
+        
+        <Collapse in={isExpanded}>
+          <Box sx={{
+          mt: 2,
+          pt: 2,
+          borderTop: '1px solid',
+          borderColor: 'divider'
+        }}>
+          <Typography variant="body2" color="text.secondary" sx={{
+          mb: 2,
+          fontSize: {
+            xs: '0.8rem',
+            sm: '0.875rem'
+          }
+        }}>
+          {invoice.description}
+        </Typography>
+        <Box sx={{
+          display: 'flex',
+          gap: 1,
+          flexDirection: {
+            xs: 'column',
+            sm: 'row'
+          }
+        }}>
+          <Button size="small" variant="outlined" startIcon={<OpenInNewIcon />} component={Link} href={invoice.zohoInvoiceUrl} target="_blank" rel="noopener noreferrer" sx={{
+          flex: 1,
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem'
+          }
+        }}>
+          View
+        </Button>
+        <Button size="small" variant="outlined" startIcon={<DownloadIcon />} onClick={() => console.log('Download PDF for', invoice.invoiceNumber)} sx={{
+          flex: 1,
+          fontSize: {
+            xs: '0.75rem',
+            sm: '0.875rem'
+          }
+        }}>
+          Download
+        </Button>
+        </Box>
+        </Box>
+        </Collapse>
+      </CardContent>
+    </Card>;
+  };
+  return (
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: { xs: 'center', sm: 'center', md: 'flex-start' },
+        px: { xs: 1, sm: 2, md: 3 },
+        py: { xs: 1.5, sm: 2, md: 2.5 },
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        backgroundColor: 'background.paper',
+        position: 'relative'
+      }}>
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            fontWeight: 600,
+            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
+            textAlign: { xs: 'center', sm: 'center', md: 'left' },
+            color: 'text.primary'
+          }}
+        >
+          Payment History
+        </Typography>
+      </Box>
+
+      {/* Content */}
+      <Box sx={{
+        flex: 1,
+        overflow: 'auto',
+        width: '100%',
+        maxWidth: '100%',
+        minHeight: '100vh'
+      }}>
+        <Container maxWidth="xl" sx={{
+        flex: 1,
+        overflow: 'auto',
+        p: {
+          xs: 1,
+          sm: 2,
+          md: 3
+        }
+      }}>
+          
+          {/* Summary Cards - Responsive Grid */}
+          <Box sx={{
+          display: 'grid',
+          gridTemplateColumns: {
+            xs: 'repeat(2, 1fr)',
+            sm: 'repeat(2, 1fr)',
+            md: 'repeat(4, 1fr)'
+          },
+          gap: {
+            xs: 1.5,
+            sm: 2,
+            md: 3
+          },
+          mb: {
+            xs: 3,
+            md: 4
+          }
+        }}>
+            {summaryStats.map((stat, index) => <Card key={index} sx={{
             height: '100%',
-            display: 'flex',
-            flexDirection: 'column'
+            borderRadius: 2,
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: 4
+            }
           }}>
-                <Box sx={{
+                <CardContent sx={{
+              p: {
+                xs: 1.5,
+                sm: 2,
+                md: 2.5
+              },
+              height: '100%',
               display: 'flex',
-              alignItems: 'center',
-              mb: 1,
-              gap: {
-                xs: 0.5,
-                sm: 1
-              }
+              flexDirection: 'column'
             }}>
-                  <Box sx={{
-                color: stat.color,
-                flexShrink: 0,
-                '& svg': {
-                  fontSize: {
-                    xs: '1.2rem',
-                    sm: '1.5rem'
-                  }
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
+                mb: 1,
+                gap: {
+                  xs: 0.5,
+                  sm: 1
                 }
               }}>
-                    {stat.icon}
-                  </Box>
-                  <Typography variant="subtitle2" fontWeight={600} sx={{
-                fontSize: {
-                  xs: '0.7rem',
-                  sm: '0.8rem',
-                  md: '0.9rem'
-                },
-                lineHeight: 1.2,
-                wordBreak: 'break-word'
-              }}>
-                    {stat.title}
-                  </Typography>
+                <Box sx={{
+                  color: stat.color,
+                  flexShrink: 0,
+                  '& svg': {
+                    fontSize: {
+                      xs: '1.2rem',
+                      sm: '1.5rem'
+                    }
+                  }
+                }}>
+                  {stat.icon}
                 </Box>
-                <Typography variant="h5" sx={{
-              color: stat.color,
-              fontWeight: 700,
-              fontSize: {
-                xs: '1.1rem',
-                sm: '1.4rem',
-                md: '1.8rem'
-              },
-              mb: 0.5
-            }}>
-                  {stat.value}
+                <Typography variant="subtitle2" fontWeight={600} sx={{
+                  fontSize: {
+                    xs: '0.7rem',
+                    sm: '0.8rem',
+                    md: '0.9rem'
+                  },
+                  lineHeight: 1.2,
+                  wordBreak: 'break-word'
+                }}>
+                  {stat.title}
                 </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{
-              fontSize: {
-                xs: '0.65rem',
-                sm: '0.7rem',
-                md: '0.75rem'
-              },
-              lineHeight: 1.2
-            }}>
-                  {stat.subtitle}
-                </Typography>
-              </CardContent>
-            </Card>)}
+              </Box>
+              <Typography variant="h5" sx={{
+                color: stat.color,
+                fontWeight: 700,
+                fontSize: {
+                  xs: '1.1rem',
+                  sm: '1.4rem',
+                  md: '1.8rem'
+                },
+                mb: 0.5
+              }}>
+                {stat.value}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{
+                fontSize: {
+                  xs: '0.65rem',
+                  sm: '0.7rem',
+                  md: '0.75rem'
+                },
+                lineHeight: 1.2
+              }}>
+                {stat.subtitle}
+              </Typography>
+            </CardContent>
+          </Card>)}
         </Box>
 
         {/* Invoice History */}
@@ -434,10 +467,10 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
               md: '1.25rem'
             }
           }}>
-              <CreditCardIcon color="primary" />
-              Payment History
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{
+            <CreditCardIcon color="primary" />
+            Payment History
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{
             mt: 0.5,
             fontSize: {
               xs: '0.8rem',
@@ -640,18 +673,20 @@ const BillingHistory: React.FC<BillingHistoryProps> = ({
             sm: '0.875rem'
           }
         }}>
-              Action Required
-            </Typography>
-            <Typography variant="body2" sx={{
+          Action Required
+        </Typography>
+        <Typography variant="body2" sx={{
           fontSize: {
             xs: '0.8rem',
             sm: '0.875rem'
           }
         }}>
-              You have overdue or failed payments. Please update your payment method to continue using S10.AI services without interruption.
-            </Typography>
-          </Alert>}
+          You have overdue or failed payments. Please update your payment method to continue using S10.AI services without interruption.
+        </Typography>
+      </Alert>}
       </Container>
-    </Box>;
+    </Box>
+  );
 };
+
 export default BillingHistory;

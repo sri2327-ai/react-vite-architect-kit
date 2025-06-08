@@ -3,6 +3,8 @@ import { Box, Paper, Typography, Divider, Button, FormControl, InputLabel, Selec
 import { Person as PersonIcon, Email as EmailIcon, Phone as PhoneIcon, Business as BusinessIcon, Settings as SettingsIcon, Cancel as CancelIcon, Storage as StorageIcon, Logout as LogoutIcon, Extension as ExtensionIcon, Login as LoginIcon, PhoneAndroid as MobileIcon, OpenInNew as OpenInNewIcon, Security as SecurityIcon, CloudUpload as CloudIcon, Shield as ShieldIcon } from '@mui/icons-material';
 import { useProfileData } from '../../hooks/useProfileData';
 import { useApiContext } from '../../contexts/ApiContext';
+import { useResponsive } from '../../hooks/useResponsive';
+
 interface UserProfile {
   email: string;
   phoneNumber: string;
@@ -14,16 +16,20 @@ interface UserProfile {
   notesRetentionDuration: number; // in months
   mfaEnabled: boolean;
 }
+
 const Profile: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobileView } = useResponsive();
+  
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [showMfaDialog, setShowMfaDialog] = useState(false);
   const [mfaOtp, setMfaOtp] = useState('');
   const [mfaOtpSent, setMfaOtpSent] = useState(false);
   const [mfaLoading, setMfaLoading] = useState(false);
+  
   const {
     useApiData
   } = useApiContext();
@@ -33,6 +39,7 @@ const Profile: React.FC = () => {
     error,
     updateProfile
   } = useProfileData(useApiData);
+  
   const retentionOptions = [{
     value: 3,
     label: '3 Months'
@@ -55,6 +62,7 @@ const Profile: React.FC = () => {
     value: -1,
     label: 'Permanent'
   }];
+  
   const handleRetentionChange = async (duration: number) => {
     try {
       await updateProfile({
@@ -64,6 +72,7 @@ const Profile: React.FC = () => {
       console.error('Failed to update retention duration:', error);
     }
   };
+  
   const handleMfaToggle = async (enabled: boolean) => {
     if (enabled) {
       // Show MFA setup dialog
@@ -80,6 +89,7 @@ const Profile: React.FC = () => {
       }
     }
   };
+  
   const sendMfaOtp = async () => {
     setMfaLoading(true);
     // Simulate OTP sending
@@ -88,6 +98,7 @@ const Profile: React.FC = () => {
       setMfaOtpSent(true);
     }, 1000);
   };
+  
   const verifyMfaOtp = async () => {
     setMfaLoading(true);
     // Simulate OTP verification
@@ -105,15 +116,18 @@ const Profile: React.FC = () => {
       }
     }, 1000);
   };
+  
   const handleCancelSubscription = () => {
     console.log('Canceling subscription...');
     setShowCancelDialog(false);
   };
+  
   const handleLogout = () => {
     console.log('Logging out...');
     setShowLogoutDialog(false);
     window.location.href = '/login';
   };
+  
   const ProfileField = ({
     icon,
     label,
@@ -200,6 +214,7 @@ const Profile: React.FC = () => {
           </Typography>}
       </Box>
     </Box>;
+  
   const QuickLinkCard = ({
     href,
     icon,
@@ -239,7 +254,7 @@ const Profile: React.FC = () => {
         },
         width: '100%'
       }}>
-          <Box sx={{
+        <Box sx={{
           color: 'primary.main',
           flexShrink: 0,
           '& svg': {
@@ -249,42 +264,43 @@ const Profile: React.FC = () => {
             }
           }
         }}>
-            {icon}
-          </Box>
-          <Box sx={{
+          {icon}
+        </Box>
+        <Box sx={{
           flex: 1,
           minWidth: 0
         }}>
-            <Typography variant="subtitle2" fontWeight={600} sx={{
-            mb: 0.5,
-            fontSize: {
-              xs: '0.85rem',
-              sm: '0.875rem'
-            },
-            lineHeight: 1.2
-          }}>
-              {title}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{
-            fontSize: {
-              xs: '0.7rem',
-              sm: '0.75rem'
-            },
-            lineHeight: 1.2
-          }}>
-              {description}
-            </Typography>
-          </Box>
-          <OpenInNewIcon fontSize="small" color="action" sx={{
+          <Typography variant="subtitle2" fontWeight={600} sx={{
+          mb: 0.5,
+          fontSize: {
+            xs: '0.85rem',
+            sm: '0.875rem'
+          },
+          lineHeight: 1.2
+        }}>
+          {title}
+        </Typography>
+        <Typography variant="caption" color="text.secondary" sx={{
+          fontSize: {
+            xs: '0.7rem',
+            sm: '0.75rem'
+          },
+          lineHeight: 1.2
+        }}>
+          {description}
+        </Typography>
+        </Box>
+        <OpenInNewIcon fontSize="small" color="action" sx={{
           flexShrink: 0,
           fontSize: {
             xs: '1rem',
             sm: '1.2rem'
           }
         }} />
-        </Box>
-      </CardContent>
-    </Card>;
+      </Box>
+    </CardContent>
+  </Card>;
+  
   if (loading) {
     return <Box sx={{
       display: 'flex',
@@ -296,6 +312,7 @@ const Profile: React.FC = () => {
         <CircularProgress />
       </Box>;
   }
+  
   if (error) {
     return <Box sx={{
       p: {
@@ -308,56 +325,86 @@ const Profile: React.FC = () => {
         </Alert>
       </Box>;
   }
-  return <Box sx={{
-    width: '100%',
-    minHeight: '100vh',
-    p: {
-      xs: 1,
-      sm: 2,
-      md: 3
-    },
-    maxWidth: '100%'
-  }}>
-      
-
+  
+  return (
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
       <Box sx={{
-      display: 'grid',
-      gridTemplateColumns: {
-        xs: '1fr',
-        lg: '2fr 1fr'
-      },
-      gap: {
-        xs: 2,
-        sm: 3
-      }
-    }}>
-        <Box>
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: { xs: 'center', sm: 'center', md: 'flex-start' },
+        px: { xs: 1, sm: 2, md: 3 },
+        py: { xs: 1.5, sm: 2, md: 2.5 },
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        backgroundColor: 'background.paper',
+        position: 'relative'
+      }}>
+        <Typography
+          variant="h5"
+          component="h1"
+          sx={{
+            fontWeight: 600,
+            fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' },
+            textAlign: { xs: 'center', sm: 'center', md: 'left' },
+            color: 'text.primary'
+          }}
+        >
+          Profile
+        </Typography>
+      </Box>
+
+      {/* Content */}
+      <Box sx={{
+        flex: 1,
+        overflow: 'auto',
+        width: '100%',
+        minHeight: '100vh',
+        p: {
+          xs: 1,
+          sm: 2,
+          md: 3
+        },
+        maxWidth: '100%'
+      }}>
+        <Box sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          lg: '2fr 1fr'
+        },
+        gap: {
+          xs: 2,
+          sm: 3
+        }
+      }}>
           {/* Personal Information */}
-          <Paper sx={{
-          p: {
-            xs: 2,
-            sm: 3
-          },
-          mb: {
-            xs: 2,
-            sm: 3
-          },
-          borderRadius: 2
-        }}>
-            <Typography variant="h6" gutterBottom sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
+          <Box>
+            <Paper sx={{
+            p: {
+              xs: 2,
+              sm: 3
+            },
             mb: {
               xs: 2,
               sm: 3
             },
-            fontSize: {
-              xs: '1rem',
-              sm: '1.1rem',
-              md: '1.25rem'
-            }
+            borderRadius: 2
           }}>
+              <Typography variant="h6" gutterBottom sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              mb: {
+                xs: 2,
+                sm: 3
+              },
+              fontSize: {
+                xs: '1rem',
+                sm: '1.1rem',
+                md: '1.25rem'
+              }
+            }}>
               <PersonIcon color="primary" />
               Personal Information
             </Typography>
@@ -373,53 +420,53 @@ const Profile: React.FC = () => {
               md: 2
             }
           }}>
-              <ProfileField icon={<EmailIcon />} label="Email Address" value={profile.email} />
-              <ProfileField icon={<PhoneIcon />} label="Phone Number" value={profile.phoneNumber} />
-              <ProfileField icon={<PersonIcon />} label="First Name" value={profile.firstName} />
-              <ProfileField icon={<PersonIcon />} label="Last Name" value={profile.lastName} />
-              <ProfileField icon={<BusinessIcon />} label="Medical Specialty" value={profile.specialty} />
-              
-              {/* Only show EHR Integration Status if ehrMode is true */}
-              {profile.ehrMode && <>
-                  <ProfileField icon={<SettingsIcon />} label="EHR Integration Status" value={profile.ehrMode} chip />
-                  {profile.ehrName && <Box sx={{
-                gridColumn: {
-                  xs: '1',
-                  md: '1 / -1'
-                }
-              }}>
-                      <ProfileField icon={<StorageIcon />} label="Connected EHR System" value={profile.ehrName} />
-                    </Box>}
-                </>}
-            </Box>
+            <ProfileField icon={<EmailIcon />} label="Email Address" value={profile.email} />
+            <ProfileField icon={<PhoneIcon />} label="Phone Number" value={profile.phoneNumber} />
+            <ProfileField icon={<PersonIcon />} label="First Name" value={profile.firstName} />
+            <ProfileField icon={<PersonIcon />} label="Last Name" value={profile.lastName} />
+            <ProfileField icon={<BusinessIcon />} label="Medical Specialty" value={profile.specialty} />
+            
+            {/* Only show EHR Integration Status if ehrMode is true */}
+            {profile.ehrMode && <>
+                <ProfileField icon={<SettingsIcon />} label="EHR Integration Status" value={profile.ehrMode} chip />
+                {profile.ehrName && <Box sx={{
+                  gridColumn: {
+                    xs: '1',
+                    md: '1 / -1'
+                  }
+                }}>
+                    <ProfileField icon={<StorageIcon />} label="Connected EHR System" value={profile.ehrName} />
+                  </Box>}
+              </>}
+          </Box>
 
-            {/* Show EHR disabled message if ehrMode is false */}
-            {!profile.ehrMode && <Alert severity="info" sx={{
-            mt: 3,
+          {/* Show EHR disabled message if ehrMode is false */}
+          {!profile.ehrMode && <Alert severity="info" sx={{
+          mt: 3,
+          fontSize: {
+            xs: '0.85rem',
+            sm: '0.875rem'
+          }
+        }}>
+            <Typography variant="body2" sx={{
+            fontWeight: 600,
+            mb: 1,
             fontSize: {
               xs: '0.85rem',
               sm: '0.875rem'
             }
           }}>
-                <Typography variant="body2" sx={{
-              fontWeight: 600,
-              mb: 1,
-              fontSize: {
-                xs: '0.85rem',
-                sm: '0.875rem'
-              }
-            }}>
-                  EHR Integration Disabled
-                </Typography>
-                <Typography variant="body2" sx={{
-              fontSize: {
-                xs: '0.8rem',
-                sm: '0.875rem'
-              }
-            }}>
-                  Your account is currently set to no-EHR mode. EHR integration features and workflow automation are not available.
-                </Typography>
-              </Alert>}
+            EHR Integration Disabled
+          </Typography>
+          <Typography variant="body2" sx={{
+            fontSize: {
+              xs: '0.8rem',
+              sm: '0.875rem'
+            }
+          }}>
+            Your account is currently set to no-EHR mode. EHR integration features and workflow automation are not available.
+          </Typography>
+        </Alert>}
           </Paper>
 
           {/* Security Settings */}
@@ -434,7 +481,7 @@ const Profile: React.FC = () => {
           },
           borderRadius: 2
         }}>
-            <Typography variant="h6" gutterBottom sx={{
+          <Typography variant="h6" gutterBottom sx={{
             display: 'flex',
             alignItems: 'center',
             gap: 1,
@@ -448,21 +495,21 @@ const Profile: React.FC = () => {
               md: '1.25rem'
             }
           }}>
-              <SecurityIcon color="primary" />
-              Security & Authentication
-            </Typography>
+            <SecurityIcon color="primary" />
+            Security & Authentication
+          </Typography>
 
-            <Alert severity="info" sx={{
+          <Alert severity="info" sx={{
             mb: 3,
             fontSize: {
               xs: '0.8rem',
               sm: '0.875rem'
             }
           }}>
-              Enhance your account security with multi-factor authentication using email verification.
-            </Alert>
+            Enhance your account security with multi-factor authentication using email verification.
+          </Alert>
 
-            <Box sx={{
+          <Box sx={{
             display: 'flex',
             flexDirection: {
               xs: 'column',
@@ -485,7 +532,7 @@ const Profile: React.FC = () => {
               sm: 0
             }
           }}>
-              <Box sx={{
+            <Box sx={{
               display: 'flex',
               alignItems: 'center',
               gap: {
@@ -493,32 +540,32 @@ const Profile: React.FC = () => {
                 sm: 2
               }
             }}>
-                <ShieldIcon color="primary" />
-                <Box>
-                  <Typography variant="body1" fontWeight={600} sx={{
-                  fontSize: {
-                    xs: '0.9rem',
-                    sm: '1rem'
-                  }
-                }}>
-                    Multi-Factor Authentication (MFA)
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{
-                  fontSize: {
-                    xs: '0.75rem',
-                    sm: '0.8rem'
-                  }
-                }}>
-                    Secure your account with email-based verification codes
-                  </Typography>
-                </Box>
+              <ShieldIcon color="primary" />
+              <Box>
+                <Typography variant="body1" fontWeight={600} sx={{
+                fontSize: {
+                  xs: '0.9rem',
+                  sm: '1rem'
+                }
+              }}>
+                Multi-Factor Authentication (MFA)
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{
+                fontSize: {
+                  xs: '0.75rem',
+                  sm: '0.8rem'
+                }
+              }}>
+                Secure your account with email-based verification codes
+              </Typography>
               </Box>
-              <FormControlLabel control={<Switch checked={profile.mfaEnabled || false} onChange={e => handleMfaToggle(e.target.checked)} color="primary" size={isMobile ? "small" : "medium"} />} label="" sx={{
+            </Box>
+            <FormControlLabel control={<Switch checked={profile.mfaEnabled || false} onChange={e => handleMfaToggle(e.target.checked)} color="primary" size={isMobile ? "small" : "medium"} />} label="" sx={{
               m: 0
             }} />
-            </Box>
+          </Box>
 
-            {profile.mfaEnabled && <Box sx={{
+          {profile.mfaEnabled && <Box sx={{
             p: {
               xs: 1.5,
               sm: 2
@@ -527,35 +574,35 @@ const Profile: React.FC = () => {
             borderRadius: 1,
             mb: 2
           }}>
-                <Typography variant="body2" color="success.dark" sx={{
+            <Typography variant="body2" color="success.dark" sx={{
               mb: 1,
               fontSize: {
                 xs: '0.85rem',
                 sm: '0.875rem'
               }
             }}>
-                  <strong>MFA is enabled</strong>
-                </Typography>
-                <Typography variant="caption" color="success.dark" sx={{
+              <strong>MFA is enabled</strong>
+            </Typography>
+            <Typography variant="caption" color="success.dark" sx={{
               fontSize: {
                 xs: '0.75rem',
                 sm: '0.8rem'
               }
             }}>
-                  You will receive a verification code via email each time you log in from a new device.
-                </Typography>
-              </Box>}
-          </Paper>
+              You will receive a verification code via email each time you log in from a new device.
+            </Typography>
+          </Box>}
+        </Paper>
 
-          {/* Data Management */}
-          <Paper sx={{
+        {/* Data Management */}
+        <Paper sx={{
           p: {
             xs: 2,
             sm: 3
           },
           borderRadius: 2
         }}>
-            <Typography variant="h6" gutterBottom sx={{
+          <Typography variant="h6" gutterBottom sx={{
             display: 'flex',
             alignItems: 'center',
             gap: 1,
@@ -569,32 +616,32 @@ const Profile: React.FC = () => {
               md: '1.25rem'
             }
           }}>
-              <CloudIcon color="primary" />
-              Data Management & Security
-            </Typography>
+            <CloudIcon color="primary" />
+            Data Management & Security
+          </Typography>
 
-            <Alert severity="info" sx={{
+          <Alert severity="info" sx={{
             mb: 3,
             fontSize: {
               xs: '0.8rem',
               sm: '0.875rem'
             }
           }}>
-              Configure how long your clinical notes and templates are securely stored in our HIPAA-compliant system.
-            </Alert>
+            Configure how long your clinical notes and templates are securely stored in our HIPAA-compliant system.
+          </Alert>
 
-            <FormControl fullWidth sx={{
+          <FormControl fullWidth sx={{
             mb: 3
           }}>
-              <InputLabel>Clinical Notes Retention Period</InputLabel>
-              <Select value={profile.notesRetentionDuration} label="Clinical Notes Retention Period" onChange={e => handleRetentionChange(Number(e.target.value))} size={isMobile ? "small" : "medium"}>
-                {retentionOptions.map(option => <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>)}
-              </Select>
-            </FormControl>
+            <InputLabel>Clinical Notes Retention Period</InputLabel>
+            <Select value={profile.notesRetentionDuration} label="Clinical Notes Retention Period" onChange={e => handleRetentionChange(Number(e.target.value))} size={isMobile ? "small" : "medium"}>
+              {retentionOptions.map(option => <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>)}
+            </Select>
+          </FormControl>
 
-            <Box sx={{
+          <Box sx={{
             p: {
               xs: 1.5,
               sm: 2
@@ -602,36 +649,36 @@ const Profile: React.FC = () => {
             backgroundColor: 'grey.50',
             borderRadius: 1
           }}>
-              <Typography variant="body2" color="text.secondary" sx={{
+            <Typography variant="body2" color="text.secondary" sx={{
               mb: 1,
               fontSize: {
                 xs: '0.8rem',
                 sm: '0.875rem'
               }
             }}>
-                <strong>Current Setting:</strong> Your clinical notes and templates will be retained for{' '}
-                <span style={{
+              <strong>Current Setting:</strong> Your clinical notes and templates will be retained for{' '}
+              <span style={{
                 color: theme.palette.primary.main,
                 fontWeight: 600
               }}>
-                  {profile.notesRetentionDuration === -1 ? 'permanently' : `${profile.notesRetentionDuration} months`}
-                </span>
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{
+                {profile.notesRetentionDuration === -1 ? 'permanently' : `${profile.notesRetentionDuration} months`}
+              </span>
+            </Typography>
+            <Typography variant="caption" color="text.secondary" sx={{
               fontSize: {
                 xs: '0.75rem',
                 sm: '0.8rem'
               }
             }}>
-                All data is encrypted and stored in HIPAA-compliant infrastructure with 99.9% uptime guarantee.
-              </Typography>
-            </Box>
-          </Paper>
-        </Box>
+              All data is encrypted and stored in HIPAA-compliant infrastructure with 99.9% uptime guarantee.
+            </Typography>
+          </Box>
+        </Paper>
+      </Box>
 
-        <Box>
-          {/* Quick Access */}
-          <Paper sx={{
+      {/* Quick Access */}
+      <Box>
+        <Paper sx={{
           p: {
             xs: 2,
             sm: 3
@@ -642,7 +689,7 @@ const Profile: React.FC = () => {
           },
           borderRadius: 2
         }}>
-            <Typography variant="h6" gutterBottom sx={{
+          <Typography variant="h6" gutterBottom sx={{
             fontSize: {
               xs: '1rem',
               sm: '1.1rem',
@@ -653,10 +700,10 @@ const Profile: React.FC = () => {
               sm: 3
             }
           }}>
-              Quick Access
-            </Typography>
-            
-            <Box sx={{
+            Quick Access
+          </Typography>
+          
+          <Box sx={{
             display: 'grid',
             gridTemplateColumns: '1fr',
             gap: {
@@ -664,16 +711,16 @@ const Profile: React.FC = () => {
               sm: 2
             }
           }}>
-              <QuickLinkCard href="https://chrome.google.com/webstore/detail/s10ai-crush-extension" icon={<ExtensionIcon />} title="Chrome Extension" description="Install S10.AI browser extension" />
-              
-              <QuickLinkCard href="https://app.s10.ai/login" icon={<LoginIcon />} title="Main Application" description="Access full S10.AI platform" />
-              
-              <QuickLinkCard href="https://play.google.com/store/apps/details?id=com.s10ai.mobile" icon={<MobileIcon />} title="Mobile App" description="Download for iOS/Android" />
-            </Box>
-          </Paper>
+            <QuickLinkCard href="https://chrome.google.com/webstore/detail/s10ai-crush-extension" icon={<ExtensionIcon />} title="Chrome Extension" description="Install S10.AI browser extension" />
+            
+            <QuickLinkCard href="https://app.s10.ai/login" icon={<LoginIcon />} title="Main Application" description="Access full S10.AI platform" />
+            
+            <QuickLinkCard href="https://play.google.com/store/apps/details?id=com.s10ai.mobile" icon={<MobileIcon />} title="Mobile App" description="Download for iOS/Android" />
+          </Box>
+        </Paper>
 
-          {/* Account Actions */}
-          <Paper sx={{
+        {/* Account Actions */}
+        <Paper sx={{
           p: {
             xs: 2,
             sm: 3
@@ -684,7 +731,7 @@ const Profile: React.FC = () => {
           },
           borderRadius: 2
         }}>
-            <Typography variant="h6" gutterBottom sx={{
+          <Typography variant="h6" gutterBottom sx={{
             fontSize: {
               xs: '1rem',
               sm: '1.1rem',
@@ -695,10 +742,10 @@ const Profile: React.FC = () => {
               sm: 3
             }
           }}>
-              Account Actions
-            </Typography>
-            
-            <Button variant="outlined" color="primary" fullWidth startIcon={<LogoutIcon />} onClick={() => setShowLogoutDialog(true)} sx={{
+            Account Actions
+          </Typography>
+          
+          <Button variant="outlined" color="primary" fullWidth startIcon={<LogoutIcon />} onClick={() => setShowLogoutDialog(true)} sx={{
             py: {
               xs: 1.5,
               sm: 2
@@ -709,12 +756,12 @@ const Profile: React.FC = () => {
               md: '1rem'
             }
           }}>
-              Logout
-            </Button>
-          </Paper>
+            Logout
+          </Button>
+        </Paper>
 
-          {/* Subscription Management */}
-          <Paper sx={{
+        {/* Subscription Management */}
+        <Paper sx={{
           p: {
             xs: 2,
             sm: 3
@@ -723,7 +770,7 @@ const Profile: React.FC = () => {
           border: '1px solid',
           borderColor: 'error.light'
         }}>
-            <Typography variant="h6" gutterBottom color="error" sx={{
+          <Typography variant="h6" gutterBottom color="error" sx={{
             fontSize: {
               xs: '1rem',
               sm: '1.1rem',
@@ -734,10 +781,10 @@ const Profile: React.FC = () => {
               sm: 3
             }
           }}>
-              Subscription Management
-            </Typography>
-            
-            <Typography variant="body2" color="text.secondary" sx={{
+            Subscription Management
+          </Typography>
+          
+          <Typography variant="body2" color="text.secondary" sx={{
             mb: 2,
             lineHeight: 1.5,
             fontSize: {
@@ -745,10 +792,10 @@ const Profile: React.FC = () => {
               sm: '0.875rem'
             }
           }}>
-              Need to pause your subscription? Your data will be safely preserved.
-            </Typography>
-            
-            <Button variant="outlined" color="error" fullWidth startIcon={<CancelIcon />} onClick={() => setShowCancelDialog(true)} sx={{
+            Need to pause your subscription? Your data will be safely preserved.
+          </Typography>
+          
+          <Button variant="outlined" color="error" fullWidth startIcon={<CancelIcon />} onClick={() => setShowCancelDialog(true)} sx={{
             py: {
               xs: 1.5,
               sm: 2
@@ -764,10 +811,10 @@ const Profile: React.FC = () => {
               color: 'white'
             }
           }}>
-              Manage Subscription
-            </Button>
-            
-            <Typography variant="caption" color="text.secondary" sx={{
+            Manage Subscription
+          </Button>
+          
+          <Typography variant="caption" color="text.secondary" sx={{
             mt: 1,
             display: 'block',
             fontSize: {
@@ -775,183 +822,12 @@ const Profile: React.FC = () => {
               sm: '0.75rem'
             }
           }}>
-              You can reactivate anytime without data loss.
-            </Typography>
-          </Paper>
-        </Box>
+            You can reactivate anytime without data loss.
+          </Typography>
+        </Paper>
       </Box>
-
-      {/* MFA Setup Dialog */}
-      <Dialog open={showMfaDialog} onClose={() => setShowMfaDialog(false)} maxWidth="sm" fullWidth fullScreen={isMobile}>
-        <DialogTitle>
-          <Typography variant="h6" fontWeight={600}>
-            Enable Multi-Factor Authentication
-          </Typography>
-        </DialogTitle>
-        <DialogContent sx={{
-        px: {
-          xs: 2,
-          sm: 3
-        }
-      }}>
-          <Typography variant="body1" sx={{
-          mb: 3,
-          fontSize: {
-            xs: '0.9rem',
-            sm: '1rem'
-          }
-        }}>
-            To enable MFA, please verify your email address by entering the code we've sent to {profile.email}.
-          </Typography>
-          
-          {mfaOtpSent && <Alert severity="success" sx={{
-          mb: 3
-        }}>
-              Verification code sent to your email
-            </Alert>}
-
-          <TextField fullWidth label="Verification Code" value={mfaOtp} onChange={e => setMfaOtp(e.target.value)} placeholder="Enter 6-digit code" inputProps={{
-          maxLength: 6
-        }} sx={{
-          mb: 2
-        }} size={isMobile ? "small" : "medium"} />
-
-          <Button variant="text" onClick={sendMfaOtp} disabled={mfaLoading} sx={{
-          mb: 2
-        }}>
-            {mfaLoading ? 'Sending...' : 'Resend Code'}
-          </Button>
-        </DialogContent>
-        <DialogActions sx={{
-        px: {
-          xs: 2,
-          sm: 3
-        },
-        pb: {
-          xs: 2,
-          sm: 3
-        }
-      }}>
-          <Button onClick={() => setShowMfaDialog(false)}>
-            Cancel
-          </Button>
-          <Button variant="contained" onClick={verifyMfaOtp} disabled={!mfaOtp || mfaOtp.length !== 6 || mfaLoading}>
-            {mfaLoading ? 'Verifying...' : 'Enable MFA'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Logout Dialog */}
-      <Dialog open={showLogoutDialog} onClose={() => setShowLogoutDialog(false)} maxWidth="sm" fullWidth fullScreen={isMobile}>
-        <DialogTitle>Confirm Logout</DialogTitle>
-        <DialogContent sx={{
-        px: {
-          xs: 2,
-          sm: 3
-        }
-      }}>
-          <Typography variant="body1" sx={{
-          fontSize: {
-            xs: '0.9rem',
-            sm: '1rem'
-          }
-        }}>
-            Are you sure you want to logout? You'll need to sign in again to access your clinical workflows and templates.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{
-        px: {
-          xs: 2,
-          sm: 3
-        },
-        pb: {
-          xs: 2,
-          sm: 3
-        }
-      }}>
-          <Button onClick={() => setShowLogoutDialog(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleLogout} color="primary" variant="contained">
-            Logout
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Cancel Subscription Dialog */}
-      <Dialog open={showCancelDialog} onClose={() => setShowCancelDialog(false)} maxWidth="sm" fullWidth fullScreen={isMobile}>
-        <DialogTitle>Manage Subscription</DialogTitle>
-        <DialogContent sx={{
-        px: {
-          xs: 2,
-          sm: 3
-        }
-      }}>
-          <Typography variant="body1" sx={{
-          mb: 2,
-          fontSize: {
-            xs: '0.9rem',
-            sm: '1rem'
-          }
-        }}>
-            Are you sure you want to pause your subscription?
-          </Typography>
-          <Alert severity="info" sx={{
-          mb: 2
-        }}>
-            <Typography variant="body2" sx={{
-            fontWeight: 600,
-            mb: 1,
-            fontSize: {
-              xs: '0.8rem',
-              sm: '0.875rem'
-            }
-          }}>
-              What happens when you pause:
-            </Typography>
-            <Box component="ul" sx={{
-            pl: 2,
-            m: 0,
-            '& li': {
-              fontSize: {
-                xs: '0.8rem',
-                sm: '0.875rem'
-              }
-            }
-          }}>
-              <li>Your clinical data remains secure and accessible</li>
-              <li>Billing stops immediately</li>
-              <li>Premium features become unavailable</li>
-              <li>You can reactivate anytime</li>
-            </Box>
-          </Alert>
-          <Typography variant="body2" color="text.secondary" sx={{
-          fontSize: {
-            xs: '0.8rem',
-            sm: '0.875rem'
-          }
-        }}>
-            Your subscription will remain active until the end of your current billing period.
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{
-        px: {
-          xs: 2,
-          sm: 3
-        },
-        pb: {
-          xs: 2,
-          sm: 3
-        }
-      }}>
-          <Button onClick={() => setShowCancelDialog(false)}>
-            Keep Active
-          </Button>
-          <Button onClick={handleCancelSubscription} color="error" variant="contained">
-            Pause Subscription
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>;
+    </Box>
+  );
 };
+
 export default Profile;
