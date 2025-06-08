@@ -37,7 +37,7 @@ import {
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { bravoColors } from '@/theme/colors';
 import { TourOverlay } from '@/components/tour/TourOverlay';
-import HelpButton from '@/components/tour/HelpButton';
+import { HelpButton } from '@/components/tour/HelpButton';
 import { useResponsive } from '@/hooks/useResponsive';
 
 const drawerWidth = 280;
@@ -162,7 +162,7 @@ const Dashboard: React.FC = () => {
           </Typography>
         </Box>
         
-        {/* Desktop Collapse Button */}
+        {/* Desktop Collapse Button - Show only on desktop */}
         {!isMobileView && (
           <IconButton
             data-tour-id="collapse-sidebar"
