@@ -10,9 +10,10 @@ interface TourOverlayProps {
 }
 
 export const TourOverlay: React.FC<TourOverlayProps> = () => {
-  const { state, endTour } = useTour();
+  const { state, endTour, nextStep } = useTour();
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
@@ -22,6 +23,11 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     
     const currentStep = state.activeTour.steps[state.currentStepIndex];
     if (!currentStep) return null;
+
+    // Special handling for body target (used for screen transitions)
+    if (currentStep.target === 'body') {
+      return document.body;
+    }
 
     const isSelector = currentStep.target.startsWith('[') || currentStep.target.startsWith('.') || currentStep.target.startsWith('#') || currentStep.target.includes(' ');
     
@@ -50,20 +56,39 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
 
   const updateTargetRect = useCallback(() => {
     const element = findTargetElement();
-    setTargetElement(element);
     
     if (element) {
+      setTargetElement(element);
       const rect = element.getBoundingClientRect();
       setTargetRect(rect);
+      setRetryCount(0);
       
       const behavior = isMobile ? 'auto' : 'smooth';
-      element.scrollIntoView({ 
-        behavior, 
-        block: 'center', 
-        inline: 'center' 
-      });
+      
+      // Only scroll if not targeting body
+      if (element !== document.body) {
+        element.scrollIntoView({ 
+          behavior, 
+          block: 'center', 
+          inline: 'center' 
+        });
+      }
+    } else {
+      // Element not found, retry with a delay
+      if (retryCount < 10) { // Max 10 retries (5 seconds)
+        setTimeout(() => {
+          setRetryCount(prev => prev + 1);
+        }, 500);
+      } else {
+        // If we can't find the element after retries, show tour on body
+        console.warn(`Tour target not found: ${state.activeTour?.steps[state.currentStepIndex]?.target}`);
+        setTargetElement(document.body);
+        const rect = document.body.getBoundingClientRect();
+        setTargetRect(rect);
+        setRetryCount(0);
+      }
     }
-  }, [findTargetElement, isMobile]);
+  }, [findTargetElement, isMobile, retryCount, state.activeTour, state.currentStepIndex]);
 
   // Auto-close drawer when tour starts
   useEffect(() => {
@@ -87,7 +112,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     };
 
     const handleScroll = () => {
-      if (targetElement) {
+      if (targetElement && targetElement !== document.body) {
         const rect = targetElement.getBoundingClientRect();
         setTargetRect(rect);
       }
@@ -101,6 +126,36 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       window.removeEventListener('scroll', handleScroll, true);
     };
   }, [targetElement, updateTargetRect]);
+
+  // Handle special cases for template builder tour
+  useEffect(() => {
+    if (state.activeTour?.id === 'template-builder-tour' && state.isRunning) {
+      const currentStep = state.activeTour.steps[state.currentStepIndex];
+      
+      // Auto-advance after visit type selection (step 3)
+      if (currentStep?.id === 'visit-type-selection') {
+        // Listen for route changes or screen transitions
+        const checkForScreenChange = setInterval(() => {
+          // Check if we're now on the templates screen (workflow-steps should be visible)
+          const workflowSteps = document.querySelector('[data-tour-id="workflow-steps"]');
+          if (workflowSteps && workflowSteps.textContent?.includes('Templates')) {
+            clearInterval(checkForScreenChange);
+            // Small delay to let the screen fully render
+            setTimeout(() => {
+              nextStep();
+            }, 500);
+          }
+        }, 500);
+
+        // Cleanup after 10 seconds to prevent infinite checking
+        setTimeout(() => {
+          clearInterval(checkForScreenChange);
+        }, 10000);
+
+        return () => clearInterval(checkForScreenChange);
+      }
+    }
+  }, [state.activeTour, state.currentStepIndex, state.isRunning, nextStep]);
 
   if (!state.isRunning || !state.activeTour) {
     return null;
@@ -137,29 +192,31 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         }}
       />
       
-      {/* Spotlight cutout */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: Math.max(0, targetRect.top - spotlightPadding),
-          left: Math.max(0, targetRect.left - spotlightPadding),
-          width: Math.min(
-            targetRect.width + (spotlightPadding * 2),
-            window.innerWidth - Math.max(0, targetRect.left - spotlightPadding)
-          ),
-          height: Math.min(
-            targetRect.height + (spotlightPadding * 2),
-            window.innerHeight - Math.max(0, targetRect.top - spotlightPadding)
-          ),
-          backgroundColor: 'transparent',
-          border: `${isMobile ? 2 : 3}px solid`,
-          borderColor: 'primary.main',
-          borderRadius: isMobile ? 1 : 2,
-          boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.6)`,
-          pointerEvents: 'none',
-          zIndex: overlayZIndex + 1
-        }}
-      />
+      {/* Spotlight cutout - don't show for body target */}
+      {targetElement !== document.body && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: Math.max(0, targetRect.top - spotlightPadding),
+            left: Math.max(0, targetRect.left - spotlightPadding),
+            width: Math.min(
+              targetRect.width + (spotlightPadding * 2),
+              window.innerWidth - Math.max(0, targetRect.left - spotlightPadding)
+            ),
+            height: Math.min(
+              targetRect.height + (spotlightPadding * 2),
+              window.innerHeight - Math.max(0, targetRect.top - spotlightPadding)
+            ),
+            backgroundColor: 'transparent',
+            border: `${isMobile ? 2 : 3}px solid`,
+            borderColor: 'primary.main',
+            borderRadius: isMobile ? 1 : 2,
+            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.6)`,
+            pointerEvents: 'none',
+            zIndex: overlayZIndex + 1
+          }}
+        />
+      )}
 
       {/* Tour tooltip */}
       <TourTooltip
