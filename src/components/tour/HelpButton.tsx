@@ -6,15 +6,14 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Typography
+  Typography,
+  Box
 } from '@mui/material';
 import {
   Help,
   PlayArrow,
   AutoStories,
-  Settings,
-  Refresh
+  Settings
 } from '@mui/icons-material';
 import { useTour } from '@/contexts/TourContext';
 import { welcomeTour, templateBuilderTour, workflowBuilderTour } from '@/data/tours';
@@ -39,15 +38,31 @@ export const HelpButton: React.FC = () => {
 
   return (
     <>
-      <IconButton
-        data-tour-id="help-button"
-        onClick={handleClick}
-        size="small"
-        sx={{ color: 'text.secondary' }}
-        aria-label="Help and tours"
+      <Box
+        sx={{
+          position: 'relative',
+          borderRadius: '50%',
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+        }}
       >
-        <Help />
-      </IconButton>
+        <IconButton
+          data-tour-id="help-button"
+          onClick={handleClick}
+          size="small"
+          sx={{ 
+            color: 'white',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            }
+          }}
+          aria-label="Help and tours"
+        >
+          <Help />
+        </IconButton>
+      </Box>
 
       <Menu
         anchorEl={anchorEl}
