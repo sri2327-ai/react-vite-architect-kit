@@ -132,27 +132,44 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     if (state.activeTour?.id === 'template-builder-tour' && state.isRunning) {
       const currentStep = state.activeTour.steps[state.currentStepIndex];
       
-      // Auto-advance after visit type selection (step 3)
+      // For step 3 (visit-type-selection), wait for user to actually select a visit type
       if (currentStep?.id === 'visit-type-selection') {
-        // Listen for route changes or screen transitions
-        const checkForScreenChange = setInterval(() => {
-          // Check if we're now on the templates screen (workflow-steps should be visible)
+        // Listen for URL changes or navigation that indicates we've moved to templates
+        const checkForNavigation = () => {
+          // Check if we're now on a template management screen (back button should be visible)
+          const backButton = document.querySelector('[data-testid="back-button"]');
+          const templatesList = document.querySelector('[data-tour-id="template-list"]');
           const workflowSteps = document.querySelector('[data-tour-id="workflow-steps"]');
-          if (workflowSteps && workflowSteps.textContent?.includes('Templates')) {
-            clearInterval(checkForScreenChange);
-            // Small delay to let the screen fully render
-            setTimeout(() => {
-              nextStep();
-            }, 500);
+          
+          if (backButton || templatesList || (workflowSteps && workflowSteps.textContent?.includes('Templates'))) {
+            console.log('Template builder tour: Navigation detected, advancing to next step');
+            nextStep();
+            return true;
+          }
+          return false;
+        };
+
+        // Check immediately
+        if (checkForNavigation()) {
+          return;
+        }
+
+        // Set up interval to check for navigation
+        const navigationCheckInterval = setInterval(() => {
+          if (checkForNavigation()) {
+            clearInterval(navigationCheckInterval);
           }
         }, 500);
 
-        // Cleanup after 10 seconds to prevent infinite checking
-        setTimeout(() => {
-          clearInterval(checkForScreenChange);
-        }, 10000);
+        // Cleanup after 15 seconds to prevent infinite checking
+        const cleanup = setTimeout(() => {
+          clearInterval(navigationCheckInterval);
+        }, 15000);
 
-        return () => clearInterval(checkForScreenChange);
+        return () => {
+          clearInterval(navigationCheckInterval);
+          clearTimeout(cleanup);
+        };
       }
     }
   }, [state.activeTour, state.currentStepIndex, state.isRunning, nextStep]);

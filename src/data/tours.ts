@@ -79,9 +79,10 @@ export const templateBuilderTour: Tour = {
     {
       id: 'visit-type-selection',
       title: 'Step 3: Select Visit Type',
-      content: 'First, select a visit type to work with. Each visit type can have its own set of templates. Click on any visit type card to continue to the next step.',
+      content: 'First, select a visit type to work with. Each visit type can have its own set of templates. Click on any visit type card to continue - the tour will automatically advance when you navigate.',
       target: '[data-tour-id="visit-type-selection"]',
-      placement: 'top'
+      placement: 'top',
+      spotlightClicks: true
     },
     {
       id: 'template-management-screen',
@@ -101,7 +102,7 @@ export const templateBuilderTour: Tour = {
       id: 'create-template-action',
       title: 'Step 6: Create New Template',
       content: 'Click the "Create Template" button to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
-      target: '.MuiButton-contained',
+      target: '[data-testid="create-template-button"]',
       placement: 'bottom'
     },
     {
