@@ -20,10 +20,17 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     const currentStep = state.activeTour.steps[state.currentStepIndex];
     if (!currentStep) return null;
 
-    // Try data-tour-id first, then fallback to CSS selector
-    let element = document.querySelector(`[data-tour-id="${currentStep.target}"]`) as HTMLElement;
-    if (!element) {
+    // Check if target is already a CSS selector (starts with '[', '.', '#', etc.)
+    const isSelector = currentStep.target.match(/^[\[\.\#]/) || currentStep.target.includes(' ');
+    
+    let element: HTMLElement | null = null;
+    
+    if (isSelector) {
+      // Use the target as-is if it's already a CSS selector
       element = document.querySelector(currentStep.target) as HTMLElement;
+    } else {
+      // Try data-tour-id first for simple identifiers
+      element = document.querySelector(`[data-tour-id="${currentStep.target}"]`) as HTMLElement;
     }
     
     return element;
