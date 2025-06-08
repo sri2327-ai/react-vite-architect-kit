@@ -118,7 +118,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   const currentStep = state.activeTour.steps[state.currentStepIndex];
   if (!currentStep) return null;
 
-  // For mobile/tablet with drawer open, use a simple notification approach
+  // For mobile/tablet with drawer open, use a full-screen overlay with instructions
   if ((isMobile || isTablet) && drawerOpen) {
     return createPortal(
       <Box
@@ -128,62 +128,64 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          zIndex: 1400, // Higher than drawer
-          pointerEvents: 'none',
+          zIndex: 9999,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'center',
-          pt: 3,
-          px: 2
+          p: 2
         }}
       >
         <Paper
-          elevation={8}
+          elevation={24}
           sx={{
-            pointerEvents: 'auto',
-            maxWidth: 340,
+            maxWidth: 400,
             width: '100%',
-            p: 2.5,
+            p: 3,
             borderRadius: 3,
-            backgroundColor: 'background.paper',
-            border: '2px solid',
-            borderColor: 'primary.main',
-            boxShadow: '0 12px 48px rgba(0,0,0,0.25)',
-            animation: 'slideInDown 0.3s ease-out'
+            textAlign: 'center',
+            position: 'relative'
           }}
         >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'primary.main', flex: 1, pr: 1 }}>
-              {currentStep.title}
-            </Typography>
-            <IconButton
-              size="small"
-              onClick={endTour}
-              sx={{ 
-                mt: -0.5,
-                color: 'text.secondary',
-                '&:hover': { color: 'text.primary' }
-              }}
-            >
-              <Close fontSize="small" />
-            </IconButton>
-          </Box>
+          <IconButton
+            size="small"
+            onClick={endTour}
+            sx={{ 
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              color: 'text.secondary'
+            }}
+          >
+            <Close fontSize="small" />
+          </IconButton>
           
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, lineHeight: 1.5 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', mb: 2 }}>
+            {currentStep.title}
+          </Typography>
+          
+          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}>
             {currentStep.content}
           </Typography>
 
+          <Box
+            sx={{
+              p: 2,
+              backgroundColor: 'warning.light',
+              borderRadius: 2,
+              mb: 2
+            }}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'warning.dark' }}>
+              💡 Close the menu to continue with the interactive tour
+            </Typography>
+          </Box>
+
           <Typography variant="caption" sx={{ 
-            color: 'primary.main', 
-            fontWeight: 600,
-            display: 'block',
-            textAlign: 'center',
-            p: 1,
-            backgroundColor: 'primary.main',
-            color: 'primary.contrastText',
-            borderRadius: 1
+            color: 'text.secondary',
+            display: 'block'
           }}>
-            Step {state.currentStepIndex + 1} of {state.activeTour.steps.length} - Look for the highlighted item in the menu
+            Step {state.currentStepIndex + 1} of {state.activeTour.steps.length}
           </Typography>
         </Paper>
       </Box>,
