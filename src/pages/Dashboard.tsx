@@ -213,16 +213,19 @@ export const Dashboard: React.FC = () => {
     }}>
       {/* Mobile Header */}
       {isMobile ? (
-        <Box sx={{
-          p: 3,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-          minHeight: 80,
-          position: 'relative',
-          zIndex: 1
-        }}>
+        <Box 
+          data-tour-id="dashboard-header"
+          sx={{
+            p: 3,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+            minHeight: 80,
+            position: 'relative',
+            zIndex: 1
+          }}
+        >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Avatar
               sx={{
@@ -269,17 +272,20 @@ export const Dashboard: React.FC = () => {
         </Box>
       ) : (
         /* Desktop Header with Logo and Profile */
-        <Box sx={{
-          p: isCollapsed ? 2 : 3,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
-          minHeight: isCollapsed ? 80 : 100,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'relative',
-          zIndex: 1
-        }}>
+        <Box 
+          data-tour-id="dashboard-header"
+          sx={{
+            p: isCollapsed ? 2 : 3,
+            borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+            minHeight: isCollapsed ? 80 : 100,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
+            zIndex: 1
+          }}
+        >
           {!isCollapsed ? (
             <>
               <Box
@@ -359,24 +365,27 @@ export const Dashboard: React.FC = () => {
       )}
 
       {/* Enhanced Navigation Menu with Accordions */}
-      <Box sx={{ 
-        flex: 1, 
-        py: 2, 
-        px: isMobile ? 1.5 : 1, 
-        overflow: 'auto',
-        position: 'relative',
-        zIndex: 1,
-        '&::-webkit-scrollbar': {
-          width: '4px'
-        },
-        '&::-webkit-scrollbar-track': {
-          background: 'rgba(255, 255, 255, 0.05)'
-        },
-        '&::-webkit-scrollbar-thumb': {
-          background: 'rgba(255, 255, 255, 0.2)',
-          borderRadius: '2px'
-        }
-      }}>
+      <Box 
+        data-tour-id="sidebar-navigation"
+        sx={{ 
+          flex: 1, 
+          py: 2, 
+          px: isMobile ? 1.5 : 1, 
+          overflow: 'auto',
+          position: 'relative',
+          zIndex: 1,
+          '&::-webkit-scrollbar': {
+            width: '4px'
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'rgba(255, 255, 255, 0.05)'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: '2px'
+          }
+        }}
+      >
         <List sx={{ px: 0, py: 1 }}>
           {menuItems.map((item, index) => (
             <React.Fragment key={item.id}>
@@ -390,6 +399,7 @@ export const Dashboard: React.FC = () => {
                       arrow
                     >
                       <ListItemButton
+                        data-tour-id={item.id === 'template-builder' ? 'nav-templates' : item.id === 'workflow-builder' ? 'nav-workflows' : `nav-${item.id}`}
                         onClick={() => !isCollapsed ? handleAccordionToggle(item.id) : setIsCollapsed(false)}
                         sx={{
                           borderRadius: isMobile ? '14px' : '12px',
@@ -575,6 +585,7 @@ export const Dashboard: React.FC = () => {
                     arrow
                   >
                     <ListItemButton
+                      data-tour-id={`nav-${item.id}`}
                       onClick={() => handleMenuItemClick(item.id)}
                       selected={activeMenuItem === item.id}
                       sx={{
