@@ -70,67 +70,60 @@ export const templateBuilderTour: Tour = {
       placement: 'bottom'
     },
     {
-      id: 'template-tabs',
-      title: 'Step 2: Template Sections',
-      content: 'Use these tabs to navigate between "My Templates" (your custom templates) and "Template Library" (pre-built templates you can import).',
-      target: '.MuiTabs-root',
+      id: 'visit-type-selection',
+      title: 'Step 2: Select Visit Type',
+      content: 'First, select a visit type to work with. Each visit type can have its own set of templates. Click on any visit type card to continue.',
+      target: '.MuiCard-root',
+      placement: 'top'
+    },
+    {
+      id: 'create-visit-type',
+      title: 'Step 3: Create New Visit Type',
+      content: 'You can create new visit types by clicking the "Create Visit Type" button. This allows you to organize templates by different appointment types.',
+      target: 'button:contains("Create Visit Type")',
       placement: 'bottom'
     },
     {
+      id: 'template-list',
+      title: 'Step 4: View Templates',
+      content: 'After selecting a visit type, you\'ll see all templates associated with that visit type. Each template shows its name, specialty, and last modified date.',
+      target: '.MuiDataGrid-root',
+      placement: 'top'
+    },
+    {
       id: 'create-template-button',
-      title: 'Step 3: Creating a New Template',
-      content: 'Click this "Create Template" button to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
+      title: 'Step 5: Create New Template',
+      content: 'Click "Create Template" to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
       target: 'button:contains("Create Template")',
       placement: 'bottom'
     },
     {
-      id: 'template-cards',
-      title: 'Step 4: Template Management',
-      content: 'Your existing templates are displayed as cards. Each card shows template details and provides options to edit, duplicate, or delete templates.',
-      target: '.MuiGrid-item:first-child',
-      placement: 'top'
-    },
-    {
       id: 'template-filters',
-      title: 'Step 5: Filter and Search',
-      content: 'Use these filters to find specific templates by specialty, visit type, or template format. The search bar helps you quickly locate templates by name.',
-      target: '.MuiTextField-root:first-child',
+      title: 'Step 6: Filter Templates',
+      content: 'Use the specialty filter to find specific templates quickly. You can filter by specialty to narrow down your template list.',
+      target: '.MuiTextField-root',
       placement: 'bottom'
     },
     {
       id: 'template-actions',
-      title: 'Step 6: Template Actions',
-      content: 'Each template card has action buttons: Edit (pencil icon) to modify the template, Duplicate (copy icon) to create a copy, and Delete (trash icon) to remove it.',
-      target: '.MuiIconButton-root',
+      title: 'Step 7: Template Actions',
+      content: 'Each template in the table has action buttons: View (eye icon) to preview, Edit (pencil icon) to modify, and Copy (duplicate icon) to create a copy.',
+      target: '.MuiDataGrid-cell--withRenderer',
       placement: 'left'
     },
     {
-      id: 'visit-type-config',
-      title: 'Step 7: Visit Type Configuration',
-      content: 'Configure which visit types should automatically use each template. This helps streamline your workflow by auto-selecting the right template.',
-      target: 'button:contains("Configure Visit Types")',
+      id: 'template-editor',
+      title: 'Step 8: Template Editor',
+      content: 'When editing a template, you\'ll see the drag-and-drop editor where you can add sections, configure fields, and customize your template layout.',
+      target: '.MuiBox-root',
       placement: 'top'
     },
     {
-      id: 'template-library',
-      title: 'Step 8: Browse Template Library',
-      content: 'Switch to the Template Library tab to explore pre-built templates. You can import and customize these templates to speed up your workflow.',
-      target: '.MuiTab-root:last-child',
+      id: 'back-navigation',
+      title: 'Step 9: Navigation',
+      content: 'Use the back button to return to the visit type selection or previous screens. The header shows your current location in the builder.',
+      target: 'button[aria-label*="back"], .MuiIconButton-root',
       placement: 'bottom'
-    },
-    {
-      id: 'import-template',
-      title: 'Step 9: Import Templates',
-      content: 'Found a template you like? Click "Import Template" to add it to your collection. You can then customize it to fit your specific needs.',
-      target: 'button:contains("Import Template")',
-      placement: 'bottom'
-    },
-    {
-      id: 'template-preview',
-      title: 'Step 10: Preview Templates',
-      content: 'Use the preview feature to see how templates will look when generating clinical notes. This helps ensure formatting meets your requirements.',
-      target: 'button:contains("Preview")',
-      placement: 'left'
     }
   ]
 };
@@ -153,79 +146,72 @@ export const workflowBuilderTour: Tour = {
     {
       id: 'workflow-tabs',
       title: 'Step 2: Workflow Sections',
-      content: 'Navigate between "My Workflows" (your custom workflows), "Workflow Library" (pre-built workflows), and "Analytics" (performance tracking).',
+      content: 'The workflow builder has two main sections: "My Workflows" where you manage your custom workflows, and "Workflow Library" where you can browse and import pre-built workflows.',
       target: '.MuiTabs-root',
       placement: 'bottom'
     },
     {
+      id: 'my-workflows-view',
+      title: 'Step 3: My Workflows View',
+      content: 'In the My Workflows section, you can see all your created workflows. Each workflow shows its status, EHR system, and configuration details.',
+      target: '.MuiCard-root',
+      placement: 'top'
+    },
+    {
       id: 'create-workflow',
-      title: 'Step 3: Creating a New Workflow',
-      content: 'Start creating automated workflows by clicking this "Create Workflow" button. You can build custom automation rules for your practice.',
+      title: 'Step 4: Create New Workflow',
+      content: 'Click "Create Workflow" to start building a new automated workflow. You can configure triggers, actions, and EHR integrations.',
       target: 'button:contains("Create Workflow")',
       placement: 'bottom'
     },
     {
-      id: 'workflow-cards',
-      title: 'Step 4: Workflow Management',
-      content: 'Your workflows are displayed as cards showing their status (Active/Inactive), last run time, and success rates. Use the toggle to activate/deactivate workflows.',
-      target: '.MuiCard-root:first-child',
+      id: 'workflow-status',
+      title: 'Step 5: Workflow Status',
+      content: 'Each workflow has a status indicator showing whether it\'s active or inactive. You can toggle workflows on/off using the switch controls.',
+      target: '.MuiSwitch-root',
+      placement: 'left'
+    },
+    {
+      id: 'workflow-actions',
+      title: 'Step 6: Workflow Actions',
+      content: 'Use the action buttons to configure EHR settings, set up triggers, map templates to visit types, and configure provider-specific settings.',
+      target: '.MuiButton-root',
       placement: 'top'
     },
     {
-      id: 'ehr-integration',
-      title: 'Step 5: EHR Integration',
-      content: 'Configure your Electronic Health Records system integration. Select your EHR provider (Epic, Cerner, etc.) to ensure proper data flow.',
+      id: 'ehr-configuration',
+      title: 'Step 7: EHR Integration',
+      content: 'Configure your Electronic Health Records system integration. Select your EHR provider and set up connection parameters for seamless data flow.',
       target: 'button:contains("Configure EHR")',
       placement: 'bottom'
     },
     {
-      id: 'workflow-triggers',
-      title: 'Step 6: Set Up Triggers',
-      content: 'Define what events should start your workflow - patient check-in, appointment start, specific visit types, or custom triggers.',
-      target: 'button:contains("Add Trigger")',
-      placement: 'left'
-    },
-    {
       id: 'template-mapping',
-      title: 'Step 7: Template Mapping',
+      title: 'Step 8: Template Mapping',
       content: 'Map your templates to different visit types and providers. This ensures the right template is automatically selected for each patient encounter.',
       target: 'button:contains("Map Templates")',
       placement: 'top'
     },
     {
-      id: 'provider-settings',
-      title: 'Step 8: Provider Configuration',
-      content: 'Configure provider-specific settings including default templates, scheduling preferences, and documentation requirements for each clinician.',
-      target: 'button:contains("Provider Settings")',
-      placement: 'top'
+      id: 'workflow-library',
+      title: 'Step 9: Browse Library',
+      content: 'Switch to the Workflow Library to explore pre-built workflows for different EHR systems and specialties. Import and customize these workflows to accelerate your setup.',
+      target: '.MuiTab-root:last-child',
+      placement: 'bottom'
+    },
+    {
+      id: 'import-workflow',
+      title: 'Step 10: Import Workflows',
+      content: 'Found a workflow you like? Click "Import Workflow" to add it to your collection. You can then customize it to fit your specific practice needs.',
+      target: 'button:contains("Import Workflow")',
+      placement: 'bottom'
     },
     {
       id: 'workflow-testing',
-      title: 'Step 9: Test Your Workflow',
-      content: 'Use the testing feature to simulate your workflow with sample data. This helps ensure everything works correctly before going live.',
+      title: 'Step 11: Test Workflow',
+      content: 'Before activating a workflow, use the test feature to ensure it works correctly with sample data. This helps prevent issues in live environments.',
       target: 'button:contains("Test Workflow")',
       placement: 'bottom'
-    },
-    {
-      id: 'workflow-analytics',
-      title: 'Step 10: Monitor Performance',
-      content: 'Track your workflow\'s performance with detailed analytics. View success rates, processing times, and identify areas for improvement.',
-      target: '.MuiTab-root:contains("Analytics")',
-      placement: 'bottom'
-    },
-    {
-      id: 'workflow-library',
-      title: 'Step 11: Explore Workflow Library',
-      content: 'Browse pre-built workflows for different EHR systems and specialties. Import and customize these workflows to accelerate your setup.',
-      target: '.MuiTab-root:contains("Workflow Library")',
-      placement: 'bottom'
-    },
-    {
-      id: 'workflow-activation',
-      title: 'Step 12: Activate Your Workflow',
-      content: 'Once tested and configured, activate your workflow using this toggle. Your automation will start running according to your defined triggers.',
-      target: '.MuiSwitch-root',
-      placement: 'left'
     }
   ]
 };
