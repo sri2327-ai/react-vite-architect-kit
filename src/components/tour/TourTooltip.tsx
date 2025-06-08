@@ -187,43 +187,73 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       <Box sx={{ mt: 2, mb: 3 }}>
         <Box
           sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 2
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(2, 1fr)'
+            },
+            gap: { xs: 1.5, sm: 2 },
+            width: '100%'
           }}
         >
           {quickLinks.map((link, index) => (
-            <Box
+            <Card
               key={index}
               sx={{
-                width: 'calc(50% - 8px)',
-                minWidth: '140px'
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                height: 'fit-content',
+                minHeight: { xs: 'auto', sm: '100px' },
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: 4
+                }
               }}
+              onClick={link.action}
             >
-              <Card
-                sx={{
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: 4
-                  }
+              <CardContent 
+                sx={{ 
+                  p: { xs: 1.5, sm: 2 }, 
+                  textAlign: 'center',
+                  '&:last-child': { pb: { xs: 1.5, sm: 2 } }
                 }}
-                onClick={link.action}
               >
-                <CardContent sx={{ p: 2, textAlign: 'center' }}>
-                  <Box sx={{ color: 'primary.main', mb: 1 }}>
-                    {link.icon}
-                  </Box>
-                  <Typography variant="caption" fontWeight={600} display="block">
-                    {link.title}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
-                    {link.description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Box>
+                <Box sx={{ 
+                  color: 'primary.main', 
+                  mb: { xs: 0.5, sm: 1 },
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}>
+                  {React.cloneElement(link.icon, {
+                    sx: { fontSize: { xs: 20, sm: 24 } }
+                  })}
+                </Box>
+                <Typography 
+                  variant="caption" 
+                  fontWeight={600} 
+                  display="block"
+                  sx={{ 
+                    fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                    lineHeight: 1.2,
+                    mb: { xs: 0.5, sm: 0.5 }
+                  }}
+                >
+                  {link.title}
+                </Typography>
+                <Typography 
+                  variant="caption" 
+                  color="text.secondary" 
+                  sx={{ 
+                    fontSize: { xs: '0.65rem', sm: '0.7rem' },
+                    lineHeight: 1.3,
+                    display: { xs: 'block', sm: 'block' }
+                  }}
+                >
+                  {link.description}
+                </Typography>
+              </CardContent>
+            </Card>
           ))}
         </Box>
       </Box>
@@ -231,9 +261,10 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   };
 
   const getTooltipPosition = () => {
-    const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 32) : 
-                       isTablet ? Math.min(320, window.innerWidth - 32) : 350;
-    const tooltipHeight = step.id === 'quick-start-guide' ? 420 : 280;
+    const tooltipWidth = isMobile ? Math.min(320, window.innerWidth - 32) : 
+                       isTablet ? Math.min(400, window.innerWidth - 32) : 450;
+    const tooltipHeight = step.id === 'quick-start-guide' ? 
+                         (isMobile ? 500 : isTablet ? 480 : 450) : 280;
     const padding = isMobile ? 12 : 16;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
