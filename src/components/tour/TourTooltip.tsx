@@ -50,46 +50,24 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   const theme = useTheme();
   const { isMobile, isTablet, isMobileView } = useResponsive();
 
-  const navigateToRoute = (route: string) => {
-    console.log(`Tour: Navigating to route ${route}`);
-    window.location.hash = route;
-    window.location.reload();
-  };
-
-  const navigateToModule = (moduleId: string) => {
-    console.log(`Tour: Navigating to module ${moduleId}`);
+  const navigateToSection = (sectionId: string) => {
+    console.log(`Tour: Navigating to section ${sectionId}`);
     
-    // Enhanced navigation logic with multiple fallback attempts
-    const navigationSelectors = [
-      `[data-tour-id="${moduleId}"]`,
-      `[data-tour-id="nav-${moduleId}"]`,
-      `[data-testid="${moduleId}"]`,
-      `[data-testid="nav-${moduleId}"]`,
-      `[href*="${moduleId}"]`,
-      `.nav-${moduleId}`,
-      `#${moduleId}`,
-      `[aria-label*="${moduleId}"]`
+    // Find and click the navigation element
+    const navSelectors = [
+      `[data-tour-id="nav-${sectionId}"]`,
+      `[data-tour-id="${sectionId}"]`,
+      `button:contains("${sectionId}")`,
+      `[aria-label*="${sectionId}"]`
     ];
     
-    for (const selector of navigationSelectors) {
+    for (const selector of navSelectors) {
       const element = document.querySelector(selector);
       if (element) {
-        console.log(`Found navigation element with selector: ${selector}`);
+        console.log(`Found nav element with selector: ${selector}`);
         (element as HTMLElement).click();
         return true;
       }
-    }
-    
-    // If navigation fails, try direct routing
-    const routeMap: { [key: string]: string } = {
-      'template-builder': '/dashboard',
-      'workflow-builder': '/dashboard',
-      'profile': '/dashboard'
-    };
-    
-    if (routeMap[moduleId]) {
-      navigateToRoute(routeMap[moduleId]);
-      return true;
     }
     
     return false;
@@ -99,44 +77,40 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     const tourId = state.activeTour?.id;
     console.log(`Tour: Handling next step for tour ${tourId}, step ${step.id}`);
     
-    // Handle navigation based on tour type and step
+    // Handle special navigation steps
     if (tourId === 'template-builder-tour') {
       if (step.id === 'template-overview') {
-        console.log('Template builder tour: Navigating to template builder');
-        navigateToModule('template-builder');
+        // Navigate to template builder section
+        navigateToSection('templates');
         setTimeout(() => nextStep(), 1000);
         return;
       }
       
       if (step.id === 'visit-type-selection') {
-        // Auto-select first visit type to proceed
+        // Auto-select first visit type
         setTimeout(() => {
-          const visitTypeCard = document.querySelector('[data-tour-id="visit-type-selection"] .MuiCard-root') ||
+          const visitTypeCard = document.querySelector('.visit-type-card') ||
                                document.querySelector('.MuiCard-root');
           if (visitTypeCard) {
-            console.log('Template builder tour: Auto-selecting visit type');
+            console.log('Auto-selecting visit type');
             (visitTypeCard as HTMLElement).click();
-            setTimeout(() => nextStep(), 1500);
-          } else {
-            nextStep();
           }
+          setTimeout(() => nextStep(), 1500);
         }, 500);
         return;
       }
 
       if (step.id === 'edit-template') {
-        // Auto-click edit button on first template
+        // Auto-click edit button
         setTimeout(() => {
           const editButton = document.querySelector('[data-testid="edit-template-button"]') ||
                            document.querySelector('[aria-label*="edit"]') ||
-                           document.querySelector('.edit-button');
+                           document.querySelector('button[title*="Edit"]');
           if (editButton) {
-            console.log('Template builder tour: Auto-clicking edit template');
+            console.log('Auto-clicking edit template');
             (editButton as HTMLElement).click();
-            setTimeout(() => nextStep(), 1500);
-          } else {
-            nextStep();
           }
+          setTimeout(() => nextStep(), 1500);
         }, 500);
         return;
       }
@@ -144,8 +118,8 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     
     if (tourId === 'workflow-builder-tour') {
       if (step.id === 'workflow-overview') {
-        console.log('Workflow builder tour: Navigating to workflow builder');
-        navigateToModule('workflow-builder');
+        // Navigate to workflow builder section
+        navigateToSection('workflows');
         setTimeout(() => nextStep(), 1000);
         return;
       }
@@ -153,47 +127,29 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       if (step.id === 'workflow-library-switch') {
         // Auto-switch to library tab
         setTimeout(() => {
-          const libraryTab = document.querySelector('[data-tour-id="workflow-tabs"] [role="tab"]:last-child') ||
-                           document.querySelector('[role="tab"]:contains("Library")') ||
+          const libraryTab = document.querySelector('[role="tab"]:last-child') ||
                            document.querySelector('[aria-label*="library"]');
           if (libraryTab) {
-            console.log('Workflow tour: Auto-switching to library tab');
+            console.log('Auto-switching to library tab');
             (libraryTab as HTMLElement).click();
-            setTimeout(() => nextStep(), 500);
-          } else {
-            nextStep();
           }
+          setTimeout(() => nextStep(), 500);
         }, 500);
         return;
       }
     }
     
     if (tourId === 'welcome-tour') {
-      // For welcome tour, handle navigation but always continue
-      if (step.id === 'template-builder') {
-        console.log('Welcome tour: Attempting to navigate to template builder');
-        navigateToModule('template-builder');
-        setTimeout(() => nextStep(), 500);
-        return;
-      }
-      
-      if (step.id === 'workflow-builder') {
-        console.log('Welcome tour: Attempting to navigate to workflow builder');
-        navigateToModule('workflow-builder');
-        setTimeout(() => nextStep(), 500);
-        return;
-      }
-      
-      if (step.id === 'profile-settings') {
-        console.log('Welcome tour: Attempting to navigate to profile');
-        navigateToModule('profile');
+      // For welcome tour, just proceed without navigation
+      if (['template-builder', 'workflow-builder', 'profile-settings'].includes(step.id)) {
+        console.log('Welcome tour: Proceeding without navigation');
         setTimeout(() => nextStep(), 500);
         return;
       }
     }
 
-    // Default next step - always proceed for any unhandled step
-    console.log('Tour: Proceeding to next step (default handler)');
+    // Default next step
+    console.log('Tour: Proceeding to next step');
     nextStep();
   };
 
@@ -205,13 +161,13 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         title: 'Setup Workflows',
         description: 'Configure automated clinical workflows',
         icon: <WorkflowIcon />,
-        action: () => navigateToModule('workflow-builder')
+        action: () => navigateToSection('workflows')
       },
       {
         title: 'Build Templates',
         description: 'Create clinical note templates',
         icon: <TemplateIcon />,
-        action: () => navigateToModule('template-builder')
+        action: () => navigateToSection('templates')
       },
       {
         title: 'Access S10.AI',

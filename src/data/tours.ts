@@ -20,7 +20,7 @@ export const welcomeTour: Tour = {
       id: 'navigation-overview',
       title: 'Navigation Menu',
       content: 'Use this navigation menu to access different sections of the application. You can build templates, create workflows, and manage your profile.',
-      target: 'nav',
+      target: '[data-tour-id="sidebar-navigation"]',
       placement: 'right',
       spotlightClicks: true
     },
@@ -28,7 +28,7 @@ export const welcomeTour: Tour = {
       id: 'template-builder',
       title: 'Template Builder',
       content: 'Create and customize clinical note templates here. You can build templates from scratch or use our library of pre-built templates.',
-      target: 'a[href*="template"], button[aria-label*="template"], [class*="template"]',
+      target: '[data-tour-id="nav-templates"]',
       placement: 'right',
       spotlightClicks: true
     },
@@ -36,7 +36,7 @@ export const welcomeTour: Tour = {
       id: 'workflow-builder',
       title: 'Workflow Builder',
       content: 'Design automated workflows to streamline your clinical documentation process and integrate with your EHR system.',
-      target: 'a[href*="workflow"], button[aria-label*="workflow"], [class*="workflow"]',
+      target: '[data-tour-id="nav-workflows"]',
       placement: 'right',
       spotlightClicks: true
     },
@@ -44,7 +44,7 @@ export const welcomeTour: Tour = {
       id: 'profile-settings',
       title: 'Profile & Settings',
       content: 'Manage your account settings, security preferences, and data retention policies from your profile page.',
-      target: 'a[href*="profile"], button[aria-label*="profile"], [class*="profile"]',
+      target: '[data-tour-id="nav-profile"]',
       placement: 'right',
       spotlightClicks: true
     },
@@ -85,7 +85,7 @@ export const templateBuilderTour: Tour = {
       id: 'workflow-steps',
       title: 'Workflow Navigation',
       content: 'This shows your current progress in the template workflow. You can navigate between visit type selection and template management.',
-      target: '.MuiStepper-root, [role="progressbar"], .workflow-steps',
+      target: '.MuiStepper-root',
       placement: 'bottom',
       spotlightClicks: true
     },
@@ -93,7 +93,7 @@ export const templateBuilderTour: Tour = {
       id: 'visit-type-selection',
       title: 'Select Visit Type',
       content: 'Click "Next" and I\'ll automatically select a visit type for you to proceed to the template management screen.',
-      target: '.MuiCard-root, .visit-type-card, [role="button"]',
+      target: '.MuiCard-root',
       placement: 'top',
       spotlightClicks: true
     },
@@ -108,7 +108,7 @@ export const templateBuilderTour: Tour = {
       id: 'template-workflow-nav',
       title: 'Updated Workflow Steps',
       content: 'Notice how the workflow navigation has updated to show you\'re now in the Templates step. You can use the back button or click on Visit Type to return to the previous screen.',
-      target: '.MuiStepper-root, [role="progressbar"], .workflow-steps',
+      target: '.MuiStepper-root',
       placement: 'bottom',
       spotlightClicks: true
     },
@@ -116,7 +116,7 @@ export const templateBuilderTour: Tour = {
       id: 'create-template-action',
       title: 'Create New Template',
       content: 'Click the "Create Template" button to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
-      target: 'button:contains("Create"), [aria-label*="create"], .create-button',
+      target: 'button[aria-label*="Create Template"], button:contains("Create")',
       placement: 'bottom',
       spotlightClicks: true
     },
@@ -124,7 +124,7 @@ export const templateBuilderTour: Tour = {
       id: 'template-filters',
       title: 'Filter Templates',
       content: 'Use the specialty filter to find specific templates quickly. You can filter by specialty to narrow down your template list when you have multiple templates.',
-      target: '.MuiSelect-root, select, [role="combobox"]',
+      target: '.MuiSelect-root',
       placement: 'bottom',
       spotlightClicks: true
     },
@@ -132,7 +132,7 @@ export const templateBuilderTour: Tour = {
       id: 'template-list',
       title: 'Template Table',
       content: 'This table shows all templates for the selected visit type. Each template displays its name, specialty, and last modified date.',
-      target: '.MuiDataGrid-root, table, .template-table',
+      target: '.MuiDataGrid-root',
       placement: 'top',
       spotlightClicks: true
     },
@@ -140,7 +140,7 @@ export const templateBuilderTour: Tour = {
       id: 'template-actions-info',
       title: 'Template Actions',
       content: 'Each template has action buttons: View (eye icon) to preview, Edit (pencil icon) to modify, and Copy (duplicate icon) to create a copy.',
-      target: '.MuiDataGrid-root, table, .template-table',
+      target: '.MuiDataGrid-root',
       placement: 'left',
       spotlightClicks: true
     },
@@ -148,7 +148,7 @@ export const templateBuilderTour: Tour = {
       id: 'edit-template',
       title: 'Edit Template',
       content: 'Now let\'s explore template editing. Click the Edit button (pencil icon) on any template to open the template editor.',
-      target: '.MuiDataGrid-root, table, .template-table',
+      target: '.MuiDataGrid-root',
       placement: 'top',
       spotlightClicks: true
     },
@@ -163,7 +163,7 @@ export const templateBuilderTour: Tour = {
       id: 'add-section-button',
       title: 'Add Template Sections',
       content: 'Click the "Add Section" button to add new sections to your template. You can choose from various section types like paragraphs, checklists, and exam findings.',
-      target: 'button:contains("Add"), [aria-label*="add"], .add-button',
+      target: 'button[aria-label*="Add Section"], button:contains("Add")',
       placement: 'bottom',
       spotlightClicks: true
     }
@@ -189,7 +189,7 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-tabs',
       title: 'Workflow Sections',
       content: 'The workflow builder has two main sections: "My Workflows" where you manage your custom workflows, and "Workflow Library" where you can browse and import pre-built workflows.',
-      target: '.MuiTabs-root, [role="tablist"]',
+      target: '.MuiTabs-root',
       placement: 'bottom',
       spotlightClicks: true
     },
@@ -197,7 +197,7 @@ export const workflowBuilderTour: Tour = {
       id: 'my-workflows-view',
       title: 'My Workflows View',
       content: 'In the My Workflows section, you can see all your created workflows. Each workflow shows its status, EHR system, and configuration details.',
-      target: '.workflow-container, .MuiTabPanel-root',
+      target: '.MuiTabPanel-root:first-child',
       placement: 'top',
       spotlightClicks: true
     },
@@ -205,7 +205,7 @@ export const workflowBuilderTour: Tour = {
       id: 'create-workflow-button',
       title: 'Create New Workflow',
       content: 'Click "Create Workflow" to start building a new automated workflow. You can configure triggers, actions, and EHR integrations.',
-      target: 'button:contains("Create"), [aria-label*="create workflow"]',
+      target: 'button[aria-label*="Create Workflow"], button:contains("Create")',
       placement: 'bottom',
       spotlightClicks: true
     },
@@ -213,7 +213,7 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-status',
       title: 'Workflow Status',
       content: 'Each workflow has a status indicator showing whether it\'s active or inactive. You can toggle workflows on/off using the switch controls.',
-      target: '.MuiSwitch-root, [role="switch"]',
+      target: '.MuiSwitch-root',
       placement: 'left',
       spotlightClicks: true
     },
@@ -221,7 +221,7 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-actions',
       title: 'Workflow Actions',
       content: 'Use the action buttons to configure EHR settings, set up triggers, map templates to visit types, and configure provider-specific settings.',
-      target: '.MuiIconButton-root, [aria-label*="action"]',
+      target: '.MuiIconButton-root[aria-label*="action"]',
       placement: 'top',
       spotlightClicks: true
     },
@@ -245,7 +245,7 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-library-switch',
       title: 'Switch to Library',
       content: 'Now let\'s explore the Workflow Library. Click on the "Workflow Library" tab to see pre-built workflows you can import and customize.',
-      target: '.MuiTabs-root [role="tab"]:last-child, [aria-label*="library"]',
+      target: '.MuiTabs-root [role="tab"]:last-child',
       placement: 'bottom',
       spotlightClicks: true
     },
@@ -253,7 +253,7 @@ export const workflowBuilderTour: Tour = {
       id: 'workflow-library',
       title: 'Browse Library',
       content: 'The Workflow Library contains pre-built workflows for different EHR systems and specialties. You can import and customize these workflows to accelerate your setup.',
-      target: '.workflow-library, .MuiTabPanel-root:last-child',
+      target: '.MuiTabPanel-root:last-child',
       placement: 'bottom',
       spotlightClicks: true
     },
@@ -261,7 +261,7 @@ export const workflowBuilderTour: Tour = {
       id: 'import-workflow',
       title: 'Import Workflows',
       content: 'Found a workflow you like? Click "Import Workflow" to add it to your collection. You can then customize it to fit your specific practice needs.',
-      target: 'button:contains("Import"), [aria-label*="import"]',
+      target: 'button[aria-label*="Import"], button:contains("Import")',
       placement: 'bottom',
       spotlightClicks: true
     }
