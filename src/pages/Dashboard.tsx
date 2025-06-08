@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Box, 
@@ -46,6 +45,7 @@ import BillingHistory from '@/components/BillingHistory/BillingHistory';
 import WorkflowBuilder from '@/components/WorkflowBuilder/WorkflowBuilder';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useApiContext } from '@/contexts/ApiContext';
+import { HelpButton } from '@/components/tour';
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 72;
@@ -247,22 +247,25 @@ export const Dashboard: React.FC = () => {
             </Box>
           </Box>
           
-          <IconButton
-            onClick={() => setMobileOpen(false)}
-            sx={{
-              color: 'white',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              padding: 1.5,
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                transform: 'rotate(90deg)'
-              }
-            }}
-          >
-            <X size={20} />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <HelpButton />
+            <IconButton
+              onClick={() => setMobileOpen(false)}
+              sx={{
+                color: 'white',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                padding: 1.5,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  transform: 'rotate(90deg)'
+                }
+              }}
+            >
+              <X size={20} />
+            </IconButton>
+          </Box>
         </Box>
       ) : (
         /* Desktop Header with Logo and Profile */
@@ -694,7 +697,8 @@ export const Dashboard: React.FC = () => {
         )}
 
         {!isMobile && (
-          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1 }}>
+            <HelpButton />
             <Tooltip title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"} placement="top" arrow>
               <Paper
                 elevation={0}
