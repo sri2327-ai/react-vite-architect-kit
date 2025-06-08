@@ -1,3 +1,4 @@
+
 import { Tour } from '@/contexts/TourContext';
 
 export const welcomeTour: Tour = {
@@ -12,7 +13,7 @@ export const welcomeTour: Tour = {
       id: 'welcome-start',
       title: 'Welcome to S10.AI! 🎉',
       content: 'Let\'s take a quick tour to help you get started with your AI clinical assistant. This will only take a few minutes.',
-      target: '[data-tour-id="dashboard-header"]',
+      target: 'body',
       placement: 'bottom'
     },
     {
@@ -20,35 +21,40 @@ export const welcomeTour: Tour = {
       title: 'Navigation Menu',
       content: 'Use this navigation menu to access different sections of the application. You can build templates, create workflows, and manage your profile.',
       target: '[data-tour-id="sidebar-navigation"]',
-      placement: 'right'
+      placement: 'right',
+      spotlightClicks: true
     },
     {
       id: 'template-builder',
       title: 'Template Builder',
       content: 'Create and customize clinical note templates here. You can build templates from scratch or use our library of pre-built templates.',
       target: '[data-tour-id="nav-templates"]',
-      placement: 'right'
+      placement: 'right',
+      spotlightClicks: true
     },
     {
       id: 'workflow-builder',
       title: 'Workflow Builder',
       content: 'Design automated workflows to streamline your clinical documentation process and integrate with your EHR system.',
       target: '[data-tour-id="nav-workflows"]',
-      placement: 'right'
+      placement: 'right',
+      spotlightClicks: true
     },
     {
       id: 'profile-settings',
       title: 'Profile & Settings',
       content: 'Manage your account settings, security preferences, and data retention policies from your profile page.',
       target: '[data-tour-id="nav-profile"]',
-      placement: 'right'
+      placement: 'right',
+      spotlightClicks: true
     },
     {
       id: 'help-center',
       title: 'Need Help?',
       content: 'You can always restart this tour or access help documentation from the help icon in the navigation.',
       target: '[data-tour-id="help-button"]',
-      placement: 'left'
+      placement: 'left',
+      spotlightClicks: true
     }
   ]
 };
@@ -63,66 +69,73 @@ export const templateBuilderTour: Tour = {
   steps: [
     {
       id: 'template-overview',
-      title: 'Step 1: Template Builder Overview',
+      title: 'Template Builder Overview',
       content: 'Welcome to the Template Builder! Here you can create, edit, and manage your clinical note templates. This is your central hub for template management.',
-      target: '[data-tour-id="template-overview"]',
+      target: 'body',
       placement: 'bottom'
     },
     {
       id: 'workflow-steps',
-      title: 'Step 2: Workflow Navigation',
+      title: 'Workflow Navigation',
       content: 'This shows your current progress in the template workflow. You can navigate between visit type selection and template management.',
       target: '[data-tour-id="workflow-steps"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'visit-type-selection',
-      title: 'Step 3: Select Visit Type',
+      title: 'Select Visit Type',
       content: 'Click "Next" and I\'ll automatically select a visit type for you to proceed to the template management screen.',
       target: '[data-tour-id="visit-type-selection"]',
-      placement: 'top'
+      placement: 'top',
+      spotlightClicks: true
     },
     {
       id: 'template-management-screen',
-      title: 'Step 4: Template Management Screen',
+      title: 'Template Management Screen',
       content: 'Great! Now you\'re in the template management view. This screen shows all templates for your selected visit type and provides tools to create, edit, and organize them.',
       target: 'body',
       placement: 'bottom'
     },
     {
       id: 'template-workflow-nav',
-      title: 'Step 5: Updated Workflow Steps',
+      title: 'Updated Workflow Steps',
       content: 'Notice how the workflow navigation has updated to show you\'re now in the Templates step. You can use the back button or click on Visit Type to return to the previous screen.',
       target: '[data-tour-id="workflow-steps"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'create-template-action',
-      title: 'Step 6: Create New Template',
+      title: 'Create New Template',
       content: 'Click the "Create Template" button to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
       target: '[data-testid="create-template-button"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'template-filters',
-      title: 'Step 7: Filter Templates',
+      title: 'Filter Templates',
       content: 'Use the specialty filter to find specific templates quickly. You can filter by specialty to narrow down your template list when you have multiple templates.',
       target: '[data-tour-id="template-filters"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'template-list',
-      title: 'Step 8: Template Table',
+      title: 'Template Table',
       content: 'This table shows all templates for the selected visit type. Each template displays its name, specialty, and last modified date.',
       target: '[data-tour-id="template-list"]',
-      placement: 'top'
+      placement: 'top',
+      spotlightClicks: true
     },
     {
       id: 'template-actions-info',
-      title: 'Step 9: Template Actions',
+      title: 'Template Actions',
       content: 'Each template has action buttons: View (eye icon) to preview, Edit (pencil icon) to modify, and Copy (duplicate icon) to create a copy.',
       target: '[data-tour-id="template-list"]',
-      placement: 'left'
+      placement: 'left',
+      spotlightClicks: true
     }
   ]
 };
@@ -137,80 +150,90 @@ export const workflowBuilderTour: Tour = {
   steps: [
     {
       id: 'workflow-overview',
-      title: 'Step 1: Workflow Builder Overview',
+      title: 'Workflow Builder Overview',
       content: 'Welcome to the Workflow Builder! Here you can create automated workflows that integrate with your EHR system to streamline your clinical documentation process.',
-      target: '[data-tour-id="workflow-overview"]',
+      target: 'body',
       placement: 'bottom'
     },
     {
       id: 'workflow-tabs',
-      title: 'Step 2: Workflow Sections',
+      title: 'Workflow Sections',
       content: 'The workflow builder has two main sections: "My Workflows" where you manage your custom workflows, and "Workflow Library" where you can browse and import pre-built workflows.',
       target: '[data-tour-id="workflow-tabs"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'my-workflows-view',
-      title: 'Step 3: My Workflows View',
+      title: 'My Workflows View',
       content: 'In the My Workflows section, you can see all your created workflows. Each workflow shows its status, EHR system, and configuration details.',
       target: '[data-tour-id="my-workflows-view"]',
-      placement: 'top'
+      placement: 'top',
+      spotlightClicks: true
     },
     {
       id: 'create-workflow-button',
-      title: 'Step 4: Create New Workflow',
+      title: 'Create New Workflow',
       content: 'Click "Create Workflow" to start building a new automated workflow. You can configure triggers, actions, and EHR integrations.',
       target: '[data-testid="create-workflow"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'workflow-status',
-      title: 'Step 5: Workflow Status',
+      title: 'Workflow Status',
       content: 'Each workflow has a status indicator showing whether it\'s active or inactive. You can toggle workflows on/off using the switch controls.',
       target: '[data-tour-id="workflow-status"]',
-      placement: 'left'
+      placement: 'left',
+      spotlightClicks: true
     },
     {
       id: 'workflow-actions',
-      title: 'Step 6: Workflow Actions',
+      title: 'Workflow Actions',
       content: 'Use the action buttons to configure EHR settings, set up triggers, map templates to visit types, and configure provider-specific settings.',
       target: '[data-tour-id="workflow-actions"]',
-      placement: 'top'
+      placement: 'top',
+      spotlightClicks: true
     },
     {
       id: 'ehr-configuration',
-      title: 'Step 7: EHR Integration',
+      title: 'EHR Integration',
       content: 'Configure your Electronic Health Records system integration. Select your EHR provider and set up connection parameters for seamless data flow.',
       target: '[data-tour-id="ehr-config"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'template-mapping',
-      title: 'Step 8: Template Mapping',
+      title: 'Template Mapping',
       content: 'Map your templates to different visit types and providers. This ensures the right template is automatically selected for each patient encounter.',
       target: '[data-tour-id="template-mapping"]',
-      placement: 'top'
+      placement: 'top',
+      spotlightClicks: true
     },
     {
       id: 'workflow-library-switch',
-      title: 'Step 9: Switch to Library',
+      title: 'Switch to Library',
       content: 'Now let\'s explore the Workflow Library. Click on the "Workflow Library" tab to see pre-built workflows you can import and customize.',
       target: '[data-tour-id="workflow-tabs"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'workflow-library',
-      title: 'Step 10: Browse Library',
+      title: 'Browse Library',
       content: 'The Workflow Library contains pre-built workflows for different EHR systems and specialties. You can import and customize these workflows to accelerate your setup.',
       target: '[data-tour-id="workflow-library"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     },
     {
       id: 'import-workflow',
-      title: 'Step 11: Import Workflows',
+      title: 'Import Workflows',
       content: 'Found a workflow you like? Click "Import Workflow" to add it to your collection. You can then customize it to fit your specific practice needs.',
       target: '[data-testid="import-workflow"]',
-      placement: 'bottom'
+      placement: 'bottom',
+      spotlightClicks: true
     }
   ]
 };

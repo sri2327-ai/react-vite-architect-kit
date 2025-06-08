@@ -1,22 +1,22 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, Backdrop, useTheme, useMediaQuery } from '@mui/material';
+import { Box, Backdrop, useTheme } from '@mui/material';
 import { useTour } from '@/contexts/TourContext';
 import { TourTooltip } from './TourTooltip';
+import { useResponsive } from '@/hooks/useResponsive';
 
 interface TourOverlayProps {
   children?: React.ReactNode;
 }
 
 export const TourOverlay: React.FC<TourOverlayProps> = () => {
-  const { state, endTour, nextStep } = useTour();
+  const { state, endTour } = useTour();
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+  const { isMobile, isTablet } = useResponsive();
 
   const findTargetElement = useCallback(() => {
     if (!state.activeTour || !state.isRunning) return null;
@@ -36,7 +36,15 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       return document.body;
     }
 
-    const isSelector = currentStep.target.startsWith('[') || currentStep.target.startsWith('.') || currentStep.target.startsWith('#') || currentStep.target.includes(' ');
+    // Wait for DOM to be ready
+    if (document.readyState !== 'complete') {
+      return null;
+    }
+
+    const isSelector = currentStep.target.startsWith('[') || 
+                     currentStep.target.startsWith('.') || 
+                     currentStep.target.startsWith('#') || 
+                     currentStep.target.includes(' ');
     
     let element: HTMLElement | null = null;
     
@@ -50,18 +58,6 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     return element;
   }, [state.activeTour, state.currentStepIndex, state.isRunning]);
 
-  const closeMobileDrawer = useCallback(() => {
-    // Find and close mobile drawer if it's open
-    const mobileDrawerBackdrop = document.querySelector('.MuiDrawer-root .MuiBackdrop-root') as HTMLElement;
-    const mobileDrawerCloseButton = document.querySelector('[aria-label*="close"], [aria-label*="Close"]') as HTMLElement;
-    
-    if (mobileDrawerBackdrop) {
-      mobileDrawerBackdrop.click();
-    } else if (mobileDrawerCloseButton) {
-      mobileDrawerCloseButton.click();
-    }
-  }, []);
-
   const updateTargetRect = useCallback(() => {
     const element = findTargetElement();
     
@@ -71,49 +67,70 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       setTargetRect(rect);
       setRetryCount(0);
       
-      const behavior = isMobile ? 'auto' : 'smooth';
-      
-      // Only scroll if not targeting body
+      // Only scroll if not targeting body and element is not in viewport
       if (element !== document.body) {
-        element.scrollIntoView({ 
-          behavior, 
-          block: 'center', 
-          inline: 'center' 
-        });
+        const isInViewport = rect.top >= 0 && 
+                            rect.left >= 0 && 
+                            rect.bottom <= window.innerHeight && 
+                            rect.right <= window.innerWidth;
+        
+        if (!isInViewport) {
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center', 
+            inline: 'center' 
+          });
+        }
       }
     } else {
-      // Element not found, retry with a delay
-      if (retryCount < 3) { // Reduced retry attempts
+      // Element not found, retry with increasing delays
+      if (retryCount < 5) {
+        const delay = Math.min(1000, 200 * (retryCount + 1));
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
-        }, 500);
+        }, delay);
       } else {
-        // If we can't find the element after retries, end the tour
-        console.warn(`Tour target not found after retries: ${state.activeTour?.steps[state.currentStepIndex]?.target}`);
-        endTour();
+        // If we can't find the element after retries, use body as fallback
+        console.warn(`Tour target not found after retries, using body fallback: ${state.activeTour?.steps[state.currentStepIndex]?.target}`);
+        setTargetElement(document.body);
+        const rect = document.body.getBoundingClientRect();
+        setTargetRect(rect);
+        setRetryCount(0);
       }
     }
-  }, [findTargetElement, isMobile, retryCount, state.activeTour, state.currentStepIndex, endTour]);
+  }, [findTargetElement, retryCount, state.activeTour, state.currentStepIndex]);
 
   // Auto-close drawer when tour starts
   useEffect(() => {
     if (state.isRunning && (isMobile || isTablet)) {
-      // Small delay to ensure drawer is fully rendered before attempting to close
       const timer = setTimeout(() => {
-        closeMobileDrawer();
+        // Close mobile drawer
+        const mobileDrawerBackdrop = document.querySelector('.MuiDrawer-root .MuiBackdrop-root') as HTMLElement;
+        if (mobileDrawerBackdrop) {
+          mobileDrawerBackdrop.click();
+        }
       }, 100);
       
       return () => clearTimeout(timer);
     }
-  }, [state.isRunning, isMobile, isTablet, closeMobileDrawer]);
+  }, [state.isRunning, isMobile, isTablet]);
 
   useEffect(() => {
-    updateTargetRect();
+    // Wait for DOM to be ready before finding targets
+    if (document.readyState === 'complete') {
+      updateTargetRect();
+    } else {
+      const timer = setTimeout(updateTargetRect, 100);
+      return () => clearTimeout(timer);
+    }
   }, [updateTargetRect]);
 
   useEffect(() => {
     const handleResize = () => {
-      updateTargetRect();
+      if (targetElement && targetElement !== document.body) {
+        const rect = targetElement.getBoundingClientRect();
+        setTargetRect(rect);
+      }
     };
 
     const handleScroll = () => {
@@ -130,25 +147,7 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll, true);
     };
-  }, [targetElement, updateTargetRect]);
-
-  // Handle navigation for template builder tour step 3
-  const handleTourNavigation = useCallback(() => {
-    if (state.activeTour?.id === 'template-builder-tour' && state.isRunning) {
-      const currentStep = state.activeTour.steps[state.currentStepIndex];
-      
-      if (currentStep?.id === 'visit-type-selection') {
-        // Find the first visit type card and click it
-        const visitTypeCard = document.querySelector('[data-tour-id="visit-type-selection"] .MuiCard-root');
-        if (visitTypeCard) {
-          console.log('Template builder tour: Clicking first visit type card');
-          (visitTypeCard as HTMLElement).click();
-          return true;
-        }
-      }
-    }
-    return false;
-  }, [state.activeTour, state.currentStepIndex, state.isRunning]);
+  }, [targetElement]);
 
   if (!state.isRunning || !state.activeTour) {
     return null;
@@ -180,13 +179,13 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         open={true}
         sx={{
           zIndex: overlayZIndex,
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          pointerEvents: currentStep.spotlightClicks ? 'none' : 'auto'
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          pointerEvents: 'auto'
         }}
-        onClick={(e) => {
-          // Allow clicks to pass through when spotlightClicks is enabled
-          if (currentStep.spotlightClicks) {
-            e.stopPropagation();
+        onClick={() => {
+          // Allow backdrop clicks to close tour only if allowSkip is true
+          if (state.activeTour?.allowSkip) {
+            endTour();
           }
         }}
       />
@@ -210,8 +209,8 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
             border: `${isMobile ? 2 : 3}px solid`,
             borderColor: 'primary.main',
             borderRadius: isMobile ? 1 : 2,
-            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.6)`,
-            pointerEvents: 'none',
+            boxShadow: `0 0 0 9999px rgba(0, 0, 0, 0.5)`,
+            pointerEvents: currentStep.spotlightClicks ? 'none' : 'auto',
             zIndex: overlayZIndex + 1
           }}
         />
@@ -229,7 +228,6 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
         isTablet={isTablet}
         drawerOpen={false}
         customZIndex={tooltipZIndex}
-        onCustomNavigation={handleTourNavigation}
       />
     </Box>,
     document.body
