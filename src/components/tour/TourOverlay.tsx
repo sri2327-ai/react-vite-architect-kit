@@ -1,8 +1,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, Backdrop, useTheme, useMediaQuery, Paper, Typography, IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Box, Backdrop, useTheme, useMediaQuery } from '@mui/material';
 import { useTour } from '@/contexts/TourContext';
 import { TourTooltip } from './TourTooltip';
 
@@ -14,7 +13,6 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
   const { state, endTour } = useTour();
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
@@ -38,18 +36,17 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     return element;
   }, [state.activeTour, state.currentStepIndex, state.isRunning]);
 
-  const checkDrawerState = useCallback(() => {
-    if (!isMobile && !isTablet) {
-      setDrawerOpen(false);
-      return;
-    }
-
-    const mobileDrawer = document.querySelector('.MuiDrawer-root .MuiBackdrop-root');
-    const drawerPaper = document.querySelector('.MuiDrawer-root[style*="visibility: visible"]');
-    const isOpen = !!(mobileDrawer || drawerPaper);
+  const closeMobileDrawer = useCallback(() => {
+    // Find and close mobile drawer if it's open
+    const mobileDrawerBackdrop = document.querySelector('.MuiDrawer-root .MuiBackdrop-root') as HTMLElement;
+    const mobileDrawerCloseButton = document.querySelector('[aria-label*="close"], [aria-label*="Close"]') as HTMLElement;
     
-    setDrawerOpen(isOpen);
-  }, [isMobile, isTablet]);
+    if (mobileDrawerBackdrop) {
+      mobileDrawerBackdrop.click();
+    } else if (mobileDrawerCloseButton) {
+      mobileDrawerCloseButton.click();
+    }
+  }, []);
 
   const updateTargetRect = useCallback(() => {
     const element = findTargetElement();
@@ -59,47 +56,42 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
       const rect = element.getBoundingClientRect();
       setTargetRect(rect);
       
-      // Don't auto-scroll when drawer is open to avoid conflicts
-      if (!drawerOpen) {
-        const behavior = isMobile ? 'auto' : 'smooth';
-        element.scrollIntoView({ 
-          behavior, 
-          block: 'center', 
-          inline: 'center' 
-        });
-      }
+      const behavior = isMobile ? 'auto' : 'smooth';
+      element.scrollIntoView({ 
+        behavior, 
+        block: 'center', 
+        inline: 'center' 
+      });
     }
-  }, [findTargetElement, isMobile, drawerOpen]);
+  }, [findTargetElement, isMobile]);
+
+  // Auto-close drawer when tour starts
+  useEffect(() => {
+    if (state.isRunning && (isMobile || isTablet)) {
+      // Small delay to ensure drawer is fully rendered before attempting to close
+      const timer = setTimeout(() => {
+        closeMobileDrawer();
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [state.isRunning, isMobile, isTablet, closeMobileDrawer]);
 
   useEffect(() => {
     updateTargetRect();
-    checkDrawerState();
-  }, [updateTargetRect, checkDrawerState]);
+  }, [updateTargetRect]);
 
   useEffect(() => {
     const handleResize = () => {
       updateTargetRect();
-      checkDrawerState();
     };
 
     const handleScroll = () => {
-      if (targetElement && !drawerOpen) {
+      if (targetElement) {
         const rect = targetElement.getBoundingClientRect();
         setTargetRect(rect);
       }
     };
-
-    const handleMutation = () => {
-      checkDrawerState();
-    };
-
-    const observer = new MutationObserver(handleMutation);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['style', 'class']
-    });
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleScroll, true);
@@ -107,94 +99,15 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll, true);
-      observer.disconnect();
     };
-  }, [targetElement, updateTargetRect, checkDrawerState, drawerOpen]);
+  }, [targetElement, updateTargetRect]);
 
   if (!state.isRunning || !state.activeTour) {
     return null;
   }
 
   const currentStep = state.activeTour.steps[state.currentStepIndex];
-  if (!currentStep) return null;
-
-  // For mobile/tablet with drawer open, use a full-screen overlay with instructions
-  if ((isMobile || isTablet) && drawerOpen) {
-    return createPortal(
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 9999,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 2
-        }}
-      >
-        <Paper
-          elevation={24}
-          sx={{
-            maxWidth: 400,
-            width: '100%',
-            p: 3,
-            borderRadius: 3,
-            textAlign: 'center',
-            position: 'relative'
-          }}
-        >
-          <IconButton
-            size="small"
-            onClick={endTour}
-            sx={{ 
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              color: 'text.secondary'
-            }}
-          >
-            <Close fontSize="small" />
-          </IconButton>
-          
-          <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main', mb: 2 }}>
-            {currentStep.title}
-          </Typography>
-          
-          <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}>
-            {currentStep.content}
-          </Typography>
-
-          <Box
-            sx={{
-              p: 2,
-              backgroundColor: 'warning.light',
-              borderRadius: 2,
-              mb: 2
-            }}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'warning.dark' }}>
-              💡 Close the menu to continue with the interactive tour
-            </Typography>
-          </Box>
-
-          <Typography variant="caption" sx={{ 
-            color: 'text.secondary',
-            display: 'block'
-          }}>
-            Step {state.currentStepIndex + 1} of {state.activeTour.steps.length}
-          </Typography>
-        </Paper>
-      </Box>,
-      document.body
-    );
-  }
-
-  // For desktop or mobile/tablet without drawer, use the normal spotlight approach
-  if (!targetElement || !targetRect) {
+  if (!currentStep || !targetElement || !targetRect) {
     return null;
   }
 
