@@ -80,7 +80,7 @@ export const templateBuilderTour: Tour = {
       id: 'create-visit-type',
       title: 'Step 3: Create New Visit Type',
       content: 'You can create new visit types by clicking the "Create Visit Type" button. This allows you to organize templates by different appointment types.',
-      target: '[data-testid="create-visit-type-button"]',
+      target: '.MuiButton-contained',
       placement: 'bottom'
     },
     {
@@ -94,7 +94,7 @@ export const templateBuilderTour: Tour = {
       id: 'create-template-button',
       title: 'Step 5: Create New Template',
       content: 'Click "Create Template" to start building a new clinical note template. You\'ll have multiple creation options to choose from.',
-      target: '[data-testid="create-template-button"]',
+      target: '.MuiButton-root:has-text("Create Template"), .MuiButton-contained:first-of-type',
       placement: 'bottom'
     },
     {
@@ -122,7 +122,7 @@ export const templateBuilderTour: Tour = {
       id: 'back-navigation',
       title: 'Step 9: Navigation',
       content: 'Use the back button to return to the visit type selection or previous screens. The header shows your current location in the builder.',
-      target: '.MuiIconButton-root',
+      target: '.MuiIconButton-root:first-of-type',
       placement: 'bottom'
     }
   ]
@@ -161,7 +161,7 @@ export const workflowBuilderTour: Tour = {
       id: 'create-workflow',
       title: 'Step 4: Create New Workflow',
       content: 'Click "Create Workflow" to start building a new automated workflow. You can configure triggers, actions, and EHR integrations.',
-      target: '[data-testid="create-workflow-button"]',
+      target: '.MuiButton-contained',
       placement: 'bottom'
     },
     {
@@ -182,14 +182,14 @@ export const workflowBuilderTour: Tour = {
       id: 'ehr-configuration',
       title: 'Step 7: EHR Integration',
       content: 'Configure your Electronic Health Records system integration. Select your EHR provider and set up connection parameters for seamless data flow.',
-      target: '[data-testid="configure-ehr-button"]',
+      target: '.MuiButton-outlined',
       placement: 'bottom'
     },
     {
       id: 'template-mapping',
       title: 'Step 8: Template Mapping',
       content: 'Map your templates to different visit types and providers. This ensures the right template is automatically selected for each patient encounter.',
-      target: '[data-testid="map-templates-button"]',
+      target: '.MuiButton-text',
       placement: 'top'
     },
     {
@@ -203,14 +203,14 @@ export const workflowBuilderTour: Tour = {
       id: 'import-workflow',
       title: 'Step 10: Import Workflows',
       content: 'Found a workflow you like? Click "Import Workflow" to add it to your collection. You can then customize it to fit your specific practice needs.',
-      target: '[data-testid="import-workflow-button"]',
+      target: '.MuiButton-contained:contains("Import")',
       placement: 'bottom'
     },
     {
       id: 'workflow-testing',
       title: 'Step 11: Test Workflow',
       content: 'Before activating a workflow, use the test feature to ensure it works correctly with sample data. This helps prevent issues in live environments.',
-      target: '[data-testid="test-workflow-button"]',
+      target: '.MuiButton-outlined:contains("Test")',
       placement: 'bottom'
     }
   ]
