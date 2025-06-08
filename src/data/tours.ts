@@ -79,7 +79,7 @@ export const templateBuilderTour: Tour = {
     {
       id: 'visit-type-selection',
       title: 'Step 3: Select Visit Type',
-      content: 'First, select a visit type to work with. Each visit type can have its own set of templates. Click on any visit type card to continue - the tour will automatically advance when you navigate.',
+      content: 'Now click on any visit type card to proceed to the template management screen. The tour will automatically advance once you make a selection.',
       target: '[data-tour-id="visit-type-selection"]',
       placement: 'top',
       spotlightClicks: true

@@ -132,43 +132,27 @@ export const TourOverlay: React.FC<TourOverlayProps> = () => {
     if (state.activeTour?.id === 'template-builder-tour' && state.isRunning) {
       const currentStep = state.activeTour.steps[state.currentStepIndex];
       
-      // For step 3 (visit-type-selection), wait for user to actually select a visit type
+      // For step 3 (visit-type-selection), listen for clicks on visit type cards
       if (currentStep?.id === 'visit-type-selection') {
-        // Listen for URL changes or navigation that indicates we've moved to templates
-        const checkForNavigation = () => {
-          // Check if we're now on a template management screen (back button should be visible)
-          const backButton = document.querySelector('[data-testid="back-button"]');
-          const templatesList = document.querySelector('[data-tour-id="template-list"]');
-          const workflowSteps = document.querySelector('[data-tour-id="workflow-steps"]');
+        const handleVisitTypeClick = (event: Event) => {
+          const target = event.target as HTMLElement;
+          // Check if clicked element is a visit type card or inside one
+          const visitTypeCard = target.closest('[data-testid*="visit-type-card"], .MuiCard-root, .visit-type-card');
           
-          if (backButton || templatesList || (workflowSteps && workflowSteps.textContent?.includes('Templates'))) {
-            console.log('Template builder tour: Navigation detected, advancing to next step');
-            nextStep();
-            return true;
+          if (visitTypeCard) {
+            console.log('Template builder tour: Visit type card clicked, advancing tour');
+            // Small delay to allow navigation to complete
+            setTimeout(() => {
+              nextStep();
+            }, 1000);
           }
-          return false;
         };
 
-        // Check immediately
-        if (checkForNavigation()) {
-          return;
-        }
-
-        // Set up interval to check for navigation
-        const navigationCheckInterval = setInterval(() => {
-          if (checkForNavigation()) {
-            clearInterval(navigationCheckInterval);
-          }
-        }, 500);
-
-        // Cleanup after 15 seconds to prevent infinite checking
-        const cleanup = setTimeout(() => {
-          clearInterval(navigationCheckInterval);
-        }, 15000);
-
+        // Listen for clicks on the document
+        document.addEventListener('click', handleVisitTypeClick);
+        
         return () => {
-          clearInterval(navigationCheckInterval);
-          clearTimeout(cleanup);
+          document.removeEventListener('click', handleVisitTypeClick);
         };
       }
     }
