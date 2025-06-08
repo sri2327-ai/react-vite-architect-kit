@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Box,
@@ -184,7 +183,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     ];
 
     return (
-      <Box sx={{ mt: 2, mb: 3 }}>
+      <Box sx={{ mt: 1.5, mb: 2 }}>
         <Box
           sx={{
             display: 'grid',
@@ -193,7 +192,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
               sm: 'repeat(2, 1fr)',
               md: 'repeat(2, 1fr)'
             },
-            gap: { xs: 1.5, sm: 2 },
+            gap: { xs: 1, sm: 1.5 },
             width: '100%'
           }}
         >
@@ -204,7 +203,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                 cursor: 'pointer',
                 transition: 'all 0.2s',
                 height: 'fit-content',
-                minHeight: { xs: 'auto', sm: '100px' },
+                minHeight: { xs: 'auto', sm: '90px' },
                 '&:hover': {
                   transform: 'translateY(-2px)',
                   boxShadow: 4
@@ -214,19 +213,19 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
             >
               <CardContent 
                 sx={{ 
-                  p: { xs: 1.5, sm: 2 }, 
+                  p: { xs: 1, sm: 1.5 }, 
                   textAlign: 'center',
-                  '&:last-child': { pb: { xs: 1.5, sm: 2 } }
+                  '&:last-child': { pb: { xs: 1, sm: 1.5 } }
                 }}
               >
                 <Box sx={{ 
                   color: 'primary.main', 
-                  mb: { xs: 0.5, sm: 1 },
+                  mb: { xs: 0.5, sm: 0.5 },
                   display: 'flex',
                   justifyContent: 'center'
                 }}>
                   {React.cloneElement(link.icon, {
-                    sx: { fontSize: { xs: 20, sm: 24 } }
+                    sx: { fontSize: { xs: 18, sm: 22 } }
                   })}
                 </Box>
                 <Typography 
@@ -234,9 +233,9 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                   fontWeight={600} 
                   display="block"
                   sx={{ 
-                    fontSize: { xs: '0.75rem', sm: '0.8rem' },
+                    fontSize: { xs: '0.7rem', sm: '0.75rem' },
                     lineHeight: 1.2,
-                    mb: { xs: 0.5, sm: 0.5 }
+                    mb: { xs: 0.25, sm: 0.5 }
                   }}
                 >
                   {link.title}
@@ -245,8 +244,8 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                   variant="caption" 
                   color="text.secondary" 
                   sx={{ 
-                    fontSize: { xs: '0.65rem', sm: '0.7rem' },
-                    lineHeight: 1.3,
+                    fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                    lineHeight: 1.2,
                     display: { xs: 'block', sm: 'block' }
                   }}
                 >
@@ -264,7 +263,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     const tooltipWidth = isMobile ? Math.min(320, window.innerWidth - 32) : 
                        isTablet ? Math.min(400, window.innerWidth - 32) : 450;
     const tooltipHeight = step.id === 'quick-start-guide' ? 
-                         (isMobile ? 500 : isTablet ? 480 : 450) : 280;
+                         (isMobile ? 420 : isTablet ? 400 : 450) : 280;
     const padding = isMobile ? 12 : 16;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
@@ -292,7 +291,12 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
     if (isMobileView) {
       left = Math.max(16, Math.min(left, viewportWidth - tooltipWidth - 16));
       
-      if (targetRect.bottom + tooltipHeight + padding > viewportHeight - 50) {
+      // Special handling for quick start guide on mobile
+      if (step.id === 'quick-start-guide') {
+        // Center vertically with more space for buttons
+        const availableHeight = viewportHeight - 100; // Leave space for system UI
+        top = Math.max(20, (availableHeight - tooltipHeight) / 2);
+      } else if (targetRect.bottom + tooltipHeight + padding > viewportHeight - 50) {
         if (targetRect.top - tooltipHeight - padding > 50) {
           top = targetRect.top - tooltipHeight - padding;
         } else {
@@ -337,7 +341,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         width: position.width,
         maxWidth: 'calc(100vw - 32px)',
         maxHeight: 'calc(100vh - 100px)',
-        p: isMobile ? 2.5 : 3,
+        p: isMobile ? 2 : 2.5,
         zIndex: customZIndex,
         pointerEvents: 'auto',
         borderRadius: isMobile ? 2 : 3,
@@ -353,7 +357,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'flex-start', 
-        mb: isMobile ? 2 : 2.5 
+        mb: isMobile ? 1.5 : 2 
       }}>
         <Typography 
           variant={isMobile ? "subtitle1" : "h6"} 
@@ -385,7 +389,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 
       {/* Progress bar */}
       {showProgress && (
-        <Box sx={{ mb: isMobile ? 2 : 2.5 }}>
+        <Box sx={{ mb: isMobile ? 1.5 : 2 }}>
           <LinearProgress
             variant="determinate"
             value={(stepIndex + 1) / totalSteps * 100}
@@ -418,7 +422,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         variant="body2" 
         color="text.secondary" 
         sx={{ 
-          mb: isMobile ? 2.5 : 3, 
+          mb: isMobile ? 2 : 2.5, 
           lineHeight: 1.6,
           fontSize: isMobile ? '0.9rem' : '0.95rem'
         }}
