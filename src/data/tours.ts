@@ -166,7 +166,7 @@ export const templateBuilderTour: Tour = {
 export const workflowBuilderTour: Tour = {
   id: 'workflow-builder-tour',
   name: 'Workflow Builder Complete Guide',
-  description: 'Learn how to import and configure automated clinical workflows step by step',
+  description: 'Learn how to create automated clinical workflows step by step',
   autoStart: false,
   showProgress: true,
   allowSkip: true,
@@ -174,46 +174,14 @@ export const workflowBuilderTour: Tour = {
     {
       id: 'workflow-overview',
       title: 'Workflow Builder Overview',
-      content: 'Welcome to the Workflow Builder! Here you can import pre-built workflows from our library and configure them to integrate with your EHR system.',
+      content: 'Welcome to the Workflow Builder! Here you can create automated workflows that integrate with your EHR system to streamline your clinical documentation process.',
       target: 'body',
       placement: 'bottom'
     },
     {
       id: 'workflow-tabs',
       title: 'Workflow Sections',
-      content: 'The workflow builder has two main sections: "My Workflows" where you manage your imported and configured workflows, and "Workflow Library" where you can browse and import pre-built workflows.',
-      target: '[data-tour-id="workflow-tabs"]',
-      placement: 'bottom',
-      spotlightClicks: true
-    },
-    {
-      id: 'workflow-library-start',
-      title: 'Start with the Library',
-      content: 'To get started, you need to import workflows from the library first. Let\'s switch to the "Workflow Library" tab to browse available workflows.',
-      target: '[data-tour-id="workflow-tabs"]',
-      placement: 'bottom',
-      spotlightClicks: true
-    },
-    {
-      id: 'workflow-library',
-      title: 'Browse Workflow Library',
-      content: 'The Workflow Library contains pre-built workflows for different EHR systems and specialties. These workflows are professionally designed and ready to import into your collection.',
-      target: '[data-tour-id="workflow-library"]',
-      placement: 'bottom',
-      spotlightClicks: true
-    },
-    {
-      id: 'import-workflow',
-      title: 'Import a Workflow',
-      content: 'Found a workflow that fits your needs? Click "Import Workflow" to add it to your collection. This will make it available in your "My Workflows" section for configuration.',
-      target: '[data-testid="import-workflow"]',
-      placement: 'bottom',
-      spotlightClicks: true
-    },
-    {
-      id: 'switch-to-my-workflows',
-      title: 'View Imported Workflows',
-      content: 'Great! Now let\'s go back to "My Workflows" to see your imported workflow and learn how to configure it.',
+      content: 'The workflow builder has two main sections: "My Workflows" where you manage your custom workflows, and "Workflow Library" where you can browse and import pre-built workflows.',
       target: '[data-tour-id="workflow-tabs"]',
       placement: 'bottom',
       spotlightClicks: true
@@ -221,22 +189,30 @@ export const workflowBuilderTour: Tour = {
     {
       id: 'my-workflows-view',
       title: 'My Workflows View',
-      content: 'In the My Workflows section, you can see all your imported workflows. Each workflow shows its status, EHR system, and configuration details.',
+      content: 'In the My Workflows section, you can see all your created workflows. Each workflow shows its status, EHR system, and configuration details.',
       target: '[data-tour-id="my-workflows-view"]',
       placement: 'top',
       spotlightClicks: true
     },
     {
+      id: 'create-workflow-button',
+      title: 'Create New Workflow',
+      content: 'Click "Create Workflow" to start building a new automated workflow. You can configure triggers, actions, and EHR integrations.',
+      target: '[data-testid="create-workflow"]',
+      placement: 'bottom',
+      spotlightClicks: true
+    },
+    {
       id: 'workflow-status',
       title: 'Workflow Status',
-      content: 'Each workflow has a status indicator showing whether it\'s active or inactive. Newly imported workflows start as "draft" until you configure them.',
+      content: 'Each workflow has a status indicator showing whether it\'s active or inactive. You can toggle workflows on/off using the switch controls.',
       target: '[data-tour-id="workflow-status"]',
       placement: 'left',
       spotlightClicks: true
     },
     {
       id: 'workflow-actions',
-      title: 'Configure Your Workflow',
+      title: 'Workflow Actions',
       content: 'Use the action buttons to configure EHR settings, set up triggers, map templates to visit types, and configure provider-specific settings.',
       target: '[data-tour-id="workflow-actions"]',
       placement: 'top',
@@ -259,11 +235,27 @@ export const workflowBuilderTour: Tour = {
       spotlightClicks: true
     },
     {
-      id: 'workflow-activation',
-      title: 'Activate Your Workflow',
-      content: 'Once configured, you can activate your workflow using the status toggle. Active workflows will automatically execute based on your configured triggers.',
-      target: '[data-tour-id="workflow-status"]',
-      placement: 'left',
+      id: 'workflow-library-switch',
+      title: 'Switch to Library',
+      content: 'Now let\'s explore the Workflow Library. Click on the "Workflow Library" tab to see pre-built workflows you can import and customize.',
+      target: '[data-tour-id="workflow-tabs"]',
+      placement: 'bottom',
+      spotlightClicks: true
+    },
+    {
+      id: 'workflow-library',
+      title: 'Browse Library',
+      content: 'The Workflow Library contains pre-built workflows for different EHR systems and specialties. You can import and customize these workflows to accelerate your setup.',
+      target: '[data-tour-id="workflow-library"]',
+      placement: 'bottom',
+      spotlightClicks: true
+    },
+    {
+      id: 'import-workflow',
+      title: 'Import Workflows',
+      content: 'Found a workflow you like? Click "Import Workflow" to add it to your collection. You can then customize it to fit your specific practice needs.',
+      target: '[data-testid="import-workflow"]',
+      placement: 'bottom',
       spotlightClicks: true
     }
   ]

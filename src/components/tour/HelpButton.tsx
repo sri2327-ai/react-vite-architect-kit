@@ -129,6 +129,3 @@ export const HelpButton: React.FC = () => {
     </>
   );
 };
-
-// Also provide a default export for compatibility
-export default HelpButton;
